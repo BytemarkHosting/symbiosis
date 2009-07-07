@@ -13,6 +13,10 @@ class TestDovecot < Test::Unit::TestCase
 
     @mailbox = @domain.add_mailbox("test")
     @mailbox.password = Bytemark::Vhost::Test.random_string
+    
+    @mailbox_crypt = @domain.add_mailbox("test_crypt")
+    @mailbox_crypt.password = Bytemark::Vhost::Test.random_string
+    @mailbox_crypt.crypt_password 
 
     Net::IMAP.debug = true if $DEBUG
   end
@@ -52,6 +56,15 @@ class TestDovecot < Test::Unit::TestCase
     end
   end
 
+  def test_imap_auth_login_crypt
+    assert_nothing_raised do
+      imap = Net::IMAP.new('localhost', 143, false) 
+      imap.authenticate('LOGIN', @mailbox_crypt.username, @mailbox_crypt.uncrypted_password)
+      imap.logout
+      imap.disconnect unless imap.disconnected?
+    end
+  end
+
   def test_imap_auth_tls
     # TODO: not implemented by net/imap library
   end
@@ -70,6 +83,15 @@ class TestDovecot < Test::Unit::TestCase
       pop = Net::POP.new('localhost', 110)
       pop.set_debug_output STDOUT if $DEBUG
       pop.start(@mailbox.username, @mailbox.password)
+      pop.finish
+    end
+  end
+
+  def test_pop3_auth_crypt
+    assert_nothing_raised do
+      pop = Net::POP.new('localhost', 110)
+      pop.set_debug_output STDOUT if $DEBUG
+      pop.start(@mailbox_crypt.username, @mailbox_crypt.uncrypted_password)
       pop.finish
     end
   end

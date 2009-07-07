@@ -10,4 +10,5 @@ require 'test/unit'
 require 'tc_dovecot'
 require 'tc_ftp'
 require 'tc_http'
+require 'tc_smtp'
 

@@ -11,7 +11,7 @@ module Bytemark
     module Test
       class Mailbox  
 
-        attr_reader :user, :domain
+        attr_reader :user, :domain, :uncrypted_password
 
         def initialize(user, domain)
           raise ArgumentError, "user must be a string" unless user.is_a?(String)
@@ -19,6 +19,8 @@ module Bytemark
 
           raise ArgumentError, "domain must be a string" unless domain.is_a?(String)
           @domain = domain
+
+	  @uncrypted_password = nil
         end
 
         def username
@@ -42,6 +44,13 @@ module Bytemark
         end
 
         def password=(pw)
+          @uncrypted_password = pw
+          Bytemark::Vhost::Test.set_param("password", pw, self.directory)
+        end
+
+        def crypt_password
+          salt = ["a".."z","A".."Z","0".."9",".","/"].collect{|r| r.to_a}.flatten.values_at(rand(64), rand(64)).join
+          pw = "{CRYPT}"+@uncrypted_password.crypt(salt)
           Bytemark::Vhost::Test.set_param("password", pw, self.directory)
         end
 

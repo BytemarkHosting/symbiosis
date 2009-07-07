@@ -1,3 +1,11 @@
+bytemark-vhost-test (20090707175721) jaunty; urgency=low
+
+  * Updated lib/bytemark/vhost/test/mailbox to support crypt'd passwords
+  * Added crypted password test to tc_dovecot
+  * Added tc_smtp
+
+ -- Patrick J. Cherry <patrick@bytemark.co.uk>  Tue, 07 Jul 2009 17:57:21 +0100
+
 bytemark-vhost-test (20090707153244) stable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches

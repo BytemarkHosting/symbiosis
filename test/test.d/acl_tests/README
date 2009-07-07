@@ -1,0 +1,52 @@
+Format
+======
+
+ * The first line should be the IP that you want the connection to
+   originate from.
+ * Then any line that doesn't consist solely of three digits will be considered
+   something to be passed as a command or data.
+ * The file will be read and "exim4 -bh <ip address>"will be used to simulate an
+   SMTP transaction, and the result of each command will be compared to the three
+   digit code following the line.
+
+Example
+=======
+
+A file containing:
+
+---8<---------------------------------
+127.0.0.1
+EHLO localhost
+250
+MAIL FROM:<test@test.com>
+250
+RCPT TO:<test@test2.com>
+250
+DATA
+330
+Blah
+Blah
+Blah
+.
+350
+QUIT
+221
+---8<---------------------------------
+
+This will do the following:
+
+ * Connect "from" 127.0.0.1
+ * Wait for the first 220 (this is part of the test and is not configurable)
+ * Issue "EHLO localhost"
+ * Expect to get a 250 code back
+ * Issue "MAIL FROM:<test@test.com>"
+ * Expect to get a 250 code back
+ * and so on.
+
+Bugs
+====
+
+ * No STARTTLS support
+ * Cannot test to see if the connection has been dropped.
+
+

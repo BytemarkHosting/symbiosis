@@ -1,0 +1,15 @@
+# This file tests a connection from another non-black/whitelisted machine
+192.168.2.2
+220
+EHLO remote.domain
+250
+# First test mail with a from address of a non-black/whitelisted sender/domain
+MAIL FROM:<anyone@remote.domain>
+250 
+# We *do* want to accept mail from this IP
+RCPT TO:<local.user@local.domain>
+250
+RSET
+250
+QUIT
+221

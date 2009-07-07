@@ -1,3 +1,9 @@
+bytemark-vhost-email (20090707175243) stable; urgency=low
+
+  * Updated checkpassword to have a better regex
+
+ -- Patrick J. Cherry <patrick@bytemark.co.uk>  Tue, 07 Jul 2009 17:52:44 +0100
+
 bytemark-vhost-email (20090707161820) stable; urgency=low
 
   * Removed mention of the Bytemark antispam servers
