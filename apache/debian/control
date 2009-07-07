@@ -3,7 +3,7 @@ Section: web
 Priority: optional
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 4.2.20), apache2-dev
-Standards-Version: 3.7.2
+Standards-Version: 3.8.0
 
 Package: libapache2-mod-vhost-bytemark
 Architecture: any

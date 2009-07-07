@@ -4,7 +4,7 @@ Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 4.0.0)
-Standards-Version: 3.7.2
+Standards-Version: 3.8.0
 
 Package: bytemark-vhost-tinydns
 Architecture: all
