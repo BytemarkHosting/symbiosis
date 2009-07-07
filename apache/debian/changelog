@@ -1,3 +1,9 @@
+libapache2-mod-vhost-bytemark (20090707164326) stable; urgency=low
+
+  * Added bytemark/info page with restrictive ACL
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 16:43:26 +0000
+
 libapache2-mod-vhost-bytemark (20090707153244) stable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches

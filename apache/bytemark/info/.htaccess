@@ -1,0 +1,6 @@
+order deny,allow
+deny from all
+allow from 127.0.0.1
+allow from 89.16.168.152
+allow from 80.68.86.219
+allow from 80.68.83.98
