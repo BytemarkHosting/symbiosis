@@ -79,13 +79,18 @@ parseCommandLineArguments();
 #
 #  Find the (primary) IP address of the system.
 #
-my $ip = findHostDetails();
+my $ip = shift;
+
+if ( !defined( $ip ) )
+{
+    $ip = findHostDetails();
+}
 
 
 #
 #  Test that IP to see if it is inside a Bytemark Range.
 #
-foreach my $range (qw! 89.16.160.0/19  80.68.80.0/20 !)
+foreach my $range (qw! 89.16.160.0/19  80.68.80.0/20 212.110.160.0/19 !)
 {
 
     #
