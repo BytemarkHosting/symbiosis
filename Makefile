@@ -50,6 +50,8 @@ clean:
 	-rm */build-stamp
 	-rm */configure-stamp
 	-rm -rf */debian/bytemar*/
+	-rm -f */debian/files
+	-rm -f */debian/*.log
 	-rm bytemark-vhost[-_]*
 	-rm all
 	-rm -rf out/
