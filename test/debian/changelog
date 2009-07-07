@@ -1,3 +1,9 @@
+bytemark-vhost-test (20090707183253) stable; urgency=low
+
+  * Updated bytemark-vhost-test script to call each script locally.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 07 Jul 2009 18:32:53 +0100
+
 bytemark-vhost-test (20090707175721) jaunty; urgency=low
 
   * Updated lib/bytemark/vhost/test/mailbox to support crypt'd passwords
