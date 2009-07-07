@@ -8,7 +8,8 @@ Standards-Version: 3.8.0
 
 Package: bytemark-vhost-tinydns
 Architecture: all
-Depends: rsync, wget, unzip, libnet-netmask-perl
+Depends: rsync, wget, unzip
+Pre-Depends: bytemark-vhost-range
 Conflicts: bytemark-vhost-autofs
 Description: Automatic DNS record creation and uploading for Bytemark customers
  This package contains tools to create a TinyDNS file which may be uploaded

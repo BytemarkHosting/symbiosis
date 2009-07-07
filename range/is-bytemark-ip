@@ -1,0 +1,186 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+is-bytemark-ip - Test to see whether this sytem is in the Bytemark IP range
+
+=cut
+
+=head1 SYNOPSIS
+
+  Help Options:
+
+   --help        Show the help information for this script.
+   --manual      Read the manual for this script.
+   --verbose     Show debugging information.
+
+=cut
+
+
+=head1 ABOUT
+
+  The "is-bytemark-ip" script is used to determine whether the machine
+ it is executed upon is a Bytemark customer.
+
+  This is done by examining the IP address of the primary ethernet
+ adapter and determining whether it is contained within one of our public
+ IP ranges.
+
+=cut
+
+
+=head1 AUTHOR
+
+ Steve
+ --
+
+=cut
+
+=head1 LICENSE
+
+Copyright (c) 2008 by Bytemark Computer Consulting Ltd.  All rights reserved.
+
+This program is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
+
+
+
+#
+#  Good practise.
+#
+use strict;
+use warnings;
+
+
+#
+#  Modules we require
+#
+use Getopt::Long;
+use Net::Netmask;
+use Pod::Usage;
+
+
+#
+#  Configuration variables
+#
+my %CONFIG;
+
+
+#
+#  Parse the command line.
+#
+parseCommandLineArguments();
+
+#
+#  Find the (primary) IP address of the system.
+#
+my $ip = shift;
+
+if ( !defined( $ip ) )
+{
+    $ip = findHostDetails();
+}
+
+
+#
+#  Test that IP to see if it is inside a Bytemark Range.
+#
+foreach my $range (qw! 89.16.160.0/19  80.68.80.0/20 212.110.160.0/19 !)
+{
+
+    #
+    #  Create a new netblock object.
+    #
+    my $block = new Net::Netmask($range);
+
+    $CONFIG{ 'verbose' } && print "Testing range: $range\n";
+
+    #
+    #  If the IP is in the range then we're OK
+    #
+    if ( $block->match($ip) )
+    {
+        $CONFIG{ 'verbose' } && print "\tfound\n";
+
+        print "1\n";
+        exit;
+    }
+    else
+    {
+        $CONFIG{ 'verbose' } && print "\tnot found\n";
+    }
+}
+
+#
+#  Failure
+#
+print "0\n";
+
+
+
+=begin doc
+
+  Parse any command line arguments we might have.
+
+=end doc
+
+=cut
+
+
+sub parseCommandLineArguments
+{
+    my $HELP    = 0;
+    my $MANUAL  = 0;
+
+    if ( !GetOptions( "verbose", \$CONFIG{ 'verbose' },
+                     "manual",       \$MANUAL,
+                     "help",         \$HELP,
+                    ) )
+    {
+        exit;
+    }
+
+    pod2usage(1) if $HELP;
+    pod2usage( -verbose => 2 ) if $MANUAL;
+}
+
+
+
+=begin doc
+
+  Find the hostname & IP address of this host.
+
+=end doc
+
+=cut
+
+
+
+sub findHostDetails
+{
+
+    #
+    #   Find IP
+    #
+    my $ip = `/sbin/ifconfig eth0 | grep 'inet addr'`;
+    if ( $ip =~ /addr:([^ ]*) / )
+    {
+        $ip = $1;
+    }
+
+    #
+    #  What did we find?
+    #
+    $CONFIG{ 'verbose' } && print "IP address is $ip\n";
+
+    #
+    #  Return it
+    #
+    return ($ip);
+
+}

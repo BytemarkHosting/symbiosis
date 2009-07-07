@@ -27,14 +27,10 @@ install: build
 	dh_clean -k
 
 	dh_installdirs
-	cp create-dns `pwd`/debian/bytemark-vhost-tinydns/etc/cron.hourly/
-	cp bytemark.dns.template `pwd`/debian/bytemark-vhost-tinydns/etc/bytemark-vhost/dns.d/template
-	chmod 755 `pwd`/debian/bytemark-vhost-tinydns/etc/cron.hourly/create-dns
-	cp bug.report `pwd`/debian/bytemark-vhost-tinydns/usr/share/bug/bytemark-vhost-tinydns/control
-
-	cp -R ./exim4/bytemark-vhost.d `pwd`/debian/bytemark-vhost-tinydns/etc/exim4/
-#	pod2man ./create-dns > `pwd`/debian/bytemark-vhost-tinydns/usr/share/man/man1/create-dns.1
-#	gzip -9 `pwd`/debian/bytemark-vhost-tinydns/usr/share/man/man1/create-dns.1
+	cp is-bytemark-ip `pwd`/debian/bytemark-vhost-range/sbin/
+	chmod 755 `pwd`/debian/bytemark-vhost-range/sbin/is-bytemark-ip
+	pod2man ./is-bytemark-ip > `pwd`/debian/bytemark-vhost-range/usr/share/man/man1/is-bytemark-ip.1
+	gzip -9 `pwd`/debian/bytemark-vhost-range/usr/share/man/man1/is-bytemark-ip.1
 
 # Build architecture-dependent files here.
 binary-arch: build install

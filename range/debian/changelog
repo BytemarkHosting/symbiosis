@@ -1,0 +1,5 @@
+bytemark-vhost-range (20090707153244) stable; urgency=low
+
+  * Per-Lenny vhost repository, rather than branches
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000

@@ -1,3 +1,10 @@
+bytemark-vhost-tinydns (20090707174805) stable; urgency=low
+
+  * Removed the is-bytemark-ip script, that now lives in the package
+    bytemark-vhost-range.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 17:48:05 +0000
+
 bytemark-vhost-tinydns (20090707153244) stable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches

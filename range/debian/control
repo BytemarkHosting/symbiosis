@@ -1,0 +1,14 @@
+Source: bytemark-vhost-range
+Section: web
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.8.0
+
+Package: bytemark-vhost-range
+Architecture: all
+Depends: perl, perl-modules, libnet-netmask-perl
+Description: Determine whether an IP is within Bytemark's range
+ This package contains a simple tool to test whether an IP address
+ is within a Bytemark allocated range.
