@@ -1,0 +1,31 @@
+# This router handles aliasing using a linearly searched alias file with the
+# name /etc/aliases. When this configuration is installed automatically,
+# the name gets inserted into this file from whatever is set in Exim's
+# build-time configuration. The default path is the traditional /etc/aliases.
+# If you install this configuration by hand, you need to specify the correct
+# path in the "data" setting below.
+#
+##### NB  You must ensure that the alias file exists. It used to be the case
+##### NB  that every Unix had that file, because it was the Sendmail default.
+##### NB  These days, there are systems that don't have it. Your aliases
+##### NB  file should at least contain an alias for "postmaster".
+#
+# If any of your aliases expand to pipes or files, you will need to set
+# up a user and a group for these deliveries to run under. You can do
+# this by uncommenting the "user" option below (changing the user name
+# as appropriate) and adding a "group" option if necessary. Alternatively, you
+# can specify "user" on the transports that are used. Note that the transports
+# listed below are the same as are used for .forward files; you might want
+# to set up different ones for pipe and file deliveries from aliases.
+
+system_aliases:
+  debug_print = "R: system_aliases for $local_part@$domain"
+  driver = redirect
+  allow_fail
+  allow_defer
+  condition = ${if exists{ETC_DIR/aliases}}
+  data = ${lookup{$local_part}lsearch{ETC_DIR/aliases}}
+  domains = @
+  file_transport = address_file
+  pipe_transport = address_pipe
+

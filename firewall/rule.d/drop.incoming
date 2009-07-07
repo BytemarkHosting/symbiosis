@@ -1,0 +1,4 @@
+#
+#  Drop all incoming connections.
+#
+/sbin/iptables -A INPUT $DEV -p tcp -m state --state NEW $SRC -j REJECT --reject-with icmp-admin-prohibited

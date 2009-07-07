@@ -1,0 +1,6 @@
+  # Accept mail to postmaster in any local domain, regardless of the source,
+  # and without verifying the sender.
+
+  accept  local_parts   = postmaster
+          domains       = +local_domains
+

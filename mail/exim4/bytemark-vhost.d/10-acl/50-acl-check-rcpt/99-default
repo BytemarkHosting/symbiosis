@@ -1,0 +1,5 @@
+  # At this point, the address has passed all the checks that have been
+  # configured, so we accept it unconditionally.
+
+  accept
+

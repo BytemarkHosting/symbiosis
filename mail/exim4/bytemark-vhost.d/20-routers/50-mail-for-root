@@ -1,0 +1,15 @@
+# deliver mail addressed to root or postmaster (in case no postmaster alias has
+# been defined) to /var/mail/mail as user mail:mail if it was not redirected in
+# /etc/aliases or by other means Exim cannot deliver as root since 4.24
+# (FIXED_NEVER_USERS)
+
+mail_for_root:
+  debug_print = "R: mail_for_root for $local_part@$domain"
+  driver = redirect
+  domains = @
+  data = /var/mail/mail
+  file_transport = address_file
+  local_parts = root
+  user = mail
+  group = mail
+

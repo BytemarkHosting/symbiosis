@@ -1,0 +1,7 @@
+# This handles whole domain rewrites (defined in ETC_DIR/exim4/rewrites)
+vhost_rewrites:
+  debug_print = "R: vhost_rewrites for $local_part@$domain"
+  driver      = redirect
+  condition   = ${if exists{ETC_DIR/exim4/rewrites}}
+  data        = ${lookup{$domain}lsearch{ETC_DIR/exim4/rewrites}{$local_part@$value}fail}
+

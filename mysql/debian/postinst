@@ -1,0 +1,99 @@
+#!/bin/sh
+
+
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+        echo "I: Skipping configuration"
+        exit 0
+fi
+
+#
+#  See if we have a password?
+#
+if ( mysql --user=root --pass="" -e "SHOW DATABASES" 2>/dev/null >/dev/null ); then
+
+    #
+    #  Do we have a password setup?  If so use it.
+    #
+    for i in if [ -e /etc/bytemark-vhost/.vhost.pass /etc/.vhost.pass ; do
+
+        if [ -e $i ]; then
+
+            echo "+--------------------------------------------+"
+            echo "|                                            |"
+            echo "|    Password setup from stored plaintext    |"
+            echo "|                                            |"
+            echo "+--------------------------------------------+"
+
+            #
+            # get the password
+            #
+            pass=`cat $i`
+
+
+            #
+            #  Set it & exit
+            #
+            mysqladmin --user=root password "$pass"
+            exit 0;
+        fi
+    done
+
+    # Source the debconf library.
+    #
+    . /usr/share/debconf/confmodule
+
+    db_version 2.0
+
+    #
+    #  Get the root password.
+    #
+    db_input high bytemark-vhost-mysql/dbrootpass || true
+    db_go || true
+    db_get bytemark-vhost-mysql/dbrootpass
+    eval rootpass'="$RET"'
+
+    #
+    #  Forget the answer.
+    #
+    db_reset bytemark-vhost-mysql/dbrootpass
+
+    #
+    #  Get the root password again
+    #
+    db_input high bytemark-vhost-mysql/confirm || true
+    db_go || true
+    db_get bytemark-vhost-mysql/confirm
+    eval confirm'="$RET"'
+
+    #
+    #  Forget the answer
+    #
+    db_reset bytemark-vhost-mysql/confirm
+
+    #
+    #  Set the password
+    #
+    if [ "$confirm" = "$rootpass" ]; then
+        mysqladmin --user=root password "$rootpass"
+    else
+        echo "+-------------------------------------------------+"
+        echo "|                                                 |"
+        echo "| Password mismatch.  Leaving root password empty |"
+        echo "|                                                 |"
+        echo "+-------------------------------------------------+"
+    fi
+
+    #
+    #  Forget the answer.
+    #
+    db_reset bytemark-vhost-mysql/dbrootpass
+    db_reset bytemark-vhost-mysql/confirm
+
+fi
+
+#DEBHELPER#
+exit 0

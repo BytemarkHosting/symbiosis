@@ -1,0 +1,4 @@
+#
+#  Allow all incoming connections.
+#
+/sbin/iptables -A INPUT $DEV -p all $SRC -j ACCEPT

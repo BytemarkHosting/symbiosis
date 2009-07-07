@@ -1,0 +1,133 @@
+bytemark-vhost-firewall (20090522105210) stable; urgency=low
+
+  * New release for Lenny.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
+
+bytemark-vhost-firewall (20091505152733) stable; urgency=low
+
+  * Build-depend upon Ruby.
+  * Use the correct pathname in /etc/cron.d/firewall-blocker.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 15 May 2009 15:27:33 +0000
+
+bytemark-vhost-firewall (20081119130025) stable; urgency=low
+
+  * depend upon iproute.
+  * Attempt to find network devices dynamically
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 18 Nov 2008 13:00:25 +0000
+
+bytemark-vhost-firewall (20081118120409) stable; urgency=low
+
+  * New installs will have 00-related by default.
+  * Load the ip_conntrack modules if available.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 18 Nov 2008 12:04:04 +0000
+
+bytemark-vhost-firewall (20081118095920) stable; urgency=low
+
+  * The "N-allow" rule is now correct.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 18 Nov 2008 09:59:20 +0000
+
+bytemark-vhost-firewall (20081117173759) stable; urgency=low
+
+  * Create the blacklist directory if it is missing.
+  * Add manpage for the firewall-blacklist script.
+  * Never blacklist 127.*
+  * Allow the blacklister to be disabled distinctly from the firewall.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 17:37:59 +0000
+
+bytemark-vhost-firewall (20081117171938) stable; urgency=low
+
+  * If a named logfile doesn't exist we abort.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 17:19:19 +0000
+
+bytemark-vhost-firewall (20081117171455) stable; urgency=low
+
+  * New format for blacklist patterns.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 17:17:17 +0000
+
+bytemark-vhost-firewall (20081117154411) stable; urgency=low
+
+  * If the firewall has been disabled then the blacklisting script is
+    also disabled.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 15:44:44 +0000
+
+bytemark-vhost-firewall (20081117132150) stable; urgency=low
+
+  * Be more strict about deleting our temporary firewall script.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 13:21:50 +0000
+
+bytemark-vhost-firewall (20081117131248) stable; urgency=low
+
+  * Added new command line flags to the firewall-blacklist script:
+     --attempts - The number of failing attemps we need before blacklisting.
+     --expire  - The number of days to keep blacklisted records.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 13:13:13 +0000
+
+bytemark-vhost-firewall (20081117130218) stable; urgency=low
+
+  * Correctly ignore the .auto suffix when reloading the firewall.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 13:00:31 +0000
+
+bytemark-vhost-firewall (20081117124948) stable; urgency=low
+
+  * The firewall-blacklist package will create blacklist entries with
+    an .auto suffix.
+  * The firewall package will recognise .auto as a valid blacklist
+    suffix
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 12:55:21 +0000
+
+bytemark-vhost-firewall (20081110153349) stable; urgency=low
+
+  * Install cron.d/ snippet to block dictionary attacks.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 14 Nov 2008 17:48:00 +0000
+
+bytemark-vhost-firewall (20081110153349) stable; urgency=low
+
+  * Remove denyhosts when we're present.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 14 Nov 2008 17:27:27 +0000
+
+bytemark-vhost-firewall (20081110153348) stable; urgency=low
+
+  * Only blacklist hosts which fail 5 times.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 14 Nov 2008 17:14:15 +0000
+
+bytemark-vhost-firewall (20081110153347) stable; urgency=low
+
+  * Conflict with denyhosts
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 14 Nov 2008 16:50:16 +0000
+
+bytemark-vhost-firewall (20081110153346) stable; urgency=low
+
+  * Correctly reject blacklisted IPs.
+  * Replace the bytemark-vhost-ssh-protection.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 14 Nov 2008 16:44:44 +0000
+
+bytemark-vhost-firewall (20081110153345) stable; urgency=low
+
+  * Added 'firewall-blacklist' to blacklist hosts attacking SSH.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 14 Nov 2008 16:33:33 +0000
+
+bytemark-vhost-firewall (20081110153344) stable; urgency=low
+
+  * The Bytemark Virtual Hosting Package bytemark-vhost-firewall
+    - Support may be found at http://vhost.bytemark.co.uk/
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 10 Nov 2008 15:33:44 +0000

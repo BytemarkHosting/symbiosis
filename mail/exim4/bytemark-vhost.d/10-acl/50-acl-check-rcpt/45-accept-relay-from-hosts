@@ -1,0 +1,9 @@
+  # Note that, by putting this test before any DNS black list checks, you will
+  # always accept from these hosts, even if they end up on a black list. The
+  # assumption is that they are your friends, and if they get onto a black
+  # list, it is a mistake.
+
+  accept  hosts         = +relay_from_hosts
+          control       = submission
+
+

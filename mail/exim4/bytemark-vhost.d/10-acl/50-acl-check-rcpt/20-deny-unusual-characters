@@ -1,0 +1,45 @@
+  #############################################################################
+  # The following section of the ACL is concerned with local parts that contain
+  # @ or % or ! or / or | or dots in unusual places.
+  #
+  # The characters other than dots are rarely found in genuine local parts, but
+  # are often tried by people looking to circumvent relaying restrictions.
+  # Therefore, although they are valid in local parts, these rules lock them
+  # out, as a precaution.
+  #
+  # Empty components (two dots in a row) are not valid in RFC 2822, but Exim
+  # allows them because they have been encountered. (Consider local parts
+  # constructed as "firstinitial.secondinitial.familyname" when applied to
+  # someone like me, who has no second initial.) However, a local part starting
+  # with a dot or containing /../ can cause trouble if it is used as part of a
+  # file name (e.g. for a mailing list). This is also true for local parts that
+  # contain slashes. A pipe symbol can also be troublesome if the local part is
+  # incorporated unthinkingly into a shell command line.
+  #
+  # Two different rules are used. The first one is stricter, and is applied to
+  # messages that are addressed to one of the local domains handled by this
+  # host. The line "domains = +local_domains" restricts it to domains that are
+  # defined by the "domainlist local_domains" setting above. The rule  blocks
+  # local parts that begin with a dot or contain @ % ! / or |. If you have
+  # local accounts that include these characters, you will have to modify this
+  # rule.
+
+  deny    message       = Restricted characters in address
+          domains       = +local_domains
+          local_parts   = ^[.] : ^.*[@%!/|]
+
+  # The second rule applies to all other domains, and is less strict. The line
+  # "domains = !+local_domains" restricts it to domains that are NOT defined by
+  # the "domainlist local_domains" setting above. The exclamation mark is a
+  # negating operator. This rule allows your own users to send outgoing
+  # messages to sites that use slashes and vertical bars in their local parts.
+  # It blocks local parts that begin with a dot, slash, or vertical bar, but
+  # allows these characters within the local part. However, the sequence /../
+  # is barred. The use of @ % and ! is blocked, as before. The motivation here
+  # is to prevent your users (or your users' viruses) from mounting certain
+  # kinds of attack on remote sites.
+
+  deny    message       = Restricted characters in address
+          domains       = !+local_domains
+          local_parts   = ^[./|] : ^.*[@%!] : ^.*/\\.\\./
+

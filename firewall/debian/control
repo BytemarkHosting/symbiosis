@@ -1,0 +1,20 @@
+Source: bytemark-vhost-firewall
+Section: web
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 4.0.0), ruby
+Standards-Version: 3.7.2
+
+Package: bytemark-vhost-firewall
+Architecture: all
+Depends: iptables, dnsutils, iproute
+Replaces: bytemark-vhost-ssh-protection
+Conflicts: bytemark-vhost-ssh-protection (<< 20081110153344)
+Suggests: libnet-dns-perl
+Description: A secure firewall for the www-data user
+ This package contains a simple firewall which will ensure that any
+ PHP, or website, compromises do no propogate.
+ .
+ When this package is installed your www-data user will be denied outgoing
+ connections.

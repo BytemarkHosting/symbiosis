@@ -1,0 +1,36 @@
+#!/bin/sh
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+    echo "I: Skipping configuration"
+    exit 0
+fi
+
+#
+#  If we don't have a list then create one
+#
+if [ ! -e /etc/apt/sources.list.security ]; then
+    cp /etc/apt/sources.list /etc/apt/sources.list.security
+fi
+
+#
+#  Make sure we notify the local sysadmin
+#
+if [ ! -e /etc/update-packages.conf ]; then
+    echo "EMAIL=root" >/etc/update-packages.conf
+fi
+
+#
+#  Remove the cron.daily job
+#
+if [ -e /etc/cron.daily/update-packages ] ; then
+    rm -f /etc/cron.daily/update-packages
+fi
+
+
+#DEBHELPER#
+exit 0

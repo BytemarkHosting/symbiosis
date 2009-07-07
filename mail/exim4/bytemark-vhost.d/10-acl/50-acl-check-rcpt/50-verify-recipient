@@ -1,0 +1,9 @@
+  # We also require all accepted addresses to be verifiable. This check will
+  # do local part verification for local domains, but only check the domain
+  # for remote domains. The only way to check local parts for the remote
+  # relay domains is to use a callout (add /callout), but please read the
+  # documentation about callouts before doing this.
+
+  require message = Unknown user
+          verify = recipient
+

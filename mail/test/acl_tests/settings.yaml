@@ -1,0 +1,36 @@
+blacklist:
+  by_ip:
+    - 192.168.1.2
+    - 192.168.2.1/24
+  by_hostname:
+    - blacklisted.remote.domain
+    - *.blacklisted.domain
+  by_sender:
+    - blacklisted@remote.domain
+    - *@blacklisted.domain
+whitelist:
+  # All these fall within the ranges defined in the blacklists above
+  by_ip:
+    - 192.168.2.2 
+  by_hostname:
+    - whitelisted.blacklisted.domain
+  by_sender:
+    - whitelisted@blacklisted.domain
+relay_from_hosts:
+  - 192.168.3.1
+  - 192.168.3.1/24
+local_ip: 192.168.0.1
+local_domains: 
+  - local.domain
+  - other.domain
+  - bytemark.co.uk
+rewrite_domains:
+  symlinked.domain: local.domain
+remote_ip: 192.168.4.1
+remote_domain: remote.domain
+local_users:
+  - username: local.user@local.domain
+    password: password
+  - username: other.user@other.domain
+    password: other.password
+

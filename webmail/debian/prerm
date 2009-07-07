@@ -1,0 +1,33 @@
+#!/bin/sh
+
+set -e
+
+
+
+#
+# Remove the existing link.
+#
+if [ -e  /etc/apache2/conf.d/squirrelmail.conf  ]; then
+    rm -f /etc/apache2/conf.d/squirrelmail.conf
+fi
+
+#
+# And our local alias
+#
+if [ -e /etc/apache2/conf.d/squirrelmail.local.conf ]; then
+    rm -f /etc/apache2/conf.d/squirrelmail.local.conf
+fi
+
+
+#
+#  Restart Apache2.
+#
+if which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d apache2 restart
+else
+    /etc/init.d/apache2 restart
+fi
+
+
+#DEBHELPER#
+exit 0

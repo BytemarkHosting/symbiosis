@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+    echo "I: Skipping configuration"
+    exit 0
+fi
+
+#
+# Remove the old duff cronjob if it exists
+#
+if [ -e /etc/cron.d/bytemark-service-monitor ] ; then
+  rm -f /etc/cron.d/bytemark-service-monitor
+fi
+
+#DEBHELPER#
+exit 0

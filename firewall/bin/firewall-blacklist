@@ -1,0 +1,531 @@
+#!/usr/bin/perl
+
+
+=head1 NAME
+
+firewall-blacklist - A simple script to mitigate against dictionary attacks.
+
+=cut
+
+
+=head1 SYNOPSIS
+
+
+  Options:
+
+   --attempts    Specify the number of failing attempts before blacklisting.
+                 (Default five failing logins.)
+   --expire      The number of days to keep blacklisted records.
+                 (Default two days)
+   --input       The input directory to find patterns within.
+
+
+  Help Options:
+
+   --help        Show the help information for this script.
+   --manual      Read the manual for this script.
+   --verbose     Show useful debugging information.
+
+=cut
+
+
+
+=head1 ABOUT
+
+  This script is designed to look over the system logs and blacklist
+ hosts which are attempting dictionary attacks.
+
+=cut
+
+
+=head1 DISABLING
+
+  If you don't wish to use this script simply touch the file:
+
+=for example begin
+
+  /etc/firewall/disabled.blacklist
+
+=for example end
+
+=cut
+
+
+=head1 WHITELISTING
+
+ The file /etc/firewall/whitelist.d/ will be consulted - any IP address
+ listed in that directory will be ignored.
+
+=cut
+
+
+=head1 AUTHOR
+
+ Steve
+ --
+
+=cut
+
+
+
+=head1 LICENSE
+
+Copyright (c) 2008 by Bytemark Computer Consulting Ltd.  All rights reserved.
+
+This program is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
+
+
+use strict;
+use warnings;
+
+use English;
+use Getopt::Long;
+use Pod::Usage;
+
+
+
+#
+#  Configuration variables
+#
+my %CONFIG;
+$CONFIG{ 'input' }     = "/etc/firewall/patterns.d/";
+$CONFIG{ 'blacklist' } = "/etc/firewall/blacklist.d/";
+$CONFIG{ 'whitelist' } = "/etc/firewall/whitelist.d/";
+$CONFIG{ 'verbose' }   = 0;
+$CONFIG{ 'attempts' }  = 5;  # count of attacks before blacklisting
+$CONFIG{ 'expire' }    = 2;  # number of days to keep records
+
+
+
+#
+#  Parse command line arguments
+#
+parseCommandLineArguments();
+
+
+#
+#  If the firewall is disabled then exit
+#
+if ( -e "/etc/firewall/disabled" )
+{
+    $CONFIG{'verbose'} && print "Firewall disabled\n";
+    exit;
+}
+
+#
+#  If just the blacklister is disabled then exit
+#
+if ( -e "/etc/firewall/disabled.blacklist" )
+{
+    $CONFIG{'verbose'} && print "Blacklister disabled\n";
+    cleanBlacklist();
+    exit;
+}
+
+
+#
+#  Sanity check system
+#
+sanityCheckSystem();
+
+
+#
+#  Exit if we have no rules
+#
+rulesPresent() || exit;
+
+
+#
+#  Load the rules
+#
+my %RULES = loadRules();
+
+
+#
+#  Do we need to reload?
+#
+my $reload = 0;
+
+#
+#  Process the rules
+#
+foreach my $file ( keys %RULES )
+{
+    my $rules = $RULES{$file};
+    $reload += processRules( $file, keys( %$rules ) );
+}
+
+
+#
+#  Remove old blacklisted IPs
+#
+$reload += expireBlacklist();
+
+
+#
+#  Reload the firewall?
+#
+if ( $reload )
+{
+    $CONFIG{ 'verbose' } && print "Reloading firewall ..\n";
+    system( "/usr/bin/firewall" );
+    $CONFIG{ 'verbose' } && print "firewall reloaded ..\n";
+}
+
+
+#
+#  All done
+#
+exit;
+
+
+
+
+
+=begin doc
+
+  Parse the command line arguments we've been given.
+
+=end doc
+
+=cut
+
+
+
+sub parseCommandLineArguments
+{
+
+    my $HELP   = 0;
+    my $MANUAL = 0;
+
+    #  Parse options.
+    #
+    if (
+         !GetOptions(
+                      "attempts=s", \$CONFIG{ 'attempts' },
+                      "expire=s",   \$CONFIG{ 'expire' },
+                      "help",       \$HELP,
+                      "input=s",    \$CONFIG{ 'input' },
+                      "manual",     \$MANUAL,
+                      "verbose",    \$CONFIG{ 'verbose' },
+         )
+      )
+    {
+        exit;
+    }
+
+    pod2usage(1) if $HELP;
+    pod2usage( -verbose => 2 ) if $MANUAL;
+
+}
+
+
+
+=begin doc
+
+  Sanity check the host system.
+
+=end doc
+
+=cut
+
+
+
+sub sanityCheckSystem
+{
+
+    #
+    #  Make sure the input directory exists.
+    #
+    if ( !-d $CONFIG{ 'input' } )
+    {
+        print "The input directory doesn't exist: $CONFIG{'input'}\n";
+        exit;
+    }
+
+    #
+    #  Make sure we're root
+    #
+    if ( ( $EFFECTIVE_USER_ID != 0 ) && ( !$CONFIG{ 'no-root' } ) )
+    {
+        print "You must be root to use this script appropriately\n";
+        exit;
+    }
+
+    #
+    #  Make sure the attempts is a number
+    #
+    if  ( $CONFIG{'attempts'} !~ /^([0-9]+)$/ )
+    {
+        $CONFIG{'attempts'} = 5;
+    }
+
+
+    #
+    #  Make sure the expiry period is a number
+    #
+    if  ( $CONFIG{'expire'} !~ /^([0-9]+)$/ )
+    {
+        $CONFIG{'expire'} = 2;
+    }
+}
+
+
+
+=begin doc
+
+  See if we have blacklist rules present.
+
+=end doc
+
+=cut
+
+
+
+sub rulesPresent
+{
+    my $count = 0;
+
+    foreach my $file ( sort( glob( $CONFIG{ 'input' } . "/*.patterns" ) ) )
+    {
+        $CONFIG{ 'verbose' } && print "Blacklist pattern found: $file\n";
+        $count += 1;
+    }
+
+    return $count;
+}
+
+
+
+=begin doc
+
+  Load each rule.
+
+=end doc
+
+=cut
+
+
+sub loadRules
+{
+    my %rules;
+
+    #
+    #  Load *.patterns
+    #
+    foreach my $file ( sort( glob( $CONFIG{ 'input' } . "/*.patterns" ) ) )
+    {
+        #
+        #  The logfile(s) to look at.
+        #
+        my $logfile = "";
+
+        open( FILE, "<", $file )
+          or die "failed to read file $file - $!";
+
+        foreach my $line (<FILE>)
+        {
+            chomp($line);
+            next if ( !length($line) );
+            next if ( $line =~ /^#/ );
+
+            if ( $line =~ /file\s+=\s+(.*)/ )
+            {
+                $logfile = $1;
+            }
+            else
+            {
+                if ( defined($logfile) )
+                {
+                    $rules{$logfile}{ $line } += 1;
+                }
+            }
+        }
+        close(FILE);
+    }
+
+    return (%rules);
+}
+
+
+
+=begin doc
+
+  Test each rule against the named logfile.
+
+=end doc
+
+=cut
+
+sub processRules
+{
+    my ( $file, @rules ) = (@_);
+
+    #
+    #  Pattern to match an IP address.
+    #
+    my $ip = "([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)";
+
+    #
+    #  List of IPs to blacklist
+    #
+    my %BLACKLIST;
+
+    #
+    #  If the file doesn't exist we'll return
+    #
+    return 0 if ( ! -e $file );
+
+
+    open( FILE, "<", $file )
+      or die "failed to read logfile: $file - $!";
+
+    foreach my $line (<FILE>)
+    {
+        next if ( !defined($line) || !length($line) );
+        chomp($line);
+        next if ( !defined($line) || !length($line) );
+
+        foreach my $rule (@rules)
+        {
+            #
+            #  Insert the IP matching regexp
+            #
+            $rule =~ s/__IP__/$ip/g if ( $rule =~ /__IP__/ );
+
+            #
+            #  If the line in the file matches the rule then
+            # we know that $1 is the IP address of the offending system.
+            #
+            if ( $line =~ /$rule/i )
+            {
+                my $match = $1;
+                $BLACKLIST{ $match } += 1;
+            }
+        }
+    }
+    close(FILE);
+
+
+    #
+    #  Now blacklist the IPs
+    #
+    my $count = 0;
+    foreach my $ip ( keys %BLACKLIST )
+    {
+        #
+        # ignore local failures.
+        #
+        next if ( $ip =~ /^127/ );
+
+        #
+        # Ignore whitelisted IPs
+        #
+        next if ( -e $CONFIG{'whitelist'} . "/$ip" );
+
+        #
+        # The number of failures we've had reported for this IP
+        #
+        my $attempts = $BLACKLIST{$ip};
+
+        if ( $attempts >= $CONFIG{'attempts'} )
+        {
+            if ( !-e "$CONFIG{'blacklist'}/$ip.auto" )
+            {
+                if ( ! -d "$CONFIG{'blacklist'}" )
+                {
+                    system( "mkdir", "-p" , $CONFIG{'blacklist'} );
+                }
+
+                open( LOG, ">", "$CONFIG{'blacklist'}/$ip.auto" );
+                print LOG "\n";
+                close(LOG);
+
+                $CONFIG{ 'verbose' } && print "Blacklisting: $ip\n";
+                $count += 1;
+            }
+            else
+            {
+                $CONFIG{ 'verbose' } && print "Ignoring blacklisted IP: $ip\n";
+            }
+        }
+        else
+        {
+            $CONFIG{'verbose'} &&
+              print "Allowing IP $ip only made $attempts (<5 ) attempts\n";
+        }
+    }
+
+
+    #
+    #  Return the count of IPs we blacklisted.
+    #
+    return( $count );
+}
+
+
+
+=begin doc
+
+  Expire entries from the blacklist which are more than two days old.
+
+=end doc
+
+=cut
+
+sub expireBlacklist
+{
+
+    #
+    #  Changed anythign?
+    #
+    my $changed = 0;
+
+
+    foreach my $file ( sort( glob( "$CONFIG{'blacklist'}/*.auto" ) ) )
+    {
+        my $age = -M $file;
+        if ( int($age) > $CONFIG{ 'expire' } )
+        {
+            $CONFIG{'verbose'} && print "Expiring file: $file\n";
+
+            unlink( $file );
+
+            $changed += 1;
+        }
+
+    }
+
+    return( $changed );
+}
+
+
+
+=begin doc
+
+  Remove all auto-generated blacklisted entries.
+
+=end doc
+
+=cut
+
+sub cleanBlacklist
+{
+    foreach my $ip ( sort( glob( "$CONFIG{'blacklist'}/*.auto" ) ) )
+    {
+        my $file = $ip;
+
+        if ( $file =~ /\/(.*)\.auto/i )
+        {
+            $file = $1;
+        }
+        $CONFIG{'verbose'} && print "Removing previously blacklisted file: $file\n";
+        unlink( $ip );
+    }
+}

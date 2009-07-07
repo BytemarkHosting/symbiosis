@@ -1,0 +1,7 @@
+# Make sure that if a domain is set to use the Bytemark anti-spam service, then
+# defer messages that come straight here, rather than via the antispam hosts.
+# 
+
+  defer  condition =  ${if exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/bytemark_antispam}}
+         hosts     =  !+relay_from_hosts : !+bytemark_antispam_hosts
+

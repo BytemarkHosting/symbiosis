@@ -1,0 +1,29 @@
+# PLAIN authentication has no server prompts. The client sends its
+# credentials in one lump, containing an authorization ID (which we do not
+# use), an authentication ID, and a password. The latter two appear as
+# $auth2 and $auth3 in the configuration and should be checked against a
+# valid username and password. In a real configuration you would typically
+# use $auth2 as a lookup key, and compare $auth3 against the result of the
+# lookup, perhaps using the crypteq{}{} condition.
+
+PLAIN:
+  driver                     = plaintext
+  server_set_id              = $auth2
+  server_prompts             = :
+  # (a) Make sure the username is of the form user@domain.cmo
+  # (b) Make sure the password file exists
+  # (c) Make sure the password is not empty, and that the crypt isn't empty.
+  # (d) Try crypt and then plain comparison in turn.
+  #
+  server_condition           = ${if and{ \
+                                 {match {$auth2}{\N(^([a-z0-9\-]+\.?)+)@(([a-z0-9\-]+\.?)+)$\N}} \
+                                 {exists {VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}} \
+                                 {!eq      {}{$auth3}} \
+                                 {!eq      {}{${readfile{VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}{}}}} \
+                                 {!crypteq {}{${readfile{VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}{}}}} \
+                                 {or { \
+                                   {crypteq {$auth3}{${readfile{VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}{}}}} \
+                                   {eq      {$auth3}{${readfile{VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}{}}}} \
+                                 }} \
+                               }}
+

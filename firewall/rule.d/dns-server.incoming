@@ -1,0 +1,5 @@
+#
+#  Allow incoming connections on port 53, needed for content DNS
+#
+/sbin/iptables -A INPUT $DEV -p tcp --dport 53 $SRC -j ACCEPT
+/sbin/iptables -A INPUT $DEV -p udp --dport 53 $SRC -j ACCEPT

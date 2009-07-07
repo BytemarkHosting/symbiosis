@@ -1,0 +1,10 @@
+# This ACL is used after the contents of a message have been received. This
+# is the ACL in which you can test a message's headers or body, and in
+# particular, this is where you can invoke external virus or spam scanners.
+# Some suggested ways of configuring these tests are shown below, commented
+# out. Without any tests, this ACL accepts all messages. If you want to use
+# such tests, you must ensure that Exim is compiled with the content-scanning
+# extension (WITH_CONTENT_SCAN=yes in Local/Makefile).
+
+acl_check_data:
+

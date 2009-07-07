@@ -1,0 +1,5 @@
+
+#
+#  Allow incoming connections on port 143
+#
+/sbin/iptables -A INPUT $DEV -p tcp --dport 143 $SRC -j ACCEPT

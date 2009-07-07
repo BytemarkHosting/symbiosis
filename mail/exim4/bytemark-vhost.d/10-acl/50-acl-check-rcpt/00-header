@@ -1,0 +1,6 @@
+# This access control list is used for every RCPT command in an incoming
+# SMTP message. The tests are run in order until the address is either
+# accepted or denied.
+
+acl_check_rcpt:
+

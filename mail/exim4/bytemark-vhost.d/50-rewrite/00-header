@@ -1,0 +1,8 @@
+######################################################################
+#                      REWRITE CONFIGURATION                         #
+######################################################################
+
+# There are no rewriting specifications in this default configuration file.
+
+begin rewrite
+

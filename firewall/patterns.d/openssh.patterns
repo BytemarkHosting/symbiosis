@@ -1,0 +1,18 @@
+#
+#  This file contains patterns for matching failed logins via OpenSSH
+#
+#
+
+#
+#  File to look for messages in.
+#
+file = /var/log/auth.log
+
+#
+#  Patterns to match upon.
+#
+Did not receive identification string from __IP__
+Failed password for invalid user [^ ]+ from __IP__ port
+Failed none for invalid user [^ ]+ from __IP__
+Invalid user [^ ]+ from __IP__
+

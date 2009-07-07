@@ -1,0 +1,542 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+create-dns - Create tinydns snippets for each hosted domain
+
+=cut
+
+=head1 SYNOPSIS
+
+  Help Options:
+
+   --help        Show the help information for this script.
+   --manual      Read the manual for this script.
+   --verbose     Show useful debugging information.
+
+=cut
+
+
+=head1 ABOUT
+
+  The create-dns script is used to generate a valid TinyDNS file for
+ each hosted domain.
+
+  These snippets will then be uploaded to the Bytemark DNS server(s).
+
+=cut
+
+
+=head1 AUTHOR
+
+ Steve
+ --
+
+=cut
+
+=head1 LICENSE
+
+Copyright (c) 2008 by Bytemark Computer Consulting Ltd.  All rights reserved.
+
+This program is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
+
+
+use strict;
+use warnings;
+use File::Copy;
+use Getopt::Long;
+use Pod::Usage;
+
+
+#
+#  Configuration handling.
+#
+my %CONFIG;
+
+
+#
+#  Defaults
+#
+$CONFIG{ 'prefix' }   = "/srv";
+$CONFIG{ 'output' }   = "/root/BytemarkDNS";
+$CONFIG{ 'template' } = "/etc/bytemark-vhost/dns.d/template";
+
+
+#
+#  Parse command line arguments.
+#
+parseCommandLineArguments();
+
+
+#
+#  Find the priamry IP of the machine we're running upon.
+#
+my $ip = findHostDetails();
+$CONFIG{ 'verbose' } && print "Local machine is : $ip\n";
+
+
+#
+#  Find subdirectories, which are actually used as hostnames.
+#
+my @dirs = findDirs( $CONFIG{ 'prefix' } );
+
+
+#
+#  No directories?  Then this is an empty machine...
+#
+if ( scalar(@dirs) < 1 )
+{
+    $CONFIG{ 'verbose' }
+      && print "Found no domains beneath: $CONFIG{'prefix'}\n";
+
+    exit;
+}
+
+
+
+#
+#  OK we have directories.
+#
+foreach my $dir (@dirs)
+{
+
+    #
+    #  Generate file
+    #
+    processDomain( $dir, $ip );
+
+    #
+    #  Fixup the permissions of each directory
+    #
+    fixupPermissions($dir);
+}
+
+
+#
+#  Make sure we have an output directory
+#
+if ( !-d "$CONFIG{'output'}/data" )
+{
+    system( "mkdir", "-p", $CONFIG{ 'output' } . "/data" );
+}
+else
+{
+
+    #
+    #  Remove all previously generated files.
+    #
+    foreach my $old ( sort( glob("$CONFIG{'output'}/data/*.txt") ) )
+    {
+        $CONFIG{ 'verbose' } && print "Removing old file : $old\n";
+        unlink($old);
+    }
+}
+
+
+#
+#  Copy each generated file into /root/BytemarkDNS/data/$domain.txt
+#
+foreach my $file ( sort glob("$CONFIG{'prefix'}/*/config/dns/*.txt") )
+{
+
+    #
+    #  Get the domain name from the zonefile.
+    #
+    my $name = $file;
+    if ( $name =~ /\/([^\\\/]+)\.txt$/i )
+    {
+        $name = $1;
+    }
+
+
+    $CONFIG{ 'verbose' }
+      && print "Copying generated file to $CONFIG{'output'}/data/$name.txt\n";
+
+    open( OUT, ">", "$CONFIG{'output'}/data/$name.txt" )
+      or die "Failed to write to $CONFIG{'output'}/data/$name.txt - $!";
+    open( IN, "<", $file ) or die "Failed to read $file - $!";
+
+    print OUT <<EOF;
+#
+#  Don't edit this file.
+#
+#  Edit this file in
+#
+#   /srv/$name/config/dns/$name.txt
+#
+EOF
+
+    #
+    # copy contents
+    #
+    while (<IN>)
+    {
+        print OUT;
+    }
+    close(OUT);
+    close(IN);
+}
+
+
+#
+#  Generated. Now upload
+#
+if ( -x "$CONFIG{'output'}/upload" )
+{
+    $CONFIG{ 'verbose' } && print "Uploading ...\n";
+
+    my $cmd = "cd $CONFIG{'output'} && ./upload";
+    $cmd .= " 2>/dev/null >/dev/null" unless ( $CONFIG{ 'verbose' } );
+    system($cmd);
+
+    $CONFIG{ 'verbose' } && print "Upload complete\n";
+}
+
+
+#
+#  All done
+#
+exit;
+
+
+
+=begin doc
+
+  Parse any command line arguments which might be present.
+
+=end doc
+
+=cut
+
+
+
+sub parseCommandLineArguments
+{
+    my $HELP    = 0;
+    my $MANUAL  = 0;
+
+    if (
+         !GetOptions(
+                      "verbose",    \$CONFIG{ 'verbose' },
+                      "prefix=s",   \$CONFIG{ 'prefix' },
+                      "template=s", \$CONFIG{ 'template' },
+                      "output=s",   \$CONFIG{ 'output' },
+                     "manual",       \$MANUAL,
+                     "help",         \$HELP,
+
+         )
+      )
+    {
+        exit;
+    }
+
+
+    pod2usage(1) if $HELP;
+    pod2usage( -verbose => 2 ) if $MANUAL;
+
+
+}
+
+
+
+=begin doc
+
+  Find the subdirectories beneath the given root.
+
+=end doc
+
+=cut
+
+
+
+sub findDirs
+{
+    my ($root) = (@_);
+
+    #
+    #  Ensure the prefix exists.
+    #
+    if ( !-d $root )
+    {
+        $CONFIG{ 'verbose' }
+          && print "Prefix $CONFIG{'prefix'} is not a directory\n";
+        exit;
+    }
+
+
+    my @results;
+
+    foreach my $file ( sort( glob( $root . "/*" ) ) )
+    {
+        if ( ( -d $file ) )
+        {
+            push( @results, $file );
+            $CONFIG{ 'verbose' } && print "Found directory: $file\n";
+        }
+        else
+        {
+            $CONFIG{ 'verbose' } && print "Ignored: $file\n";
+        }
+    }
+    return (@results);
+}
+
+
+
+=begin doc
+
+  Return a stub file for the given domain.
+
+  This stub file will refer to the primary IP of the machine unless the
+ file /srv/$domain/config/ip is present in which case it will be used.
+
+=end doc
+
+=cut
+
+
+
+sub processDomain
+{
+    my ( $domain, $ip ) = (@_);
+
+    #
+    #  Strip prefix, if present.
+    #
+    if ( $domain =~ /^(.*)[\\\/](.*)$/ )
+    {
+        $domain = $2;
+    }
+
+    $CONFIG{ 'verbose' } && print "Found domain : $domain\n";
+
+    #
+    #  Should we over-ride the IP address for the domain?
+    #
+    if ( -e $CONFIG{ 'prefix' } . "/" . $domain . "/config/ip" )
+    {
+        open( IP, "<", $CONFIG{ 'prefix' } . "/" . $domain . "/config/ip" )
+          or die "failed to open $CONFIG{'prefix'}/$domain/config/ip - $!";
+        $ip = <IP>;
+        close(IP);
+        chomp($ip);
+        $CONFIG{ 'verbose' } && print "\tOverriden IP: $ip\n";
+    }
+
+
+    #
+    #  Does a zonefile exist?
+    #
+    # e.g. /srv/foo.com/config/dns/foo.com.txt
+    #
+    if ( -e $CONFIG{ 'prefix' } . "/" . $domain . "/config/dns/$domain.txt" )
+    {
+        $CONFIG{ 'verbose' } && print "Existing file found for $domain\n";
+
+        #
+        #  OK we have an existing file - but does it match?
+        #
+        if ( -e $CONFIG{ 'prefix' } . "/" . $domain . "/config/ip" )
+        {
+
+            #
+            #  Open the generated file and see if it contains the
+            # IP we expect.  If it doesn't then we need to replace it.
+            #
+            #
+            my $found = 0;
+
+            open( EXISTING,
+                  "<",
+                  $CONFIG{ 'prefix' } . "/" . $domain
+                    . "/config/dns/$domain.txt"
+            );
+            while (<EXISTING>)
+            {
+                my $line = $_;
+                next if ( ( !$line ) || ( !length($line) ) );
+                chomp($line);
+                if ( $line =~ /\Q$ip\E/i )
+                {
+                    $found = 1;
+                }
+            }
+            close(EXISTING);
+
+            if ($found)
+            {
+                $CONFIG{ 'verbose' }
+                  && print "The IP is correct - leaving file alone\n";
+                return;
+            }
+            else
+            {
+                $CONFIG{ 'verbose' }
+                  && print "File needs replacing due to config/ip\n";
+            }
+        }
+        else
+        {
+            $CONFIG{ 'verbose' } && print "Not overwriting existing file.\n";
+
+            #
+            return;
+        }
+    }
+
+    #
+    #  Read the template
+    #
+    my @template = readFile( $CONFIG{ 'template' } );
+
+
+    #
+    #  Process the template
+    #
+    my $tmp;
+    foreach my $line (@template)
+    {
+        $line =~ s/\$domain/$domain/g if ( $line =~ /\$domain/ );
+        $line =~ s/\$ip/$ip/g         if ( $line =~ /\$ip/ );
+        $tmp .= $line;
+    }
+
+    #
+    #  Make sure the output exists
+    #
+    if ( !-d $CONFIG{ 'prefix' } . "/" . $domain . "/config/dns" )
+    {
+        system( "mkdir", "-p",
+                $CONFIG{ 'prefix' } . "/" . $domain . "/config/dns" );
+    }
+
+    #
+    #  Now write it out
+    #
+    open( OUTPUT, ">",
+          $CONFIG{ 'prefix' } . "/" . $domain . "/config/dns/$domain.txt" )
+      or die "Failed to write output for $domain - $!";
+    print OUTPUT $tmp;
+    close(OUTPUT);
+
+    $CONFIG{ 'verbose' } && print "\tWrote output file\n";
+}
+
+
+=begin doc
+
+  Read a files contents, and return as an array.
+
+=end doc
+
+=cut
+
+
+
+sub readFile
+{
+    my ($file) = (@_);
+
+    open( INPUT, "<", $file )
+      or die "failed to read file $file for reading - $!";
+
+    my @results;
+
+    while (<INPUT>)
+    {
+        push( @results, $_ );
+    }
+    return (@results);
+}
+
+
+
+=begin doc
+
+  Find the hostname & IP address of this host.
+
+=end doc
+
+=cut
+
+
+
+sub findHostDetails
+{
+
+    #
+    #   Find IP
+    #
+    my $ip = `/sbin/ifconfig eth0 | grep 'inet addr'`;
+    if ( $ip =~ /addr:([^ ]*) / )
+    {
+        $ip = $1;
+    }
+    return ($ip);
+
+}
+
+
+=begin doc
+
+  Ensure that /srv/domain/config/dns is owned by the same
+ user as /srv/domain
+
+=end doc
+
+=cut
+
+
+
+sub fixupPermissions
+{
+    my ($domain) = (@_);
+
+    #
+    #  If the directory doesn't exist we have problems
+    #
+    if ( !-d $domain )
+    {
+        $CONFIG{ 'verbose' } && print "$domain not found\n";
+        return;
+    }
+
+    #
+    #  Get the owner + group
+    #
+    my (
+         $dev,  $ino,   $mode,  $nlink, $uid,     $gid, $rdev,
+         $size, $atime, $mtime, $ctime, $blksize, $blocks
+    ) = stat($domain);
+
+    #
+    #  Find the find the username
+    #
+    my $username  = getpwuid($uid);
+    my $groupname = getgrgid($gid);
+
+    #
+    #  If we found both then we can do it
+    #
+    if ( defined($username) && defined($groupname) )
+    {
+
+        #
+        #  Change the ownership
+        #
+        system( "chown", "-R", $username . ":" . $groupname,
+                "$domain/config" );
+    }
+    else
+    {
+        $CONFIG{ 'verbose' } && print "Failed to find uid/gid for $domain\n";
+        $CONFIG{ 'verbose' } && print "UID: $uid -> $username\n";
+        $CONFIG{ 'verbose' } && print "GID: $gid -> $groupname\n";
+    }
+}

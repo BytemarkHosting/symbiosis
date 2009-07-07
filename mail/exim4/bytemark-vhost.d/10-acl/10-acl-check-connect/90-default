@@ -1,0 +1,4 @@
+  # Allow anything not already denied to connect
+  warn   log_message = Connection from ${interface_address}:${interface_port} from ${sender_host_address}:${sender_host_port}
+  
+  accept 

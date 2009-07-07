@@ -1,0 +1,16 @@
+Source: bytemark-vhost-test
+Section: web
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 4.0.0), rdoc, txt2man
+Standards-Version: 3.7.2
+
+Package: bytemark-vhost-test
+Architecture: all
+Depends: ruby, libopenssl-ruby
+Description: Self-test scripts for the bytemark vhost project
+ This package contains code to run self-tests upon an installation of the
+ Bytemark Virtual Hosting project.
+ .
+ The tests must be executed manually.

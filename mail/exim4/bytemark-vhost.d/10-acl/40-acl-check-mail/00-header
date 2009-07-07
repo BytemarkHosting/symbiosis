@@ -1,0 +1,3 @@
+# ACL that is used after the MAIL command
+acl_check_mail:
+

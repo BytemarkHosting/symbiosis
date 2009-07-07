@@ -1,0 +1,221 @@
+#!/usr/bin/perl
+#
+#  This script is designed to configure additional IPs for Apache.
+#
+#  1.  We find the primary IP of the system.
+#
+#  2.  For each additional IP which is not claimed by SSL we configure
+#     Apache to listen on that too.
+#
+# Steve
+# --
+#
+
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+
+
+#
+#  Configuration variables
+#
+my %CONFIG;
+
+
+#
+#  Parse command line
+#
+parseCommandLineArguments();
+
+
+#
+#  Find the IP addresses on the system.
+#
+my %IPS = findIPs();
+
+
+
+#
+#  Read each enabled site
+#
+my %ENABLED = findEnabled();
+
+
+#
+#  Now create files for the ones not listening.
+#
+foreach my $dev ( keys %IPS )
+{
+    my $ip = $IPS{$dev};
+
+    next if ( $ip =~ /^127/ );
+
+    if ( $ENABLED{$ip} )
+    {
+        $CONFIG{'verbose'} && print "Already enabled $ip\n";
+    }
+    else
+    {
+        $CONFIG{'verbose'} && print "Should create site for: $ip\n";
+
+        createSiteFor( $ip );
+    }
+}
+
+
+#
+#  If we did create something we need to reload Apache2
+#
+if ( $CONFIG{'created'} )
+{
+    $CONFIG{'verbose'} && print "Restarting apache2\n";
+    system( "/etc/init.d/apache2 restart >/dev/null 2>/dev/null" );
+    $CONFIG{'verbose'} && print "Done\n";
+}
+
+
+
+#
+#  All done.
+#
+exit;
+
+
+
+
+
+
+=begin doc
+
+  Parse any command line arguments which might be present.
+
+=end doc
+
+=cut
+
+
+
+sub parseCommandLineArguments
+{
+    if (
+         !GetOptions( "verbose",  \$CONFIG{ 'verbose' },
+                      "prefix=s", \$CONFIG{ 'prefix' }, )
+      )
+    {
+        exit;
+    }
+
+}
+
+
+
+=begin doc
+
+  Find the IP addresses on the system.
+
+=end doc
+
+=cut
+
+sub findIPs
+{
+    my $out = `/sbin/ifconfig`;
+
+    my %results;
+
+    my $dev = undef;
+
+    foreach my $line ( split( /[\r\n]/, $out ) )
+    {
+        if ( $line =~ /^([^ \t]+)[ \t]/ )
+        {
+            $dev = $1;
+        }
+        elsif ( $line =~ /inet addr:([0-9\.]+)/ )
+        {
+            $results{$dev}=$1;
+            $dev = undef;
+        }
+    }
+
+    return( %results );
+}
+
+
+=begin doc
+
+  Find the sites which are enabled.
+
+=end doc
+
+=cut
+
+sub findEnabled
+{
+    my %listening;
+
+    #
+    #  Read each file.
+    #
+    foreach my $file ( sort( glob( "/etc/apache2/sites-enabled/*" ) ) )
+    {
+        open( FILE, "<", $file )
+          or die "Failed to read file $file - $!";
+
+        foreach my $line (<FILE>)
+        {
+            if ( $line =~ /NameVirtualHost (.*):/ )
+            {
+                $listening{$1} += 1;
+            }
+        }
+
+        close( FILE );
+    }
+
+    return( %listening );
+}
+
+
+
+=begin doc
+
+  Create the apache configuration file for the given IP.
+
+=end doc
+
+=cut
+
+sub createSiteFor
+{
+
+    my( $ip ) = (@_);
+
+    foreach my $file ( qw! zz-mass-hosting zz-mass-hosting.ssl ! )
+    {
+        my $input  = "/etc/apache2/sites-enabled/$file";
+        my $output = "/etc/apache2/sites-enabled/$file.$ip";
+
+        open( IN, "<", $input )
+          or die "Failed to read input: $input - $!";
+
+        open( OUT, ">", $output )
+          or die "failed to write output: $output - $!";
+
+        foreach my $line ( <IN> )
+        {
+            chomp( $line );
+            if ( $line =~ /(.*) ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(.*)/ )
+            {
+                $line = $1 . " " . $ip . $3;
+            }
+
+            print OUT $line . "\n";
+        }
+
+        close( IN );
+        close( OUT );
+    }
+}

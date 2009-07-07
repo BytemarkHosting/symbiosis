@@ -1,0 +1,34 @@
+#!/usr/bin/ruby 
+
+require 'bytemark/vhost/monitor/check'
+
+class PureFtpdCheck < Bytemark::Vhost::Monitor::Check
+
+  def initialize
+    super
+    @process.pidfile = "/var/run/inetd.pid"
+    @process.initscript = "/etc/init.d/openbsd-inetd"
+    @name = "inetd"
+  end
+
+  def do_check
+    return SystemExit::EX_CONFIG unless initscript_ok?
+
+    tcpconnection = Bytemark::Vhost::Monitor::TCPConnection.new(
+      "localhost",
+      "ftp", 
+      [nil,"NOOP\r\n",nil,"QUIT\r\n",nil])
+    r = do_tcpconnection_check(tcpconnection)
+    self.restart if r == 1
+    return r
+  end
+
+  def do_response_check(responses)
+    bad = responses.find{|l| l !~ /^2\d+[ -]/}
+    raise "Unexpected response '#{bad}'" unless bad.nil? 
+  end
+
+end
+
+exit PureFtpdCheck.new.do_check if $0 == __FILE__
+

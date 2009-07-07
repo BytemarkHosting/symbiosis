@@ -1,0 +1,10 @@
+# Send mail bound for postmaster to root, if no alias has been defined so far,
+# ensuring that mail for postmaster is always accepted,
+
+mail_for_postmaster:
+  debug_print = "R: mail_for_postmaster for $local_part@$domain"
+  driver = redirect
+  domains = @
+  data = root
+  local_parts = postmaster
+

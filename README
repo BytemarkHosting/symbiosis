@@ -1,0 +1,60 @@
+
+README
+------
+
+  This README is intentionally brief.  All the details on the Bytemark
+ Virtual Hosting packages may be found online:
+
+     http://vhost.bytemark.co.uk/
+
+  Note that the repository has branches for etch + lenny.
+
+
+Building The Packages
+---------------------
+
+  You should be able to build all packages via :
+
+                make all
+
+  Once you're done you'll see a bunch of .deb files in the current
+ directory.  Failures are going to be hard to spot, so do look over
+ the output to ensure that you see as many packages as you expect.
+
+  (Mostly failures will be due to lack of build-dependencies.)
+
+
+
+
+Releasing
+---------
+
+  To make a new release, visible on http://vhost.bytemark.co.uk/, you
+ need to run:
+
+        make sync-down
+
+  Once you've done that you'll find a local tree:
+
+   ./releases
+   ./releases/live/
+   ./releases/staging/
+
+  Remove the obsolete packages and move your newly built ones into place.
+
+  Now run
+
+        make sync-up
+
+  This will copy the files to /staging and /incoming on the vhost machine.
+ This will place them correctly for releasing.
+
+  Finally ssh to vhost and run:
+
+        /home/www/vhost.bytemark.co.uk/htdocs/staging/build.sh
+
+     or
+        /home/www/vhost.bytemark.co.uk/htdocs/packages/build.sh
+
+Steve
+--

@@ -1,0 +1,2 @@
+  # Allow anything not already denied to connect
+  accept

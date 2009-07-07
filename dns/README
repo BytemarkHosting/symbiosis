@@ -1,0 +1,31 @@
+
+  This package contains a system to automatically generate valid TinyDNS
+ files for the domains hosted upon the current host.
+
+  The way this works is pretty simplistic by default each "host"
+ (or directory beneath /srv) is assumed to point to the primary IP
+ of the machine running the package.
+
+  If the user wants to point the records at a new machine they should
+ create the file:
+
+        /srv/$hostname/config/ip
+
+  This file will override the primary IP of the host machine, and ensure
+ that all records point there.
+
+ Bytemark Anti-spam service
+ --------------------------
+
+  At the moment this package will stick in appropriate snippets into
+ /etc/exim4/bytemark-vhost.d for the exim config file to use. All these do is
+ make sure that for domains configured to use the Bytemark anti-spam service,
+ recipients are deferred unless the connecting machine is one of the anti-spam
+ machines.
+
+  To switch this on, touch
+
+        /srv/$hostname/config/bytemark-antispam
+
+Steve (and Patrick)
+--

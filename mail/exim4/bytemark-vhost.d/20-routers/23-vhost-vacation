@@ -1,0 +1,24 @@
+# This router handles vacation/autoreply messages for vhost users
+vhost_vacation:
+  debug_print = "R: vhost_vacation for $local_part@$domain"
+  driver = accept
+  domains = +vhost_domains
+  local_part_suffix = +*
+  local_part_suffix_optional
+  # This condition is mostly cribbed from the default value for
+  # delay_warning_condition in the exim4 spec.
+  condition = ${if or {\
+                { !eq{$h_list-id:$h_list-help:$h_list-post:$h_list-subscribe:$h_list-unsubscribe:$h_list-owner:$h_list-archive:}{} }\
+                { match{$h_precedence:}{(?i)bulk|list|junk} }\
+                { match{$h_auto-submitted:}{(?i)auto-generated|auto-replied} }\
+              } {no}{yes}}
+  require_files = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part/vacation
+  # This line is used to match normal bulk mail senders &c.
+  senders = "!^server@.*:^daemon@.*:^root@.*:^listserv@.*:^majordomo@.*:\
+             !^.*-request@.*:!^owner-[^@]+@.*:!^mailer-daemon@.*"
+  user  = ${extract{uid}{${stat:VHOST_DIR/$domain}}}
+  group = ${extract{gid}{${stat:VHOST_DIR/$domain}}}
+  transport = vhost_vacation
+  unseen
+  no_verify
+

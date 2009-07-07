@@ -1,0 +1,63 @@
+
+firewall
+--------
+
+  This package will create a simple firewall which is designed to
+ be simple to configure and use.
+
+  The way the firewall works is by examining a pair of directories,
+ and based upon the names of files within them generate a collection
+ of different "iptables" rules for both INCOMING & OUTGOING connections.
+
+
+Setup
+-----
+
+  Create your rules by touching files in:
+
+         /etc/firewall/incoming.d/
+         /etc/firewall/outgoing.d/
+
+  The filenames you choose must be of the form "$number-$name", where
+ number is used purely for sorting purposes.  The name defines the
+ set of rules which are used.  (See the later section on naming.)
+
+
+Simple Example
+--------------
+
+
+  The following defines a system which will only accept incoming connections
+ for SSH and SMTP
+
+        rm /etc/firewall/incoming.d/*
+        touch /etc/firewall/incoming.d/10-smtp
+        touch /etc/firewall/incoming.d/20-ssh
+        touch /etc/firewall/incoming.d/99-drop
+
+
+Complex Example
+---------------
+
+  The following example will accept incoming SMTP connections from anywhere
+ but only SSH from a single IP address:
+
+        rm /etc/firewall/incoming.d/*
+        touch /etc/firewall/incoming.d/10-smtp
+        touch /etc/firewall/incoming.d/99-drop
+        echo "192.168.1.1" > /etc/firewall/incoming.d/20-ssh
+
+
+Naming
+------
+
+  The names "smtp", "ssh", and "drop" used in the previous two examples
+ are magical.  These names refer to the files located in our master
+ rules directory:
+
+    /usr/share/firewall/
+
+
+
+Steve
+--

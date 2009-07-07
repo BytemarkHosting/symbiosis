@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+        echo "I: Skipping configuration"
+        exit 0
+fi
+
+cat >/etc/pam.d/common-password<<EOF
+password required         pam_cracklib.so retry=3 minlen=6 difok=3
+password required         pam_unix.so use_authtok nullok md5
+EOF
+
+#DEBHELPER#
+exit 0

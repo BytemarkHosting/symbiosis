@@ -1,0 +1,10 @@
+  # Similarly, we will deny the message if the host IP or name is on a local
+  deny    hosts         = +blacklisted_hosts
+          message       = The IP or hostname used when connecting is locally blacklisted.
+          log_message   = IP/hostname locally blacklisted
+
+  # OK, now we check whether the sender address is on a local blacklist
+  deny    senders       = +blacklisted_senders
+          message       = Your email address is locally blacklisted.
+          log_message   = Sender locally blacklisted
+

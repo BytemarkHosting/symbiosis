@@ -1,0 +1,5 @@
+
+#
+#  Allow incoming connections on port 465
+#
+/sbin/iptables -A INPUT $DEV -p tcp --dport 465 $SRC -j ACCEPT

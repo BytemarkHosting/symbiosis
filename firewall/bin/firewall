@@ -1,0 +1,1034 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+firewall - A simple firewall generator
+
+=cut
+
+
+=head1 SYNOPSIS
+
+
+  Options:
+
+   --flush       Flush all currently used iptables rules, and exit.
+   --no-delete   Do not delete the generated script once it has been run.
+   --no-execute  Generate the script, but do not execute it.
+   --no-flush    Don't flush all rules prior to adding the new ones.
+   --no-root     Don't complain if started by a non-root user.
+   --test        Perform a minimal test after installing the firewall.
+
+  Paths:
+
+   --blacklist-d  A directory containing blacklisted hosts/ips.
+   --incoming-d   The directory where incoming configuration is made.
+   --outgoing-d   The directory where outgoing configuration is made.
+   --local-d      A local directory containing scripts to execute afterwards.
+   --rule-d       The directory where rule definitions live.
+
+  Help Options:
+
+   --help        Show the help information for this script.
+   --manual      Read the manual for this script.
+   --verbose     Show useful debugging information.
+
+=cut
+
+
+
+=head1 ABOUT
+
+  This firewall script is designed to be simple to use, while still
+ allowing a reasonable level of control over your system.
+
+  The firewall generator will read a number of files located beneath
+ the directory /etc/firewall and automatically use the names of those
+ files to construct a complete iptables-based firewall script.
+
+  The script will be executed once it has been generated, and then
+ removed.  (Both of these actions may be changed.)
+
+=cut
+
+
+
+=head1 CONFIGURATION
+
+  To configure the firewall which is applied to your server you simply
+ need to create files in the directories the script reads:
+
+=over 8
+
+=item /etc/firewall/blacklist.d/
+Any file present in this directory is assumed to be the IP address of a machine you wish to globally prevent connections from.
+
+=item /etc/firewall/incoming.d/
+This directory is examined to determine which rules should be applied to incoming connections.
+
+
+=item /etc/firewall/outgoing.d/
+This directory is examined to determine which rules should be applied to outgoing connections.
+
+=back
+
+  For the incoming and outgoing directories you should create files with
+ names such as "10-ssh". (The number you choose merely determines sorting
+ order there is no additional significance to it)
+
+  The presence of a file named "nn-ssh" will mean that the firewall will
+ include rules it knows about for the service "ssh".  These rule types
+ may be arbitrarily complex, as they are processed via /bin/sh.
+
+  The presence of a rule file will generally allow access to the named
+ service.  For example the file "20-ssh" placed in the incoming directory
+ will allow all access to port 22.  If you wish to restrict access place
+ the hostnames, or IP addresses, in the file instead of leaving it empty.
+
+  This will restrict access to/from the named addresses.
+
+=cut
+
+
+
+=head1 ADDING ADDITIONAL RULETYPES
+
+  For each "rule" type you should simply create two files:
+
+=for example begin
+
+  /usr/share/firewall/$name.incoming
+  /usr/share/firewall/$name.outgoing
+
+=for example end
+
+  The contents of these file(s) will be inserted appropriately into
+ the generate firewall script.
+
+  The magic strings '$SRC' and '$DEST' will be replaced by any IP
+ addresses the user has specified in their file - or removed if none
+ are present.
+
+=cut
+
+
+
+=head1 AUTHOR
+
+ Steve
+ --
+
+=cut
+
+
+
+=head1 LICENSE
+
+Copyright (c) 2008 by Bytemark Computer Consulting Ltd.  All rights reserved.
+
+This program is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
+
+
+use strict;
+use warnings;
+
+use English;
+use File::Temp qw/ tempfile tempdir /;
+use Getopt::Long;
+use Pod::Usage;
+
+
+#
+#  Holder for the configuration values.
+#
+my %CONFIG;
+
+#
+#  Modules we should try to load.
+#
+my %MODULES = ( "ip_conntrack_ftp" => 1,
+                "ip_conntrack" => 1 );
+
+
+#
+#  Holder for service data.
+#
+my %SERVICE;
+
+
+#
+#  Directories we examine.
+#
+$CONFIG{ 'blacklist.d' } = "/etc/firewall/blacklist.d/";
+$CONFIG{ 'incoming.d' }  = "/etc/firewall/incoming.d/";
+$CONFIG{ 'outgoing.d' }  = "/etc/firewall/outgoing.d/";
+$CONFIG{ 'local.d' }     = "/etc/firewall/local.d/";
+$CONFIG{ 'rule.d' }      = "/usr/share/firewall/";
+
+
+
+#
+#  Parse arguments
+#
+parseCommandLineArguments();
+
+
+#
+#  Make sure we're root & that we're setup correctly.
+#
+sanityCheck();
+
+#
+#  Load modules
+#
+loadModules();
+
+
+#
+#  Generate a temporary file which will be used to contain the
+# generated firewall rules.
+#
+my $tempfile = createTemporaryFile();
+
+
+#
+#  Blacklist any blacklisted entries immediately.
+#
+createBlacklist($tempfile);
+
+
+#
+#  Find the rules that the user would like to use.
+#
+my @incoming = findRules( $CONFIG{ 'incoming.d' } );
+my @outgoing = findRules( $CONFIG{ 'outgoing.d' } );
+
+
+#
+#  Find devices.
+#
+my @devices = findDevices();
+
+#
+#  Make sure we found something
+#
+if ( scalar(@devices) < 1 )
+{
+    print "We failed to find any network devices\n";
+    print "Aborting\n";
+    exit;
+}
+
+
+#
+#  Process each of the rules rules
+#
+foreach my $entry (@incoming)
+{
+    processRule( $tempfile, $CONFIG{ 'rule.d' }, "incoming", $entry );
+}
+foreach my $entry (@outgoing)
+{
+    processRule( $tempfile, $CONFIG{ 'rule.d' }, "outgoing", $entry );
+}
+
+
+#
+#  Is the firewall disabled?
+#
+if ( -e "/etc/firewall/disabled" )
+{
+    unlink( $tempfile );
+    exit;
+}
+
+
+#
+#  Flush the existing rules.
+#
+flushAllRules() unless ( $CONFIG{ 'no-flush' } );
+
+
+#
+#  Did the user just want to flush the rules?  If so exit now
+#
+if ( $CONFIG{ 'flush' } )
+{
+    unlink( $tempfile );
+    exit;
+}
+
+
+#
+#  Finally execute the temporary file.
+#
+unless ( $CONFIG{ 'no-execute' } )
+{
+    $CONFIG{ 'verbose' } && print "Executing : $tempfile\n";
+    system($tempfile );
+    $CONFIG{ 'verbose' } && print "Done\n";
+}
+
+#
+#  And delete the file unless we're supposed to keep it.
+#
+if ( $CONFIG{ 'no-delete' } )
+{
+    print "Temporary script left in: $tempfile\n";
+}
+else
+{
+    unlink($tempfile);
+}
+
+
+#
+#   Any local additions?
+#
+if ( -d $CONFIG{ 'local.d' } )
+{
+
+    #
+    #  Run-parts against it.
+    #
+    my $cmd = "run-parts $CONFIG{'local.d'}";
+    if ( $CONFIG{ 'verbose' } )
+    {
+        $cmd = "run-parts --verbose $CONFIG{'local.d'}";
+    }
+
+    $CONFIG{ 'verbose' } && print "Starting: run-parts $CONFIG{'local.d'}\n";
+
+    system($cmd );
+
+    $CONFIG{ 'verbose' } && print "Finished: run-parts $CONFIG{'local.d'}\n";
+}
+
+
+#
+#  Should we test the firewall?
+#
+if ( $CONFIG{ 'test' } )
+{
+    if ( !testFirewall() )
+    {
+        print <<EOF;
+The test of the firewall failed.
+
+All rules have been flushed.
+
+You are *NOT* running with a firewall.
+EOF
+        flushAllRules();
+    }
+}
+
+
+
+#
+#  All done
+#
+unless ( $CONFIG{'no-delete'} )
+{
+    unlink( $tempfile );
+}
+exit;
+
+
+
+=begin doc
+
+  Parse the command line arguments we've been given.
+
+=end doc
+
+=cut
+
+
+
+sub parseCommandLineArguments
+{
+
+    my $HELP   = 0;
+    my $MANUAL = 0;
+
+    #  Parse options.
+    #
+    if (
+         !GetOptions(
+                      "verbose",       \$CONFIG{ 'verbose' },
+                      "help",          \$HELP,
+                      "flush",         \$CONFIG{ 'flush' },
+                      "test",          \$CONFIG{ 'test' },
+                      "no-execute",    \$CONFIG{ 'no-execute' },
+                      "no-flush",      \$CONFIG{ 'no-flush' },
+                      "no-delete",     \$CONFIG{ 'no-delete' },
+                      "no-root",       \$CONFIG{ 'no-root' },
+                      "incoming-d=s",  \$CONFIG{ 'incoming.d' },
+                      "blacklist-d=s", \$CONFIG{ 'blacklist.d' },
+                      "outgoing-d=s",  \$CONFIG{ 'outgoing.d' },
+                      "rule-d=s",      \$CONFIG{ 'rule.d' },
+                      "local-d=s",     \$CONFIG{ 'local.d' },
+                      "manual",        \$MANUAL
+         )
+      )
+    {
+        exit;
+    }
+
+    pod2usage(1) if $HELP;
+    pod2usage( -verbose => 2 ) if $MANUAL;
+
+}
+
+
+=begin doc
+
+  Sanity check our environment & our user.
+
+=end doc
+
+=cut
+
+
+
+sub sanityCheck
+{
+
+    foreach my $arg (qw! incoming.d outgoing.d rule.d !)
+    {
+        if ( !defined( $CONFIG{ $arg } ) )
+        {
+            print "Missing required argument: $arg\n";
+            exit;
+        }
+        if ( !-d $CONFIG{ $arg } )
+        {
+            print "No such directory: $CONFIG{$arg}\n";
+            exit;
+        }
+    }
+
+    #
+    #  Are we root?
+    #
+    if ( ( $EFFECTIVE_USER_ID != 0 ) && ( !$CONFIG{ 'no-root' } ) )
+    {
+        print "You must be root to use this script appropriately\n";
+        exit;
+    }
+}
+
+
+
+=begin doc
+
+  Indescriminately flush all firewall rules.
+
+=end doc
+
+=cut
+
+
+
+sub flushAllRules
+{
+
+    #
+    #  The commands required to flush a system.
+    #
+    my @cmds = (
+
+                "/sbin/iptables -P INPUT ACCEPT",
+                "/sbin/iptables -P OUTPUT ACCEPT",
+                "/sbin/iptables -P FORWARD ACCEPT",
+                "/sbin/iptables -F",
+                "/sbin/iptables -t nat -F",
+                "/sbin/iptables -t raw -F",
+                "/sbin/iptables -t mangle -F",
+                "/sbin/iptables -X"
+    );
+
+    #
+    #  Run each one.
+    #
+    foreach my $command (@cmds)
+    {
+        system($command );
+    }
+}
+
+
+=begin doc
+
+  Create a temporary file.
+
+=end doc
+
+=cut
+
+
+
+sub createTemporaryFile
+{
+    my ( $fh, $tempfile ) = tempfile();
+
+    #
+    #  Get the date + hostname
+    #
+    my $date = `date`;
+    my $host = `hostname --fqdn`;
+    chomp($host);
+    chomp($date);
+
+    open( FILE, ">", $tempfile )
+      or die "ERROR: Failed to open temporary file: $tempfile - $!";
+    print FILE <<EOF;
+#!/bin/sh
+#
+#  This firewall script was automatically generated by the
+# bytemark-vhost-firewall package.
+#
+#  Generated : $host / $date
+#
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/X11
+export PATH
+
+#
+# Enable free use of loopback interfaces
+#
+/sbin/iptables -A INPUT -i lo -j ACCEPT
+/sbin/iptables -A OUTPUT -o lo -j ACCEPT
+
+EOF
+    close(FILE);
+
+    system( "chmod", "0755", $tempfile );
+
+    return ($tempfile);
+}
+
+
+=begin doc
+
+  For each file which is named with an IP address in our blacklist
+ directory update our script to drop it.
+
+=end doc
+
+=cut
+
+
+
+sub createBlacklist
+{
+    my ($file) = (@_);
+
+    open( FILE, ">>", $file )
+      or die "ERROR: failed to append to temporary file $file - $!";
+
+
+    foreach my $file ( sort( glob( $CONFIG{ 'blacklist.d' } . "/*" ) ) )
+    {
+        if ( ( -e $file ) && ( !-d $file ) )
+        {
+            my $name = $file;
+            if ( $name =~ /(.*)[\\\/](.*)/ )
+            {
+                $name = $2;
+            }
+            if ( ( $name =~ /^([0-9\.]+)$/ ) ||
+                 ( $name =~ /^([0-9\.]+).auto$/i ) )
+            {
+                # ignore localhost.
+                next if ( $name =~ /^127.0.0/ );
+
+                # strip ".auto" if present.
+                $name =~ s/\.auto$//g;
+
+                $CONFIG{ 'verbose' } && print "Blacklisting: $name\n";
+
+                print FILE "# blacklisted IP: $name\n";
+                print FILE "/sbin/iptables -A INPUT -p tcp --src $name -j REJECT -m state --state NEW\n";
+                print FILE "/sbin/iptables -A INPUT -p udp --src $name -j REJECT -m state --state NEW\n";
+                print FILE "\n";
+            }
+        }
+    }
+    close(FILE);
+}
+
+=begin doc
+
+  Read the entries from the given directory, and return a list of
+ keys - keys being the parts of the name after the numeric prefix.
+
+=end doc
+
+=cut
+
+
+
+sub findRules
+{
+    my ($directory) = (@_);
+
+    my @names;
+
+    #
+    #  Process the files in sorted order
+    #
+    foreach my $file ( sort( glob( $directory . "/*" ) ) )
+    {
+
+        #
+        #  Make sure we only handle files, not directories.
+        #
+        if ( -f $file )
+        {
+
+            #
+            #  Get the name of the rule, with the directory.
+            #
+            if ( $file =~ /^(.*)\/(.*)$/ )
+            {
+                my $name = $2;
+                push( @names, $name );
+            }
+        }
+        else
+        {
+            print "WARNING: Ignoring non-file: $file\n";
+        }
+    }
+
+    return (@names);
+}
+
+
+
+=begin doc
+
+  Find the network interfaces on the system, by parsing the output of
+
+    ip -o link show
+
+=end doc
+
+=cut
+
+sub findDevices
+{
+    my %interfaces;
+
+    my $output = `/sbin/ip -o link show`;
+
+    foreach my $line ( split( /[\r\n]/, $output ) )
+    {
+        if ( $line =~ /\d: ([^:]+):/ )
+        {
+            my $int = $1;
+            if ( ( $int ne "lo" ) && ( $int !~ /^sit/i ) )
+            {
+                $CONFIG{'verbose'} && print "Found network device: $int\n";
+
+                $interfaces{$int} += 1;
+            }
+        }
+    }
+    return( sort keys %interfaces );
+}
+
+
+
+=begin doc
+
+  Process a given rule.
+
+  This means that we open the template for that rule, and then append that
+ to our globally available temporary file.
+
+  If a rule doesn't actually exist then we should warn about it.
+
+=end doc
+
+=cut
+
+
+
+sub processRule
+{
+    my ( $file, $ruleDir, $direction, $name ) = (@_);
+
+    #
+    #  Src/destination limits.
+    #
+    my @args = ();
+
+    #
+    #  There are two types of rule here -
+    #
+    #  1.  Non-empty files containing src/destination ACLs.
+    #
+    #  2.  Empty files containing merely the name of the rule in their
+    #     own name.
+    #
+
+    my $prefix = "";
+    if ( $direction =~ /incoming/ )
+    {
+        $prefix = $CONFIG{ 'incoming.d' };
+    }
+    else
+    {
+        $prefix = $CONFIG{ 'outgoing.d' };
+    }
+
+    #
+    #  The file has size > 0.
+    #
+    if ( ( -s "$prefix/$name" > 0 ) )
+    {
+
+        #
+        #  Open the file and read the sources.
+        #
+        open( INPUT, "<", "$prefix/$name" )
+          or die "ERROR: failed to read custom file : $file - $!";
+
+
+        while ( my $line = <INPUT> )
+        {
+
+            # skip blank lines
+            next if ( ( !$line ) || ( !length($line) ) );
+            chomp($line);
+            next if ( ( !$line ) || ( !length($line) ) );
+
+            # skip comments
+            next if ( $line =~ /^#/ );
+
+            # record the ACL.
+            push( @args, $line );
+        }
+
+
+        #
+        #  Close the file.
+        #
+        close(INPUT);
+    }
+
+    #
+    #  Strip prefix.
+    #
+    if ( $name =~ /^([0-9]+)-(.*)$/ )
+    {
+        $name = $2;
+    }
+    else
+    {
+        print "WARNING: Ignoring file with invalid name: $name\n";
+        return;
+    }
+
+    #
+    #  Do we have the global rule?
+    #
+    my $global = undef;
+    if ( -e $ruleDir . "/$name.$direction" )
+    {
+        $global = $ruleDir . "/$name.$direction";
+    }
+    if ( -e "/usr/local/share/firewall/$name.$direction" )
+    {
+        $global = "/usr/local/share/firewall/$name.$direction";
+    }
+
+
+    #
+    #  If we got a file for input.
+    #
+    if ( defined( $global ) && ( -e $global ) )
+    {
+
+        #
+        #  Open the file.
+        #
+        open( INPUT, "<", $global )
+          or die "ERROR: failed to read $global - $!";
+
+        #
+        #  Append each line of the input template to the temporary file.
+        #
+        while ( my $line = <INPUT> )
+        {
+            chomp($line);
+
+            #
+            #  Handle retrictions.
+            #
+            if ( scalar(@args) )
+            {
+
+                #
+                #  OK we've got an ACL list, and the rule entry mentions
+                # $SRC - repeat that line once for each acl entry
+                #
+                if ( $line =~ /\$SRC/ )
+                {
+                    foreach my $src (@args)
+                    {
+
+                        # expand
+                        my $copy = $line;
+                        $copy =~ s/\$SRC/--src $src/g;
+
+                        # add the rule.
+                        addRule( $file, $copy , $direction );
+                    }
+                }
+                elsif ( $line =~ /\$DEST/ )
+                {
+
+                    #
+                    #  OK we've got an ACL list, and the rule entry mentions
+                    # $DEST - repeat that line once for each acl entry
+                    #
+                    foreach my $dst (@args)
+                    {
+
+                        # expand the string
+                        my $copy = $line;
+                        $copy =~ s/\$DEST/--destination $dst/g;
+
+                        # write it out
+                        addRule( $file, $copy, $direction );
+                    }
+                }
+                else
+                {
+
+                    #
+                    #  We have an ACL but the line doesn't contain either
+                    # $SRC or $DEST
+                    #
+                    addRule( $file, $line, $direction );
+                }
+            }
+            else
+            {
+
+                #
+                #  This is just a plain line - remove $SRC & $DEST
+                # if present
+                #
+                $line =~ s/\$SRC//g  if ( length($line) );
+                $line =~ s/\$DEST//g if ( length($line) );
+
+                #
+                #  Write it out
+                #
+                addRule( $file, $line, $direction );
+            }
+        }
+
+        #
+        #  Close the file.
+        #
+        close(INPUT);
+    }
+    else
+    {
+        print "WARNING unknown rule type '$name'\n";
+    }
+}
+
+
+=begin doc
+
+  Add the rule to the file.
+
+=end doc
+
+=cut
+
+sub addRule
+{
+    my( $file, $rule, $direction ) = ( @_ );
+
+    #
+    #  Strip trailng newlines.
+    #
+    $rule =~ s/[\r\n]$//g;
+
+
+    #
+    #  Open our output file.
+    #
+    open( FILE, ">>", $file )
+      or die "ERROR: failed to append to temporary file $file - $!";
+
+
+    if ($rule =~ /\$DEV/ )
+    {
+        foreach my $dev ( @devices )
+        {
+            my $copy = $rule;
+
+            if ($direction =~ /incoming/i )
+            {
+                $copy =~ s/\$DEV/-i $dev/;
+            }
+            elsif ( $direction =~ /outgoing/i )
+            {
+                $copy =~ s/\$DEV/-o $dev/;
+            }
+            else
+            {
+                die "ERROR: Uknown direction: $direction\n";
+            }
+            print FILE $copy . "\n";
+        }
+        print FILE "\n";
+    }
+    else
+    {
+        print FILE $rule . "\n";
+    }
+    close( FILE );
+
+
+}
+
+
+=begin doc
+
+  This routine will perform some basic tests of the installed firewall,
+ if it fails then the firewall will be disabled.
+
+=end doc
+
+=cut
+
+
+
+sub testFirewall
+{
+    my $test = "use Net::DNS;";
+    eval($test);
+    if ($@)
+    {
+
+        #
+        #  OK the perl module Net::DNS is not available.
+        #
+        $CONFIG{ 'verbose' } && print "Unable to use Net::DNS\n";
+
+        if ( -x "/usr/bin/dig" )
+        {
+            $CONFIG{ 'verbose' } && print "Using dig to test DNS\n";
+
+            my $output = `dig -t a +short bytemark.co.uk`;
+            return 0 if (    !defined($output)
+                          || !length($output) );
+
+            my $found = 0;
+            foreach my $line ( split( /[\r\n]/, $output ) )
+            {
+                $found = 1 if ( $line =~ /^([0-9\.]+)$/ );
+            }
+
+            $CONFIG{ 'verbose' } && print "Result: $found\n";
+            return $found;
+        }
+        elsif ( -x "/usr/bin/nslookup" )
+        {
+            $CONFIG{ 'verbose' } && print "Using nslookup to test DNS\n";
+
+            my $output = `nslookup bytemark.co.uk`;
+            return 0 if (    !defined($output)
+                          || !length($output) );
+
+            my $found = 0;
+            foreach my $line ( split( /[\r\n]/, $output ) )
+            {
+                $found = 1 if ( $line =~ /^Address: ([0-9\.]+)$/ );
+            }
+
+            $CONFIG{ 'verbose' } && print "Result: $found\n";
+            return $found;
+        }
+        else
+        {
+            $CONFIG{ 'verbose' }
+              && print "Unable to test DNS lookups - dig & nslookup missing\n";
+        }
+    }
+    else
+    {
+        $CONFIG{ 'verbose' } && print "Testing DNS with Net::DNS\n";
+
+        #
+        #  OK we have Net::DNS to use.
+        #
+        my $res   = Net::DNS::Resolver->new;
+        my $query = $res->search("bytemark.co.uk");
+        my $found = 0;
+
+        if ($query)
+        {
+            foreach my $rr ( $query->answer )
+            {
+                next unless $rr->type eq "A";
+                $found += 1;
+            }
+        }
+        else
+        {
+            print "query failed: ", $res->errorstring, "\n";
+            return 0;
+        }
+
+        if ( !$found )
+        {
+            print "failed to find any records for bytemark.co.uk\n";
+            return 0;
+        }
+
+        #
+        #  OK so DNS works.
+        #
+
+    }
+    return 1;
+}
+
+
+
+
+=begin doc
+
+  Load any kernel modules which we've got listed.
+
+=end doc
+
+=cut
+
+sub loadModules
+{
+    return if ( ! -x "/sbin/modprobe" );
+
+    foreach my $mod ( keys %MODULES )
+    {
+        $CONFIG{'verbose'} && print "Loading kernel module: $mod\n";
+
+        system( "/sbin/modprobe $mod 2>/dev/null >/dev/null" );
+    }
+}

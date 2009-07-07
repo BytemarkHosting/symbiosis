@@ -1,0 +1,30 @@
+bytemark-vhost (20090522105210) stable; urgency=low
+
+  * New release for Lenny.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
+
+bytemark-vhost (20081117163642) stable; urgency=low
+
+  * Updated the short description of this package.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 16:36:16 +0000
+
+bytemark-vhost (20081110153347) stable; urgency=low
+
+  * No longer rely upon the bytemark-vhost-ssh-protection package.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 11 Nov 2008 16:47:32 +0000
+
+bytemark-vhost (20081110153346) stable; urgency=low
+
+  * Updated all dependencies to be in order.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 11 Nov 2008 13:44:31 +0000
+
+bytemark-vhost (20081110153344) stable; urgency=low
+
+  * The Bytemark Virtual Hosting Package bytemark-vhost
+    - Support may be found at http://vhost.bytemark.co.uk/
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 10 Nov 2008 15:33:44 +0000

@@ -1,0 +1,5 @@
+
+#
+#  Allow incoming imager connections
+#
+/sbin/iptables -A INPUT $DEV -p tcp --dport 5000 $SRC -j ACCEPT

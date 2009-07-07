@@ -1,0 +1,12 @@
+  # Test to see if a domain needs virus scanning, 
+  warn    domains    = +vhost_domains
+          condition  = ${if and{\
+                         {!exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/bytemark-antispam}} \
+                         {exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/antivirus}} \
+                         {!eq{$acl_m2}{tag}} \
+                       }}
+
+          set acl_m2 = ${if match{${extract{smode}{${stat:VHOST_DIR/${domain}/VHOST_CONFIG_DIR/antivirus}}}}{\Nr..$\N}{\
+                          ${if match{${readfile{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/antivirus}}}{^tag}{tag}{reject}}\
+                       }{reject}}
+

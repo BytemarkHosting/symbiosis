@@ -1,0 +1,12 @@
+bytemark-vhost-phpmyadmin (20090522105210) stable; urgency=low
+
+  * New release for Lenny.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
+
+bytemark-vhost-phpmyadmin (20081110153344) stable; urgency=low
+
+  * The Bytemark Virtual Hosting Package bytemark-vhost-phpmyadmin
+    - Support may be found at http://vhost.bytemark.co.uk/
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 10 Nov 2008 15:33:44 +0000

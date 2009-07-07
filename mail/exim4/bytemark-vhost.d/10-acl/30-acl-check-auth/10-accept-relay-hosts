@@ -1,0 +1,4 @@
+  # Accept hosts we've allowed relaying from
+  accept  hosts = : +relay_from_hosts
+          endpass
+

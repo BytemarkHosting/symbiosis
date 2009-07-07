@@ -1,0 +1,12 @@
+######################################################################
+#                   CONFIGURATION FOR local_scan()                   #
+######################################################################
+
+# If you have built Exim to include a local_scan() function that contains
+# tables for private options, you can define those options here. Remember to
+# uncomment the "begin" line. It is commented by default because it provokes
+# an error with Exim binaries that are not built with LOCAL_SCAN_HAS_OPTIONS
+# set in the Local/Makefile.
+
+# begin local_scan
+

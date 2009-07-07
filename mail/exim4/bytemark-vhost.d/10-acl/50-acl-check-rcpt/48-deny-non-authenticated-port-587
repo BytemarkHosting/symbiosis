@@ -1,0 +1,5 @@
+  # Deny connections that are made on port 587 if the client hasn't
+  # authenticated yet, and isn't on the relay list.
+  deny condition = ${if !eq{${interface_port}}{25}}
+         message = Only authenticated connections are allowed on ports other than 25 (${interface_port}).
+

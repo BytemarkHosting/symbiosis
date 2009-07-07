@@ -1,0 +1,19 @@
+# Like the last router, this tries DNS lookups for vhost domains with no
+# mailbox directory, and no default forwarding rule set up.
+
+vhost_no_local_mail:
+  debug_print = "R: vhost_no_local_mail for $local_part@$domain"
+  driver = dnslookup
+  domains = +vhost_domains
+  condition  = ${if and{ \
+                 {!exists{VHOST_DIR/$domain/VHOST_MAILBOX_DIR/}} \
+                 {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/default_forward}} \
+                }}
+  transport = remote_smtp
+  same_domain_copy_routing = yes
+  # ignore private rfc1918 and APIPA addresses
+  ignore_target_hosts = 0.0.0.0 : 127.0.0.0/8 : 192.168.0.0/16 :\
+                        172.16.0.0/12 : 10.0.0.0/8 : 169.254.0.0/16 :\
+                        255.255.255.255
+  no_more
+

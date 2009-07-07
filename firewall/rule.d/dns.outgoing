@@ -1,0 +1,8 @@
+
+#
+#  Allow outgoing connections on port 53
+#
+/sbin/iptables -A OUTPUT $DEV -p tcp --sport 53 $DEST -j ACCEPT
+/sbin/iptables -A OUTPUT $DEV -p tcp --dport 53 $DEST -j ACCEPT
+/sbin/iptables -A OUTPUT $DEV -p udp --sport 53 $DEST -j ACCEPT
+/sbin/iptables -A OUTPUT $DEV -p udp --dport 53 $DEST -j ACCEPT

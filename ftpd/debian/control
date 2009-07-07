@@ -1,0 +1,17 @@
+Source: bytemark-vhost-ftpd
+Section: web
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.7.2
+
+Package: bytemark-vhost-ftpd
+Architecture: all
+Depends: pure-ftpd
+Description: Tools to manage FTP virtual hosting
+ This package contains tools to FTP access to any virtual hosts which
+ have been setup with the bytemark packges.
+ .
+ When this package is installed your system will be automatically
+ configured to allow FTP access to your websites.

@@ -1,0 +1,96 @@
+#!/bin/sh
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+        echo "I: Skipping configuration"
+        exit 0
+fi
+
+#
+#  Remove old file
+#
+if [ -e /etc/bytemark.dns.template ]; then
+    rm -f /etc/bytemark.dns.template
+fi
+
+
+#
+#  If we're not on a Bytemark host then we do nothing.
+#
+bytemark=`/usr/bin/is-bytemark-ip`;
+
+if [ ! "$bytemark" ]; then
+    if [ -x /root/BytemarkDNS/upload ]; then
+        chmod 644 /root/BytemarkDNS/upload
+    fi
+
+    echo "* ============================================================= *"
+    echo "*  This machine doesn't appear to be within the Bytemark Range  *"
+    echo "* ============================================================= *"
+    exit 0;
+
+fi
+
+#
+#  Rebuild exim if we need to
+#
+if [ -e /etc/exim4/Makefile ]; then
+
+    #
+    #  Rebuild exim4
+    #
+    cd /etc/exim4 && make
+
+    #
+    #  Restart exim4
+    #
+    if which invoke-rc.d >/dev/null 2>&1; then
+        invoke-rc.d exim4 reload
+    else
+        /etc/init.d/exim4 reload
+    fi
+
+fi
+
+#
+#  Reload Apache
+#
+#
+#  If we have a /root/BytemarkDNS.zip file then we're OK.
+#
+if [ !  -d /root/BytemarkDNS ]; then
+
+    #
+    #  Get the file
+    #
+    cd /root && wget -OBytemarkDNS.zip http://upload.ns.bytemark.co.uk/create/
+
+    #
+    #  Unzip it
+    #
+    cd /root && unzip -o BytemarkDNS.zip
+fi
+
+
+#
+#  If there are files on the system with the old names regenerate them.
+#
+for i in /srv/*/config/dns/zone*; do
+    if [ -e $i ]; then
+        rm -f $i
+    fi
+done
+
+
+#
+#  Now regenerate and re-upload all DNS files.
+#
+/etc/cron.hourly/create-dns
+
+
+#DEBHELPER#
+exit 0

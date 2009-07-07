@@ -1,0 +1,24 @@
+#
+#  Nameserver records.
+#
+.$domain::a.ns.bytemark.co.uk
+.$domain::b.ns.bytemark.co.uk
+.$domain::c.ns.bytemark.co.uk
+
+#
+#  The domain name itself
+#
+=$domain:$ip
+
+#
+#  Useful aliases.
+#
++ftp.$domain:$ip
++mx.$domain:$ip
++www.$domain:$ip
+
+#
+#  MX record
+#
+@$domain:$ip:mx.$domain:15
+

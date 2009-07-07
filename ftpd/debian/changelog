@@ -1,0 +1,24 @@
+bytemark-vhost-ftpd (20090522105210) stable; urgency=low
+
+  * New release for Lenny.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
+
+bytemark-vhost-ftpd (20081117171455) stable; urgency=low
+
+  * New format for blacklist patterns.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 17:17:17 +0000
+
+bytemark-vhost-ftpd (20081110153345) stable; urgency=low
+
+  * Blacklist IPs which fail our login.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 14 Nov 2008 17:11:11 +0000
+
+bytemark-vhost-ftpd (20081110153344) stable; urgency=low
+
+  * The Bytemark Virtual Hosting Package bytemark-vhost-ftpd
+    - Support may be found at http://vhost.bytemark.co.uk/
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 10 Nov 2008 15:33:44 +0000

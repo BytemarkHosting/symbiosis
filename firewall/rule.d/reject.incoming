@@ -1,0 +1,6 @@
+#
+#  Reject all new incoming connections.
+#
+/sbin/iptables -A INPUT $DEV -p tcp   $SRC -j REJECT --reject-with tcp-reset  -m state --state NEW
+/sbin/iptables -A INPUT $DEV -p udp   $SRC -j REJECT -m state --state NEW
+/sbin/iptables -A INPUT $DEV -p icmp  $SRC -j REJECT -m state --state NEW

@@ -1,0 +1,30 @@
+# This handles the catchall case, defined in VHOST_DIR/$domain/VHOST_CONFIG_DIR/default_forward
+vhost_default_forward:
+  debug_print = "R: vhost_default_forward for $local_part@$domain"
+  driver = redirect
+  domains = +vhost_domains
+  condition  = ${if exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/default_forward}}
+  file  = VHOST_DIR/$domain/VHOST_CONFIG_DIR/default_forward
+  # Set permissions
+  user  = ${extract{uid}{${stat:VHOST_DIR/$domain}}}
+  group = ${extract{gid}{${stat:VHOST_DIR/$domain}}}
+  directory_transport = address_directory
+  file_transport      = address_file
+  pipe_transport      = address_pipe
+  reply_transport     = address_reply
+  # these two are required to allow :fail:, :defer: to work
+  allow_fail
+  allow_defer
+  allow_filter
+  # again, this makes sure that we don't try and change uid/gid during
+  # verification, by skipping this router.
+  no_verify
+
+# If the default_forward file exists, we can accept the message.  This router
+# is *only* for verification.
+vhost_default_forward_check:
+  debug_print = "R: vhost_default_forward_check for $local_part@$domain"
+  driver = accept
+  condition  = ${if exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/default_forward}}
+  verify_only
+

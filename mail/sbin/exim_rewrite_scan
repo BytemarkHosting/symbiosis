@@ -1,0 +1,91 @@
+#!/usr/bin/ruby
+
+# = NAME
+#
+# exim_rewrite_scan -- A program to generate rewrite rules for exim4
+#
+# = SYNOPSIS
+#
+# exim4_rewrite_scan [file]
+#
+# = USAGE
+#
+# This program takes one optional argument, which is the exim4 configuration
+# file.  By default the program assumes it is /etc/exim4/exim4.conf.
+#
+# The program reads the exim4 configuration file and looks for two constants,
+# one called ETC_DIR, and one called VHOST_DIR.  It then assumes that the
+# rewrites file should be called ETC_DIR/exim4/rewrites.
+#
+# It then scans the VHOST_DIR for symlinks to other directories inside the same
+# directory.  It then generates a file of the form
+#
+#   symlinked.domain: actual.domain
+#
+# which exim4 then uses to determine which domains should be rewritten.
+#
+# = BUGS
+#
+# On writing this manpage, I was struck by the stupidity of the program.
+#
+# = AUTHOR
+#
+# Patrick J. Cherry <patrick@bytemark.co.uk>
+#
+# = DATE
+#
+# 2008-09-11
+
+require 'rdoc/usage'
+
+DEFAULT_EXIM4_CONF = "/etc/exim4/exim4.conf"
+
+def do_write_exim4_rewrites(fn=DEFAULT_EXIM4_CONF)
+  raise "Cannot find #{fn}" unless File.exists?(fn)
+  raise "Cannot read #{fn}" unless File.readable?(fn)
+
+  # Read in our current exim4.conf so we can modify it
+  exim4_config = File.open(fn,"r"){|fh| fh.read}
+
+  # Check where exim thinks /etc is
+  exim4_config =~ /^ETC_DIR\s*=\s*(.*)$/
+  etc_dir = $1
+  raise "Could not find ETC_DIR in #{fn}" if etc_dir.to_s.empty?
+  exim4_dir = File.join(etc_dir, "exim4")
+  raise "Could not find directory #{exim4_dir}" unless File.directory?(exim4_dir)
+
+  # Change where exim thinks the /srv directory is
+  exim4_config =~ /^VHOST_DIR\s*=\s*(.+)$/
+  vhost_dir = $1
+  raise "Could not find VHOST_DIR in #{fn}" if vhost_dir.to_s.empty?
+  raise "Could not find directory #{vhost_dir}" unless File.directory?(vhost_dir)
+
+  File.open(File.join(exim4_dir, "rewrites"),"w+") do |fh|
+    Dir.glob(File.join(vhost_dir,"*")).each do |from|
+      # check that this entry is a symink
+      next unless File.symlink?(from)
+      to = File.readlink(from)
+
+      # Make sure the link is an absolute path, starting in the vhost_dir
+      to = File.expand_path(File.join(vhost_dir,to)) unless to =~ /^\//
+      
+      # check that the symlink isn't broken
+      next unless File.directory?(to)
+      
+      # check that this new directory is in the vhost directory
+      next unless File.dirname(to) == vhost_dir
+
+      fh.puts(File.basename(from)+": "+File.basename(to))
+    end
+  end
+end
+
+if __FILE__ == $0
+  exim4_conf = ($*.length > 0 ? $*.first : DEFAULT_EXIM4_CONF)
+  if exim4_conf =~ /--?h.*/
+    RDoc::usage
+  else
+    do_write_exim4_rewrites(exim4_conf)
+  end
+end
+

@@ -1,0 +1,17 @@
+# If you are running a version of Exim that was compiled with the content-
+# scanning extension, you can cause incoming messages to be automatically
+# scanned for viruses. You have to modify the configuration in two places to
+# set this up. The first of them is here, where you define the interface to
+# your scanner. This example is typical for ClamAV; see the manual for details
+# of what to set for other virus scanners. The second modification is in the
+# acl_check_data access control list (see below).
+
+av_scanner = clamd:CLAMAV_SOCKET
+
+# For spam scanning, there is a similar option that defines the interface to
+# SpamAssassin. You do not need to set this if you are using the default, which
+# is shown in this commented example. As for virus scanning, you must also
+# modify the acl_check_data access control list to enable spam scanning.
+
+spamd_address = 127.0.0.1 783
+

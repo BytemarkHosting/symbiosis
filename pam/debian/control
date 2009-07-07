@@ -1,0 +1,17 @@
+Source: bytemark-vhost-pam
+Section: web
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.7.2
+
+Package: bytemark-vhost-pam
+Architecture: all
+Depends: libpam-tmpdir, wbritish, libpam-cracklib
+Description: PAM configuration meta-package
+ This package is a meta-package which will configure and control the
+ basic PAM setup of your machine.
+ .
+ It provides a simple means of centralising PAM configuration for
+ security.

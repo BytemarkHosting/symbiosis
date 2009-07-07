@@ -1,0 +1,17 @@
+Source: bytemark-vhost-phpmyadmin
+Section: web
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.7.2
+
+Package: bytemark-vhost-phpmyadmin
+Architecture: all
+Depends: phpmyadmin, bytemark-vhost-mysql
+Description: This package gives remote database access
+ This package will enable a global MySQL administrative interface
+ which may be used remotely.
+ .
+ Note:  You should ensure that you setup a root password for your
+ MySQL database prior to installing this package.

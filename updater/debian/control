@@ -1,0 +1,16 @@
+Source: bytemark-vhost-updater
+Section: web
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.8.0
+
+Package: bytemark-vhost-updater
+Architecture: all
+Replaces: cron-apt
+Description: Automatic package upgrades
+ This package contains a helper which will automatically apply security
+ and vhost package updates once a day.
+ .
+ It replaces the prior use of cron-apt, which could fail at times.

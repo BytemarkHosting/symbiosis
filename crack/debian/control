@@ -1,0 +1,21 @@
+Source: bytemark-vhost-crack
+Section: web
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 4.0.0), cracklib2-dev
+Standards-Version: 3.7.2
+
+Package: bytemark-vhost-crack
+Architecture: any
+Depends: cracklib2
+Description: Test the strength of virtual hosting passwords
+ This package contains a simple script to test each virtual host
+ password to ensure they are secure.
+ .
+ The passwords tested are:
+ .
+ * FTP passwords
+ * IMAP passwords
+ .
+ The password strength testing is achieved via cracklib2.

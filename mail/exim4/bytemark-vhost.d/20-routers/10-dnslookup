@@ -1,0 +1,25 @@
+# This router routes addresses that are not in local domains by doing a DNS
+# lookup on the domain name. The exclamation mark that appears in "domains = !
+# +local_domains" is a negating operator, that is, it can be read as "not". The
+# recipient's domain must not be one of those defined by "domainlist
+# local_domains" above for this router to be used.
+#
+# If the router is used, any domain that resolves to 0.0.0.0 or to a loopback
+# interface address (127.0.0.0/8) is treated as if it had no DNS entry. Note
+# that 0.0.0.0 is the same as 0.0.0.0/32, which is commonly treated as the
+# local host inside the network stack. It is not 0.0.0.0/0, the default route.
+# If the DNS lookup fails, no further routers are tried because of the no_more
+# setting, and consequently the address is unrouteable.
+
+dnslookup:
+  debug_print = "R: dnslookup for $local_part@$domain"
+  driver = dnslookup
+  domains = ! +local_domains
+  transport = remote_smtp
+  same_domain_copy_routing = yes
+  # ignore private rfc1918 and APIPA addresses
+  ignore_target_hosts = 0.0.0.0 : 127.0.0.0/8 : 192.168.0.0/16 :\
+                        172.16.0.0/12 : 10.0.0.0/8 : 169.254.0.0/16 :\
+                        255.255.255.255
+  no_more
+

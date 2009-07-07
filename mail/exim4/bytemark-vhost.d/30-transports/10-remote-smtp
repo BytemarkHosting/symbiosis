@@ -1,0 +1,6 @@
+# This transport is used for delivering messages over SMTP connections.
+
+remote_smtp:
+  debug_print = "T: remote_smtp for $local_part@$domain"
+  driver = smtp
+

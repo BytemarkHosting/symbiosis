@@ -1,0 +1,7 @@
+#
+#  Allow established incoming connections for resolving DNS
+#
+/sbin/iptables -A INPUT $DEV -p udp --sport 53 --dport 1024:65535 -m state --state ESTABLISHED -j ACCEPT
+
+
+

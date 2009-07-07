@@ -1,0 +1,10 @@
+# Deliver mail for postmaster at any domain, even if no specfic alias has been
+# defined for him (except for the local domain)
+
+vhost_postmaster:
+  debug_print = "R: vhost_postmaster for $local_part@$domain"
+  driver = redirect
+  domains = +vhost_domains
+  local_parts = postmaster
+  data = postmaster
+

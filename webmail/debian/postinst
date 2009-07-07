@@ -1,0 +1,49 @@
+#!/bin/sh
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+        echo "I: Skipping configuration"
+        exit 0
+fi
+
+
+#
+# Remove existing link, and add new one.
+#
+if [ -e  /etc/apache2/conf.d/squirrelmail.conf  ]; then
+    rm -f /etc/apache2/conf.d/squirrelmail.conf
+fi
+
+#
+# Link in the default file.
+#
+ln -s /etc/squirrelmail/apache.conf  /etc/apache2/conf.d/squirrelmail.conf
+
+#
+#  Ensure we have our alias.
+#
+cat > /etc/apache2/conf.d/squirrelmail.local.conf<<EOF
+
+#
+#  Setup a friendlier login link
+#
+Alias /webmail /usr/share/squirrelmail
+
+EOF
+
+
+#
+#  Restart Apache2.
+#
+if which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d apache2 restart
+else
+    /etc/init.d/apache2 restart
+fi
+
+#DEBHELPER#
+exit 0

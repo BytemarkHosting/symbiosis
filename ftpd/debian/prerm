@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+#
+# Stop the authd
+#
+
+if which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d pure-authd stop
+else
+    /etc/init.d/pure-authd stop
+fi
+
+#DEBHELPER#
+exit 0

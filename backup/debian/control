@@ -1,0 +1,17 @@
+Source: bytemark-vhost-simple-backup
+Section: web
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.7.2
+
+Package: bytemark-vhost-simple-backup
+Architecture: all
+Depends: backup2l
+Description: Automatically backup your files locally
+ When this package is installed all your files will be backed up locally,
+ for a period of one week.
+ .
+ This backup won't protect you against system failure, but will prevent
+ you from accidental deletions, etc.

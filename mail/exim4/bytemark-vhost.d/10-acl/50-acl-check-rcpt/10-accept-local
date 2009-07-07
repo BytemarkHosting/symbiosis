@@ -1,0 +1,5 @@
+  # Accept if the source is local SMTP (i.e. not over TCP/IP). We do this by
+  # testing for an empty sending host field.
+
+  accept  hosts = :
+

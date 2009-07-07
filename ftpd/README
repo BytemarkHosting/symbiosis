@@ -1,0 +1,15 @@
+
+
+  This package completely configures a Debian Etch machine for the
+ virtual hosting of sites via FTP.
+
+  To get started just create a new website beneath /srv/
+  For example:
+
+mkdir -p /srv/foo.com/htdocs
+mkdir -p /srv/foo.com/cgi-bin
+
+  Now save the ftp password away:
+
+echo 'mysecretpassword' > /srv/foo.com/ftp-password
+

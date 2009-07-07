@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+        echo "I: Skipping configuration"
+        exit 0
+fi
+
+cp /usr/share/bytemark-vhost-simple-backup/backup2l.conf /etc/
+
+#DEBHELPER#
+exit 0

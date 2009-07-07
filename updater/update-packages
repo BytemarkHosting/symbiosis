@@ -1,0 +1,178 @@
+#!/bin/bash
+#
+#  Update the local system with apt-get so that all pending
+# package update are completed.
+#
+#  This uses a special sources.list file to ensure that we only
+# update packages that we expect to update.
+#
+# Steve
+# --
+
+
+#
+#  PATH updating
+#
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+export PATH
+
+
+#
+#  The sources list we update from.
+#
+SOURCES="/etc/apt/sources.list.security"
+
+
+#
+#  The email address to notify, if any.
+#
+EMAIL=automatic@lists.bytemark.co.uk
+
+
+#
+#  The options to use by default.
+#
+OPTIONS="-o \"APT::Get::AllowUnauthenticated=true\" -o \"DPkg::Options::=--force-confold\" -o \"Dir::Etc::SourceList=$SOURCES\""
+
+#
+#  Options to use for operations that should be quiet.
+#
+QUIET="-o quiet=2 $OPTIONS"
+
+
+#
+#  Upgrade method [dist-upgrade|upgrade]
+#
+METHOD="dist-upgrade"
+
+
+
+#
+#  Source a config file if it exists, that'll allow
+# the settings above to be overridden.
+#
+if [ -e /etc/update-packages.conf ]; then
+    . /etc/update-packages.conf
+fi
+
+
+#
+#  Exit silently if we shouldn't run
+#
+if [ -e /etc/update-packages.disabled ]; then
+    exit
+fi
+
+
+#
+#  Sanity check that we're on a Debian/Ubuntu host.
+#
+if [ ! -x /usr/bin/apt-get ] ; then
+    echo "/usr/bin/apt-get missing or non-executable."
+    exit
+fi
+
+
+#
+#  Make sure we have our sources.list present.
+#
+if [ ! -e "$SOURCES" ] ; then
+    echo "$SOURCES missing"
+    exit
+fi
+
+#
+#  Make sure we're root
+#
+if [ "$UID" -ne "0" ] ; then
+    echo "You're not root."
+    exit
+fi
+
+
+
+
+#
+# Sleep a random amount of time, max ten minutes, unless running under sudo.
+#
+if [ -z "$SUDO_USER" ]; then
+    splay=$RANDOM
+
+    #
+    # modulo: Which is why we have /bin/bash in the
+    # shebang line of thie script.
+    #
+    MAXSLEEP=600
+    let "splay %= $MAXSLEEP"
+
+    sleep $splay
+fi
+
+
+
+#
+#  Update our sources list
+#
+apt-get $QUIET update 2>/dev/null >/dev/null
+
+
+#
+#  Now simulate a dist-upgrade so that we can see if we need to do anything
+#
+tmp=`tempfile`
+/usr/bin/apt-get $QUIET --simulate $METHOD &>"$tmp"
+
+
+#
+#  Did that require us to upgrade?
+#
+if ( grep ^Inst "$tmp" 2>/dev/null >/dev/null ) ; then
+
+
+    #
+    #  We're going to update now - overwrite the temporary file
+    # with the output of the upgrade
+    #
+    /usr/bin/apt-get $OPTIONS -y -u $METHOD &>"$tmp"
+
+    #
+    #  Send output by email if we have an email address setup
+    # and mailx available.
+    #
+    if ( test ! -z "$EMAIL" -a -x /usr/bin/mailx ); then
+
+        cat "$tmp" | /usr/bin/mailx -s "[update-packages] `hostname`" "$EMAIL"
+
+    else
+        cat "$tmp"
+    fi
+fi
+
+
+
+#
+# Make sure we have an archive directory.
+#
+if [ ! -d /var/log/update-packages ]; then
+    mkdir -p /var/log/update-packages
+fi
+
+#
+# Move the temporary file somewhere safe
+#
+if [ -s "$tmp" ]; then
+
+    # date foramt
+    now=`date +%d-%m-%Y-%T`
+
+    #
+    #  Move it into place.
+    #
+    mv "$tmp" "/var/log/update-packages/$now"
+    chmod 644 "/var/log/update-packages/$now"
+else
+
+    rm -f "$tmp"
+fi
+
+

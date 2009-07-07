@@ -1,0 +1,9 @@
+usr/bin
+etc/cron.hourly
+etc/network/if-up.d
+etc/network/if-down.d
+usr/share/man/man1
+etc/firewall/incoming.d/
+etc/firewall/outgoing.d/
+etc/firewall/blacklist.d/
+etc/firewall/patterns.d/

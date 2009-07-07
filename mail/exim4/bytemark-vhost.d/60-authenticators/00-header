@@ -1,0 +1,21 @@
+######################################################################
+#                   AUTHENTICATION CONFIGURATION                     #
+######################################################################
+
+# The following authenticators support plaintext username/password
+# authentication using the standard PLAIN mechanism and the traditional
+# but non-standard LOGIN mechanism, with Exim acting as the server.
+# PLAIN and LOGIN are enough to support most MUA software.
+#
+# These authenticators are not complete: you need to change the
+# server_condition settings to specify how passwords are verified.
+# They are set up to offer authentication to the client only if the
+# connection is encrypted with TLS, so you also need to add support
+# for TLS. See the global configuration options section at the start
+# of this file for more about TLS.
+#
+# The default RCPT ACL checks for successful authentication, and will accept
+# messages from authenticated users from anywhere on the Internet.
+
+begin authenticators
+

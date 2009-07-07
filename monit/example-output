@@ -1,0 +1,133 @@
+= Bytemark Virtual Hosting service test report ========================
+Host:  example.vm.bytemark.co.uk
+Start: Wed, 03 Sep 2008 16:03:30 +0100
+Tests to be carried out:
+
+ * apache2
+ * clamav-daemon
+ * clamav-freshclam
+ * cron
+ * dovecot
+ * exim4
+ * ftpd
+ * mysqld
+ * spamassassin
+ * sshd
+
+-- apache2 -------------------------------------------------------------
+ * Checking process
+ * Process apache2 found with PID 10583
+ * Process state OK -- apache2 should be running
+ * Testing connection to localhost:http
+   > OPTIONS / HTTP/1.0\r\n
+   > Host: localhost\r\n
+   > \r\n
+   < HTTP/1.1 200 OK\r\n
+   < Date: Wed, 03 Sep 2008 15:03:30 GMT\r\n
+   < Server: Apache/2.2.3 (Debian) Phusion_Passenger/2.0.2 mod_ssl/2.2.3 OpenSSL/0.9.8c\r\n
+   < Allow: GET,HEAD,POST,OPTIONS,TRACE\r\n
+   < Content-Length: 0\r\n
+   < Connection: close\r\n
+   < Content-Type: text/plain; charset=UTF-8\r\n
+   < \r\n
+ * Connection tested OK
+
+-- clamav-daemon -------------------------------------------------------
+ * Checking process
+ * clamd doesn't appear to be runing: No such file or directory - /var/run/clamav/clamd.pid
+ * Process state OK -- clamd should not be running
+
+-- clamav-freshclam ----------------------------------------------------
+ * Checking process
+ * freshclam doesn't appear to be runing: No such file or directory - /var/run/clamav/freshclam.pid
+ * Process state OK -- freshclam should not be running
+
+-- cron ----------------------------------------------------------------
+ * Checking process
+ * Process cron found with PID 2795
+ * Process state OK -- cron should be running
+
+-- dovecot -------------------------------------------------------------
+ * Checking process
+ * Process dovecot found with PID 7756
+ * Process state OK -- dovecot should be running
+ * Testing connection to localhost:pop3
+   < +OK Dovecot ready.\r\n
+   > AUTH\r\n
+   < +OK\r\n
+   < PLAIN\r\n
+   < LOGIN\r\n
+   < .\r\n
+   > QUIT\r\n
+   < +OK Logging out\r\n
+ * Connection tested OK
+ * Testing connection to localhost:imap
+   < * OK Dovecot ready.\r\n
+   > * CAPABILITY\r\n
+   < * CAPABILITY IMAP4rev1 SASL-IR SORT THREAD=REFERENCES MULTIAPPEND UNSELECT LITERAL+ IDLE CHILDREN NAMESPACE LOGIN-REFERRALS STARTTLS AUTH=PLAIN AUTH=LOGIN\r\n
+   < * OK Capability completed.\r\n
+   > * LOGOUT\r\n
+   < * BYE Logging out\r\n
+   < * OK Logout completed.\r\n
+ * Connection tested OK
+
+-- exim4 ---------------------------------------------------------------
+ * Checking process
+ * Process exim4 found with PID 10666
+ * Process state OK -- exim4 should be running
+ * Testing connection to localhost:smtp
+   < 220 example.vm.bytemark.co.uk ESMTP Exim 4.63 Wed, 03 Sep 2008 16:03:31 +0100\r\n
+   > EHLO localhost\r\n
+   < 250-example.vm.bytemark.co.uk Hello localhost [127.0.0.1]\r\n
+   < 250-SIZE 52428800\r\n
+   < 250-PIPELINING\r\n
+   < 250-AUTH PLAIN LOGIN\r\n
+   < 250-STARTTLS\r\n
+   < 250 HELP\r\n
+   > QUIT\r\n
+   < 221 example.vm.bytemark.co.uk closing connection\r\n
+ * Connection tested OK
+
+-- ftpd ----------------------------------------------------------------
+ * Checking process
+ * Process inetd found with PID 6565
+ * Process state OK -- inetd should be running
+ * Testing connection to localhost:ftp
+   < 220---------- Welcome to Pure-FTPd [privsep] [TLS] ----------\r\n
+   < 220-You are user number 1 of 50 allowed.\r\n
+   < 220-Local time is now 16:03. Server port: 21.\r\n
+   < 220-This is a private system - No anonymous login\r\n
+   < 220-IPv6 connections are also welcome on this server.\r\n
+   < 220 You will be disconnected after 15 minutes of inactivity.\r\n
+   > NOOP\r\n
+   < 200 Zzz...\r\n
+   > QUIT\r\n
+   < 221-Goodbye. You uploaded 0 and downloaded 0 kbytes.\r\n
+   < 221 Logout.\r\n
+ * Connection tested OK
+
+-- mysqld --------------------------------------------------------------
+ * Checking process
+ * Process mysqld found with PID 2525
+ * Process state OK -- mysqld should be running
+ * Testing connection with a ping
+   mysqld is alive
+ * Connection tested OK
+
+-- spamassassin --------------------------------------------------------
+ * Checking process
+ * spamd doesn't appear to be runing: No such file or directory - /var/run/spamd.pid
+ * Process state OK -- spamd should not be running
+
+-- sshd ----------------------------------------------------------------
+ * Checking process
+ * Process sshd found with PID 8326
+ * Process state OK -- sshd should be running
+ * Testing connection to localhost:ssh
+   < SSH-2.0-OpenSSH_4.3p2 Debian-9etch2\n
+   > SSH-2.0-OpenSSH-4.3p2\n
+ * Connection tested OK
+------------------------------------------------------------------------
+
+Finished at: Wed, 03 Sep 2008 16:03:31 +0100
+= End Service test report ==============================================

@@ -1,0 +1,56 @@
+libapache2-mod-vhost-bytemark (20090707094355) stable; urgency=low
+
+  * Update the pre-rm script to be less broken.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tues, 8 Jul 2009 09:44:01 +0000
+
+libapache2-mod-vhost-bytemark (20090706162121) stable; urgency=low
+
+  * Forcible lenny rebuild
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 16:21:21 +0000
+
+libapache2-mod-vhost-bytemark (20090706151825) stable; urgency=low
+
+  * Prune the old logs from the correct location.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 15:18:25 +0000
+
+libapache2-mod-vhost-bytemark (20090706150949) stable; urgency=low
+
+  * Use perl for make-logs
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 15:10:09 +0000
+
+libapache2-mod-vhost-bytemark (20090706110146) stable; urgency=low
+
+  * Use "mtime" not "ctime" to purge old logs.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 10:44:10 +0000
+
+libapache2-mod-vhost-bytemark (20081118175414) stable; urgency=low
+
+  * Make sure the "admin" exists.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 18 Nov 2008 17:55:21 +0000
+
+libapache2-mod-vhost-bytemark (20081117153127) stable; urgency=low
+
+  * The create-ssl-sites script now understands config/ssl.bundle
+  * The auto-generated files will have a warning suggesting users shouldn't
+    edit them.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 15:33:51 +0000
+
+libapache2-mod-vhost-bytemark (20081110153345) stable; urgency=low
+
+  * Reinstate the postinstallation files.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 10 Nov 2008 15:33:44 +0000
+
+libapache2-mod-vhost-bytemark (20081110153344) stable; urgency=low
+
+  * The Bytemark Virtual Hosting Package libapache2-mod-vhost-bytemark
+    - Support may be found at http://vhost.bytemark.co.uk/
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 10 Nov 2008 15:33:44 +0000

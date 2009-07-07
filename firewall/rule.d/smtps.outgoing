@@ -1,0 +1,5 @@
+
+#
+#  Allow outgoing connections on port 465
+#
+/sbin/iptables -A OUTPUT $DEV -p tcp --dport 465 $DEST -j ACCEPT

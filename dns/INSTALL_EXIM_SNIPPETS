@@ -1,0 +1,5 @@
+To get the exim4 snippets working:
+
+a) copy the contents of exim4/bytemark-vhost.d to /etc/exim4/bytemark-vhost.d, keeping the directory structure in tact.
+b) cd /etc/exim4 && make
+c) restart exim4.

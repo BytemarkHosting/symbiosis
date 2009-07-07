@@ -1,0 +1,17 @@
+# Set up some basic macros, enabling us to test things.
+ETC_DIR = /etc
+
+# These are where the vhosts are kept
+VHOST_DIR = /srv
+
+# This is where the configuraion for a domain is kept
+VHOST_CONFIG_DIR=config
+VHOST_MAILBOX_DIR=mailboxes
+
+# This is where the clamd socket is.  If, at data time, this file is not
+# present, then no malware scan is performed.
+CLAMAV_SOCKET = /var/run/clamav/clamd.ctl
+# This user is used if no appropriate user can be found wilst using spamassassin.
+DEFAULT_SPAMD_USER = nobody
+
+

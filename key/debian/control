@@ -1,0 +1,17 @@
+Source: bytemark-vhost-key
+Section: web
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.7.2
+
+Package: bytemark-vhost-key
+Architecture: all
+Depends: gnupg
+Description: The Bytemark Debian package-signing key
+ This package contains a key which may be used to validate the signature
+ of the Bytemark Virtual Hosting repository.
+ .
+ Once installed there will be no further warnings about the signature
+ of the bytemark packages.

@@ -1,0 +1,6 @@
+######################################################################
+#                       ACL CONFIGURATION                            #
+#         Specifies access control lists for incoming SMTP mail      #
+######################################################################
+
+begin acl

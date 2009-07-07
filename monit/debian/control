@@ -1,0 +1,17 @@
+Source: bytemark-vhost-monit
+Section: web
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 4.0.0), rdoc, txt2man
+Standards-Version: 3.7.2
+
+Package: bytemark-vhost-monit
+Architecture: all
+Depends: ruby, rdoc, cron
+Conflicts: monit
+Description: Service monitoring and restarting
+ This package configures your server to include monitoring, so that
+ failed services are restarted automatically.
+ .
+ The monitoring is triggered by cron, and will mail output on failure.

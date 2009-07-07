@@ -1,0 +1,31 @@
+  # Test to see if a domain needs spam scanning.  This rule only gets matched
+  # if the file VHOST_DIR/domain/VHOST_CONFIG_DIR/antispam,
+  # VHOST_DIR/domain/VHOST_CONFIG_DIR/bytemark-antispam does not exist and
+  # acl_m0 hasn't previously been set to "tag"
+  warn    domains    = +vhost_domains
+          condition  = ${if and{ \
+                          {!exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/bytemark-antispam}} \
+                          {exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/antispam}} \
+                          {!eq{$acl_m0}{tag}} \
+                        }}
+
+          # This variable contains the user ID of the owner of the vhost directory
+          set acl_m0  = ${extract{uid}{${stat:VHOST_DIR/${domain}}}}
+
+          # This variable then contains the username (or nobody if grep fails, or the userid < 1000)
+          set acl_m1  = ${if <{$acl_m0}{1000}{DEFAULT_SPAMD_USER}\
+                         {${extract{1}{:}\
+                           {${run{ \
+                             /bin/egrep "^[^:]+:[^:]+:$acl_m0:" ETC_DIR/passwd\
+                           }{$value}{DEFAULT_SPAMD_USER}}}\
+                         }}\
+                       }
+
+          # Reuse acl_m0 since we don't need it any more.  If it contains tag,
+          # then the message will be accepted, and tagged, else we reject the
+          # mail.
+
+          set acl_m0  = ${if match{${extract{smode}{${stat:VHOST_DIR/${domain}/VHOST_CONFIG_DIR/antispam}}}}{\Nr..$\N}{\
+                          ${if match{${readfile{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/antispam}}}{^tag}{tag}{reject}}\
+                        }{reject}}
+

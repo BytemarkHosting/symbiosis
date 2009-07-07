@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+#  Test the firewall works.
+#
+/usr/bin/firewall --test

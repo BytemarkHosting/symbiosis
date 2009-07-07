@@ -1,0 +1,33 @@
+#!/usr/bin/ruby 
+
+require 'bytemark/vhost/monitor/check'
+
+class ApacheCheck < Bytemark::Vhost::Monitor::Check
+
+  def initialize
+    super
+    @process.pidfile = "/var/run/apache2.pid"
+    @process.initscript = "/etc/init.d/apache2"
+    @name = "apache2"
+  end
+
+  def do_check
+    return SystemExit::EX_CONFIG unless initscript_ok?
+
+    tcpconnection = Bytemark::Vhost::Monitor::TCPConnection.new(
+      "localhost", 
+      "http",
+      ["OPTIONS / HTTP/1.0\r\n","Host: localhost\r\n","\r\n",nil] )
+    r = do_tcpconnection_check(tcpconnection)
+    self.restart if SystemExit::EX_TEMPFAIL == r
+    return r
+  end
+
+  def do_tcpresponse_check(responses)
+    raise Errno::EPROTO, "Unexpected response '#{responses.first}'" unless responses.first =~ /HTTP\/\d+\.\d+\s+200\s+OK/
+  end
+
+end
+
+exit ApacheCheck.new.do_check if $0 == __FILE__
+

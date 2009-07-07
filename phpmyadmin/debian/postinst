@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+        echo "I: Skipping configuration"
+        exit 0
+fi
+
+#
+# Configure PHPMyAdmin
+#
+cat > /etc/apache2/conf.d/phpmyadmin.vhost.conf  <<EOF
+
+Alias /phpmyadmin /usr/share/phpmyadmin
+Include /etc/phpmyadmin/apache.conf
+
+EOF
+
+#
+# Remove old file if present
+#
+if [ -e /etc/apache2/conf.d/phpmyadmin.conf ]; then
+    rm /etc/apache2/conf.d/phpmyadmin.conf
+fi
+
+#
+#  Restart Apache2.
+#
+if which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d apache2 restart
+else
+    /etc/init.d/apache2 restart
+fi
+
+#DEBHELPER#
+exit 0

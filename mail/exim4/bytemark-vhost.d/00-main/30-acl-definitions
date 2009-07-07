@@ -1,0 +1,28 @@
+# This is the ACL to be called on smtp connect
+acl_smtp_connect = acl_check_connect
+
+# This one is checked after the helo
+acl_smtp_helo = acl_check_helo
+
+# This option specifies the Access Control List (ACL) that
+# is used after an AUTH command.
+
+acl_smtp_auth = acl_check_auth
+
+# Defines the access control list that is run when an
+# SMTP MAIL command is received.
+#
+acl_smtp_mail = acl_check_mail
+
+# Defines the access control list that is run when an
+# SMTP RCPT command is received.
+#
+acl_smtp_rcpt = acl_check_rcpt
+
+
+# Defines the access control list that is run when an
+# SMTP DATA command is received.
+#
+acl_smtp_data = acl_check_data
+
+

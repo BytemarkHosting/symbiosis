@@ -1,0 +1,9 @@
+  # Before we embark on DNS black lists, we will always accept the mail if the
+  # host IP or address is white listed by a domain
+  accept  hosts         = +whitelisted_hosts
+          log_message   = IP/hostname locally whitelisted
+
+  # Accept if the sender address is on a local whitelist
+  accept  senders       = +whitelisted_senders
+          log_message   = Address/domain locally whitelisted
+

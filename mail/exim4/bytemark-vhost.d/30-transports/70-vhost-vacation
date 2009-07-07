@@ -1,0 +1,16 @@
+# This transport is used for handling vacation autoreplies for the vhost system.
+
+vhost_vacation:
+  debug_print = "T: vhost_vacation for $local_part@$domain to $return_path"
+  driver   = autoreply
+  file     = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part/vacation 
+  log      = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part/vacation.log
+  once     = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part/vacation.db
+  once_repeat = 24h
+  headers  = "Precedence: junk"
+  to       = ${return_path}
+  from     = ${local_part}@${domain}
+  reply_to = ${local_part}@${domain}
+  subject  = "AutoReply Re: ${escape:$h_subject:}"
+
+

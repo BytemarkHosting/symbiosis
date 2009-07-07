@@ -1,0 +1,18 @@
+bytemark-vhost-test (20090522105210) stable; urgency=low
+
+  * New release for Lenny.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
+
+bytemark-vhost-test (20081110153344) stable; urgency=low
+
+  * Added tests for missing files, to ensure 404s are returned as expected.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 12 Nov 2008 10:00:01 +0000
+
+bytemark-vhost-test (20081110153344) stable; urgency=low
+
+  * The Bytemark Virtual Hosting Package bytemark-vhost-test
+    - Support may be found at http://vhost.bytemark.co.uk/
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 10 Nov 2008 15:33:44 +0000

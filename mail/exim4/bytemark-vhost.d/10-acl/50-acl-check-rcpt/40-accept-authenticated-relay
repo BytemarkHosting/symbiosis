@@ -1,0 +1,8 @@
+  # Accept if the message arrived over an authenticated connection, from
+  # any host. These messages are usually from MUAs, so recipient verification
+  # is omitted, and submission mode is set. And again, we do this check before
+  # any black list tests.
+
+  accept  authenticated = *
+          control       = submission/domain=
+

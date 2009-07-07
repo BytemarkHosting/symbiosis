@@ -1,0 +1,66 @@
+bytemark-vhost-updater (200906011113728) stable; urgency=low
+
+  * Updated standards version
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 1 Jun 2009 11:37:28 +0000
+
+bytemark-vhost-updater (20090522105210) stable; urgency=low
+
+  * New release for Lenny.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
+
+bytemark-vhost-updater (20081119105025) stable; urgency=low
+
+  * Don't call home
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 19 Nov 2008 10:50:25 +0000
+
+bytemark-vhost-updater (20081119103805) stable; urgency=low
+
+  * Ensure we have a PATH defined.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 19 Nov 2008 10:38:05 +0000
+
+bytemark-vhost-updater (20081119101226) stable; urgency=low
+
+  * Definely use the dpkg-confold option correctly.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 19 Nov 2008 10:12:25 +0000
+
+bytemark-vhost-updater (20081118122760) stable; urgency=low
+
+  * Use the dpkg-confold option correctly
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 18 Nov 2008 12:27:58 +0000
+
+bytemark-vhost-updater (20081118122325) stable; urgency=low
+
+  * Be quiet when running "apt-get update".
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 18 Nov 2008 12:23:19 +0000
+
+bytemark-vhost-updater (20081110153347) stable; urgency=low
+
+  * Move updater out of cron.daily and into /usr/bin
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 14 Nov 2008 10:33:01 +0000
+
+bytemark-vhost-updater (20081110153347) stable; urgency=low
+
+  * Persist logfiles in /var/log/update-packages
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 12 Nov 2008 16:44:59 +0000
+
+bytemark-vhost-updater (20081110153346) stable; urgency=low
+
+  * Updated to avoid sending blank messages.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 12 Nov 2008 12:33:21 +0000
+
+bytemark-vhost-updater (20081110153344) stable; urgency=low
+
+  * The Bytemark Virtual Hosting Package bytemark-vhost
+    - Support may be found at http://vhost.bytemark.co.uk/
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 10 Nov 2008 15:33:44 +0000

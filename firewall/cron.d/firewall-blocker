@@ -1,0 +1,5 @@
+# Crontab snippet which will invoke our firewall-based blocker to firewall
+# away people who conduct dictionary attacks.
+
+*/5 * * * * root [ -x /usr/bin/firewall-blacklist ] && /usr/bin/firewall-blacklist
+

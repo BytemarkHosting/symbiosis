@@ -1,0 +1,72 @@
+  # Spamhaus rules
+  # ==============
+  #
+  # This collection of rules will fire if various files are in the blacklists
+  # directory of the VHOST_CONFIG_DIR for a domain.  It tries to be efficient
+  # with lookups, and doesn't query the same dataset twice.
+  #
+  # So for example, if the files sbl.spamhaus.org and sbl-xbl.spamhaus.org are
+  # present, only the latter list is checked.
+  #
+  # The followling lists can be checked:
+  #  * sbl.spamhaus.org
+  #  * xbl.spamhaus.org
+  #  * pbl.spamhaus.org
+  #  * sbl-xbl.spamhaus.org
+  #  * zen.spamhaus.org
+  #
+  # NB:  Use of the Spamhaus DNSBLs is free of charge for low-volume
+  # non-commercial use. To check if you qualify for free use, please see:
+  # http://www.spamhaus.org/organization/dnsblusage.html
+  #
+  deny    domains       = +vhost_domains
+          condition     = ${if and{ \
+                            {!exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/bytemark-antispam}} \
+                            {exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/blacklists/sbl.spamhaus.org}}  \
+                            {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/blacklists/sbl-xbl.spamhaus.org}} \
+                            {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/blacklists/xbl.spamhaus.org}} \
+                            {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/blacklists/zen.spamhaus.org}} \
+                          }}
+          dnslists      = sbl.spamhaus.org
+          message       = $sender_host_address is blacklisted at $dnslist_domain.\n\
+                          Please see $dnslist_text
+          log_message   = IP blacklisted at $dnslist_domain.
+
+  deny    domains       = +vhost_domains
+          condition     = ${if and{ \
+                            {!exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/bytemark-antispam}} \
+                            {or{ \
+                              {exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/blacklists/sbl-xbl.spamhaus.org}} \
+                              {and{ \
+                                {exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/blacklists/xbl.spamhaus.org}} \
+                                {exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/blacklists/sbl.spamhaus.org}} \
+                              }} \
+                            }} \
+                            {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/blacklists/zen.spamhaus.org}} \
+                          }}
+          dnslists      = sbl-xbl.spamhaus.org
+          message       = $sender_host_address is blacklisted at $dnslist_domain.\n\
+                          Please see $dnslist_text
+          log_message   = IP blacklisted at $dnslist_domain.
+
+  deny    domains       = +vhost_domains
+          condition     = ${if and{ \
+                            {!exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/bytemark-antispam}} \
+                            {exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/blacklists/pbl.spamhaus.org}}  \
+                            {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/blacklists/zen.spamhaus.org}} \
+                          }}
+          dnslists      = pbl.spamhaus.org
+          message       = $sender_host_address is blacklisted at $dnslist_domain.\n\
+                          Please see $dnslist_text
+          log_message   = IP blacklisted at $dnslist_domain.
+
+  deny    domains       = +vhost_domains
+          condition     = ${if and{ \
+                            {!exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/bytemark-antispam}} \
+                            {exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/blacklists/zen.spamhaus.org}} \
+                          }}
+          dnslists      = zen.spamhaus.org
+          message       = $sender_host_address is blacklisted at $dnslist_domain.\n\
+                          Please see $dnslist_text
+          log_message   = IP blacklisted at $dnslist_domain.
+

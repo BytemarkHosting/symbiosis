@@ -1,0 +1,13 @@
+# This router handles aliases for vhost users
+vhost_aliases:
+  debug_print = "R: vhost_aliases for $local_part@$domain"
+  driver = redirect
+  domains = +vhost_domains
+  local_part_suffix = +*
+  local_part_suffix_optional
+  # Make sure the files exists to avoid awkward failures
+  condition  = ${if exists{VHOST_DIR/$domain/config/aliases}}
+  data = ${lookup{$local_part}lsearch{VHOST_DIR/$domain/config/aliases}}
+  reply_transport = address_reply
+
+

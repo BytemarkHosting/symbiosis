@@ -1,0 +1,92 @@
+#!/bin/sh
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+    echo "I: Skipping configuration"
+    exit 0
+fi
+
+
+#
+#  If there is no volatile then add it.
+#
+if ( ! grep volatile /etc/apt/sources.list 2>/dev/null >/dev/null ); then
+    cat >> /etc/apt/sources.list <<EOF
+
+deb     http://mirror.bytemark.co.uk/debian-volatile/ stable/volatile main contrib non-free
+deb-src http://mirror.bytemark.co.uk/debian-volatile/ stable/volatile main contrib non-free
+EOF
+
+fi
+
+#
+#  If there isn't an admin account add it.
+#
+if ( ! grep ^admin: /etc/passwd 2>/dev/null >/dev/null ); then
+
+    echo "Adding 'admin' account"
+    useradd  --home=/srv admin --shell=/bin/bash
+
+    #
+    #  Now set the same  password for admin if it isn't there
+    #
+    usermod -p $(grep root /etc/shadow | awk -F: '{print $2}') admin
+fi
+
+#
+#  Add group if missing
+#
+if ( ! grep ^admin: /etc/group 2>/dev/null >/dev/null ); then
+    addgroup admin
+fi
+
+if [ ! -d /srv ]; then
+    mkdir /srv
+    chown admin:admin /srv
+fi
+
+
+#
+#  Shadow passwords must be on
+#
+/sbin/shadowconfig on 2>/dev/null >/dev/null
+
+
+#
+#  If we don't have the sudoers file setup then configure it
+#
+if [ -e /etc/sudoers ]; then
+
+    #
+    #  Not already present?
+    #
+    if ( ! grep ^admin /etc/sudoers 2>/dev/null >/dev/null ); then
+
+        #
+        #  Add it.
+        #
+        echo 'admin ALL = (ALL) ALL' >> /etc/sudoers
+    fi
+fi
+
+
+#
+#  Fix all perms
+#
+for i in /srv /srv/* ; do
+    if [ -e $i ]; then
+        if [ -d $i ] ; then
+            owner=`stat --format='%U.%G' $i`
+            if [ "$owner" = "root.root" ]; then
+                chown -R admin.admin $i
+            fi
+        fi
+    fi
+done
+
+#DEBHELPER#
+exit 0

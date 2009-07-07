@@ -1,0 +1,15 @@
+# This transport is used for local delivery to user mailboxes in traditional
+# BSD mailbox format. By default it will be run under the uid and gid of the
+# local user, and requires the sticky bit to be set on the /var/mail directory.
+# Some systems use the alternative approach of running mail deliveries under a
+# particular group instead of using the sticky bit. The commented options below
+# show how this can be done.
+
+local_delivery:
+  debug_print = "T: local_delivery for $local_part@$domain"
+  driver = appendfile
+  file = /var/mail/$local_part
+  delivery_date_add
+  envelope_to_add
+  return_path_add
+
