@@ -1,7 +1,0 @@
-  # Defer mail from non-Bytemark-anti-spam hosts if
-  # VHOST_DIR/domain/VHOST_CONFIG_DIR/bytemark-antispam exists
-  #
-  defer   domains    = +vhost_domains
-          hosts      = !+bytemark_antispam_host
-          condition  = ${if exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/bytemark-antispam}}
-
