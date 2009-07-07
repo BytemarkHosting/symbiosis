@@ -21,7 +21,7 @@ fi
 #
 #  If we're not on a Bytemark host then we do nothing.
 #
-bytemark=`/usr/bin/is-bytemark-ip`;
+bytemark=`/sbin/is-bytemark-ip`;
 
 if [ ! "$bytemark" ]; then
     if [ -x /root/BytemarkDNS/upload ]; then
