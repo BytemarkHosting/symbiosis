@@ -1,6 +1,4 @@
 etc/cron.hourly
 etc/bytemark-vhost/dns.d/
 usr/share/bug/bytemark-vhost-tinydns
-usr/bin
 etc/exim4/bytemark-vhost.d
-usr/share/man/man1
