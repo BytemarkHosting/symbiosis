@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+#  Run each of our test scripts.
+#
+# Steve
+# --
+#
+
+
+#
+#  Go to the correct directory
+#
+cd /etc/bytemark-vhost/
+
+for i in /etc/bytemark-vhost/test.d/tc_*.rb ; do
+
+    if [ -e $i ]; then
+        if [ -x $i ]; then
+            echo "Running  : $(basename $i)"
+            $i
+            echo "Completed: $(basename $i)"
+        else
+            echo "Ignoring non-executable $i"
+        fi
+    fi
+done
