@@ -1,3 +1,9 @@
+bytemark-vhost-mysql (20090707153244) stable; urgency=low
+
+  * Per-Lenny vhost repository, rather than branches
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
+
 bytemark-vhost-mysql (20090522105210) stable; urgency=low
 
   * New release for Lenny.

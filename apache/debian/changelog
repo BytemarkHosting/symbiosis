@@ -1,3 +1,9 @@
+libapache2-mod-vhost-bytemark (20090707153244) stable; urgency=low
+
+  * Per-Lenny vhost repository, rather than branches
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
+
 libapache2-mod-vhost-bytemark (20090707094355) stable; urgency=low
 
   * Update the pre-rm script to be less broken.
