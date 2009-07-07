@@ -5,9 +5,9 @@ set -e
 #
 #  Disable the sites
 #
-for i in mass-hosting* mass-hosting.ssl* zz-mass-hosting* zz-mass-hosting.ssl* default 00-default ; do
-    if [ -e /etc/apache2/sites-enabled/$i ]; then
-        rm /etc/apache2/sites-enabled/$i
+for i in /etc/apache2/sites-enabled/* ; do
+    if [ -e $i ]; then
+        rm $i
     fi
 done
 
