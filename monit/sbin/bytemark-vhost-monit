@@ -1,0 +1,338 @@
+#!/usr/bin/ruby
+# = NAME
+#
+# bytemark-vhost-monit - Bytemark Vhost Service Monitor
+#
+# = SYNOPSIS
+#
+# bytemark-vhost-monit [OPTIONS]
+#
+# = USAGE
+#
+# -d, --directory <directory>:
+#   The directory which contains the scripts to be run.  The default is
+#   /etc/bytemark-vhost/monit.d/
+#
+# -m, --send-mail:
+#   If any of the tests fail, send an email containing a pass/fail summary.
+#   Use the verbose flag if more detail is required.
+#
+# -a, --always-mail:
+#   Always send the email summary.   
+#
+# -t, --mailto <email>:
+#   Set the to address for the email notification.  The default address is
+#   root.
+#
+# -f, --mailfrom <email>:
+#   Set the from address for the email notification.  The default address is
+#   nobody.
+#
+# -v, --verbose:
+#   Enable verbose output.  This means show or email the entire output all the
+#   test scripts produce.  Normally only a pass/fail summary will be shown.
+#
+# -l, --log-level:
+#   Set the log level for logging to syslog.  Available options are the EMERG,
+#   ALARM, CRIT, ERR, WARNING, NOTICE, INFO, and DEBUG.  Currently failures are
+#   logged with the WARNING level, and other output with the INFO level.
+#
+# -h, --help:
+#   Show help.
+#
+# -n, --manual:
+#   Show the full manual.
+#
+# = SCRIPTS
+#
+# Each of the scripts in the script directory are expected to be self
+# contained.  That is to say, each script is responsible for testing, and
+# starting/stopping/restarting a service as necessary.
+#
+# A script will be deemed successful if it exits with a status of EX_OK (0).
+#
+# This program will retry a script once more if it returns with an exit status
+# of EX_TEMPFAIL (75).
+#
+# If a script exits with a status equal to certain pre-defined values, it is
+# deemed to be a bad test.  Results of tests returning any of these bad
+# statuses are not routinely reported.  
+#
+# Currently the bad test statuses are
+#   * EX_USAGE (64) -- command line usage error
+#   * EX_CONFIG (78) -- configuration error
+#
+# = LOGGING
+#
+# Any scripts that fail tests will be logged to the daemon syslog, along with
+# the last 10 lines of any output they produce.
+#
+# = EXIT STATUS
+#
+# This program will return 0 if none of the tests fail.  Otherwise it will
+# return 1.
+#
+# = COPYRIGHT
+#
+# Copyright © 2008 Bytemark Computer Consulting Ltd.  License GPLv2+: GNU GPL
+# version 2 or later <http://gnu.org/licenses/gpl.html> This is free software:
+# you are free to change and redistribute it.  There is NO WARRANTY, to the
+# extent permitted by law.
+#
+# = AUTHOR
+#
+# Patrick J Cherry <patrick@bytemark.co.uk>
+#
+# = DATE
+#
+# 2008-09-08
+
+
+require 'getoptlong'
+require 'time'
+require 'net/smtp'
+require 'syslog'
+require 'stringio'
+require 'rdoc/usage'
+require 'systemexit'
+
+#
+#  Ensure we have a sensible path.
+#
+ENV['PATH']="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin"
+
+#
+#  Defaults.
+#
+$DEBUG      = ( ENV['DEBUG']   ? 1 : nil )  unless $DEBUG
+$VERBOSE    = ( ENV['VERBOSE']   ? 1 : nil )  unless $VERBOSE
+
+# Default mailing addresses
+user          = (ENV['USER'].to_s.empty? ? "nobody" : ENV['USER'])
+hostname      = `hostname --fqdn`.chomp
+mailfrom_addr = user+"@"+hostname
+# We only send mail if this is set
+mailto_addr   = "root@"+hostname
+always_mail   = false
+send_mail     = false
+dir           = "/etc/bytemark-vhost/monit.d/"
+level         = "INFO"
+
+#
+# Options parsing
+#
+opts = GetoptLong.new(
+                        [ "--verbose",    "-v", GetoptLong::NO_ARGUMENT ],
+                        [ "--always-mail","-a", GetoptLong::NO_ARGUMENT ],
+                        [ "--send-mail",  "-m", GetoptLong::NO_ARGUMENT ],
+                        [ "--help" ,      "-h", GetoptLong::NO_ARGUMENT ],
+                        [ "--manual" ,    "-n", GetoptLong::NO_ARGUMENT ],
+                        [ "--mailto",     "-t", GetoptLong::REQUIRED_ARGUMENT ],
+                        [ "--mailfrom",   "-f", GetoptLong::REQUIRED_ARGUMENT ],
+                        [ "--log-level",  "-l", GetoptLong::REQUIRED_ARGUMENT ],
+                        [ "--directory",  "-d", GetoptLong::REQUIRED_ARGUMENT ]
+                      )
+
+opts.each do |opt, arg|
+  case opt
+  when "--verbose"
+    $VERBOSE=1
+  when "--send-mail"
+    send_mail = true
+  when "--always-mail"
+    send_mail   = true
+    always_mail = true
+  when "--help"
+    RDoc::usage('synopsis','usage')
+  when "--manual"
+    RDoc::usage
+  when "--mailto"
+    send_mail = true
+    mailto_addr = arg 
+  when "--mailfrom"
+    mailfrom_addr = arg
+  when "--directory"
+    dir = arg
+  when "--log-level"
+    level = arg.upcase
+  end
+end
+
+unless %w(EMERG ALARM CRIT ERR WARNING NOTICE INFO DEBUG).include?(level) 
+  raise "Bad log level #{level}"
+end
+#
+# Open syslog
+#
+syslog = Syslog.open(File.basename($0), Syslog::LOG_PID | Syslog::LOG_CONS, Syslog::LOG_DAEMON)
+syslog.mask = Syslog::LOG_UPTO(Syslog::const_get("LOG_"+level))
+
+#
+# Reopen stdout as a stringio, if we're going to send the output by mail
+#
+if send_mail
+  output = StringIO.new
+  $stdout = output
+end
+
+#
+# Work out which tests we're going to do
+#
+tests = Dir.glob(File.join(dir,"*")).collect{|t| File.basename(t)}
+tests.reject!{|t| t !~ /^[a-z0-9][a-z0-9-]*$/}
+tests.sort!
+
+#
+# Where we keep the list of failed tests
+#
+failed_tests = []
+retried_tests = []
+duff_tests   = []
+
+#
+# Set a header up
+#
+print <<EOF
+= Bytemark Virtual Hosting service test report ========================
+
+ * Host: #{hostname}
+ * Tests started at: #{Time.new.rfc822}
+
+EOF
+
+
+tests.each do |test|
+
+  puts "-"*72 if $VERBOSE
+  retried = false
+  cmd = File.join(dir,test)
+
+  begin
+    cmd_output = []
+    pid = nil
+
+    IO.popen(cmd +" 2>&1") do |pipe|
+      pid = pipe.pid
+      while !pipe.eof?
+        cmd_output << "#{test}: "+pipe.gets.to_s.chomp
+        puts " * "+cmd_output.last if $VERBOSE
+      end
+    end
+
+    #
+    # Sanity checks...
+    #
+    raise RuntimeError, "Somehow the command #{cmd} didn't execute." unless $?.is_a?(Process::Status)
+    raise RuntimeError, "Process IDs don't match." if pid != $?.pid
+    
+    err = SystemExit.new($?.exitstatus)
+    err.set_backtrace cmd_output
+
+    raise err unless $?.success?
+
+    # 
+    # Log retry success
+    #
+    msg = "#{test}: PASS" + (retried ? " (on retry)": "")
+    if retried
+      retried_tests << test 
+      syslog.log(Syslog::LOG_INFO, msg)
+    end
+    puts " * "+msg
+
+  rescue SystemExit => err
+
+    #
+    # Always log the last part of the backtrace
+    #
+    err.backtrace.last(10).each{ |e| syslog.log(Syslog::LOG_INFO, e) }
+
+    #
+    # Check the exitstatus
+    #
+    case 
+      # 
+      # These are two config failures, that we'll ignore
+      # These next two codes are returned by bash/sh
+      #
+      when [SystemExit::EX_USAGE, SystemExit::EX_CONFIG, 126, 127].include?(err.status)
+        msg = "#{test}: Usage/config failure"
+        syslog.log(Syslog::LOG_INFO, msg)
+        puts " * "+msg 
+        duff_tests << test
+
+      #
+      # If we get a temporary failure, retry!
+      #
+      when ( SystemExit::EX_TEMPFAIL == err.status and not retried )
+        msg = "#{test}: Temporary failure -- retrying" 
+        syslog.log(Syslog::LOG_INFO, msg)
+        puts " * "+msg if $VERBOSE
+
+        retried = true
+        retry
+
+      else
+        # 
+        # Log the failure
+        #
+        msg = "#{test}: FAIL: #{err.to_s}"
+        syslog.log(Syslog::LOG_WARNING, msg)
+        puts " * "+msg
+
+        failed_tests << test
+
+    end
+
+  end
+
+end
+
+#
+# Stick a footer on
+#
+#
+puts "-"*72 if $VERBOSE
+
+msg = []
+n_actual_tests = tests.length - duff_tests.length
+msg << "#{duff_tests.length}/#{tests.length} not conducted due to configuration / usage errors" if duff_tests.length > 0
+msg << "#{n_actual_tests - retried_tests.length - failed_tests.length}/#{n_actual_tests} tests passed on first attempt." 
+msg << "#{retried_tests.length}/#{n_actual_tests} tests passed on second attempt." if retried_tests.length > 0
+msg << "#{failed_tests.length}/#{n_actual_tests} tests failed."  if failed_tests.length > 0
+
+msg.each{|m| syslog.log(Syslog::LOG_INFO, m)}
+
+puts "\n"+msg.collect{|m| " * "+m}.join("\n")
+
+puts <<EOF
+ * Tests finished at: #{Time.new.rfc822}
+
+= End of service test report ==============================================
+EOF
+
+#
+# set stdout back to normal if needed
+# 
+$stdout = STDOUT if $stdout.is_a?(StringIO)
+
+if send_mail and (always_mail or failed_tests.length > 0) 
+  msg =<<EOF
+To: #{mailto_addr}
+From: #{mailfrom_addr}
+Date: #{Time.now.rfc822}
+Subject: [bytemark-vhost] Service test report
+
+EOF
+  msg += output.string
+
+  Net::SMTP::start('localhost',25) do |smtp|
+    smtp.send_message(msg, mailfrom_addr, [mailto_addr])
+  end
+end
+
+syslog.close
+
+# Return the code
+exit (failed_tests.length > 0 ? 1 : 0)
+

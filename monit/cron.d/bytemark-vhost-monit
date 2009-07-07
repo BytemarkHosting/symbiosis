@@ -1,0 +1,1 @@
+0-59/2 * * * *   root  /usr/sbin/bytemark-vhost-monit -m -d /etc/bytemark-vhost/monit.d
