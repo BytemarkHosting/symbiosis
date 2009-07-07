@@ -1,3 +1,10 @@
+bytemark-vhost-email (20090707183051) stable; urgency=low
+
+  * Fixed exim4 config to defer mail from non-bytemark antispam hosts if
+    bytemark-antispam is present.
+
+ -- Patrick J. Cherry <patrick@bytemark.co.uk>  Tue, 07 Jul 2009 18:30:52 +0100
+
 bytemark-vhost-email (20090707175243) stable; urgency=low
 
   * Updated checkpassword to have a better regex
