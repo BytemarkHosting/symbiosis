@@ -1,0 +1,4 @@
+bin/create-ssl-sites etc/cron.hourly/
+bin/configure-additional etc/cron.hourly/
+bin/make-logs  etc/cron.daily/
+bytemark var/www

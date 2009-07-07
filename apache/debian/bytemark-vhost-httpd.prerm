@@ -1,0 +1,35 @@
+#!/bin/sh
+
+set -e
+
+#
+#  Disable the sites
+#
+for i in mass-hosting* mass-hosting.ssl* zz-mass-hosting* zz-mass-hosting.ssl* default 00-default ; do
+    if [ -e /etc/apache2/sites-enabled/$i ]; then
+        rm /etc/apache2/sites-enabled/$i
+    fi
+done
+
+#
+#  Remove any files that are Per-IP based.
+#
+
+#
+#  Disable the module(s)
+#
+a2dismod  mod_vhost_bytemark  >/dev/null 2>/dev/null
+a2dismod  vhost_alias         >/dev/null 2>/dev/null
+
+#
+# Restart
+#
+if which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d apache2 restart
+else
+    /etc/init.d/apache2 restart
+fi
+
+
+#DEBHELPER#
+exit 0

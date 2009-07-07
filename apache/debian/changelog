@@ -1,39 +1,3 @@
-libapache2-mod-vhost-bytemark (20090707153244) stable; urgency=low
-
-  * Per-Lenny vhost repository, rather than branches
-
- -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
-
-libapache2-mod-vhost-bytemark (20090707094355) stable; urgency=low
-
-  * Update the pre-rm script to be less broken.
-
- -- Steve Kemp <steve@bytemark.co.uk>  Tues, 8 Jul 2009 09:44:01 +0000
-
-libapache2-mod-vhost-bytemark (20090706162121) stable; urgency=low
-
-  * Forcible lenny rebuild
-
- -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 16:21:21 +0000
-
-libapache2-mod-vhost-bytemark (20090706151825) stable; urgency=low
-
-  * Prune the old logs from the correct location.
-
- -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 15:18:25 +0000
-
-libapache2-mod-vhost-bytemark (20090706150949) stable; urgency=low
-
-  * Use perl for make-logs
-
- -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 15:10:09 +0000
-
-libapache2-mod-vhost-bytemark (20090706110146) stable; urgency=low
-
-  * Use "mtime" not "ctime" to purge old logs.
-
- -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 10:44:10 +0000
-
 libapache2-mod-vhost-bytemark (20081118175414) stable; urgency=low
 
   * Make sure the "admin" exists.

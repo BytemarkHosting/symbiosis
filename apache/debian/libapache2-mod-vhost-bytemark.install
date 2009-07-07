@@ -1,0 +1,3 @@
+src/.libs/*.so usr/lib/apache2/modules
+debian/*.load  etc/apache2/mods-available
+bug.report     usr/share/bug/libapache2-mod-vhost-bytemark/control
