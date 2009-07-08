@@ -16,7 +16,7 @@ PLAIN:
   # (d) Try crypt and then plain comparison in turn.
   #
   server_condition           = ${if and{ \
-                                 {match {$auth2}{\N(^([a-z0-9\-]+\.?)+)@(([a-z0-9\-]+\.?)+)$\N}} \
+                                 {match {$auth2}{\N(^([a-z0-9_\-]+\.?)+)@(([a-z0-9\-]+\.?)+)$\N}} \
                                  {exists {VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}} \
                                  {!eq      {}{$auth3}} \
                                  {!eq      {}{${readfile{VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}{}}}} \

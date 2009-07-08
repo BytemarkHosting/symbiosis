@@ -310,29 +310,6 @@ class Exim4ConfigTest < Test::Unit::TestCase
     end
   end
 
-  def test_acl_check_bytemark_antispam
-    do_acl_setup()
-
-    bytemark_antispam_ip = "89.16.176.76"
-
-    username = @acl_config['local_users'].first['username']
-
-    script = [
-      ["EHLO test.test",  250],
-      ["MAIL FROM:<#{username}>", 250],
-      ["RCPT TO:<#{username}>", 250]
-    ]
-
-    do_exim4_bh(bytemark_antispam_ip, @acl_config['local_ip'], script)
-    do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip'], script)
-
-    FileUtils.touch(File.join(@vhost_dir, @acl_config['local_domains'].first, @vhost_config_dir, "bytemark-antispam"))
-
-    do_exim4_bh(bytemark_antispam_ip, @acl_config['local_ip'], script)
-    script[-1][-1] = 451
-    do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip'], script)
-  end
-
   def test_acl_check_spam
     # setup the acl
     do_acl_setup()

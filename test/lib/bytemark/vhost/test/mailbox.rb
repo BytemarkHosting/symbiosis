@@ -17,18 +17,18 @@ module Bytemark
           raise ArgumentError, "user must be a string" unless user.is_a?(String)
           @user = user
 
-          raise ArgumentError, "domain must be a string" unless domain.is_a?(String)
+          raise ArgumentError, "domain must be a vhostdomain #{domain.class.to_s}" unless domain.is_a?(Bytemark::Vhost::Test::VhostDomain)
           @domain = domain
 
-	  @uncrypted_password = nil
+          @uncrypted_password = nil
         end
 
         def username
-          [@user, @domain].join("@")
+          [@user, @domain.name].join("@")
         end
 
         def directory
-          "/srv/#{@domain}/mailboxes/#{@user}"
+          File.join(@domain.directory, "mailboxes", @user)
         end
 
         def create

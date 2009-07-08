@@ -1,5 +1,3 @@
-#!/usr/bin/ruby
-
 $: << ".."
 
 require 'test/unit'
@@ -71,7 +69,6 @@ class SmtpTest < Test::Unit::TestCase
     # and where the mailbox directory should be
     macro_snippet =~ /^VHOST_MAILBOX_DIR\s*=\s*(.*)$/
     @vhost_mailbox_dir = $1
-
 
     # And write
     File.open(macro_snippet_fn, "w+"){|fh| fh.puts(macro_snippet)}
@@ -315,6 +312,13 @@ class SmtpTest < Test::Unit::TestCase
   end
 
   def test_acl_check_bytemark_antispam
+    # Check to make sure exim4 is configured to do this.
+    if !File.exists?('/etc/exim4/bytemark-vhost.d/00-main/21-bytemark-antispam-hostlist') or
+       !File.exists?('/etc/exim4/bytemark-vhost.d/10-acl/50-acl-check-rcpt/70-bytemark-antispam-defer') 
+      warn "Not conducting Bytemark antispam host defer tests, since exim4 is not configured for this."
+      return
+    end
+
     do_acl_setup()
 
     bytemark_antispam_ip = "89.16.176.76"
@@ -338,6 +342,19 @@ class SmtpTest < Test::Unit::TestCase
   end
 
   def test_acl_check_spam
+    # Check spamd is running
+    if File.exists?('/var/run/spamd.pid')
+      pid = File.read('/var/run/spamd.pid').chomp
+      cmd = File.read("/proc/#{pid}/cmdline") if File.exists?("/proc/#{pid}/cmdline")
+      if cmd.nil? or cmd !~ /\/spamd /
+        warn "Not conducting spamassassin tests (spamd not running?)"
+        return 
+      end
+    else
+      warn "Not conducting spamassassin tests (spamd not running?)"
+      return
+    end
+
     # setup the acl
     do_acl_setup()
 
@@ -365,6 +382,24 @@ class SmtpTest < Test::Unit::TestCase
   end
 
   def test_acl_check_antivirus
+    if File.exists?('/var/run/clamav/clamd.pid')
+      pid = File.read('/var/run/clamav/clamd.pid').chomp
+      cmd = File.read("/proc/#{pid}/cmdline").chomp if File.exists?("/proc/#{pid}/cmdline")
+      if cmd.nil? or cmd !~ /^\/usr\/sbin\/clamd/
+        warn "Not conducting anti-virus tests (clamd not running? pidfile found, but wrong process #{cmd.inspect})"
+        return 
+      end
+
+      clamav_pipe = "/var/run/clamav/clamd.ctl" 
+      if !File.exists?(clamav_pipe)
+        warn "Not conducting anti-virus tests (clamd running, but no pipe?)"
+        return
+      end
+    else
+      warn "Not conducting anti-virus tests (clamd not running? no pidfile found)"
+      return
+    end
+
     # setup the acl
     do_acl_setup()
 
