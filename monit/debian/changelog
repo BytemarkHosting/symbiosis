@@ -1,3 +1,9 @@
+bytemark-vhost-monit (20090708114218) stable; urgency=low
+
+  * Don't run any stop|start|restart actions if apt-get is running.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 8 Jul 2009 11:42:18 +0000
+
 bytemark-vhost-monit (20090707153244) stable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches

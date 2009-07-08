@@ -12,6 +12,33 @@ module Bytemark
           @process = Bytemark::Vhost::Monitor::Process.new
         end
 
+
+        #
+        #  Should we ignore failures because apt-get|aptitude|dpkg is running?
+        #
+        def should_ignore?
+          found = false
+
+          Dir.foreach("/proc/") do |entry|
+            if ( File.directory?( "/proc/#{entry}" ) && ( entry =~ /([0-9]+)/ ) )
+              File.open( "/proc/#{entry}/cmdline", "r") do |infile|
+                begin
+                  while (line = infile.gets)
+                    line.chomp!
+                    if ( line =~ /(apt|dpkg|apt-get|aptitude|debconf)/i )
+                      found = true
+                      puts "apt-get|aptitude|dpkg|debconf are running..."
+                    end
+                  end
+                rescue
+                end
+              end
+            end
+          end
+          found
+        end
+
+
         def should_be_running
           true
         end
@@ -83,16 +110,22 @@ module Bytemark
         end
 
         def restart
+          return if ( should_ignore? )
+
           self.stop
           self.start
         end
 
         def stop
+          return if ( should_ignore? )
+
           puts "Attempting to stop #{@name}"
           @process.stop
         end
 
         def start
+          return if ( should_ignore? )
+
           puts "Attempting to start #{@name}"
           @process.start
         end
