@@ -3,3 +3,4 @@ monit.d/*                     etc/bytemark-vhost/monit.d/
 cron.d/*                      etc/cron.d/
 bug.report                    usr/share/bug/bytemark-vhost-monit/control
 lib/*                         usr/lib/ruby/1.8/
+etc/apt.conf.d/*              etc/apt.conf.d/
