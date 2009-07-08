@@ -14,7 +14,7 @@ class TestDovecot < Test::Unit::TestCase
     @mailbox = @domain.add_mailbox("test")
     @mailbox.password = Bytemark::Vhost::Test.random_string
     
-    @mailbox_crypt = @domain.add_mailbox("test_crypt")
+    @mailbox_crypt = @domain.add_mailbox("te-s.t_crypt")
     @mailbox_crypt.password = Bytemark::Vhost::Test.random_string
     @mailbox_crypt.crypt_password 
 

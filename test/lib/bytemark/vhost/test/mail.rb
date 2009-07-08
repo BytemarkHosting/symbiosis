@@ -25,7 +25,7 @@ module Bytemark
           mb = self.mailbox(user)
           return mb unless mb.nil?
 
-          mb = Mailbox.new(user, @name)
+          mb = Mailbox.new(user, self)
           mb.create
 
           @mailboxes << mb
