@@ -19,6 +19,8 @@ module Bytemark
         def should_ignore?
           found = false
 
+          return true if ( File.exists?( "/tmp/dpkg.running" ) )
+
           Dir.foreach("/proc/") do |entry|
             if ( File.directory?( "/proc/#{entry}" ) && ( entry =~ /([0-9]+)/ ) )
               File.open( "/proc/#{entry}/cmdline", "r") do |infile|
