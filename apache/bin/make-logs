@@ -182,9 +182,10 @@ EOF
 
 
     #
-    #  Run webalizer
+    #  Run webalizer: if we got any logs
     #
-    system("cd $CONFIG{'prefix'}/$domain/public/htdocs/stats/ && webalizer -q");
+    system("cd $CONFIG{'prefix'}/$domain/public/htdocs/stats/ && webalizer -q")
+      if ( scalar( @logfiles ) > 0 );
 
     #
     #  Join the logfiles so the user can download them.

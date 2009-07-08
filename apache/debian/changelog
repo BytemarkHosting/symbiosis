@@ -1,3 +1,9 @@
+libapache2-mod-vhost-bytemark (20090708161223) stable; urgency=low
+
+  * Don't hang processing logs for empty domains.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 8 Jul 2009 16:12:23 +0000
+
 libapache2-mod-vhost-bytemark (20090707164326) stable; urgency=low
 
   * Added bytemark/info page with restrictive ACL
