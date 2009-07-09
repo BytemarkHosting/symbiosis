@@ -82,7 +82,7 @@ class SmtpTest < Test::Unit::TestCase
   end
 
   def teardown
-    FileUtils.rm_rf(@tempdir) if @tempdir =~/^\/tmp/
+#    FileUtils.rm_rf(@tempdir) if @tempdir =~/^\/tmp/
   end
 
   def do_acl_setup
@@ -448,7 +448,7 @@ class SmtpTest < Test::Unit::TestCase
     script[-1][-1] = 550
     do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip']+".587", script)
     
-    plain = "\0#{username}\0#{password}".to_a.pack("m").chomp
+    plain = "\0#{username}\0#{password}".to_a.pack("m").gsub("\n","")
     script.insert(1,["AUTH PLAIN #{plain}", 235])
     script[-1][-1] = 250
 
@@ -507,6 +507,15 @@ class SmtpTest < Test::Unit::TestCase
       u['username'] =~ /(#{LOCAL_PART_REGEXP})@(#{DOMAIN_REGEXP})/
       local_part, domain = [$1, $2]
       do_exim4_bt(u['username'],File.join(@vhost_dir,domain,@vhost_mailbox_dir,local_part,"Maildir/"), "vhost_mailbox", "address_directory")
+    end
+  end
+
+  def test_router_vhost_mailbox_caseful
+    do_acl_setup()
+    @acl_config['local_users'].each do |u|
+      u['username'] =~ /(#{LOCAL_PART_REGEXP})@(#{DOMAIN_REGEXP})/
+      local_part, domain = [$1, $2]
+      do_exim4_bt(u['username'].upcase,File.join(@vhost_dir,domain,@vhost_mailbox_dir,local_part,"Maildir/"), "vhost_mailbox", "address_directory")
     end
   end
 
@@ -611,15 +620,15 @@ class SmtpTest < Test::Unit::TestCase
     username = @acl_config['local_users'].first['username']
     password = @acl_config['local_users'].first['password']
 
-    plain = "\0#{username}\0#{password}".to_a.pack("m").chomp
+    plain = "\0#{username}\0#{password}".to_a.pack("m").gsub("\n","")
     script = [
       ["EHLO test.test",  250],
       ["AUTH PLAIN #{plain}", 235]
     ]
     do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip'], script)
 
-    enc_username = username.to_a.pack("m").chomp
-    enc_password = password.to_a.pack("m").chomp
+    enc_username = username.to_a.pack("m").gsub("\n","")
+    enc_password = password.to_a.pack("m").gsub("\n","")
     script = [
       ["EHLO test.test",  250],
       ["AUTH LOGIN", 334],
@@ -629,20 +638,33 @@ class SmtpTest < Test::Unit::TestCase
     do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip'], script)
   end
 
+  def test_auth_caseless
+    do_acl_setup
+    username = @acl_config['local_users'].first['username'].upcase
+    password = @acl_config['local_users'].first['password']
+
+    plain = "\0#{username}\0#{password}".to_a.pack("m").gsub("\n","")
+    script = [
+      ["EHLO test.test",  250],
+      ["AUTH PLAIN #{plain}", 235]
+    ]
+    do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip'], script)
+  end
+
   def test_auth_crypt
     do_acl_setup
     username = @acl_config['local_users'].last['username']
     password = @acl_config['local_users'].last['password']
 
-    plain = "\0#{username}\0#{password}".to_a.pack("m").chomp
+    plain = "\0#{username}\0#{password}".to_a.pack("m").gsub("\n","")
     script = [
       ["EHLO test.test",  250],
       ["AUTH PLAIN #{plain}", 235]
     ]
     do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip'], script)
 
-    enc_username = username.to_a.pack("m").chomp
-    enc_password = password.to_a.pack("m").chomp
+    enc_username = username.to_a.pack("m").gsub("\n","")
+    enc_password = password.to_a.pack("m").gsub("\n","")
     script = [
       ["EHLO test.test",  250],
       ["AUTH LOGIN", 334],

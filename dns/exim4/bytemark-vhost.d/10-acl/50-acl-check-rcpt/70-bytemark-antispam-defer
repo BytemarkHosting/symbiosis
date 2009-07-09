@@ -4,5 +4,5 @@
 
   defer hosts     =  !+relay_from_hosts : !+bytemark_antispam_hosts
         domains   =  +vhost_domains
-        condition =  ${if exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/bytemark_antispam}}
+        condition =  ${if exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/bytemark-antispam}}
 

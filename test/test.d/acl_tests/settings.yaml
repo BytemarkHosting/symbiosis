@@ -35,6 +35,6 @@ local_users:
   - username: other.user@other.domain
     password: other.password
   - username: crypted-us_er@local-domain.com
-    password: crypted.password
-    crypt_password: "{CRYPT}a.x6Pi3NvgBSs"
+    password: "crypted.password"
+    crypt_password: "{crypt}a.x6Pi3NvgBSs"
 

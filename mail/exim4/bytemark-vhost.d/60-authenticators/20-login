@@ -8,14 +8,14 @@ LOGIN:
   server_set_id              = $auth1
   server_prompts             = <| Username: | Password:
   server_condition           = ${if and{ \
-                                 {match {$auth1}{\N(^([a-z0-9_\-]+\.?)+)@(([a-z0-9\-]+\.?)+)$\N}} \
-                                 {exists {VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}} \
+                                 {match {$auth1}{\N(^([a-zA-Z0-9_\-]+\.?)+)@(([a-zA-Z0-9\-]+\.?)+)$\N}} \
+                                 {exists {VHOST_DIR/${lc:$3}/VHOST_MAILBOX_DIR/${lc:$1}/password}} \
                                  {!eq       {}{$auth2}} \
-                                 {!eq      {}{${readfile{VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}{}}}} \
-                                 {!crypteq {}{${readfile{VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}{}}}} \
+                                 {!eq      {}{${readfile{VHOST_DIR/${lc:$3}/VHOST_MAILBOX_DIR/${lc:$1}/password}{}}}} \
+                                 {!crypteq {}{${readfile{VHOST_DIR/${lc:$3}/VHOST_MAILBOX_DIR/${lc:$1}/password}{}}}} \
                                  {or { \
-                                   {crypteq {$auth2}{${readfile{VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}{}}}} \
-                                   {eq      {$auth2}{${readfile{VHOST_DIR/$3/VHOST_MAILBOX_DIR/$1/password}{}}}} \
+                                   {crypteq {$auth2}{${readfile{VHOST_DIR/${lc:$3}/VHOST_MAILBOX_DIR/${lc:$1}/password}{}}}} \
+                                   {eq      {$auth2}{${readfile{VHOST_DIR/${lc:$3}/VHOST_MAILBOX_DIR/${lc:$1}/password}{}}}} \
                                  }} \
                                }}
 
