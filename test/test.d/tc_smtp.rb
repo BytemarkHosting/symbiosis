@@ -189,9 +189,9 @@ class SmtpTest < Test::Unit::TestCase
         when /^mail to ([^\s]+) is discarded$/
           this_destination = ":blackhole:"
           this_transport = ":blackhole:"
-        when /^([^\s]+) cannot be resolved at this time:$/
+        when /^([^\s]+) cannot be resolved at this time: /
           this_transport = ":defer:"
-        when /^([^\s]+) is undeliverable:$/
+        when /^([^\s]+) is undeliverable: /
           this_transport = ":fail:"
       end
     end
