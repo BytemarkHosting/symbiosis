@@ -8,22 +8,25 @@ set -e
 # Remove the existing link.
 #
 if [ -e  /etc/apache2/conf.d/phpmyadmin.conf  ]; then
-
-    #
-    #  Remove the file.
-    #
     rm -f /etc/apache2/conf.d/phpmyadmin.conf
-
-    #
-    #  Restart Apache2.
-    #
-    if which invoke-rc.d >/dev/null 2>&1; then
-        invoke-rc.d apache2 restart
-    else
-        /etc/init.d/apache2 restart
-    fi
-
 fi
+
+#
+#  And our file
+#
+if [ -e /etc/apache2/conf.d/phpmyadmin.vhost.conf ]; then
+    rm -f /etc/apache2/conf.d/phpmyadmin.vhost.conf
+fi
+
+#
+#  Restart Apache2.
+#
+if which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d apache2 restart
+else
+    /etc/init.d/apache2 restart
+fi
+
 
 
 #DEBHELPER#
