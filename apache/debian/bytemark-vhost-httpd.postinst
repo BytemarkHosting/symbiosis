@@ -253,8 +253,8 @@ NameVirtualHost $ip:443
         #
         Alias /bytemark/ "/var/www/bytemark/"
         <Directory "/var/www/bytemark/">
-                DirectoryIndex index.html
-                AllowOverride None
+                DirectoryIndex index.html index.php
+                AllowOverride All
         </Directory>
 
         #

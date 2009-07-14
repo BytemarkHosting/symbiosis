@@ -1,3 +1,10 @@
+libapache2-mod-vhost-bytemark (20090714122742) stable; urgency=low
+
+  * Fixed typo on the front-page.
+  * Enable index.php for the /bytemark/ path.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 14 Jul 2009 12:27:42 +0000
+
 libapache2-mod-vhost-bytemark (20090708161223) stable; urgency=low
 
   * Don't hang processing logs for empty domains.
