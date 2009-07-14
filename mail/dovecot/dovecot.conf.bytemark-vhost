@@ -37,7 +37,7 @@ protocols = imap imaps pop3 pop3s
 #     listen = *:10100
 #     ..
 #   }
-#listen = *
+listen = [::]
 
 # Disable LOGIN command and all other plaintext authentications unless
 # SSL/TLS is used (LOGINDISABLED capability). Note that if the remote IP
