@@ -154,7 +154,7 @@ NameVirtualHost $ip:80
         Alias /bytemark/ "/var/www/bytemark/"
         <Directory "/var/www/bytemark/">
                 DirectoryIndex index.html index.php
-                AllowOverride None
+                AllowOverride All
         </Directory>
 
 
