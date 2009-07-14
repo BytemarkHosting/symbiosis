@@ -88,6 +88,18 @@ if ( !defined( $ip ) )
 
 
 #
+#  We only cope with IPv4 addresses
+#
+if ( $ip =~ /:/ )
+{
+    $CONFIG{ 'verbose' } && print "$ip looks like IPv6\n";
+    print "0\n";
+    exit;
+}
+
+
+
+#
 #  Test that IP to see if it is inside a Bytemark Range.
 #
 foreach my $range (qw! 89.16.160.0/19  80.68.80.0/20 212.110.160.0/19 !)
