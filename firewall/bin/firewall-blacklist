@@ -70,7 +70,7 @@ firewall-blacklist - A simple script to mitigate against dictionary attacks.
 
 =head1 LICENSE
 
-Copyright (c) 2008 by Bytemark Computer Consulting Ltd.  All rights reserved.
+Copyright (c) 2008,2009 by Bytemark Computer Consulting Ltd.  All rights reserved.
 
 This program is free software;
 you can redistribute it and/or modify it under
@@ -98,8 +98,8 @@ $CONFIG{ 'input' }     = "/etc/firewall/patterns.d/";
 $CONFIG{ 'blacklist' } = "/etc/firewall/blacklist.d/";
 $CONFIG{ 'whitelist' } = "/etc/firewall/whitelist.d/";
 $CONFIG{ 'verbose' }   = 0;
-$CONFIG{ 'attempts' }  = 5;  # count of attacks before blacklisting
-$CONFIG{ 'expire' }    = 2;  # number of days to keep records
+$CONFIG{ 'attempts' } = 5;    # count of attacks before blacklisting
+$CONFIG{ 'expire' }   = 2;    # number of days to keep records
 
 
 
@@ -114,16 +114,17 @@ parseCommandLineArguments();
 #
 if ( -e "/etc/firewall/disabled" )
 {
-    $CONFIG{'verbose'} && print "Firewall disabled\n";
+    $CONFIG{ 'verbose' } && print "Firewall disabled\n";
 
     #
-    #  If we're disabled we'll still reload the firewall
-    # because we want to make sure changes take effect.
+    #  If we're disabled and we were disabled "recently" then
+    # reload the firewall to make sure changes take effect.
     #
-    if ( -x "/usr/bin/firewall" )
+    if (    ( -x "/usr/bin/firewall" )
+         && ( recentlyModified("/etc/firewall/disabled") ) )
     {
-        $CONFIG{'verbose'} && print "Reloading firewall\n";
-        system( "/usr/bin/firewall" );
+        $CONFIG{ 'verbose' } && print "Reloading firewall\n";
+        system("/usr/bin/firewall");
     }
 
     exit;
@@ -134,7 +135,7 @@ if ( -e "/etc/firewall/disabled" )
 #
 if ( -e "/etc/firewall/disabled.blacklist" )
 {
-    $CONFIG{'verbose'} && print "Blacklister disabled\n";
+    $CONFIG{ 'verbose' } && print "Blacklister disabled\n";
     cleanBlacklist();
     exit;
 }
@@ -168,8 +169,8 @@ my $reload = 0;
 #
 foreach my $file ( keys %RULES )
 {
-    my $rules = $RULES{$file};
-    $reload += processRules( $file, keys( %$rules ) );
+    my $rules = $RULES{ $file };
+    $reload += processRules( $file, keys(%$rules) );
 }
 
 
@@ -182,10 +183,10 @@ $reload += expireBlacklist();
 #
 #  Reload the firewall?
 #
-if ( $reload )
+if ($reload)
 {
     $CONFIG{ 'verbose' } && print "Reloading firewall ..\n";
-    system( "/usr/bin/firewall" );
+    system("/usr/bin/firewall");
     $CONFIG{ 'verbose' } && print "firewall reloaded ..\n";
 }
 
@@ -194,7 +195,6 @@ if ( $reload )
 #  All done
 #
 exit;
-
 
 
 
@@ -218,15 +218,13 @@ sub parseCommandLineArguments
     #  Parse options.
     #
     if (
-         !GetOptions(
-                      "attempts=s", \$CONFIG{ 'attempts' },
+         !GetOptions( "attempts=s", \$CONFIG{ 'attempts' },
                       "expire=s",   \$CONFIG{ 'expire' },
                       "help",       \$HELP,
                       "input=s",    \$CONFIG{ 'input' },
                       "manual",     \$MANUAL,
                       "verbose",    \$CONFIG{ 'verbose' },
-         )
-      )
+                    ) )
     {
         exit;
     }
@@ -272,18 +270,18 @@ sub sanityCheckSystem
     #
     #  Make sure the attempts is a number
     #
-    if  ( $CONFIG{'attempts'} !~ /^([0-9]+)$/ )
+    if ( $CONFIG{ 'attempts' } !~ /^([0-9]+)$/ )
     {
-        $CONFIG{'attempts'} = 5;
+        $CONFIG{ 'attempts' } = 5;
     }
 
 
     #
     #  Make sure the expiry period is a number
     #
-    if  ( $CONFIG{'expire'} !~ /^([0-9]+)$/ )
+    if ( $CONFIG{ 'expire' } !~ /^([0-9]+)$/ )
     {
-        $CONFIG{'expire'} = 2;
+        $CONFIG{ 'expire' } = 2;
     }
 }
 
@@ -332,6 +330,7 @@ sub loadRules
     #
     foreach my $file ( sort( glob( $CONFIG{ 'input' } . "/*.patterns" ) ) )
     {
+
         #
         #  The logfile(s) to look at.
         #
@@ -354,7 +353,7 @@ sub loadRules
             {
                 if ( defined($logfile) )
                 {
-                    $rules{$logfile}{ $line } += 1;
+                    $rules{ $logfile }{ $line } += 1;
                 }
             }
         }
@@ -391,7 +390,7 @@ sub processRules
     #
     #  If the file doesn't exist we'll return
     #
-    return 0 if ( ! -e $file );
+    return 0 if ( !-e $file );
 
 
     open( FILE, "<", $file )
@@ -405,6 +404,7 @@ sub processRules
 
         foreach my $rule (@rules)
         {
+
             #
             #  Insert the IP matching regexp
             #
@@ -430,6 +430,7 @@ sub processRules
     my $count = 0;
     foreach my $ip ( keys %BLACKLIST )
     {
+
         #
         # ignore local failures.
         #
@@ -438,20 +439,20 @@ sub processRules
         #
         # Ignore whitelisted IPs
         #
-        next if ( -e $CONFIG{'whitelist'} . "/$ip" );
+        next if ( -e $CONFIG{ 'whitelist' } . "/$ip" );
 
         #
         # The number of failures we've had reported for this IP
         #
-        my $attempts = $BLACKLIST{$ip};
+        my $attempts = $BLACKLIST{ $ip };
 
-        if ( $attempts >= $CONFIG{'attempts'} )
+        if ( $attempts >= $CONFIG{ 'attempts' } )
         {
             if ( !-e "$CONFIG{'blacklist'}/$ip.auto" )
             {
-                if ( ! -d "$CONFIG{'blacklist'}" )
+                if ( !-d "$CONFIG{'blacklist'}" )
                 {
-                    system( "mkdir", "-p" , $CONFIG{'blacklist'} );
+                    system( "mkdir", "-p", $CONFIG{ 'blacklist' } );
                 }
 
                 open( LOG, ">", "$CONFIG{'blacklist'}/$ip.auto" );
@@ -468,8 +469,9 @@ sub processRules
         }
         else
         {
-            $CONFIG{'verbose'} &&
-              print "Allowing IP $ip only made $attempts (<$CONFIG{'attempts'} ) attempts\n";
+            $CONFIG{ 'verbose' }
+              && print
+              "Allowing IP $ip only made $attempts (<$CONFIG{'attempts'} ) attempts\n";
         }
     }
 
@@ -477,7 +479,7 @@ sub processRules
     #
     #  Return the count of IPs we blacklisted.
     #
-    return( $count );
+    return ($count);
 }
 
 
@@ -499,21 +501,21 @@ sub expireBlacklist
     my $changed = 0;
 
 
-    foreach my $file ( sort( glob( "$CONFIG{'blacklist'}/*.auto" ) ) )
+    foreach my $file ( sort( glob("$CONFIG{'blacklist'}/*.auto") ) )
     {
         my $age = -M $file;
         if ( int($age) > $CONFIG{ 'expire' } )
         {
-            $CONFIG{'verbose'} && print "Expiring file: $file\n";
+            $CONFIG{ 'verbose' } && print "Expiring file: $file\n";
 
-            unlink( $file );
+            unlink($file);
 
             $changed += 1;
         }
 
     }
 
-    return( $changed );
+    return ($changed);
 }
 
 
@@ -528,7 +530,7 @@ sub expireBlacklist
 
 sub cleanBlacklist
 {
-    foreach my $ip ( sort( glob( "$CONFIG{'blacklist'}/*.auto" ) ) )
+    foreach my $ip ( sort( glob("$CONFIG{'blacklist'}/*.auto") ) )
     {
         my $file = $ip;
 
@@ -536,7 +538,56 @@ sub cleanBlacklist
         {
             $file = $1;
         }
-        $CONFIG{'verbose'} && print "Removing previously blacklisted file: $file\n";
-        unlink( $ip );
+        $CONFIG{ 'verbose' }
+          && print "Removing previously blacklisted file: $file\n";
+        unlink($ip);
     }
+}
+
+
+=begin doc
+
+  Return 1 if the specified file was modified "recently".
+
+=end doc
+
+=cut
+
+sub recentlyModified
+{
+    my ($filename,$threshold) = (@_);
+
+    #
+    #  File not present?  Not modified then.
+    #
+    return 0 unless ( -e $filename );
+
+    #
+    #  Our threshold: six hours unless overridden
+    #
+    my $thresh = $threshold;
+    if ( !defined($thresh) )
+    {
+        $thresh = 60 * 60 * 6;
+    }
+
+    my ( $dev,  $ino,   $mode,  $nlink, $uid,     $gid, $rdev,
+         $size, $atime, $mtime, $ctime, $blksize, $blocks
+       ) = stat($filename);
+
+    #
+    #  Current date
+    #
+    my $now = time;
+
+    if ( abs( $now - $mtime ) < $thresh )
+    {
+        return 1;
+    }
+    if ( abs( $now - $ctime ) < $thresh )
+    {
+        return 1;
+    }
+
+    return 0;
 }
