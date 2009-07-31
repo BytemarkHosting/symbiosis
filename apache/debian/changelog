@@ -1,3 +1,9 @@
+libapache2-mod-vhost-bytemark (20090731103324) stable; urgency=low
+
+  * Generated logs/ and stats/ have correct ownership.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 31 Jul 2009 10:33:24 +1000
+
 libapache2-mod-vhost-bytemark (20090714122742) stable; urgency=low
 
   * Fixed typo on the front-page.
