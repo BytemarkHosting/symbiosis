@@ -56,6 +56,8 @@ foreach my $domain (@domains)
 
     processDomain($domain);
 
+    fixPermissions($domain);
+
     $CONFIG{ 'verbose' } && print "$domain - completed\n";
 }
 
@@ -185,7 +187,7 @@ EOF
     #  Run webalizer: if we got any logs
     #
     system("cd $CONFIG{'prefix'}/$domain/public/htdocs/stats/ && webalizer -q")
-      if ( scalar( @logfiles ) > 0 );
+      if ( scalar(@logfiles) > 0 );
 
     #
     #  Join the logfiles so the user can download them.
@@ -303,4 +305,59 @@ sub parseCommandLineArguments
         exit;
     }
 
+}
+
+
+=begin doc
+
+  Fix the ownership of the named domain's generated stats.
+
+=end doc
+
+=cut
+
+sub fixPermissions
+{
+    my ($domain) = (@_);
+
+    return unless ( -d "/srv/$domain/public/htdocs" );
+
+    #
+    #  We want the owner + group of the directory
+    #
+    my ( $dev,  $ino,   $mode,  $nlink, $uid,     $gid, $rdev,
+         $size, $atime, $mtime, $ctime, $blksize, $blocks
+       ) = stat("/srv/$domain/public/htdocs");
+
+    $CONFIG{ 'verbose' } && print " Domain $domain owned by ($uid.$gid)\n";
+
+    #
+    #  The directories we're going to fixup
+    #
+    my @dirs =
+      ( "/srv/$domain/public/htdocs/stats", "/srv/$domain/public/logs" );
+
+    foreach my $dir (@dirs)
+    {
+        if ( -d $dir )
+        {
+
+            #
+            #  Change the directory
+            #
+            system("chown $uid.$gid $dir");
+
+            foreach my $file ( sort( glob("$dir/*") ) )
+            {
+
+                #
+                #  And the files inside it.
+                #
+                if ( -e $file )
+                {
+                    system("chown $uid.$gid $file");
+                }
+            }
+        }
+    }
 }
