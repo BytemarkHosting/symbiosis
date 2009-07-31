@@ -115,6 +115,17 @@ parseCommandLineArguments();
 if ( -e "/etc/firewall/disabled" )
 {
     $CONFIG{'verbose'} && print "Firewall disabled\n";
+
+    #
+    #  If we're disabled we'll still reload the firewall
+    # because we want to make sure changes take effect.
+    #
+    if ( -x "/usr/bin/firewall" )
+    {
+        $CONFIG{'verbose'} && print "Reloading firewall\n";
+        system( "/usr/bin/firewall" );
+    }
+
     exit;
 }
 
@@ -458,7 +469,7 @@ sub processRules
         else
         {
             $CONFIG{'verbose'} &&
-              print "Allowing IP $ip only made $attempts (<5 ) attempts\n";
+              print "Allowing IP $ip only made $attempts (<$CONFIG{'attempts'} ) attempts\n";
         }
     }
 
