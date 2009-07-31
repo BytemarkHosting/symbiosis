@@ -116,17 +116,6 @@ if ( -e "/etc/firewall/disabled" )
 {
     $CONFIG{ 'verbose' } && print "Firewall disabled\n";
 
-    #
-    #  If we're disabled and we were disabled "recently" then
-    # reload the firewall to make sure changes take effect.
-    #
-    if (    ( -x "/usr/bin/firewall" )
-         && ( recentlyModified("/etc/firewall/disabled") ) )
-    {
-        $CONFIG{ 'verbose' } && print "Reloading firewall\n";
-        system("/usr/bin/firewall");
-    }
-
     exit;
 }
 
@@ -137,6 +126,17 @@ if ( -e "/etc/firewall/disabled.blacklist" )
 {
     $CONFIG{ 'verbose' } && print "Blacklister disabled\n";
     cleanBlacklist();
+
+    #
+    #  If we're disabled and we were disabled "recently" then
+    # reload the firewall to make sure changes take effect.
+    #
+    if (    ( -x "/usr/bin/firewall" )
+         && ( recentlyModified("/etc/firewall/disabled") ) )
+    {
+        $CONFIG{ 'verbose' } && print "Reloading firewall\n";
+        system("/usr/bin/firewall");
+    }
     exit;
 }
 
