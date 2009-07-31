@@ -2,6 +2,9 @@ bytemark-vhost-firewall (20090731104804) stable; urgency=low
 
   * If the firewall-blacklist program is disabled then reload the
     firewall prior to exiting - to flush out bogus entries.
+  * Added the "logtail" script from the Debian logcheck package so
+    that we only process new entries.
+  * Changed our cronjob so that we run every 15 minutes not every 5.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 31 Jul 2009 10:48:04 +0000
 

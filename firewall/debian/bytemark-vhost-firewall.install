@@ -1,6 +1,7 @@
 rule.d/*               usr/share/firewall
 bin/firewall           usr/bin
 bin/firewall-blacklist usr/bin
+bin/firewall-logtail   usr/bin
 bin/firewall-test      etc/cron.hourly
 patterns.d/            etc/firewall
 cron.d/*               etc/cron.d/

@@ -98,8 +98,8 @@ $CONFIG{ 'input' }     = "/etc/firewall/patterns.d/";
 $CONFIG{ 'blacklist' } = "/etc/firewall/blacklist.d/";
 $CONFIG{ 'whitelist' } = "/etc/firewall/whitelist.d/";
 $CONFIG{ 'verbose' }   = 0;
-$CONFIG{ 'attempts' } = 5;    # count of attacks before blacklisting
-$CONFIG{ 'expire' }   = 2;    # number of days to keep records
+$CONFIG{ 'attempts' }  = 5;    # count of attacks before blacklisting
+$CONFIG{ 'expire' }    = 2;    # number of days to keep records
 
 
 
@@ -393,7 +393,7 @@ sub processRules
     return 0 if ( !-e $file );
 
 
-    open( FILE, "<", $file )
+    open( FILE, "/usr/bin/firewall-logtail $file|" )
       or die "failed to read logfile: $file - $!";
 
     foreach my $line (<FILE>)
