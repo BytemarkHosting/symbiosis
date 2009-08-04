@@ -1,3 +1,9 @@
+libapache2-mod-vhost-bytemark (20090804161200) stable; urgency=low
+
+  * Set the content type in our /bytemark/info/ page.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 4 Aug 2009 16:12:00 +0100
+
 libapache2-mod-vhost-bytemark (20090731103324) stable; urgency=low
 
   * Generated logs/ and stats/ have correct ownership.
