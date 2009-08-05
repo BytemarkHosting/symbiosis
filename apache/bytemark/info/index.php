@@ -26,7 +26,7 @@
 $dir = opendir("/srv");
 while (($file = readdir($dir)) !== false)
 {
-  if (($file != '.')&&($file != '..') && is_dir("/srv/".$file) ))
+  if (($file != '.')&&($file != '..') && (is_dir("/srv/".$file) ))
   {
      echo "<li><a href=\"http://$file\">$file</a></li>\n";
   }
