@@ -520,13 +520,13 @@ sub expireBlacklist
     #
     #  Remove any blacklisted IP which is now on our whitelist.
     #
-    foreach my $file ( sort ( glob( "$CONFIG{'whitelist'}/*" ) ) )
+    foreach my $file ( sort ( glob( "$CONFIG{'blacklist'}/*" ) ) )
     {
         #
         #  Get the IP
         #
         my $ip = $file;
-        if ( $ip =~ /(.*)\/(.*)$/ )
+        if ( $ip =~ /(.*)\/(.*)\.auto$/i )
         {
             $ip = $2;
         }

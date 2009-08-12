@@ -1,3 +1,9 @@
+bytemark-vhost-firewall (20090812171748) stable; urgency=low
+
+  * Correctly handle mis-named blacklisted files.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 12 Aug 2009 17:17:48 +0000
+
 bytemark-vhost-firewall (20090812162548) stable; urgency=low
 
   * Remove active blacklist entries for IPs which are subsequently
