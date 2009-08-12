@@ -496,11 +496,13 @@ sub expireBlacklist
 {
 
     #
-    #  Changed anythign?
+    #  Changed anything?
     #
     my $changed = 0;
 
-
+    #
+    #  Remove any auto-added file which is older than our threshold.
+    #
     foreach my $file ( sort( glob("$CONFIG{'blacklist'}/*.auto") ) )
     {
         my $age = -M $file;
@@ -514,6 +516,32 @@ sub expireBlacklist
         }
 
     }
+
+    #
+    #  Remove any blacklisted IP which is now on our whitelist.
+    #
+    foreach my $file ( sort ( glob( "$CONFIG{'whitelist'}/*" ) ) )
+    {
+        #
+        #  Get the IP
+        #
+        my $ip = $file;
+        if ( $ip =~ /(.*)\/(.*)$/ )
+        {
+            $ip = $2;
+        }
+
+        #
+        #  If that IP was whitelisted after blocking then remove it.
+        #
+        if ( -e $CONFIG{'whitelist'} . "/$ip" )
+        {
+            $CONFIG{ 'verbose' } && print "Removing file: $file due to it being whitelisted.\n";
+            unlink( $file );
+            $changed += 1;
+        }
+    }
+
 
     return ($changed);
 }

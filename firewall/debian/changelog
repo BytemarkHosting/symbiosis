@@ -1,3 +1,10 @@
+bytemark-vhost-firewall (20090812162548) stable; urgency=low
+
+  * Remove active blacklist entries for IPs which are subsequently
+    whitelisted.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 12 Aug 2009 16:25:48 +0000
+
 bytemark-vhost-firewall (20090731104804) stable; urgency=low
 
   * If the firewall-blacklist program is disabled then reload the
