@@ -1,3 +1,9 @@
+bytemark-vhost-firewall (20090825102446) stable; urgency=low
+
+  * Duplicate IPv4 rules onto IPv6 if such support is enabled.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 25 Aug 2009 10:24:46 +0000
+
 bytemark-vhost-firewall (20090812171748) stable; urgency=low
 
   * Correctly handle mis-named blacklisted files.

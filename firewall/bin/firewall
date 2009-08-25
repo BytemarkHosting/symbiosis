@@ -18,6 +18,7 @@ firewall - A simple firewall generator
    --no-flush    Don't flush all rules prior to adding the new ones.
    --no-root     Don't complain if started by a non-root user.
    --test        Perform a minimal test after installing the firewall.
+   --ipv6        Specify whether to generate and run IPv6 rules.
 
   Paths:
 
@@ -375,6 +376,7 @@ sub parseCommandLineArguments
                       "outgoing-d=s",  \$CONFIG{ 'outgoing.d' },
                       "rule-d=s",      \$CONFIG{ 'rule.d' },
                       "local-d=s",     \$CONFIG{ 'local.d' },
+                      "ipv6=s",        \$CONFIG{ 'ipv6' },
                       "manual",        \$MANUAL
          )
       )
@@ -400,7 +402,9 @@ sub parseCommandLineArguments
 
 sub sanityCheck
 {
-
+    #
+    #  Make sure we received directories that exist.
+    #
     foreach my $arg (qw! incoming.d outgoing.d rule.d !)
     {
         if ( !defined( $CONFIG{ $arg } ) )
@@ -423,6 +427,20 @@ sub sanityCheck
         print "You must be root to use this script appropriately\n";
         exit;
     }
+
+    #
+    #  IPv6 can either be yes or no.
+    #
+    if ( $CONFIG{'ipv6'} )
+    {
+        if ( ( $CONFIG{'ipv6'} !~ /^yes$/ ) &&
+             ( $CONFIG{'ipv6'} !~ /^no$/ ) )
+        {
+            print "--ipv6 may be specified as either 'yes' or 'no'\n";
+            exit;
+        }
+    }
+
 }
 
 
@@ -443,7 +461,7 @@ sub flushAllRules
     #
     #  The commands required to flush a system.
     #
-    my @cmds = (
+    my @ip4 = (
 
                 "/sbin/iptables -P INPUT ACCEPT",
                 "/sbin/iptables -P OUTPUT ACCEPT",
@@ -455,12 +473,35 @@ sub flushAllRules
                 "/sbin/iptables -X"
     );
 
+    my @ip6 = (
+
+                "/sbin/ip6tables -P INPUT ACCEPT",
+                "/sbin/ip6tables -P OUTPUT ACCEPT",
+                "/sbin/ip6tables -P FORWARD ACCEPT",
+                "/sbin/ip6tables -F",
+                "/sbin/ip6tables -t nat -F",
+                "/sbin/ip6tables -t raw -F",
+                "/sbin/ip6tables -t mangle -F",
+                "/sbin/ip6tables -X"
+    );
+
     #
-    #  Run each one.
+    #  Run each IP4 command
     #
-    foreach my $command (@cmds)
+    foreach my $command (@ip4)
     {
         system($command );
+    }
+
+    #
+    #  If IP6 run the others
+    #
+    if ( isIPv6() )
+    {
+        foreach my $command (@ip6)
+        {
+            system( $command . " >/dev/null 2>/dev/null");
+        }
     }
 }
 
@@ -506,6 +547,13 @@ export PATH
 /sbin/iptables -A INPUT -i lo -j ACCEPT
 /sbin/iptables -A OUTPUT -o lo -j ACCEPT
 
+
+#
+# Ditto for IPv6.
+#
+ip6tables -A INPUT  -i lo -j ACCEPT 2>/dev/null >/dev/null
+ip6tables -A OUTPUT -o lo -j ACCEPT 2>/dev/null >/dev/null
+
 EOF
     close(FILE);
 
@@ -543,6 +591,10 @@ sub createBlacklist
             {
                 $name = $2;
             }
+
+            #
+            #  If it is an IPv4 address.
+            #
             if ( ( $name =~ /^([0-9\.]+)$/ ) ||
                  ( $name =~ /^([0-9\.]+).auto$/i ) )
             {
@@ -557,12 +609,24 @@ sub createBlacklist
                 print FILE "# blacklisted IP: $name\n";
                 print FILE "/sbin/iptables -A INPUT -p tcp --src $name -j REJECT -m state --state NEW\n";
                 print FILE "/sbin/iptables -A INPUT -p udp --src $name -j REJECT -m state --state NEW\n";
-                print FILE "\n";
+            }
+
+            #
+            # Is it an IPv6 address?
+            #
+            if ( ( $name =~ /:/ ) &&
+                 ( isIPv6() ) )
+            {
+                print FILE "/sbin/ip6tables -A INPUT -p tcp --src $name -j REJECT -m state --state NEW\n";
+                print FILE "/sbin/ip6tables -A INPUT -p udp --src $name -j REJECT -m state --state NEW\n";
             }
         }
     }
     close(FILE);
 }
+
+
+
 
 =begin doc
 
@@ -634,11 +698,21 @@ sub findDevices
         if ( $line =~ /\d: ([^:]+):/ )
         {
             my $int = $1;
-            if ( ( $int ne "lo" ) && ( $int !~ /^sit/i ) )
+
+            if ( ( $int !~ /^lo/ ) &&
+                 ( $int !~ /^dummy/ ) &&
+                 ( $int !~ /^sit/ ) &&
+                 ( $int !~ /^teq/ ) &&
+                 ( $int !~ /^gre/ ) &&
+                 ( $int !~ /^ip6tnl/ ) )
             {
                 $CONFIG{'verbose'} && print "Found network device: $int\n";
 
                 $interfaces{$int} += 1;
+            }
+            else
+            {
+                $CONFIG{'verbose'} && print "Ignoring network device: $int\n";
             }
         }
     }
@@ -895,6 +969,16 @@ sub addRule
                 die "ERROR: Uknown direction: $direction\n";
             }
             print FILE $copy . "\n";
+
+            #
+            #  If we have IPv6 then write that too.
+            #
+            if ( isIPv6() )
+            {
+                my $tmp = $copy . " >/dev/null 2>/dev/null\n";
+                $tmp =~ s/iptables/ip6tables/g;
+                print FILE $tmp ;
+            }
         }
         print FILE "\n";
     }
@@ -1031,4 +1115,50 @@ sub loadModules
 
         system( "/sbin/modprobe $mod 2>/dev/null >/dev/null" );
     }
+}
+
+
+
+=begin doc
+
+  Is IPv6 enabled?  This is called a few times, so it caches between
+ runs.
+
+=end doc
+
+=cut
+
+sub isIPv6
+{
+    #
+    #  Get the cached result.
+    #
+    my $enabled = $CONFIG{'ipv6'} || "";
+
+    if ( $enabled =~ /yes/i )
+    {
+        return 1;
+    }
+    elsif ( $enabled =~ /no/i )
+    {
+        return 0;
+    }
+    else
+    {
+
+        my $out = `/sbin/ip -6 addr | grep ::`;
+
+        foreach my $line ( split( /[\n\r]/, $out ) )
+        {
+            if ( $out =~ /::/ )
+            {
+                $CONFIG{'verbose'} && print "Found IPv6\n";
+                $CONFIG{'ipv6'} = "yes";
+                return 1;
+            }
+        }
+    }
+
+    $CONFIG{'ipv6'} = "no";
+    return 0;
 }
