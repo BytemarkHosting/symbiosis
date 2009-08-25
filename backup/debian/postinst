@@ -10,7 +10,20 @@ if [ "$1" != "configure" ]; then
         exit 0
 fi
 
+
+#
+#  If the has been edited locally save it away.
+#
+if ( ! diff /etc/backup2l.conf /usr/share/bytemark-vhost-simple-backup/backup2l.conf 2>/dev/null >/dev/null ) ; then 
+  mv /etc/backup2l.conf /etc/backup2l.conf.$(date +%Y-%M-%d)
+fi
+
+
+#
+#  Install our global file.
+#
 cp /usr/share/bytemark-vhost-simple-backup/backup2l.conf /etc/
+
 
 #DEBHELPER#
 exit 0
