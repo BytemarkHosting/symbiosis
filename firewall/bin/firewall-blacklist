@@ -98,7 +98,7 @@ $CONFIG{ 'input' }     = "/etc/firewall/patterns.d/";
 $CONFIG{ 'blacklist' } = "/etc/firewall/blacklist.d/";
 $CONFIG{ 'whitelist' } = "/etc/firewall/whitelist.d/";
 $CONFIG{ 'verbose' }   = 0;
-$CONFIG{ 'attempts' }  = 5;    # count of attacks before blacklisting
+$CONFIG{ 'attempts' }  = 20;   # count of attacks before blacklisting
 $CONFIG{ 'expire' }    = 2;    # number of days to keep records
 
 
