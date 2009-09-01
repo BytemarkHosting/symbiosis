@@ -1,3 +1,9 @@
+bytemark-vhost-firewall (20090901095146) stable; urgency=low
+
+  * Skip "tun" devices.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 1 Sep 2009 09:51:46 +0000
+
 bytemark-vhost-firewall (20090825102446) stable; urgency=low
 
   * Duplicate IPv4 rules onto IPv6 if such support is enabled.

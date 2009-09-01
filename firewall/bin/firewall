@@ -703,6 +703,7 @@ sub findDevices
                  ( $int !~ /^dummy/ ) &&
                  ( $int !~ /^sit/ ) &&
                  ( $int !~ /^teq/ ) &&
+                 ( $int !~ /^tun/ ) &&
                  ( $int !~ /^gre/ ) &&
                  ( $int !~ /^ip6tnl/ ) )
             {
