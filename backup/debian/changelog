@@ -1,3 +1,9 @@
+bytemark-vhost-simple-backup (20090901095954) stable; urgency=low
+
+  * Add /home + /var/lib to the directories which are backed up.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 1 Sep 2009 09:59:54 +0000
+
 bytemark-vhost-simple-backup (20090825172437) stable; urgency=low
 
   * Ensure we keep a backup if we change the backup2l.conf file.
