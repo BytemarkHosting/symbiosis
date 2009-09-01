@@ -92,8 +92,8 @@ my @dirs = findDirs( $CONFIG{ 'prefix' } );
 #
 if ( scalar(@dirs) < 1 )
 {
-    $CONFIG{ 'verbose' }
-      && print "Found no domains beneath: $CONFIG{'prefix'}\n";
+    $CONFIG{ 'verbose' } &&
+      print "Found no domains beneath: $CONFIG{'prefix'}\n";
 
     exit;
 }
@@ -155,18 +155,18 @@ foreach my $file ( sort glob("$CONFIG{'prefix'}/*/config/dns/*.txt") )
     }
 
 
-    $CONFIG{ 'verbose' }
-      && print "Copying generated file to $CONFIG{'output'}/data/$name.txt\n";
+    $CONFIG{ 'verbose' } &&
+      print "Copying generated file to $CONFIG{'output'}/data/$name.txt\n";
 
-    open( OUT, ">", "$CONFIG{'output'}/data/$name.txt" )
-      or die "Failed to write to $CONFIG{'output'}/data/$name.txt - $!";
+    open( OUT, ">", "$CONFIG{'output'}/data/$name.txt" ) or
+      die "Failed to write to $CONFIG{'output'}/data/$name.txt - $!";
     open( IN, "<", $file ) or die "Failed to read $file - $!";
 
     print OUT <<EOF;
 #
 #  Don't edit this file.
 #
-#  Edit this file in
+#  Edit the source of this file:
 #
 #   /srv/$name/config/dns/$name.txt
 #
@@ -197,6 +197,10 @@ if ( -x "$CONFIG{'output'}/upload" )
 
     $CONFIG{ 'verbose' } && print "Upload complete\n";
 }
+else
+{
+    print "Upload script missing!\n";
+}
 
 
 #
@@ -218,20 +222,19 @@ exit;
 
 sub parseCommandLineArguments
 {
-    my $HELP    = 0;
-    my $MANUAL  = 0;
+    my $HELP   = 0;
+    my $MANUAL = 0;
 
     if (
-         !GetOptions(
-                      "verbose",    \$CONFIG{ 'verbose' },
-                      "prefix=s",   \$CONFIG{ 'prefix' },
-                      "template=s", \$CONFIG{ 'template' },
-                      "output=s",   \$CONFIG{ 'output' },
-                     "manual",       \$MANUAL,
-                     "help",         \$HELP,
+        !GetOptions(
+            "verbose",    \$CONFIG{ 'verbose' },
+            "prefix=s",   \$CONFIG{ 'prefix' },
+            "template=s", \$CONFIG{ 'template' },
+            "output=s",   \$CONFIG{ 'output' },
+            "manual",     \$MANUAL,
+            "help",       \$HELP,
 
-         )
-      )
+                   ) )
     {
         exit;
     }
@@ -264,8 +267,8 @@ sub findDirs
     #
     if ( !-d $root )
     {
-        $CONFIG{ 'verbose' }
-          && print "Prefix $CONFIG{'prefix'} is not a directory\n";
+        $CONFIG{ 'verbose' } &&
+          print "Prefix $CONFIG{'prefix'} is not a directory\n";
         exit;
     }
 
@@ -274,14 +277,11 @@ sub findDirs
 
     foreach my $file ( sort( glob( $root . "/*" ) ) )
     {
-        if ( ( -d $file ) )
+        if ( ( -d $file ) &&
+             ( $file !~ /lost\+found/ ) )
         {
             push( @results, $file );
             $CONFIG{ 'verbose' } && print "Found directory: $file\n";
-        }
-        else
-        {
-            $CONFIG{ 'verbose' } && print "Ignored: $file\n";
         }
     }
     return (@results);
@@ -321,8 +321,8 @@ sub processDomain
     #
     if ( -e $CONFIG{ 'prefix' } . "/" . $domain . "/config/ip" )
     {
-        open( IP, "<", $CONFIG{ 'prefix' } . "/" . $domain . "/config/ip" )
-          or die "failed to open $CONFIG{'prefix'}/$domain/config/ip - $!";
+        open( IP, "<", $CONFIG{ 'prefix' } . "/" . $domain . "/config/ip" ) or
+          die "failed to open $CONFIG{'prefix'}/$domain/config/ip - $!";
         $ip = <IP>;
         close(IP);
         chomp($ip);
@@ -354,9 +354,9 @@ sub processDomain
 
             open( EXISTING,
                   "<",
-                  $CONFIG{ 'prefix' } . "/" . $domain
-                    . "/config/dns/$domain.txt"
-            );
+                  $CONFIG{ 'prefix' } . "/" . $domain .
+                    "/config/dns/$domain.txt"
+                );
             while (<EXISTING>)
             {
                 my $line = $_;
@@ -371,14 +371,14 @@ sub processDomain
 
             if ($found)
             {
-                $CONFIG{ 'verbose' }
-                  && print "The IP is correct - leaving file alone\n";
+                $CONFIG{ 'verbose' } &&
+                  print "The IP is correct - leaving file alone\n";
                 return;
             }
             else
             {
-                $CONFIG{ 'verbose' }
-                  && print "File needs replacing due to config/ip\n";
+                $CONFIG{ 'verbose' } &&
+                  print "File needs replacing due to config/ip\n";
             }
         }
         else
@@ -420,8 +420,8 @@ sub processDomain
     #  Now write it out
     #
     open( OUTPUT, ">",
-          $CONFIG{ 'prefix' } . "/" . $domain . "/config/dns/$domain.txt" )
-      or die "Failed to write output for $domain - $!";
+          $CONFIG{ 'prefix' } . "/" . $domain . "/config/dns/$domain.txt" ) or
+      die "Failed to write output for $domain - $!";
     print OUTPUT $tmp;
     close(OUTPUT);
 
@@ -443,8 +443,8 @@ sub readFile
 {
     my ($file) = (@_);
 
-    open( INPUT, "<", $file )
-      or die "failed to read file $file for reading - $!";
+    open( INPUT, "<", $file ) or
+      die "failed to read file $file for reading - $!";
 
     my @results;
 
@@ -510,10 +510,9 @@ sub fixupPermissions
     #
     #  Get the owner + group
     #
-    my (
-         $dev,  $ino,   $mode,  $nlink, $uid,     $gid, $rdev,
+    my ( $dev,  $ino,   $mode,  $nlink, $uid,     $gid, $rdev,
          $size, $atime, $mtime, $ctime, $blksize, $blocks
-    ) = stat($domain);
+       ) = stat($domain);
 
     #
     #  Find the find the username
@@ -530,8 +529,7 @@ sub fixupPermissions
         #
         #  Change the ownership
         #
-        system( "chown", "-R", $username . ":" . $groupname,
-                "$domain/config" );
+        system( "chown", "-R", $username . ":" . $groupname, "$domain/config" );
     }
     else
     {
