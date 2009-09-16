@@ -593,33 +593,106 @@ sub createBlacklist
             }
 
             #
-            #  If it is an IPv4 address.
+            #  If the file is zero-bytes in size we block all
+            # access from the named IP.
             #
-            if ( ( $name =~ /^([0-9\.]+)$/ ) ||
-                 ( $name =~ /^([0-9\.]+).auto$/i ) )
+            if (  -s $file <= 0 )
             {
-                # ignore localhost.
-                next if ( $name =~ /^127.0.0/ );
 
-                # strip ".auto" if present.
-                $name =~ s/\.auto$//g;
+                #
+                #  Empty file
+                #
+                $CONFIG{ 'verbose' } && print "File is empty: $file\n";
 
-                $CONFIG{ 'verbose' } && print "Blacklisting: $name\n";
+                #
+                #  If it is an IPv4 address.
+                #
 
-                print FILE "# blacklisted IP: $name\n";
-                print FILE "/sbin/iptables -A INPUT -p tcp --src $name -j REJECT -m state --state NEW\n";
-                print FILE "/sbin/iptables -A INPUT -p udp --src $name -j REJECT -m state --state NEW\n";
+                if ( ( $name =~ /^([0-9\.]+)$/ ) ||
+                     ( $name =~ /^([0-9\.]+).auto$/i ) )
+                {
+                    # ignore localhost.
+                    next if ( $name =~ /^127.0.0/ );
+
+                    # strip ".auto" if present.
+                    $name =~ s/\.auto$//g;
+
+                    $CONFIG{ 'verbose' } && print "Blacklisting: $name\n";
+
+                    print FILE "# blacklisted IP: $name\n";
+                    print FILE "/sbin/iptables -A INPUT -p tcp --src $name -j REJECT -m state --state NEW\n";
+                    print FILE "/sbin/iptables -A INPUT -p udp --src $name -j REJECT -m state --state NEW\n";
+                }
+
+                #
+                # Is it an IPv6 address?
+                #
+                if ( ( $name =~ /:/ ) &&
+                     ( isIPv6() ) )
+                {
+                    print FILE "/sbin/ip6tables -A INPUT -p tcp --src $name -j REJECT -m state --state NEW\n";
+                    print FILE "/sbin/ip6tables -A INPUT -p udp --src $name -j REJECT -m state --state NEW\n";
+                }
+            }
+            else
+            {
+                #
+                #  The file has non-zero contents
+                #
+                my @ports;
+
+                open( PORTS, "<", $file )
+                  or die "Failed to open file : $file - $!";
+                while(my $line = <PORTS> )
+                {
+                    chomp( $line );
+                    next if ( !$line || !length($line) || $line !~ /^([0-9]+)$/ );
+
+                    push( @ports, $line );
+                }
+                close( PORTS );
+
+                #
+                #  So we have a blacklist entry with a list of ports
+                #
+                $CONFIG{'verbose'} && print "Blacklisting ports: " . join( ",", @ports ) . "\n";
+
+                #
+                #  Blacklist
+                #
+                if ( ( $name =~ /^([0-9\.]+)$/ ) ||
+                     ( $name =~ /^([0-9\.]+).auto$/i ) )
+                {
+                    # ignore localhost.
+                    next if ( $name =~ /^127.0.0/ );
+
+                    # strip ".auto" if present.
+                    $name =~ s/\.auto$//g;
+
+                    foreach my $port ( @ports )
+                    {
+                        $CONFIG{ 'verbose' } && print "Blacklisting: $name $port\n";
+
+                        print FILE "# blacklisted IP:$name Port:$port\n";
+                        print FILE "/sbin/iptables -A INPUT -p tcp --src $name --dport $port -j REJECT -m state --state NEW\n";
+                    }
+                }
+
+                #
+                # Is it an IPv6 address?
+                #
+                if ( ( $name =~ /:/ ) &&
+                     ( isIPv6() ) )
+                {
+                    foreach my $port ( @ports )
+                    {
+                        $CONFIG{ 'verbose' } && print "Blacklisting: $name $port\n";
+
+                        print FILE "/sbin/ip6tables -A INPUT -p tcp --src $name --dport $port -j REJECT -m state --state NEW\n";
+                    }
+                }
             }
 
-            #
-            # Is it an IPv6 address?
-            #
-            if ( ( $name =~ /:/ ) &&
-                 ( isIPv6() ) )
-            {
-                print FILE "/sbin/ip6tables -A INPUT -p tcp --src $name -j REJECT -m state --state NEW\n";
-                print FILE "/sbin/ip6tables -A INPUT -p udp --src $name -j REJECT -m state --state NEW\n";
-            }
         }
     }
     close(FILE);
