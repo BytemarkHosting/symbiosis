@@ -1,3 +1,9 @@
+bytemark-vhost-updater (2009.0916-1) stable; urgency=low
+
+  * Updated to use epoch-based revision date.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 16 Sep 2009 10:16:01 +0000
+
 bytemark-vhost-updater (20090714103603) stable; urgency=low
 
   * Include our cronjob

@@ -1,3 +1,9 @@
+bytemark-vhost-firewall (2009.0916-1) stable; urgency=low
+
+  * Blacklisting files now allow per-port blocks.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 16 Sep 2009 10:15:01 +0000
+
 bytemark-vhost-firewall (20090901095146) stable; urgency=low
 
   * Skip "tun" devices.
