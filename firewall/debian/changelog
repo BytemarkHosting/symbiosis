@@ -1,4 +1,4 @@
-bytemark-vhost-firewall (2009.0916-1) stable; urgency=low
+bytemark-vhost-firewall (1.20090916-1) stable; urgency=low
 
   * Blacklisting files now allow per-port blocks.
 

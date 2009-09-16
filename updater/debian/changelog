@@ -1,4 +1,4 @@
-bytemark-vhost-updater (2009.0916-1) stable; urgency=low
+bytemark-vhost-updater (1.20090916-1) stable; urgency=low
 
   * Updated to use epoch-based revision date.
 
