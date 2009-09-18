@@ -456,7 +456,6 @@ sub processRules
                 }
 
                 open( LOG, ">", "$CONFIG{'blacklist'}/$ip.auto" );
-                print LOG "\n";
                 close(LOG);
 
                 $CONFIG{ 'verbose' } && print "Blacklisting: $ip\n";
