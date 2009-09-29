@@ -1,3 +1,10 @@
+bytemark-vhost-updater (2009:0929-1) stable; urgency=low
+
+  * Explicitly disable the use of /etc/apt/sources.list.d/
+  * Configure debconf to be non-interactive.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 29 Sep 2009 10:57:01 +0000
+
 bytemark-vhost-updater (2009:0916-1) stable; urgency=low
 
   * Updated to use epoch-based revision date.
