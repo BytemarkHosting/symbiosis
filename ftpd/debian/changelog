@@ -1,3 +1,9 @@
+bytemark-vhost-ftpd (2009.1009-1) stable; urgency=low
+
+  * Our firewalling now only blocks port 21 access.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 9 Oct 2009 12:43:12 +0000
+
 bytemark-vhost-ftpd (20090707153244) stable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches

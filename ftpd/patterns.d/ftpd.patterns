@@ -9,6 +9,10 @@
 #
 file = /var/log/syslog
 
+#
+#  We block access to failing machines only to port 21.
+#
+ports = 21
 
 #
 #  The rule(s) we match
