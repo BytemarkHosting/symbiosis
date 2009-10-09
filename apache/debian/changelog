@@ -1,3 +1,9 @@
+libapache2-mod-vhost-bytemark (2009.1009-1) stable; urgency=low
+
+  * Correctly archive and prune old logs.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 9 Oct 2009 11:33:11 +0000
+
 libapache2-mod-vhost-bytemark (20090804161200) stable; urgency=low
 
   * Set the content type in our /bytemark/info/ page.

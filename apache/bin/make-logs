@@ -196,7 +196,7 @@ EOF
     {
         my $date = getDay();
         system(
-            "cd $CONFIG{'prefix'}/$domain/public/htdocs/stats/  && cat $file >> access.log.$date"
+            "cd $CONFIG{'prefix'}/$domain/public/htdocs/stats/  && cat $CONFIG{'prefix'}/$domain/public/logs/$file >> access.log.$date"
         );
     }
 
@@ -221,12 +221,12 @@ EOF
     #
     #  Now remove old files
     #
-    my $count = 10;
+    my $count = 0;
     foreach my $file (
         reverse(
             sort(
                 glob(
-                    "$CONFIG{'prefix'}/$domain/public/htdocs/stats/access.log.*"
+                    "$CONFIG{'prefix'}/$domain/public/logs/access.log.*"
                 ) ) ) )
     {
         if ( $count > 10 )
