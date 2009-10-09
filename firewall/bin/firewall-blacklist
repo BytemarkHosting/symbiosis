@@ -102,8 +102,8 @@ $CONFIG{ 'input' }     = "/etc/firewall/patterns.d/";
 $CONFIG{ 'blacklist' } = "/etc/firewall/blacklist.d/";
 $CONFIG{ 'whitelist' } = "/etc/firewall/whitelist.d/";
 $CONFIG{ 'verbose' }   = 0;
-$CONFIG{ 'attempts' }  = 20;   # count of attacks before blacklisting
-$CONFIG{ 'expire' }    = 2;    # number of days to keep records
+$CONFIG{ 'attempts' } = 20;    # count of attacks before blacklisting
+$CONFIG{ 'expire' }   = 2;     # number of days to keep records
 
 
 
@@ -135,8 +135,8 @@ if ( -e "/etc/firewall/disabled.blacklist" )
     #  If we're disabled and we were disabled "recently" then
     # reload the firewall to make sure changes take effect.
     #
-    if (    ( -x "/usr/bin/firewall" )
-         && ( recentlyModified("/etc/firewall/disabled") ) )
+    if ( ( -x "/usr/bin/firewall" ) &&
+         ( recentlyModified("/etc/firewall/disabled") ) )
     {
         $CONFIG{ 'verbose' } && print "Reloading firewall\n";
         system("/usr/bin/firewall");
@@ -165,7 +165,7 @@ my $RULES = loadRules();
 #
 #  Just dumping?
 #
-if ($CONFIG{'dump'} )
+if ( $CONFIG{ 'dump' } )
 {
     use Data::Dumper;
     print Dumper( \$RULES );
@@ -180,9 +180,9 @@ my $reload = 0;
 #
 #  Process the rules
 #
-foreach my $ruleset ( @$RULES )
+foreach my $ruleset (@$RULES)
 {
-    $reload += processRules( $ruleset );
+    $reload += processRules($ruleset);
 }
 
 
@@ -346,17 +346,19 @@ sub loadRules
     #
     foreach my $file ( sort( glob( $CONFIG{ 'input' } . "/*.patterns" ) ) )
     {
+
         #
         #  The data associated with each file.
         #
         my $data;
 
 
-        open( FILE, "<", $file )
-          or die "failed to read file $file - $!";
+        open( FILE, "<", $file ) or
+          die "failed to read file $file - $!";
 
         foreach my $line (<FILE>)
         {
+
             #
             #  Remove trailing newline, and skip empty lines or comments.
             #
@@ -368,7 +370,7 @@ sub loadRules
             #
             if ( $line =~ /file\s+=\s+(.*)/ )
             {
-                $data->{'file'} = $1;
+                $data->{ 'file' } = $1;
             }
             elsif ( $line =~ /ports\s+=\s+(.*)/ )
             {
@@ -376,14 +378,15 @@ sub loadRules
                 $ports =~ s/^\s*//;
                 $ports =~ s/\s*$//;
 
-                $data->{'ports'} = $ports;
+                $data->{ 'ports' } = $ports;
             }
             else
             {
+
                 # rules
-                my $cur = $data->{'rules'};
+                my $cur = $data->{ 'rules' };
                 push( @$cur, $line );
-                $data->{'rules'} = $cur;
+                $data->{ 'rules' } = $cur;
             }
         }
         close(FILE);
@@ -410,14 +413,14 @@ sub loadRules
 
 sub processRules
 {
-    my ( $rule ) = (@_);
+    my ($rule) = (@_);
 
     #
     #  The data from the ruleset.
     #
-    my $file  = $rule->{'file'};
-    my $ports = $rule->{'ports'} || "all";
-    my @rules = @{$rule->{'rules'}};
+    my $file  = $rule->{ 'file' };
+    my $ports = $rule->{ 'ports' } || "all";
+    my @rules = @{ $rule->{ 'rules' } };
 
     #
     #  Pattern to match an IP address.
@@ -434,13 +437,13 @@ sub processRules
     #
     if ( !-e $file )
     {
-        $CONFIG{'verbose'} && print "Named logfile doesn't exist: $file\n";
+        $CONFIG{ 'verbose' } && print "Named logfile doesn't exist: $file\n";
         return 0;
     }
 
 
-    open( FILE, "/usr/bin/firewall-logtail $file|" )
-      or die "failed to read logfile: $file - $!";
+    open( FILE, "/usr/bin/firewall-logtail $file|" ) or
+      die "failed to read logfile: $file - $!";
 
     foreach my $line (<FILE>)
     {
@@ -467,7 +470,7 @@ sub processRules
                 #
                 # Record the blacklist
                 #
-                $BLACKLIST{ $match }->{$ports} += 1;
+                $BLACKLIST{ $match }->{ $ports } += 1;
             }
         }
     }
@@ -487,23 +490,24 @@ sub processRules
     my $count = 0;
     foreach my $ip ( keys %BLACKLIST )
     {
+
         #
         # ignore local failures.
         #
-#        next if ( $ip =~ /^127/ );
+        next if ( $ip =~ /^127/ );
 
         #
         # Ignore whitelisted IPs
         #
- #       next if ( -e $CONFIG{ 'whitelist' } . "/$ip" );
+        next if ( -e $CONFIG{ 'whitelist' } . "/$ip" );
 
         #
         # The ports which were affected.
         #
-        foreach my $p ( keys %{$BLACKLIST{$ip}} )
+        foreach my $p ( keys %{ $BLACKLIST{ $ip } } )
         {
 
-            my $attempts = $BLACKLIST{$ip}->{$p};
+            my $attempts = $BLACKLIST{ $ip }->{ $p };
             if ( $attempts >= $CONFIG{ 'attempts' } )
             {
                 if ( !-e "$CONFIG{'blacklist'}/$ip.auto" )
@@ -514,7 +518,7 @@ sub processRules
                     }
 
                     open( LOG, ">", "$CONFIG{'blacklist'}/$ip.auto" );
-                    if (  ( $p ) && ( $p !~ /^all$/i ) )
+                    if ( ($p) && ( $p !~ /^all$/i ) )
                     {
                         foreach my $block ( split( /,/, $p ) )
                         {
@@ -528,14 +532,15 @@ sub processRules
                 }
                 else
                 {
-                    $CONFIG{ 'verbose' } && print "Ignoring blacklisted IP: $ip\n";
+                    $CONFIG{ 'verbose' } &&
+                      print "Ignoring blacklisted IP: $ip\n";
                 }
             }
             else
             {
-                $CONFIG{ 'verbose' }
-                  && print
-                    "Allowing IP $ip only made $attempts (<$CONFIG{'attempts'} ) attempts\n";
+                $CONFIG{ 'verbose' } &&
+                  print
+                  "Allowing IP $ip only made $attempts (<$CONFIG{'attempts'} ) attempts\n";
             }
         }
     }
@@ -585,8 +590,9 @@ sub expireBlacklist
     #
     #  Remove any blacklisted IP which is now on our whitelist.
     #
-    foreach my $file ( sort ( glob( "$CONFIG{'blacklist'}/*" ) ) )
+    foreach my $file ( sort ( glob("$CONFIG{'blacklist'}/*") ) )
     {
+
         #
         #  Get the IP
         #
@@ -599,10 +605,11 @@ sub expireBlacklist
         #
         #  If that IP was whitelisted after blocking then remove it.
         #
-        if ( -e $CONFIG{'whitelist'} . "/$ip" )
+        if ( -e $CONFIG{ 'whitelist' } . "/$ip" )
         {
-            $CONFIG{ 'verbose' } && print "Removing file: $file due to it being whitelisted.\n";
-            unlink( $file );
+            $CONFIG{ 'verbose' } &&
+              print "Removing file: $file due to it being whitelisted.\n";
+            unlink($file);
             $changed += 1;
         }
     }
@@ -631,8 +638,8 @@ sub cleanBlacklist
         {
             $file = $1;
         }
-        $CONFIG{ 'verbose' }
-          && print "Removing previously blacklisted file: $file\n";
+        $CONFIG{ 'verbose' } &&
+          print "Removing previously blacklisted file: $file\n";
         unlink($ip);
     }
 }
@@ -648,7 +655,7 @@ sub cleanBlacklist
 
 sub recentlyModified
 {
-    my ($filename,$threshold) = (@_);
+    my ( $filename, $threshold ) = (@_);
 
     #
     #  File not present?  Not modified then.
