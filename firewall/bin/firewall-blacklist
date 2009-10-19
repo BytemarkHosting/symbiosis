@@ -14,7 +14,7 @@ firewall-blacklist - A simple script to mitigate against dictionary attacks.
   Options:
 
    --attempts    Specify the number of failing attempts before blacklisting.
-                 (Default five failing logins.)
+                 (Default 20 failing logins.)
 
    --dump        Just dump loaded rules.
 
@@ -38,6 +38,15 @@ firewall-blacklist - A simple script to mitigate against dictionary attacks.
 
   This script is designed to look over the system logs and blacklist
  hosts which are attempting dictionary attacks.
+
+  The way that the script detects addresses which are worthy of blacklisting
+ is via the use of pattern files.  All pattern files located beneath
+ /etc/firewall/patterns.d/ are loaded and applied.  These pattern files
+ contain the name of a file to examine and a list of regular expressions
+ which will be tested for within that named logfile.
+
+  Any IPs which are blocked will be logged to syslog, and similarly the
+ removal of the blocks will also be logged to syslog.
 
 =cut
 
@@ -175,6 +184,13 @@ if ( $CONFIG{ 'dump' } )
 }
 
 #
+#  Open syslog
+#
+my $prog = basename($0);
+openlog( $prog, 'pid', 'user' );
+
+
+#
 #  Do we need to reload?
 #
 my $reload = 0;
@@ -203,6 +219,12 @@ if ($reload)
     system("/usr/bin/firewall");
     $CONFIG{ 'verbose' } && print "firewall reloaded ..\n";
 }
+
+
+#
+# Close syslog
+#
+closelog();
 
 
 #
@@ -287,7 +309,7 @@ sub sanityCheckSystem
     #
     if ( $CONFIG{ 'attempts' } !~ /^([0-9]+)$/ )
     {
-        $CONFIG{ 'attempts' } = 5;
+        $CONFIG{ 'attempts' } = 20;
     }
 
 
@@ -487,14 +509,6 @@ sub processRules
     #  That shows that the IP 1.2.3.4 hit port 22 23 times
     #
     #
-
-    #
-    #  Open syslog for logging purposes
-    #
-    my $prog = basename($0);
-    openlog($prog, 'pid', 'user');
-
-
     my $count = 0;
     foreach my $ip ( keys %BLACKLIST )
     {
@@ -537,7 +551,10 @@ sub processRules
 
                     $CONFIG{ 'verbose' } && print "Blacklisting: $ip\n";
 
-                    syslog('info', "Blacklisting IP: $ip" );
+                    #
+                    # log the new block to syslog.
+                    #
+                    syslog( 'info', "blacklist adding: $ip" );
 
                     $count += 1;
                 }
@@ -555,12 +572,6 @@ sub processRules
             }
         }
     }
-
-    #
-    # Close syslog
-    #
-    closelog();
-
 
 
     #
@@ -599,6 +610,14 @@ sub expireBlacklist
 
             unlink($file);
 
+
+            my $ip = $file;
+            if ( $ip =~ /(.*)\/(.*)\.auto$/i )
+            {
+                $ip = $2;
+            }
+
+            syslog( 'info', "blacklist removing: $ip" );
             $changed += 1;
         }
 
@@ -627,6 +646,9 @@ sub expireBlacklist
             $CONFIG{ 'verbose' } &&
               print "Removing file: $file due to it being whitelisted.\n";
             unlink($file);
+
+            syslog( 'info', "blacklist removing: $ip" );
+
             $changed += 1;
         }
     }
