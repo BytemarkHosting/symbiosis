@@ -1,3 +1,10 @@
+bytemark-vhost-firewall (2009.1019-1) stable; urgency=low
+
+  * Supply empty local.d/ and whitelist.d/ directories by default.
+  * Log to syslog any IPs which we've temporarily blacklisted.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 19 Oct 2009 14:32:21 +0000
+
 bytemark-vhost-firewall (2009:1009-1) stable; urgency=low
 
   * Our blacklist application now can block on a per-port basis, and

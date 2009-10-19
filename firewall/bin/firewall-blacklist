@@ -89,8 +89,10 @@ use strict;
 use warnings;
 
 use English;
+use File::Basename;
 use Getopt::Long;
 use Pod::Usage;
+use Sys::Syslog;
 
 
 
@@ -486,6 +488,12 @@ sub processRules
     #
     #
 
+    #
+    #  Open syslog for logging purposes
+    #
+    my $prog = basename($0);
+    openlog($prog, 'pid', 'user');
+
 
     my $count = 0;
     foreach my $ip ( keys %BLACKLIST )
@@ -528,6 +536,9 @@ sub processRules
                     close(LOG);
 
                     $CONFIG{ 'verbose' } && print "Blacklisting: $ip\n";
+
+                    syslog('info', "Blacklisting IP: $ip" );
+
                     $count += 1;
                 }
                 else
@@ -544,6 +555,12 @@ sub processRules
             }
         }
     }
+
+    #
+    # Close syslog
+    #
+    closelog();
+
 
 
     #
