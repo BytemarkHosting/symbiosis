@@ -34,7 +34,7 @@ all: dependencies
 	-touch all
 
 changelog:
-	 @date +%Y.%m%d-1
+	 @date +%Y:%m%d-1
 
 #
 # If we're using sautobuild, then there is no need to check for dependencies
