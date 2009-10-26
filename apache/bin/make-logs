@@ -196,7 +196,7 @@ EOF
     {
         my $date = getDay();
         system(
-            "cd $CONFIG{'prefix'}/$domain/public/htdocs/stats/  && cat $CONFIG{'prefix'}/$domain/public/logs/$file >> access.log.$date"
+               "cd $CONFIG{'prefix'}/$domain/public/logs/  && cat $file >> access.log.$date"
         );
     }
 

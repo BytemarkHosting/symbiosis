@@ -1,3 +1,9 @@
+libapache2-mod-vhost-bytemark (2009:1026-1) stable; urgency=low
+
+  * Move logs into the correct location.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 26 Oct 2009 15:00:51 +0000
+
 libapache2-mod-vhost-bytemark (2009:1021-1) stable; urgency=low
 
   * Correctly use the epoch.
