@@ -1,3 +1,10 @@
+bytemark-vhost-key (2009:1026-1) stable; urgency=low
+
+  * Install both keys to plain files beneath
+    /usr/share/bytemark-vhost-key/
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 26 Oct 2009 10:33:01 +0000
+
 bytemark-vhost-key (20090707153244) stable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches

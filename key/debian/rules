@@ -27,6 +27,7 @@ install: build
 	dh_clean -k
 
 	dh_installdirs
+	cp *.pub `pwd`/debian/bytemark-vhost-key/usr/share/bytemark-vhost-key
 
 # Build architecture-dependent files here.
 binary-arch: build install
