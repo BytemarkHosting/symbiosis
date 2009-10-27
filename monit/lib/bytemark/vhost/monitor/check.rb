@@ -27,7 +27,7 @@ module Bytemark
                 begin
                   while (line = infile.gets)
                     line.chomp!
-                    if ( line =~ /(apt|dpkg|apt-get|aptitude|debconf)/i )
+                    if ( line =~ /(apt|bytemark-vhost-updater|dpkg|apt-get|aptitude|debconf)/i )
                       found = true
                       puts "apt-get|aptitude|dpkg|debconf are running..."
                     end
@@ -131,7 +131,7 @@ module Bytemark
           puts "Attempting to start #{@name}"
           @process.start
         end
-  
+
         def do_tcpresponse_check(responses)
           true
         end

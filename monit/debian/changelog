@@ -1,3 +1,9 @@
+bytemark-vhost-monit (2009:1027-1) stable; urgency=low
+
+  * Add bytemark-vhost-updater to our list of exclusions.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 27 Oct 2009 10:13:01 +0000
+
 bytemark-vhost-monit (20090708114218) stable; urgency=low
 
   * Don't run any stop|start|restart actions if apt-get is running.
