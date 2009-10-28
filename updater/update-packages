@@ -28,6 +28,7 @@ SOURCES="/etc/apt/sources.list.security"
 #
 EMAIL=automatic@lists.bytemark.co.uk
 
+
 #
 #  Minimise debconf front-end
 #
@@ -39,6 +40,7 @@ export DEBIAN_FRONTENDnoninteractive
 #  The options to use by default.
 #
 OPTIONS="-o \"APT::Get::AllowUnauthenticated=true\" -o \"DPkg::Options::=--force-confold\" -o \"Dir::Etc::SourceList=$SOURCES\"  -o \"Dir::Etc::SourceParts=/dev/null\""
+
 
 #
 #  Options to use for operations that should be quiet.
@@ -87,6 +89,7 @@ if [ ! -e "$SOURCES" ] ; then
     exit
 fi
 
+
 #
 #  Make sure we're root
 #
@@ -96,6 +99,10 @@ if [ "$UID" -ne "0" ] ; then
 fi
 
 
+#
+# Mark ourself as running to avoid monit issues.
+#
+touch /var/tmp/update.packages
 
 
 #
@@ -181,4 +188,11 @@ else
     rm -f "$tmp"
 fi
 
+
+#
+# Remove our lockfile
+#
+if [ -e /var/tmp/update.packages ]; then
+    rm -f /var/tmp/update.packages
+fi
 

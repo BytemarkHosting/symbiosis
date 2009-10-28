@@ -19,17 +19,28 @@ module Bytemark
         def should_ignore?
           found = false
 
-          return true if ( File.exists?( "/tmp/dpkg.running" ) )
+          #
+          #  Our update package script will create a lockfile.
+          #
+          #  Similarly we've configured dpkg to create a file when
+          # it starts
+          #
+          return true if ( File.exists?( "/tmp/dpkg.running" ) ||
+                           File.exists?( "/var/tmp/update.packages" ) )
 
+          #
+          #  Final chance - avoid alerting if we have a system
+          # process running which looks related to system updates.
+          #
           Dir.foreach("/proc/") do |entry|
             if ( File.directory?( "/proc/#{entry}" ) && ( entry =~ /([0-9]+)/ ) )
               File.open( "/proc/#{entry}/cmdline", "r") do |infile|
                 begin
                   while (line = infile.gets)
                     line.chomp!
-                    if ( line =~ /(apt|bytemark-vhost-updater|dpkg|apt-get|aptitude|debconf)/i )
+                    if ( line =~ /(apt|bytemark-vhost-updater|debconf|dpkg|apt-get|aptitude|debconf)/i )
                       found = true
-                      puts "apt-get|aptitude|dpkg|debconf are running..."
+                      puts "Skipping alerts due to running process: #{line}"
                     end
                   end
                 rescue

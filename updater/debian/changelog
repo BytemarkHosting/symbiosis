@@ -1,3 +1,10 @@
+bytemark-vhost-updater (2009:1028-1) stable; urgency=low
+
+  * Create a lockfile when we're running.
+    (/var/tmp/update.packages)
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Oct 2009 10:22:01 +0000
+
 bytemark-vhost-updater (2009:0929-1) stable; urgency=low
 
   * Explicitly disable the use of /etc/apt/sources.list.d/

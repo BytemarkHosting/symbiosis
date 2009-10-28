@@ -1,3 +1,9 @@
+bytemark-vhost-monit (2009:1028-1) stable; urgency=low
+
+  * Avoid running if the bytemark-vhost-updater lockfile is present.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Oct 2009 10:22:01 +0000
+
 bytemark-vhost-monit (2009:1027-1) stable; urgency=low
 
   * Add bytemark-vhost-updater to our list of exclusions.
