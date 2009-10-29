@@ -109,7 +109,7 @@ EOF
 #  If we have an init script then show it.
 #
 if [ -e /etc/init.d/bytemark-vhost ]; then
-    update-rc.d bytemark-vhost defaults 2>/dev/null 2>/dev/null
+    update-rc.d bytemark-vhost defaults 2>/dev/null >/dev/null
 fi
 
 
