@@ -1,3 +1,10 @@
+bytemark-vhost (2009:1029-1) stable; urgency=low
+
+  * Updated /etc/motd to have mention of the Bytemark Vhost system.
+  * Added an init-script to report the use of vhost.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 29 Oct 2009 10:00:01 +0000
+
 bytemark-vhost (20090707153244) stable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches

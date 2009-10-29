@@ -1,0 +1,69 @@
+#!/bin/bash
+#
+### BEGIN INIT INFO
+# Provides:          bytemark-vhost
+# Required-Start:    $syslog
+# Required-Stop:     $syslog
+# Should-Start:      $network $named $time
+# Should-Stop:       $network $named $time
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Alert the user that vhost is active.
+# Description:       Alerts the user that the Bytemark vHost system is in use.
+#
+### END INIT INFO
+#
+
+set -e
+set -u
+
+. /lib/lsb/init-functions
+
+# Safeguard (relative paths, core dumps..)
+cd /
+umask 077
+
+SELF=$(cd $(dirname $0); pwd -P)/$(basename $0)
+
+
+case "${1:-''}" in
+  'start')
+	log_daemon_msg "Starting vhost init" "vhost"
+        log_end_msg 0
+        cat <<EOF
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+   This system is running the Bytemark Virtual Hosting system.
+
+   For documentation please visit
+
+     *  http://vhost.bytemark.co.uk
+
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+EOF
+	;;
+
+  'stop')
+	log_daemon_msg "Stopping vhost init" "vhost"
+        log_end_msg 0
+
+	;;
+
+  'restart')
+	set +e; $SELF stop; set -e
+	$SELF start 
+	;;
+
+  'reload'|'force-reload')
+	;;
+
+  'status')
+        log_action_msg "vhost is running."
+  	;;
+
+  *)
+	echo "Usage: $SELF start|stop|restart|reload|force-reload|status"
+	exit 1
+	;;
+esac
+

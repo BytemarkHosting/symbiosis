@@ -38,12 +38,15 @@ if ( ! grep ^admin: /etc/passwd 2>/dev/null >/dev/null ); then
 fi
 
 #
-#  Add group if missing
+#  Add the matching admin group if missing
 #
 if ( ! grep ^admin: /etc/group 2>/dev/null >/dev/null ); then
     addgroup admin
 fi
 
+#
+#  Ensure /srv exists and has sane ownership
+#
 if [ ! -d /srv ]; then
     mkdir /srv
     chown admin:admin /srv
@@ -87,6 +90,28 @@ for i in /srv /srv/* ; do
         fi
     fi
 done
+
+#
+#  Update /etc/motd.
+#
+uname -snrvm > /etc/motd
+cat >>/etc/motd<<EOF
+
+To access the Bytemark Virtual Host documentation, please visit:
+
+  * http://vhost.bytemark.co.uk/
+
+
+EOF
+
+
+#
+#  If we have an init script then show it.
+#
+if [ -e /etc/init.d/bytemark-vhost ]; then
+    update-rc.d bytemark-vhost defaults 2>/dev/null 2>/dev/null
+fi
+
 
 #DEBHELPER#
 exit 0

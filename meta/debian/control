@@ -10,7 +10,7 @@ Package: bytemark-vhost
 Architecture: all
 Depends: bytemark-vhost-crack, bytemark-vhost-email, bytemark-vhost-firewall, bytemark-vhost-ftpd, bytemark-vhost-httpd, bytemark-vhost-key, bytemark-vhost-monit, bytemark-vhost-mysql, bytemark-vhost-pam, bytemark-vhost-phpmyadmin, bytemark-vhost-simple-backup, bytemark-vhost-test, bytemark-vhost-tinydns, bytemark-vhost-updater, bytemark-vhost-webmail
 Description: The bytemark virtual hosting system
- This package is a meta-package which will pull in each package which
+ This package is a metapackage which will pull in each package which
  is a component of the Bytemark virtual hosting system.
  .
  Installing this package will completely configure your system for
