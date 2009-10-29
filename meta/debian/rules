@@ -27,7 +27,7 @@ install: build
 	dh_clean -k
 
 	dh_installdirs
-	cp ./bytemark-vhost.init `pwd`/debian/bytemark-vhost/etc/init.d/
+	cp ./bytemark-vhost.init `pwd`/debian/bytemark-vhost/etc/init.d/bytemark-vhost
 	chmod 755 `pwd`/debian/bytemark-vhost/etc/init.d/
 
 # Build architecture-dependent files here.
