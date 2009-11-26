@@ -51,7 +51,6 @@ services.each do |service, ports|
                     ("incoming" == direction ? "INPUT" : "OUTPUT"),
                     "--protocol",
                     proto,
-                    "$DEV",
                     "--destination-port",
                     port,
                     ("incoming" == direction ? "$SRC" : "$DEST"),
