@@ -2,5 +2,5 @@
 #
 #  Allow incoming connections on port 20 + 21
 #
-/sbin/iptables -A OUTPUT $DEV -p tcp --dport 20 $DEST -j ACCEPT
-/sbin/iptables -A OUTPUT $DEV -p tcp --dport 21 $DEST -j ACCEPT
+/sbin/iptables -A OUTPUT -p tcp --dport 20 $DEST -j ACCEPT
+/sbin/iptables -A OUTPUT -p tcp --dport 21 $DEST -j ACCEPT

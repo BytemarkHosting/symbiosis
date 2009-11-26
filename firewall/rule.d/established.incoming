@@ -1,4 +1,4 @@
 #
 #  Allow outgoing connections when already established
 #
-/sbin/iptables -A INPUT $DEV -m state --state ESTABLISHED $SRC -j ACCEPT
+/sbin/iptables -A INPUT -m state --state ESTABLISHED $SRC -j ACCEPT

@@ -2,5 +2,5 @@
 #
 #  Allow incoming connections on port 7711
 #
-/sbin/iptables -A INPUT $DEV -p tcp --dport 7711 $SRC -j ACCEPT
-/sbin/iptables -A INPUT $DEV -p tcp --dport 1919 $SRC -j ACCEPT
+/sbin/iptables -A INPUT -p tcp --dport 7711 $SRC -j ACCEPT
+/sbin/iptables -A INPUT -p tcp --dport 1919 $SRC -j ACCEPT

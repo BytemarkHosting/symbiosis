@@ -2,5 +2,5 @@
 #
 #  Allow incoming connections on port 80 + 443
 #
-/sbin/iptables -A INPUT $DEV -p tcp --dport  80 $SRC -j ACCEPT
-/sbin/iptables -A INPUT $DEV -p tcp --dport 443 $SRC -j ACCEPT
+/sbin/iptables -A INPUT -p tcp --dport  80 $SRC -j ACCEPT
+/sbin/iptables -A INPUT -p tcp --dport 443 $SRC -j ACCEPT

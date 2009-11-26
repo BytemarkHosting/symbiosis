@@ -3,5 +3,5 @@
 #
 
 for i in echo-request echo-reply ttl-exceeded ; do
-    /sbin/iptables -A OUTPUT $DEV -p icmp --icmp-type $i $DEST -j ACCEPT
+    /sbin/iptables -A OUTPUT -p icmp --icmp-type $i $DEST -j ACCEPT
 done
