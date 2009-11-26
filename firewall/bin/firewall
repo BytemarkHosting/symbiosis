@@ -1024,42 +1024,15 @@ sub addRule
       or die "ERROR: failed to append to temporary file $file - $!";
 
 
-    if ($rule =~ /\$DEV/ )
-    {
-        foreach my $dev ( @devices )
-        {
-            my $copy = $rule;
+    #
+    #  Remove any obsolete reference to "$DEV".
+    #
+    $rule =~ s/\$DEV//g;
 
-            if ($direction =~ /incoming/i )
-            {
-                $copy =~ s/\$DEV/-i $dev/;
-            }
-            elsif ( $direction =~ /outgoing/i )
-            {
-                $copy =~ s/\$DEV/-o $dev/;
-            }
-            else
-            {
-                die "ERROR: Uknown direction: $direction\n";
-            }
-            print FILE $copy . "\n";
-
-            #
-            #  If we have IPv6 then write that too.
-            #
-            if ( isIPv6() )
-            {
-                my $tmp = $copy . " >/dev/null 2>/dev/null\n";
-                $tmp =~ s/iptables/ip6tables/g;
-                print FILE $tmp ;
-            }
-        }
-        print FILE "\n";
-    }
-    else
-    {
-        print FILE $rule . "\n";
-    }
+    #
+    #  Write the line & close
+    #
+    print FILE $rule . "\n";
     close( FILE );
 
 
