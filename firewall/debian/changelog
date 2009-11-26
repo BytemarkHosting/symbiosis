@@ -1,3 +1,9 @@
+bytemark-vhost-firewall (2009:1126-1) stable; urgency=low
+
+  * Avoid making rules specific to devices.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 26 Nov 2009 16:24:16 +0000
+
 bytemark-vhost-firewall (2009:1021-1) stable; urgency=low
 
   * Correctly use the epoch.
