@@ -33,7 +33,7 @@ EMAIL=automatic@lists.bytemark.co.uk
 #  Minimise debconf front-end
 #
 DEBIAN_FRONTEND=noninteractive
-export DEBIAN_FRONTENDnoninteractive
+export DEBIAN_FRONTEND
 
 
 #
