@@ -1,0 +1,16 @@
+  1.  log to syslog when blocking IPs.
+
+  2.  create $prefix/whitelist.d/ + $prefix/local.d/ at install-time.
+
+  3.  firewall needs to be more uniform wrt the www-data rules.
+
+  4.  Move the /usr/share/bytemark into a separate package so that it
+     may be updated  without restarting apache.  (and so we can later move
+     the documentation ito this package: bytemark-vhost-docs)
+
+  5.  crontabs for each site.
+
+  6.  per-vhost disable webstats flag.
+
+  7.  check for disk space and alert on low-usage.
+
