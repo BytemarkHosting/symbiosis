@@ -1,0 +1,8 @@
+  # User to use for the process. This user needs access to only user and
+  # password databases, nothing else. Only shadow and pam authentication
+  # requires roots, so use something else if possible. Note that passwd
+  # authentication with BSDs internally accesses shadow files, which also
+  # requires roots. Note that this user is NOT used to access mails.
+  # That user is specified by userdb above.
+  user = root
+
