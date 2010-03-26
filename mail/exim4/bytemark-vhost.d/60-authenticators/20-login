@@ -1,21 +1,10 @@
-# LOGIN authentication has traditional prompts and responses. There is no
-# authorization ID in this mechanism, so unlike PLAIN the username and
-# password are $auth1 and $auth2. Apart from that you can use the same
-# server_condition setting for both authenticators.
+# LOGIN authentication has traditional prompts and responses. 
+#
+# Again, this uses Dovecot SASL to authenticate.
+#
 
 LOGIN:
-  driver                     = plaintext
+  driver                     = dovecot
   server_set_id              = $auth1
-  server_prompts             = <| Username: | Password:
-  server_condition           = ${if and{ \
-                                 {match {$auth1}{\N(^([a-zA-Z0-9_\-]+\.?)+)@(([a-zA-Z0-9\-]+\.?)+)$\N}} \
-                                 {exists {VHOST_DIR/${lc:$3}/VHOST_MAILBOX_DIR/${lc:$1}/password}} \
-                                 {!eq       {}{$auth2}} \
-                                 {!eq      {}{${readfile{VHOST_DIR/${lc:$3}/VHOST_MAILBOX_DIR/${lc:$1}/password}{}}}} \
-                                 {!crypteq {}{${readfile{VHOST_DIR/${lc:$3}/VHOST_MAILBOX_DIR/${lc:$1}/password}{}}}} \
-                                 {or { \
-                                   {crypteq {$auth2}{${readfile{VHOST_DIR/${lc:$3}/VHOST_MAILBOX_DIR/${lc:$1}/password}{}}}} \
-                                   {eq      {$auth2}{${readfile{VHOST_DIR/${lc:$3}/VHOST_MAILBOX_DIR/${lc:$1}/password}{}}}} \
-                                 }} \
-                               }}
+  server_socket              = /var/run/dovecot/auth-client
 
