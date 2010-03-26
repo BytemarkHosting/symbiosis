@@ -1,0 +1,27 @@
+  # POP3 UIDL format to use. You can use following variables:
+  #
+  #  %v - Mailbox UIDVALIDITY
+  #  %u - Mail UID
+  #  %m - MD5 sum of the mailbox headers in hex (mbox only)
+  #  %f - filename (maildir only)
+  #
+  # If you want UIDL compatibility with other POP3 servers, use:
+  #  UW's ipop3d         : %08Xv%08Xu
+  #  Courier version 0   : %f
+  #  Courier version 1   : %u
+  #  Courier version 2   : %v-%u
+  #  Cyrus (<= 2.1.3)    : %u
+  #  Cyrus (>= 2.1.4)    : %v.%u
+  #  Older Dovecots      : %v.%u
+  #  tpop3d              : %Mf
+  #
+  # Note that Outlook 2003 seems to have problems with %v.%u format which was
+  # Dovecot's default, so if you're building a new server it would be a good
+  # idea to change this. %08Xu%08Xv should be pretty fail-safe.
+  #
+  # NOTE: Nowadays this is required to be set explicitly, since the old
+  # default was bad but it couldn't be changed without breaking existing
+  # installations. %08Xu%08Xv will be the new default, so use it for new
+  # installations.
+  #
+  pop3_uidl_format = %08Xu%08Xv

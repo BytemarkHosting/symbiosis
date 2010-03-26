@@ -1,0 +1,6 @@
+# PEM encoded X.509 SSL/TLS certificate and private key. They're opened before
+# dropping root privileges, so keep the key file unreadable by anyone but
+# root.
+ssl_cert_file = /etc/ssl/ssl.pem
+ssl_key_file = /etc/ssl/ssl.key
+

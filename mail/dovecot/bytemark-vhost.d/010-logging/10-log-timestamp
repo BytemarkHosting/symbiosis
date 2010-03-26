@@ -1,0 +1,4 @@
+# Prefix for each line written to log file. % codes are in strftime(3)
+# format.
+log_timestamp = "%Y-%m-%d %H:%M:%S "
+

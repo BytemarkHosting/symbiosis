@@ -46,12 +46,11 @@ fi
 
 
 #
-# Copy the dovecot file to the new one, unconditionally.
+#  Rebuild dovecot
 #
-if [ -f /etc/dovecot/dovecot.conf.bytemark-vhost ] ; then
-  cp -b /etc/dovecot/dovecot.conf.bytemark-vhost /etc/dovecot/dovecot.conf
+if [ -e /etc/dovecot/Makefile ] ; then
+    cd /etc/dovecot && make
 fi
-
 
 for i in spamassassin clamav-daemon exim4 dovecot; do
 
@@ -73,5 +72,6 @@ for i in spamassassin clamav-daemon exim4 dovecot; do
         /etc/init.d/$i start
     fi
 done
+
 #DEBHELPER#
 exit 0

@@ -1,0 +1,25 @@
+  # It's possible to export the authentication interface to other programs:
+  socket listen {
+    #master {
+      # Master socket is typically used to give Dovecot's local delivery
+      # agent access to userdb so it can find mailbox locations. It can
+      # however also be used to disturb regular user authentications.
+      # WARNING: Giving untrusted users access to master socket may be a
+      # security risk, don't give too wide permissions to it!
+      #path = /var/run/dovecot/auth-master
+      #mode = 0600
+      # Default user/group is the one who started dovecot-auth (root)
+      #user =
+      #group =
+    #}
+    client {
+      # The client socket is generally safe to export to everyone. Typical use
+      # is to export it to your SMTP server so it can do SMTP AUTH lookups
+      # using it.
+      path = /var/run/dovecot/auth-client
+  
+      # This is an open mode, so Exim4 can use the socket too
+      mode = 0666
+    }
+  }
+
