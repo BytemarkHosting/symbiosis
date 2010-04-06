@@ -21,3 +21,7 @@
 
  10.  backup2l should use /etc/backup2l.dir/* and make a combined file
      via that.  Use a post-install to migrate to it easily enough.
+
+  11.  Fixup the SSL certificate for any additional IPs.
+        # 227001 has the problem and a solution.
+
