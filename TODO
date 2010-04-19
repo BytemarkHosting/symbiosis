@@ -26,3 +26,11 @@
         # 227001 has the problem and a solution.
 
   12.  The imager - CERT should be removed, and redone on post-install
+
+  13.  Allow incoming.d/ & outgoing.d/ entries to be looked up by
+     the name in /etc/services or to include port-numbers directly.
+     For example:
+
+        touch /etc/firewall/incoming.d/10-1234
+
+      (Opens port 1234 for both TCP & UDP.)
