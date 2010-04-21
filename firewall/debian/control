@@ -1,5 +1,5 @@
 Source: bytemark-vhost-firewall
-Section: web
+Section: net
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
@@ -12,9 +12,11 @@ Depends: iptables, dnsutils, iproute
 Replaces: bytemark-vhost-ssh-protection
 Conflicts: bytemark-vhost-ssh-protection (<< 20081110153344)
 Suggests: libnet-dns-perl
-Description: A secure firewall for the www-data user
- This package contains a simple firewall which will ensure that any
- PHP, or website, compromises do no propogate.
+Description: A simple firewall generator for the Bytemark vhost system
+ This package contains a firewall generator which makes it simple to restrict
+ the incoming and outgoing connections a machine is permitted to accept or
+ initiate.
  .
- When this package is installed your www-data user will be denied outgoing
- connections.
+ The firewall also allows the user to restrict the abilities of the
+ www-data user  which will ensure that any PHP, or website, compromises
+ do not propogate.
