@@ -20,6 +20,7 @@ clean:
 manpage: ./bin/firewall
 	if ! [ -d ./man ] ; then mkdir ./man ; fi
 	pod2man ./bin/firewall > ./man/firewall.1
+	pod2man ./bin/firewall-logtail > ./man/firewall-logtail.1
 	pod2man ./bin/firewall-blacklist > ./man/firewall-blacklist.1
 
 rules: ./make-rules.rb ./services

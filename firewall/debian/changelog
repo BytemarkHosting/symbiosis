@@ -1,3 +1,9 @@
+bytemark-vhost-firewall (2010:0421-1) stable; urgency=low
+
+  * Install a trivial manpage for `firewall-logtail`.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 21 Apr 2010 10:00:01 +0000
+
 bytemark-vhost-firewall (2009:1126-1) stable; urgency=low
 
   * Avoid making rules specific to devices.
