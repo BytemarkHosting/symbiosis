@@ -613,7 +613,7 @@ sub createBlacklist
                 {
 
                     # ignore localhost.
-                    next if ( $name =~ /^127.0.0/ );
+                    next if ( $name =~ /^127.0./ );
 
                     # strip ".auto" if present.
                     $name =~ s/\.auto$//g;
@@ -671,7 +671,7 @@ sub createBlacklist
                 {
 
                     # ignore localhost.
-                    next if ( $name =~ /^127.0.0/ );
+                    next if ( $name =~ /^127.0/ );
 
                     # strip ".auto" if present.
                     $name =~ s/\.auto$//g;
@@ -815,12 +815,17 @@ sub findDevices
 
 =begin doc
 
-  Process a given rule.
+Process a given rule.
 
-  This means that we open the template for that rule, and then append that
- to our globally available temporary file.
+This means that we open the template for that rule, and then append that
+to our globally available temporary file.
 
-  If a rule doesn't actually exist then we should warn about it.
+TODO:  IN the future we will ignore the existance of rules, and instead
+determine the port number by parsing /etc/services.
+
+If a rule is numerically named then we'll use the port directly as the rule,
+
+If a rule doesn't actually exist then we should warn about it.
 
 =end doc
 
@@ -835,7 +840,7 @@ sub processRule
     #
     #  Src/destination limits.
     #
-    my @args = ();
+    my @acl = ();
 
     #
     #  There are two types of rule here -
@@ -881,7 +886,7 @@ sub processRule
             next if ( $line =~ /^#/ );
 
             # record the ACL.
-            push( @args, $line );
+            push( @acl, $line );
         }
 
 
@@ -905,13 +910,21 @@ sub processRule
     }
 
     #
-    #  Do we have the global rule?
+    #  Do we a rule file to read?
     #
     my $global = undef;
+
+    #
+    #  Global rule.
+    #
     if ( -e $ruleDir . "/$name.$direction" )
     {
         $global = $ruleDir . "/$name.$direction";
     }
+
+    #
+    #  User-customized rule.
+    #
     if ( -e "/usr/local/share/firewall/$name.$direction" )
     {
         $global = "/usr/local/share/firewall/$name.$direction";
@@ -940,7 +953,7 @@ sub processRule
             #
             #  Handle retrictions.
             #
-            if ( scalar(@args) )
+            if ( scalar(@acl) )
             {
 
                 #
@@ -949,7 +962,7 @@ sub processRule
                 #
                 if ( $line =~ /\$SRC/ )
                 {
-                    foreach my $src (@args)
+                    foreach my $src (@acl )
                     {
 
                         # expand
@@ -957,7 +970,7 @@ sub processRule
                         $copy =~ s/\$SRC/--src $src/g;
 
                         # add the rule.
-                        addRule( $file, $copy, $direction );
+                        addRule( $file, $copy );
                     }
                 }
                 elsif ( $line =~ /\$DEST/ )
@@ -967,7 +980,7 @@ sub processRule
                     #  OK we've got an ACL list, and the rule entry mentions
                     # $DEST - repeat that line once for each acl entry
                     #
-                    foreach my $dst (@args)
+                    foreach my $dst (@acl)
                     {
 
                         # expand the string
@@ -975,7 +988,7 @@ sub processRule
                         $copy =~ s/\$DEST/--destination $dst/g;
 
                         # write it out
-                        addRule( $file, $copy, $direction );
+                        addRule( $file, $copy );
                     }
                 }
                 else
@@ -985,7 +998,7 @@ sub processRule
                     #  We have an ACL but the line doesn't contain either
                     # $SRC or $DEST
                     #
-                    addRule( $file, $line, $direction );
+                    addRule( $file, $line );
                 }
             }
             else
@@ -1001,7 +1014,7 @@ sub processRule
                 #
                 #  Write it out
                 #
-                addRule( $file, $line, $direction );
+                addRule( $file, $line );
             }
         }
 
@@ -1009,6 +1022,25 @@ sub processRule
         #  Close the file.
         #
         close(INPUT);
+    }
+    elsif ( $name =~ /^([0-9]+)$/ )
+    {
+        #
+        #  TODO:  Handle ACLs.
+        #
+
+        #
+        #  Purely a numerical rule.
+        #
+        if ( $direction =~ /incoming/ )
+        {
+            addRule( $file, "/sbin/iptables --append OUTPUT --protocol all --destintion-port $name -j ACCEPT" );
+        }
+
+        if ( $direction =~ /outgoing/ )
+        {
+            addRule( $file, "/sbin/iptables --append INPUT --protocol all --destintion-port $name -j ACCEPT" );
+        }
     }
     else
     {
@@ -1027,7 +1059,7 @@ sub processRule
 
 sub addRule
 {
-    my ( $file, $rule, $direction ) = (@_);
+    my ( $file, $rule ) = (@_);
 
     #
     #  Strip trailng newlines.
