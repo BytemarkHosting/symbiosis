@@ -15,7 +15,6 @@ nop:
 clean:
 	if [ -d ./man ] ; then rm -rf ./man ; fi
 	if [ -d ./i ] ; then rm -rf ./i ; fi
-	ruby make-rules.rb clean ./rule.d ./services
 
 manpage: ./bin/firewall
 	if ! [ -d ./man ] ; then mkdir ./man ; fi
@@ -23,11 +22,7 @@ manpage: ./bin/firewall
 	pod2man ./bin/firewall-logtail > ./man/firewall-logtail.1
 	pod2man ./bin/firewall-blacklist > ./man/firewall-blacklist.1
 
-rules: ./make-rules.rb ./services
-	if ! [ -d ./rule.d ] ; then mkdir ./rule.d ; fi
-	ruby make-rules.rb create ./rule.d ./services
-
-all: manpage rules
+all: manpage
 
 test:
 	if [ ! -d ./i ]; then mkdir ./i ; fi

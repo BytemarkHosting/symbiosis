@@ -1,3 +1,10 @@
+bytemark-symbiosis-firewall (2010:0427-1) stable; urgency=low
+
+  * Renamed the main package.
+    - But still "Provide:" the old name.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 27 Apr 2010 16:00:16 +0000
+
 bytemark-vhost-firewall (2010:0421-1) stable; urgency=low
 
   * Install a trivial manpage for `firewall-logtail`.

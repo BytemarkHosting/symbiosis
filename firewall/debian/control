@@ -1,12 +1,13 @@
-Source: bytemark-vhost-firewall
+Source: bytemark-symbiosis-firewall
 Section: net
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 4.0.0), ruby
+Build-Depends: debhelper (>= 4.0.0)
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-firewall
+Package: bytemark-symbiosis-firewall
+Provide: bytemark-vhost-firewall
 Architecture: all
 Depends: iptables, dnsutils, iproute
 Replaces: bytemark-vhost-ssh-protection
