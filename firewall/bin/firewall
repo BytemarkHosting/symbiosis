@@ -27,6 +27,7 @@ firewall - A simple firewall generator
    --outgoing-d   The directory where outgoing configuration is made.
    --local-d      A local directory containing scripts to execute afterwards.
    --rule-d       The directory where rule definitions live.
+   --services     Point to an alternative services file.
 
   Help Options:
 
@@ -185,6 +186,13 @@ parseCommandLineArguments();
 #  Make sure we're root & that we're setup correctly.
 #
 sanityCheck();
+
+
+#
+#  Read and parse our services file.
+#
+my %SERVICES = parseServices();
+
 
 
 #
@@ -379,6 +387,7 @@ sub parseCommandLineArguments
                       "blacklist-d=s", \$CONFIG{ 'blacklist.d' },
                       "outgoing-d=s",  \$CONFIG{ 'outgoing.d' },
                       "rule-d=s",      \$CONFIG{ 'rule.d' },
+                      "servics=s",     \$CONFIG{ 'services' },
                       "local-d=s",     \$CONFIG{ 'local.d' },
                       "ipv6=s",        \$CONFIG{ 'ipv6' },
                       "manual",        \$MANUAL
@@ -443,6 +452,20 @@ sub sanityCheck
             print "--ipv6 may be specified as either 'yes' or 'no'\n";
             exit;
         }
+    }
+
+    #
+    #  Ensure we have a services file.
+    #
+    if ( ! $CONFIG{'services'} )
+    {
+        $CONFIG{'services'} = "/etc/services";
+    }
+
+    if ( ! -e $CONFIG{'services'} )
+    {
+        print "The specified services file doesn't exist: $CONFIG{'services'}\n";
+        exit 1;
     }
 
 }
@@ -1262,4 +1285,45 @@ sub isIPv6
 
     $CONFIG{ 'ipv6' } = "no";
     return 0;
+}
+
+
+
+=begin doc
+
+Parse the /etc/services file.
+
+=end doc
+
+=cut
+
+sub parseServices
+{
+    my %data;
+
+    open( FILE, "<", $CONFIG{'services'} ) ||
+      die "Failed to open services file $CONFIG{'services'} - $!";
+
+    while( my $line = <FILE> )
+    {
+        # trim newline and skip enty ones.
+        chomp( $line );
+        next if ( !$line || !length($line));
+
+        if ( $line =~ /^([^ \t]+)([ \t]+)([0-9]+)\/(tcp|udp)/ )
+        {
+            my $name = $1;
+            my $port = $3;
+            my $type = $4;
+
+            my $current = $data{$name};
+            push( @$current, { type => $type,
+                               port => $port } );
+            $data{$name}=$current;
+        }
+    }
+
+    close( FILE );
+
+    return( %data );
 }
