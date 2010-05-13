@@ -203,6 +203,11 @@ my %SERVICES = parseServices();
 #
 loadKernelModules();
 
+#
+#  Fix ownership of /etc/firewall
+#
+fixOwnership();
+
 
 #
 #  Generate a temporary file which will be used to contain the
@@ -1241,6 +1246,29 @@ sub loadKernelModules
 }
 
 
+
+sub fixOwnership
+{
+    #
+    #  Do we have an "admin" user.
+    #
+    my @user =  getpwnam( "admin" );
+
+    if ( ( !@user ) || ( !$user[0] ) )
+    {
+        $CONFIG{'verbose'} && print "There is no admin user.\n";
+        return;
+    }
+
+    #
+    #  OK we know we have an admin user.
+    #
+    system( "chown",
+            "-R",
+            "admin:admin",
+            "/etc/firewall" );
+
+}
 
 =begin doc
 
