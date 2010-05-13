@@ -1246,6 +1246,18 @@ sub loadKernelModules
 }
 
 
+=begin doc
+
+Ensure that /etc/firewall is owned by the admin user, such that
+we can allow the user to make changes via sftp.
+
+NOTE:  We explicitly change the permissions of /etc/firewall, not
+the directory the user has setup - we do that so that somebody couldn't
+run "firewall --incoming-d=/tmp" to change the ownership of /tmp, for example.
+
+=end doc
+
+=cut
 
 sub fixOwnership
 {
