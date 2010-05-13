@@ -41,15 +41,16 @@ firewall - A simple firewall generator
 
 =head1 ABOUT
 
-  This firewall script is designed to be simple to use, while still
- allowing a reasonable level of control over your system.
+This firewall script is designed to be simple to use, while still
+allowing a reasonable level of control over your system.
 
-  The firewall generator will read a number of files located beneath
- the directory /etc/firewall and automatically use the names of those
- files to construct a complete iptables-based firewall script.
+The firewall generator will read a number of files located beneath
+the directory /etc/firewall and automatically use the names of those
+files to construct a complete iptables-based firewall script.
 
-  The script will be executed once it has been generated, and then
- removed.  (Both of these actions may be changed.)
+The script will be executed once it has been generated, and then
+removed.  (You may use B<--no-delete> and B<--no-execute> to prevent
+either action from being carried out.)
 
 =cut
 
@@ -57,8 +58,8 @@ firewall - A simple firewall generator
 
 =head1 CONFIGURATION
 
-  To configure the firewall which is applied to your server you simply
- need to create files in the directories the script reads:
+To configure the firewall which is generated and applied to your server
+you simply need to create files in the directories the script reads:
 
 =over 8
 
@@ -68,26 +69,29 @@ Any file present in this directory is assumed to be the IP address of a machine 
 =item /etc/firewall/incoming.d/
 This directory is examined to determine which rules should be applied to incoming connections.
 
-
 =item /etc/firewall/outgoing.d/
 This directory is examined to determine which rules should be applied to outgoing connections.
 
+=item /etc/firewall/local.d/
+Executable shell-scripts in this directory are executed after the firewall
+is installed.
+
 =back
 
-  For the incoming and outgoing directories you should create files with
- names such as "10-ssh". (The number you choose merely determines sorting
- order there is no additional significance to it)
+For the incoming and outgoing directories you should create files with
+names such as "10-ssh". (The prefix you choose merely determines sorting
+order.)
 
-  The presence of a file named "nn-ssh" will mean that the firewall will
- include rules it knows about for the service "ssh".  These rule types
- may be arbitrarily complex, as they are processed via /bin/sh.
+The presence of a file named "NN-ssh" will mean that the firewall will
+include rules it knows about for the service "ssh".  These rule types
+may be arbitrarily complex, as they are processed via /bin/sh.
 
-  The presence of a rule file will generally allow access to the named
- service.  For example the file "20-ssh" placed in the incoming directory
- will allow all access to port 22.  If you wish to restrict access place
- the hostnames, or IP addresses, in the file instead of leaving it empty.
+The presence of a rule file will generally allow access to the named
+service.  For example the file "10-ssh" placed in the incoming directory
+will allow all access to port 22.  If you wish to restrict access place
+the hostnames, or IP addresses, in the file instead of leaving it empty.
 
-  This will restrict access to/from the named addresses.
+This will restrict access to/from the named addresses.
 
 =cut
 
@@ -95,21 +99,21 @@ This directory is examined to determine which rules should be applied to outgoin
 
 =head1 ADDING ADDITIONAL RULETYPES
 
-  For each "rule" type you should simply create two files:
+For each "rule" type you should simply create two files:
 
 =for example begin
 
-  /usr/share/firewall/$name.incoming
-  /usr/share/firewall/$name.outgoing
+  /usr/local/share/firewall/$name.incoming
+  /usr/local/share/firewall/$name.outgoing
 
 =for example end
 
-  The contents of these file(s) will be inserted appropriately into
- the generate firewall script.
+The contents of these file(s) will be inserted appropriately into
+the generated firewall script.
 
-  The magic strings '$SRC' and '$DEST' will be replaced by any IP
- addresses the user has specified in their file - or removed if none
- are present.
+The magic strings '$SRC' and '$DEST' will be replaced by any IP
+addresses the user has specified in their file - or removed if none
+are present.
 
 =cut
 
@@ -462,14 +466,15 @@ sub sanityCheck
     #
     #  Ensure we have a services file.
     #
-    if ( ! $CONFIG{'services'} )
+    if ( !$CONFIG{ 'services' } )
     {
-        $CONFIG{'services'} = "/etc/services";
+        $CONFIG{ 'services' } = "/etc/services";
     }
 
-    if ( ! -e $CONFIG{'services'} )
+    if ( !-e $CONFIG{ 'services' } )
     {
-        print "The specified services file doesn't exist: $CONFIG{'services'}\n";
+        print
+          "The specified services file doesn't exist: $CONFIG{'services'}\n";
         exit 1;
     }
 
@@ -974,7 +979,7 @@ sub processRule
     #
     #  OK if we have a template process that.
     #
-    if ( defined( $template ) )
+    if ( defined($template) )
     {
         processRuleTemplate( $template, @acl );
         return;
@@ -989,7 +994,8 @@ sub processRule
 
     if ( $name =~ /^([0-9]+)$/ )
     {
-print "NAME: $name : PORT $name\n";
+        print "NAME: $name : PORT $name\n";
+
         # name.
         push( @proto, "tcp" );
         push( @proto, "udp" );
@@ -997,17 +1003,18 @@ print "NAME: $name : PORT $name\n";
     }
     else
     {
-print "NAME: $name - SERVICE\n";
+        print "NAME: $name - SERVICE\n";
+
         # lookup from /etc/services.
-        my $entry = $SERVICES{$name};
-use Data::Dumper;
-print Dumper( \$entry );
-        if ( $entry )
+        my $entry = $SERVICES{ $name };
+        use Data::Dumper;
+        print Dumper( \$entry );
+        if ($entry)
         {
-            foreach my $ent ( @$entry )
+            foreach my $ent (@$entry)
             {
-                push( @proto, $ent->{'type'} );
-                $port = $ent->{'port'};
+                push( @proto, $ent->{ 'type' } );
+                $port = $ent->{ 'port' };
             }
         }
     }
@@ -1017,56 +1024,78 @@ print Dumper( \$entry );
     #
     if ( $direction =~ /incoming/ )
     {
-        foreach my $protocol ( @proto )
+        foreach my $protocol (@proto)
         {
-            if (scalar @acl )
+            if ( scalar @acl )
             {
-                addRule( $file, "# Incoming connections on $port are restricted" );
+                addRule( $file,
+                         "# Incoming connections on $port are restricted" );
+
                 #
                 #  Restricted
                 #
-                foreach my $src ( @acl )
+                foreach my $src (@acl)
                 {
                     addRule( $file, "# allow $src\n" );
-                    addRule( $file, "/sbin/iptables --append OUTPUT --protocol $protocol --destintion-port $port --src $src -j ACCEPT" );
+                    addRule(
+                        $file,
+                        "/sbin/iptables --append OUTPUT --protocol $protocol --destintion-port $port --src $src -j ACCEPT"
+                    );
                 }
 
             }
             else
             {
+
                 #
                 #  Globally allowed
                 #
-                addRule( $file, "# Incoming connections on $port globally allowed" );
-                addRule( $file, "/sbin/iptables --append OUTPUT --protocol $protocol --destintion-port $port -j ACCEPT" );
+                addRule( $file,
+                         "# Incoming connections on $port globally allowed" );
+                addRule(
+                    $file,
+                    "/sbin/iptables --append OUTPUT --protocol $protocol --destintion-port $port -j ACCEPT"
+                );
             }
         }
     }
 
     if ( $direction =~ /outgoing/ )
     {
-        foreach my $protocol ( @proto )
+        foreach my $protocol (@proto)
         {
-            if (scalar @acl )
+            if ( scalar @acl )
             {
-                addRule( $file, "# Restricted ACL in place for outgoing connections on $port" );
+                addRule(
+                    $file,
+                    "# Restricted ACL in place for outgoing connections on $port"
+                );
+
                 #
                 #  Restricted
                 #
-                foreach my $dest ( @acl )
+                foreach my $dest (@acl)
                 {
                     addRule( $file, "# allow $dest\n" );
-                    addRule( $file, "/sbin/iptables --append OUTPUT --protocol $protocol --destintion-port $name --destination $dest -j ACCEPT" );
+                    addRule(
+                        $file,
+                        "/sbin/iptables --append OUTPUT --protocol $protocol --destintion-port $name --destination $dest -j ACCEPT"
+                    );
 
                 }
             }
             else
             {
+
                 #
                 #  Globally allowed
                 #
-                addRule( $file, "# Outgoing connections on $port globally allowed" );
-                addRule( $file, "/sbin/iptables --append OUTPUT --protocol $protocol --destintion-port $name -j ACCEPT" );
+                addRule( $file,
+                         "# Outgoing connections on $port globally allowed" );
+                addRule(
+                    $file,
+                    "/sbin/iptables --append OUTPUT --protocol $protocol --destintion-port $name -j ACCEPT"
+                );
             }
         }
     }
@@ -1075,7 +1104,7 @@ print Dumper( \$entry );
 
 sub processRuleTemplate
 {
-    return ;
+    return;
 }
 
 =begin doc
@@ -1262,24 +1291,22 @@ run "firewall --incoming-d=/tmp" to change the ownership of /tmp, for example.
 
 sub fixOwnership
 {
+
     #
     #  Do we have an "admin" user.
     #
-    my @user =  getpwnam( "admin" );
+    my @user = getpwnam("admin");
 
     if ( ( !@user ) || ( !$user[0] ) )
     {
-        $CONFIG{'verbose'} && print "There is no admin user.\n";
+        $CONFIG{ 'verbose' } && print "There is no admin user.\n";
         return;
     }
 
     #
     #  OK we know we have an admin user.
     #
-    system( "chown",
-            "-R",
-            "admin:admin",
-            "/etc/firewall" );
+    system( "chown", "-R", "admin:admin", "/etc/firewall" );
 
 }
 
@@ -1342,14 +1369,15 @@ sub parseServices
 {
     my %data;
 
-    open( FILE, "<", $CONFIG{'services'} ) ||
+    open( FILE, "<", $CONFIG{ 'services' } ) ||
       die "Failed to open services file $CONFIG{'services'} - $!";
 
-    while( my $line = <FILE> )
+    while ( my $line = <FILE> )
     {
+
         # trim newline and skip enty ones.
-        chomp( $line );
-        next if ( !$line || !length($line));
+        chomp($line);
+        next if ( !$line || !length($line) );
 
         if ( $line =~ /^([^ \t]+)([ \t]+)([0-9]+)\/(tcp|udp)/ )
         {
@@ -1357,14 +1385,16 @@ sub parseServices
             my $port = $3;
             my $type = $4;
 
-            my $current = $data{$name};
-            push( @$current, { type => $type,
-                               port => $port } );
-            $data{$name}=$current;
+            my $current = $data{ $name };
+            push( @$current,
+                  {  type => $type,
+                     port => $port
+                  } );
+            $data{ $name } = $current;
         }
     }
 
-    close( FILE );
+    close(FILE);
 
-    return( %data );
+    return (%data);
 }
