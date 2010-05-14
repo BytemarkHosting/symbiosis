@@ -1145,10 +1145,81 @@ sub processRule
 
 }
 
+
+=begin doc
+
+This function reads and adds a templated-rule-file to the generated firewall,
+it is used for the few special cases we have (e.g. ftp and the www-data rule).
+
+=end doc
+
+=cut
+
 sub processRuleTemplate
 {
+    my( $rule, @acl ) = ( @_ );
+
+    #
+    #  Open the template rule for reading.
+    #
+    open( RULE, "<", $rule )
+      or die "Failed to read rule file $rule - $!";
+
+    #
+    #  Open the firewall script for appending
+    #
+    open( SCRIPT, ">>", $tempfile )
+      or die "Failed to open firewall for appending: $!";
+
+    print SCRIPT "\n# Added from template $rule\n";
+
+    while( my $line = <RULE> )
+    {
+        chomp( $line );
+
+        if ( $line =~ /\$SRC/ ) 
+        {
+            if ( scalar @acl )
+            {
+                foreach my $src ( @acl )
+                {
+                    my $copy = $line;
+                    $copy =~ s/\$SRC/$src/g;
+                    print SCRIPT $copy . "\n";
+                }
+            }
+            else
+            {
+                $line =~ s/\$SRC//g;
+                print SCRIPT $line . "\n";
+            }
+        }
+        elsif ( $line =~ /\$DST/ )
+        {
+            if ( scalar @acl )
+            {
+                foreach my $dst ( @acl )
+                {
+                    my $copy = $line;
+                    $copy =~ s/\$DEST/$dst/g;
+                    print SCRIPT $copy . "\n";
+                }
+            }
+            else
+            {
+                $line =~ s/\$DEST//g;
+                print SCRIPT $line . "\n";
+            }
+        }
+        else
+        {
+            print SCRIPT $line . "\n";
+        }
+    }
+    close( RULE );
     return;
 }
+
 
 =begin doc
 
