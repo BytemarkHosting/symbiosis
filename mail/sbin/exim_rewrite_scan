@@ -82,7 +82,7 @@ end
 
 if __FILE__ == $0
   exim4_conf = ($*.length > 0 ? $*.first : DEFAULT_EXIM4_CONF)
-  if exim4_conf =~ /--?h.*/
+  if exim4_conf =~ /--?[mh].*/
     RDoc::usage
   else
     do_write_exim4_rewrites(exim4_conf)

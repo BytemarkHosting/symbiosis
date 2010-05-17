@@ -3,7 +3,7 @@ all: docs
 
 man/%.man: ./sbin/%
 	[ -d man ] || mkdir man
-	RUBYLIB=./lib $<  --help | sed -e 's/^=\+$$//' | txt2man -s 1 | sed -e 's/\\\\fB/\\fB/' > $@
+	RUBYLIB=./lib $<  --manual | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
 
 docs: man/exim_rewrite_scan.man man/dovecot_checkpassword.man
 
