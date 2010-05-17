@@ -1,3 +1,14 @@
+bytemark-vhost-email (20100517144051) lucid; urgency=low
+
+  * Split dovecot config into a multiple file layout (like exim4)
+  * Unified exim4 and dovecot makefiles
+  * Exim4 now uses dovecot sasl for authentication.
+  * Exim4 no longer delays mail following errors in forward files
+  * Regex in /usr/sbin/checkpassword sanitised
+  * Bytemark antispam config removed.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 17 May 2010 14:40:51 +0100
+
 bytemark-vhost-email (20090707183051) stable; urgency=low
 
   * Fixed exim4 config to defer mail from non-bytemark antispam hosts if

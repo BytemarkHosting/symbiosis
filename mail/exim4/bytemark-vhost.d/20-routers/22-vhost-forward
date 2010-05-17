@@ -19,6 +19,8 @@ vhost_forward:
   allow_fail
   allow_defer
   allow_filter
+  # Syntax errors do not prevent delivery.
+  skip_syntax_errors
   # This stops this router from trying to change uid/gid whilst verifying the
   # address by skipping this router.  The address will get validated by the
   # next router.

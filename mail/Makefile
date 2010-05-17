@@ -1,12 +1,16 @@
 
 all: docs
 
-man/exim_rewrite_scan.man: sbin/exim_rewrite_scan
+man/%.man: ./sbin/%
 	[ -d man ] || mkdir man
-	RUBYLIB=./lib ./sbin/exim_rewrite_scan  --help | sed -e 's/^=\+$$//' | txt2man -s 1 -t exim_rewrite_scan | sed -e 's/\\\\fB/\\fB/' > man/exim_rewrite_scan.man
+	RUBYLIB=./lib $<  --help | sed -e 's/^=\+$$//' | txt2man -s 1 | sed -e 's/\\\\fB/\\fB/' > $@
 
-docs: man/exim_rewrite_scan.man
+docs: man/exim_rewrite_scan.man man/dovecot_checkpassword.man
 
 clean:
 	$(RM) man/exim_rewrite_scan.man
+	$(RM) exim4/exim4.conf
+	$(RM) exim4/exim4.conf.tmp
+	$(RM) dovecot/dovecot.conf
+	$(RM) dovecot/dovecot.conf.tmp
 	$(RM) -r man
