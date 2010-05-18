@@ -42,3 +42,8 @@
   15. Make sure that exim4 forward-file errors get forwarded on
       somewhere sensible.
 
+
+  16.  a) Add a randomised sleep to the DNS script to ensure that upload.ns
+          isn't unduly hammered.
+       b) Only upload if contents have actually changed.
+
