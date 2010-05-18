@@ -8,7 +8,6 @@ man/%.man: ./sbin/%
 docs: man/exim_rewrite_scan.man man/dovecot_checkpassword.man
 
 clean:
-	$(RM) man/exim_rewrite_scan.man
 	$(RM) exim4/exim4.conf
 	$(RM) exim4/exim4.conf.tmp
 	$(RM) dovecot/dovecot.conf

@@ -2,9 +2,9 @@
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 
-build/bytemark-vhost-mail::
+build/bytemark-vhost-email::
 	make docs
 
-clean/bytemark-vhost-mail::
+cleanbuilddir/bytemark-vhost-email::
 	make clean
 
