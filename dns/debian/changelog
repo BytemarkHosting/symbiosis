@@ -1,4 +1,4 @@
-bytemark-vhost-tinydns (2010:0519-1) stable; urgency=low
+bytemark-symbiosis-tinydns (2010:0519-1) stable; urgency=low
 
   * Don't re-upload the generated DNS contents, unless they are
     different than the last run.
