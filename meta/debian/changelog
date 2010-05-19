@@ -1,3 +1,9 @@
+bytemark-symbiosis (2010:0519-1) stable; urgency=low
+
+  * Renamed the package.
+
+ -- Steve Kemp <steve@steve.org.uk>  Wed, 19 May 2010 17:00:17 +0000
+
 bytemark-vhost (2009:1029-1) stable; urgency=low
 
   * Updated /etc/motd to have mention of the Bytemark Vhost system.
