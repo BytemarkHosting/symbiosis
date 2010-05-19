@@ -1,3 +1,10 @@
+bytemark-vhost-tinydns (2010:0519-1) stable; urgency=low
+
+  * Don't re-upload the generated DNS contents, unless they are
+    different than the last run.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 19 May 2010 15:44:51 +0000
+
 bytemark-vhost-tinydns (20090901094658) stable; urgency=low
 
   * Skip /srv/lost+found if present.

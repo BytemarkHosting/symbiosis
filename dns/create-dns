@@ -8,6 +8,10 @@ create-dns - Create tinydns snippets for each hosted domain
 
 =head1 SYNOPSIS
 
+  Options:
+
+   --force       Force the DNS data to be uploaded, even if no changes.
+
   Help Options:
 
    --help        Show the help information for this script.
@@ -36,7 +40,8 @@ create-dns - Create tinydns snippets for each hosted domain
 
 =head1 LICENSE
 
-Copyright (c) 2008 by Bytemark Computer Consulting Ltd.  All rights reserved.
+Copyright (c) 2008-2010 by Bytemark Computer Consulting Ltd.
+All rights reserved.
 
 This program is free software;
 you can redistribute it and/or modify it under
@@ -52,7 +57,7 @@ use warnings;
 use File::Copy;
 use Getopt::Long;
 use Pod::Usage;
-
+use Digest::MD5;
 
 #
 #  Configuration handling.
@@ -189,13 +194,32 @@ EOF
 #
 if ( -x "$CONFIG{'output'}/upload" )
 {
-    $CONFIG{ 'verbose' } && print "Uploading ...\n";
 
     my $cmd = "cd $CONFIG{'output'} && ./upload";
     $cmd .= " 2>/dev/null >/dev/null" unless ( $CONFIG{ 'verbose' } );
-    system($cmd);
 
-    $CONFIG{ 'verbose' } && print "Upload complete\n";
+    #
+    #  Has our data changed?
+    #
+    my $changed = hasDataChanged();
+
+
+    #
+    #  We either upload if we're forced, or if we've changed.
+    #
+    if ( $CONFIG{ 'force' } || $changed )
+    {
+
+        $CONFIG{ 'verbose' } && print "Uploading ...\n";
+        system($cmd);
+        $CONFIG{ 'verbose' } && print "Upload complete\n";
+    }
+    else
+    {
+        $CONFIG{ 'verbose' } &&
+          print "Not uploading - no change, and --force not specified\n";
+    }
+
 }
 else
 {
@@ -229,6 +253,7 @@ sub parseCommandLineArguments
         !GetOptions(
             "verbose",    \$CONFIG{ 'verbose' },
             "prefix=s",   \$CONFIG{ 'prefix' },
+            "force",      \$CONFIG{ 'force' },
             "template=s", \$CONFIG{ 'template' },
             "output=s",   \$CONFIG{ 'output' },
             "manual",     \$MANUAL,
@@ -537,4 +562,91 @@ sub fixupPermissions
         $CONFIG{ 'verbose' } && print "UID: $uid -> $username\n";
         $CONFIG{ 'verbose' } && print "GID: $gid -> $groupname\n";
     }
+}
+
+
+
+=begin doc
+
+Determine if the data has changed.
+
+Do this by keeping track of the number of files in /root/BytemarkDNS/data
+and a hash of their contents.
+
+=end doc
+
+=cut
+
+sub hasDataChanged
+{
+
+    #
+    #  Find each file in the output directory
+    #
+    my @files = sort( glob("/root/BytemarkDNS/data/*") );
+
+
+    #
+    #  Now hash each contents
+    #
+    my $hash = Digest::MD5->new;
+
+    foreach my $file (@files)
+    {
+        open( FILE, "<", $file ) or
+          die "Failed to open $file - $!";
+
+        while ( my $line = <FILE> )
+        {
+            $hash->add($line);
+        }
+        close(FILE);
+    }
+
+    #
+    #  The hash of the contents.
+    #
+    my $result = $hash->hexdigest;
+
+    #
+    #  If there is no existing record, then create one.
+    #
+    #  If there is no hash then we've not changed.
+    #
+    if ( !-e "/root/BytemarkDNS/.hash" )
+    {
+        print "HASH MISSING\n";
+        open( FILE, ">", "/root/BytemarkDNS/.hash" );
+        print FILE $result . "\n";
+        close(FILE);
+
+        return 1;
+    }
+
+    #
+    #  OK there is a hash.  Does the contents match?
+    #
+    open( FILE, "<", "/root/BytemarkDNS/.hash" ) or
+      die "Failed to open hash file for reading - $!";
+    my $line = <FILE>;
+    chomp($line);
+    close(FILE);
+
+
+    #
+    #  OK does the hash match that recorded?  If so we've not changed
+    #
+    if ( $result eq $line )
+    {
+        return 0;
+    }
+
+    #
+    #  Hash differs.  Record it.
+    #
+    open( FILE, ">", "/root/BytemarkDNS/.hash" );
+    print FILE $result . "\n";
+    close(FILE);
+
+    return 1;
 }
