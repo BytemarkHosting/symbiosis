@@ -27,7 +27,7 @@ install: build
 	dh_clean -k
 
 	dh_installdirs
-	cp create-dns `pwd`/debian/bytemark-symbiosis-tinydns/etc/cron.hourly/
+	cp bin/create-dns `pwd`/debian/bytemark-symbiosis-tinydns/etc/cron.hourly/
 	cp bytemark.dns.template `pwd`/debian/bytemark-symbiosis-tinydns/etc/bytemark-vhost/dns.d/template
 	chmod 755 `pwd`/debian/bytemark-symbiosis-tinydns/etc/cron.hourly/create-dns
 	cp bug.report `pwd`/debian/bytemark-symbiosis-tinydns/usr/share/bug/bytemark-vhost-tinydns/control
