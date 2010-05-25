@@ -48,19 +48,19 @@ my %ENABLED = findEnabled();
 #
 foreach my $dev ( keys %IPS )
 {
-    my $ip = $IPS{$dev};
+    my $ip = $IPS{ $dev };
 
     next if ( $ip =~ /^127/ );
 
-    if ( $ENABLED{$ip} )
+    if ( $ENABLED{ $ip } )
     {
-        $CONFIG{'verbose'} && print "Already enabled $ip\n";
+        $CONFIG{ 'verbose' } && print "Already enabled $ip\n";
     }
     else
     {
-        $CONFIG{'verbose'} && print "Should create site for: $ip\n";
+        $CONFIG{ 'verbose' } && print "Should create site for: $ip\n";
 
-        createSiteFor( $ip );
+        createSiteFor($ip);
     }
 }
 
@@ -68,11 +68,11 @@ foreach my $dev ( keys %IPS )
 #
 #  If we did create something we need to reload Apache2
 #
-if ( $CONFIG{'created'} )
+if ( $CONFIG{ 'created' } )
 {
-    $CONFIG{'verbose'} && print "Restarting apache2\n";
-    system( "/etc/init.d/apache2 restart >/dev/null 2>/dev/null" );
-    $CONFIG{'verbose'} && print "Done\n";
+    $CONFIG{ 'verbose' } && print "Restarting apache2\n";
+    system("/etc/init.d/apache2 restart >/dev/null 2>/dev/null");
+    $CONFIG{ 'verbose' } && print "Done\n";
 }
 
 
@@ -81,8 +81,6 @@ if ( $CONFIG{'created'} )
 #  All done.
 #
 exit;
-
-
 
 
 
@@ -101,8 +99,7 @@ sub parseCommandLineArguments
 {
     if (
          !GetOptions( "verbose",  \$CONFIG{ 'verbose' },
-                      "prefix=s", \$CONFIG{ 'prefix' }, )
-      )
+                      "prefix=s", \$CONFIG{ 'prefix' }, ) )
     {
         exit;
     }
@@ -135,12 +132,12 @@ sub findIPs
         }
         elsif ( $line =~ /inet addr:([0-9\.]+)/ )
         {
-            $results{$dev}=$1;
+            $results{ $dev } = $1;
             $dev = undef;
         }
     }
 
-    return( %results );
+    return (%results);
 }
 
 
@@ -159,23 +156,23 @@ sub findEnabled
     #
     #  Read each file.
     #
-    foreach my $file ( sort( glob( "/etc/apache2/sites-enabled/*" ) ) )
+    foreach my $file ( sort( glob("/etc/apache2/sites-enabled/*") ) )
     {
-        open( FILE, "<", $file )
-          or die "Failed to read file $file - $!";
+        open( FILE, "<", $file ) or
+          die "Failed to read file $file - $!";
 
         foreach my $line (<FILE>)
         {
             if ( $line =~ /NameVirtualHost (.*):/ )
             {
-                $listening{$1} += 1;
+                $listening{ $1 } += 1;
             }
         }
 
-        close( FILE );
+        close(FILE);
     }
 
-    return( %listening );
+    return (%listening);
 }
 
 
@@ -191,22 +188,22 @@ sub findEnabled
 sub createSiteFor
 {
 
-    my( $ip ) = (@_);
+    my ($ip) = (@_);
 
-    foreach my $file ( qw! zz-mass-hosting zz-mass-hosting.ssl ! )
+    foreach my $file (qw! zz-mass-hosting zz-mass-hosting.ssl !)
     {
         my $input  = "/etc/apache2/sites-enabled/$file";
         my $output = "/etc/apache2/sites-enabled/$file.$ip";
 
-        open( IN, "<", $input )
-          or die "Failed to read input: $input - $!";
+        open( IN, "<", $input ) or
+          die "Failed to read input: $input - $!";
 
-        open( OUT, ">", $output )
-          or die "failed to write output: $output - $!";
+        open( OUT, ">", $output ) or
+          die "failed to write output: $output - $!";
 
-        foreach my $line ( <IN> )
+        foreach my $line (<IN>)
         {
-            chomp( $line );
+            chomp($line);
             if ( $line =~ /(.*) ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(.*)/ )
             {
                 $line = $1 . " " . $ip . $3;
@@ -215,7 +212,7 @@ sub createSiteFor
             print OUT $line . "\n";
         }
 
-        close( IN );
-        close( OUT );
+        close(IN);
+        close(OUT);
     }
 }
