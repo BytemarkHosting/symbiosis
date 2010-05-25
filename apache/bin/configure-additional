@@ -1,15 +1,53 @@
-#!/usr/bin/perl
-#
-#  This script is designed to configure additional IPs for Apache.
-#
-#  1.  We find the primary IP of the system.
-#
-#  2.  For each additional IP which is not claimed by SSL we configure
-#     Apache to listen on that too.
-#
-# Steve
-# --
-#
+
+=head1 NAME
+
+configure-additional - Create Apache configuration files.
+
+=cut
+
+=head1 SYNOPSIS
+
+  Help Options:
+
+   --help        Show the help information for this script.
+   --manual      Read the manual for this script.
+   --verbose     Show useful debugging information.
+
+=cut
+
+
+=head1 ABOUT
+
+This script is designed to create per-site Apache virtual host files
+for each domain hosted upon the machine which has a different IP
+address than that allocated to eth0.
+
+The intention is that such domains will be determined dynamically,
+but that any existing files will be left untouched.  ie.  Once we
+generate a file we no longer modify it.
+
+=cut
+
+
+=head1 AUTHOR
+
+ Steve
+ --
+
+=cut
+
+=head1 LICENSE
+
+Copyright (c) 2008-2010 by Bytemark Computer Consulting Ltd.
+All rights reserved.
+
+This program is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
 
 
 use strict;

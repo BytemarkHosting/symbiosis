@@ -46,9 +46,6 @@ foreach my $domain (@domains)
 {
     $CONFIG{ 'verbose' } && print "Testing $domain\n";
 
-    #
-    #  Test and handle the domain.
-    #
     $CONFIG{ 'changed' } += testDomain($domain);
 
     $CONFIG{ 'verbose' } && print "done\n";
@@ -62,7 +59,10 @@ foreach my $domain (@domains)
 if ( $CONFIG{ 'changed' } )
 {
     $CONFIG{ 'verbose' } && print "Reloading Apache\n";
+
     system("/etc/init.d/apache2 reload >/dev/null");
+
+    $CONFIG{ 'verbose' } && print "done.\n";
 }
 
 
@@ -404,6 +404,15 @@ sub findHostDetails
 
 }
 
+
+=begin doc
+
+Return the creation date of the specified file, which is expressed
+in seconds past the epoch.
+
+=end doc
+
+=cut
 
 sub createdTime
 {
