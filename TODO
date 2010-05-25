@@ -2,12 +2,6 @@
 firewall
 --------
 
-1. create $prefix/whitelist.d/ + $prefix/local.d/ at install-time.
-
-2. move the /usr/share/bytemark into a separate package so that it
-   may be updated  without restarting apache.  (and so we can later move
-   the documentation ito this package: bytemark-vhost-docs)
-
 
 
 features
@@ -52,4 +46,12 @@ Email
 
 1. Make sure that exim4 forward-file errors get forwarded on
    somewhere sensible.
+
+
+Web
+---
+
+1. move the /usr/share/bytemark into a separate package so that it
+   may be updated  without restarting apache.  (and so we can later move
+   the documentation ito this package: bytemark-vhost-docs)
 
