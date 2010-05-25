@@ -1,49 +1,55 @@
-  1.  log to syslog when blocking IPs.
 
-  2.  create $prefix/whitelist.d/ + $prefix/local.d/ at install-time.
+firewall
+--------
 
-  3.  firewall needs to be more uniform wrt the www-data rules.
+1. create $prefix/whitelist.d/ + $prefix/local.d/ at install-time.
 
-  4.  Move the /usr/share/bytemark into a separate package so that it
-     may be updated  without restarting apache.  (and so we can later move
-     the documentation ito this package: bytemark-vhost-docs)
-
-  5.  crontabs for each site.
-
-  6.  per-vhost disable webstats flag.
-
-  7.  check for disk space and alert on low-usage.
-
-  8.  backup2l we should modify the umask, so that the backups aren't
-     world-readable.
-
-  9. backup2l we should try to guess the backup-space name if we can.
-
- 10.  backup2l should use /etc/backup2l.dir/* and make a combined file
-     via that.  Use a post-install to migrate to it easily enough.
-
-  11.  Fixup the SSL certificate for any additional IPs.
-        # 227001 has the problem and a solution.
-
-  12.  The imager - CERT should be removed, and redone on post-install
-
-  13.  Allow incoming.d/ & outgoing.d/ entries to be looked up by
-     the name in /etc/services or to include port-numbers directly.
-     For example:
-
-        touch /etc/firewall/incoming.d/10-1234
-
-      (Opens port 1234 for both TCP & UDP.)
-
-  14. Add munin?  Yann seems keen - I'm not sure it would be globally
-     useful, but its nice to offer graphs to people regardless.  So on that
-     basis I'll say "yes">
-
-  15. Make sure that exim4 forward-file errors get forwarded on
-      somewhere sensible.
+2. move the /usr/share/bytemark into a separate package so that it
+   may be updated  without restarting apache.  (and so we can later move
+   the documentation ito this package: bytemark-vhost-docs)
 
 
-  16.  a) Add a randomised sleep to the DNS script to ensure that upload.ns
-          isn't unduly hammered.
-       b) Only upload if contents have actually changed.
+
+features
+--------
+
+1. crontabs for each site.
+
+2. per-vhost disable webstats flag.
+
+3. check for disk space and alert on low-usage.
+
+4. Add munin?  Yann seems keen - I'm not sure it would be globally
+   useful, but its nice to offer graphs to people regardless.
+
+
+
+backup2l
+--------
+
+1. backup2l we should modify the umask, so that the backups aren't
+   world-readable.
+
+2. backup2l we should try to guess the backup-space name if we can.
+
+3. backup2l should use /etc/backup2l.dir/* and make a combined file
+   via that.  Use a post-install to migrate to it easily enough.
+
+
+
+SSL
+---
+
+1. Fixup the SSL certificate for any additional IPs.
+   (#227001 has the problem and a solution.)
+
+2. The imager - CERT should be removed, and redone on post-install
+
+
+
+Email
+-----
+
+1. Make sure that exim4 forward-file errors get forwarded on
+   somewhere sensible.
 
