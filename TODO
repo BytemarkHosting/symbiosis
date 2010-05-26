@@ -15,15 +15,15 @@
   7.  check for disk space and alert on low-usage.
 
   8.  backup2l we should modify the umask, so that the backups aren't
-     world-readable.
+      world-readable.
 
   9. backup2l we should try to guess the backup-space name if we can.
 
  10.  backup2l should use /etc/backup2l.dir/* and make a combined file
-     via that.  Use a post-install to migrate to it easily enough.
+      via that.  Use a post-install to migrate to it easily enough.
 
   11.  Fixup the SSL certificate for any additional IPs.
-        # 227001 has the problem and a solution.
+       # 227001 has the problem and a solution.
 
   12.  The imager - CERT should be removed, and redone on post-install
 
@@ -41,7 +41,6 @@
 
   15. Make sure that exim4 forward-file errors get forwarded on
       somewhere sensible.
-
 
   16.  a) Add a randomised sleep to the DNS script to ensure that upload.ns
           isn't unduly hammered.

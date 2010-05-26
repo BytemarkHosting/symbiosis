@@ -13,6 +13,9 @@ create-dns - Create tinydns snippets for each hosted domain
    --help        Show the help information for this script.
    --manual      Read the manual for this script.
    --verbose     Show useful debugging information.
+   --prefix      Directory beneath which domains are found (default: /srv)
+   --template    DNS template file (default: /etc/bytemark-vhost/dns.d/template)
+   --output      Directory where the DNS data should be output (default: /root/BytemarkDNS)
 
 =cut
 
