@@ -15,3 +15,6 @@ Description: Automatically backup your files locally
  .
  This backup won't protect you against system failure, but will prevent
  you from accidental deletions, etc.
+ .
+ If you're running upon a Bytemark system this package will also configure
+ remote backups.

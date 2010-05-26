@@ -1,26 +1,8 @@
-bytemark-vhost-simple-backup (20090901095954) stable; urgency=low
+bytemark-vhost-simple-backup (2010:0525-1) stable; urgency=low
 
-  * Add /home + /var/lib to the directories which are backed up.
+  * Move to a modular configuration file.
 
- -- Steve Kemp <steve@bytemark.co.uk>  Tue, 1 Sep 2009 09:59:54 +0000
-
-bytemark-vhost-simple-backup (20090825172437) stable; urgency=low
-
-  * Ensure we keep a backup if we change the backup2l.conf file.
-
- -- Steve Kemp <steve@bytemark.co.uk>  Tue, 25 Jul 2009 17:25:37 +0000
-
-bytemark-vhost-simple-backup (20090707153244) stable; urgency=low
-
-  * Per-Lenny vhost repository, rather than branches
-
- -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
-
-bytemark-vhost-simple-backup (20090522105210) stable; urgency=low
-
-  * New release for Lenny.
-
- -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 25 May 2010 21:00:12 +0000
 
 bytemark-vhost-simple-backup (20081110153344) stable; urgency=low
 

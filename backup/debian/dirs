@@ -1,4 +1,4 @@
 var/backups/localhost
 var/backups/mysql
-usr/share/bytemark-vhost-simple-backup
 usr/share/bug/bytemark-vhost-simple-backup
+etc/backup.d/
