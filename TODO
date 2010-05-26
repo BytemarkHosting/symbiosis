@@ -18,19 +18,6 @@ features
 
 
 
-backup2l
---------
-
-1. backup2l we should modify the umask, so that the backups aren't
-   world-readable.
-
-2. backup2l we should try to guess the backup-space name if we can.
-
-3. backup2l should use /etc/backup2l.dir/* and make a combined file
-   via that.  Use a post-install to migrate to it easily enough.
-
-
-
 SSL
 ---
 
