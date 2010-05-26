@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+#  This script is designed to dump all the MySQL databases upon
+# the local system.
+#
+
+if [ ! -d /var/backups/mysql ]; then
+    mkdir -p /var/backups/mysql
+fi
+
+
+#
+#  Get the username and password
+#
+user=$(grep user /etc/mysql/debian.cnf | awk '{print $3}' | head -n 1)
+pass=$(grep pass /etc/mysql/debian.cnf | awk '{print $3}' | head -n 1)
+
+
+#
+#  For each database we find, dump it
+#
+for i in /var/lib/mysql/*/; do
+
+    # the name of the database
+    name=`basename $i`
+
+    # do the dump
+    mysqldump --user="$user" --pass="$pass" $name | gzip > /var/backups/mysql/$name.gz
+
+done
+
