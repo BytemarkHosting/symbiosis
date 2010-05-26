@@ -1,19 +1,28 @@
-Source: bytemark-vhost-tinydns
-Section: web
+Source: bytemark-symbiosis-tinydns
+Section: net
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 4.0.0)
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-tinydns
+Package: bytemark-symbiosis-tinydns
+Provides: bytemark-vhost-tinydns
 Architecture: all
 Depends: rsync, wget, unzip
 Pre-Depends: bytemark-vhost-range
 Conflicts: bytemark-vhost-autofs
 Description: Automatic DNS record creation and uploading for Bytemark customers
- This package contains tools to create a TinyDNS file which may be uploaded
- to the Bytemark DNS hosts.
+ This package contains tools to create TinyDNS files which may be uploaded
+ to the Bytemark DNS host.
  .
- This package will create a TinyDNS file which may be uploaded to our
- content DNS service but it will not actually upload that file for you.
+ The generated TinyDNS files will be automatically uploaded to the Bytemark
+ content DNS service, where they will be visible and may be queried directly
+ via:
+ .
+   * a.ns.bytemark.co.uk
+ .
+   * b.ns.bytemark.co.uk
+ .
+   * c.ns.bytemark.co.uk
+ .

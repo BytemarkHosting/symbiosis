@@ -1,4 +1,12 @@
 #!/usr/bin/perl -w
+#
+#  This script is designed to create a new Apache virtual host for
+# each site upon the local host which is configured for SSL but which
+# doesn't already have an SSL site generated.
+#
+# Steve
+# --
+#
 
 use strict;
 use warnings;
@@ -38,9 +46,6 @@ foreach my $domain (@domains)
 {
     $CONFIG{ 'verbose' } && print "Testing $domain\n";
 
-    #
-    #  Test and handle the domain.
-    #
     $CONFIG{ 'changed' } += testDomain($domain);
 
     $CONFIG{ 'verbose' } && print "done\n";
@@ -49,12 +54,15 @@ foreach my $domain (@domains)
 
 
 #
-#  Did we make any changes, if so reload Apache
+#  Reload Apache if we made changes.
 #
 if ( $CONFIG{ 'changed' } )
 {
     $CONFIG{ 'verbose' } && print "Reloading Apache\n";
-    system("/etc/init.d/apache2 reload");
+
+    system("/etc/init.d/apache2 reload >/dev/null");
+
+    $CONFIG{ 'verbose' } && print "done.\n";
 }
 
 
@@ -73,8 +81,7 @@ sub parseCommandLineArguments
 {
     if (
          !GetOptions( "verbose",  \$CONFIG{ 'verbose' },
-                      "prefix=s", \$CONFIG{ 'prefix' }, )
-      )
+                      "prefix=s", \$CONFIG{ 'prefix' }, ) )
     {
         exit;
     }
@@ -156,15 +163,11 @@ sub testDomain
     #  So we need to check:
     #
     #   1.  Is this IP different from the primary IP?
-    #   2.  Is there already an SSL site available for this domain
-    #
-    return 0 if ( -e "/etc/apache2/sites-enabled/$domain.ssl" );
-
     #
     #  Get the IP from the file
     #
-    open( IP, "<", "$CONFIG{'prefix'}/$domain/config/ip" )
-      or die "Failed to read file - $!";
+    open( IP, "<", "$CONFIG{'prefix'}/$domain/config/ip" ) or
+      die "Failed to read file - $!";
     my $ip = <IP>;
     close(IP);
     chomp($ip);
@@ -178,17 +181,61 @@ sub testDomain
         return 0;
     }
 
+    #
+    # Is there already an SSL site available for this domain?
+    #
+    # If there is we'll return, unless either the SSL key or bundle
+    # is newer than that generated file.
+    #
+    if ( -e "/etc/apache2/sites-enabled/$domain.ssl" )
+    {
+
+        #
+        #  See when the generated file was created.
+        #
+        my $site = createdTime("/etc/apache2/sites-enabled/$domain.ssl");
+
+        #
+        #  See when the SSL key was created.
+        #
+        my $key =
+          createdTime( $CONFIG{ 'prefix' } . "/$domain/config/ssl.key" );
+
+
+        if ( -e $CONFIG{ 'prefix' } . "/$domain/config/ssl.bundle" )
+        {
+            my $bundle =
+              createdTime( $CONFIG{ 'prefix' } . "/$domain/config/ssl.bundle" );
+
+            #
+            #  If the generated site older than the key or the bundle
+            # then we need make no changes.
+            #
+            return 0 if ( ( $bundle < $site ) && ( $key < $site ) );
+        }
+        else
+        {
+
+            #
+            #  If the generated site config file was
+            # older than the generated file.
+            #
+            return 0 if ( $key < $site );
+        }
+    }
+
     my $bundle = "";
     if ( -e $CONFIG{ 'prefix' } . "/$domain/config/ssl.bundle" )
     {
-        $bundle = "SSLCertificateChainFile $CONFIG{'prefix'}/$domain/config/ssl.bundle";
+        $bundle =
+          "SSLCertificateChainFile $CONFIG{'prefix'}/$domain/config/ssl.bundle";
     }
 
     #
     #  Now we have all the details we need.
     #
-    open( CONFIG, ">", "/etc/apache2/sites-enabled/$domain.ssl" )
-      or die "failed to write apache configuration file - $!";
+    open( CONFIG, ">", "/etc/apache2/sites-enabled/$domain.ssl" ) or
+      die "failed to write apache configuration file - $!";
     print CONFIG <<EOF;
 
 ####
@@ -355,4 +402,33 @@ sub findHostDetails
     }
     return ($ip);
 
+}
+
+
+=begin doc
+
+Return the creation date of the specified file, which is expressed
+in seconds past the epoch.
+
+=end doc
+
+=cut
+
+sub createdTime
+{
+    my ($file) = (@_);
+
+
+    if ( !-e $file )
+    {
+        print "WARNING: Failing to stat $file\n";
+    }
+
+    my ( $dev,  $ino,   $mode,  $nlink, $uid,     $gid, $rdev,
+         $size, $atime, $mtime, $ctime, $blksize, $blocks
+       ) = stat($file);
+
+
+    $CONFIG{ 'verbose' } && print "File $file ctime:$ctime\n";
+    return ($ctime);
 }

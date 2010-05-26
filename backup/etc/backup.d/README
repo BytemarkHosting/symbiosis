@@ -1,0 +1,19 @@
+
+/etc/backup.d/
+
+  This directory is the root of the backup script used by the Bytemark Symbiosis
+ system.
+
+  The following directories are present:
+
+    pre-backup.d/
+        ->  Every script in this directory is executed prior to a backup run.
+
+    post-backup.d/
+        -> Every script in this directory is executed after a backup run has completed.
+
+    conf.d/
+        -> The contents of this directory are concatenated together to form a
+           backup2l.conf file which is written to /etc/backup.d/backup2l.conf
+
+

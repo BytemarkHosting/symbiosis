@@ -1,28 +1,54 @@
 #!/bin/sh
+##
+##  The post-install script needs to do two things:
+##
+##    1.  If this is a migration, then configure it.
+##
+##    2.  Otherwise force a rebuild
+##
+###
 
 set -e
 
-#
-# Skip, if we are not in "configure" state
-#
+
+##
+## Skip, if we are not in "configure" state
+##
 if [ "$1" != "configure" ]; then
         echo "I: Skipping configuration"
         exit 0
 fi
 
+##
+##  The backup2l configuration file.
+##
+conf=/etc/backup2l.conf
 
-#
-#  If the has been edited locally save it away.
-#
-if ( ! diff /etc/backup2l.conf /usr/share/bytemark-vhost-simple-backup/backup2l.conf 2>/dev/null >/dev/null ) ; then 
-  mv /etc/backup2l.conf /etc/backup2l.conf.$(date +%Y-%M-%d)
+##
+##  If we're migrated then we'll have the file /etc/backup2l.conf
+## be a symlink to the generated file.
+##
+##  So we test to see if the file exists and is a symlink.
+##
+if ( ! test -e $conf -a -h $conf ) ; then
+    echo "UPGRADING"
+
+    #
+    # We know that the conf file isn't our expected symlink.
+    #
+    mv $conf $conf.old >/dev/null 2>/dev/null || true
+
+    #
+    #  Now link in the file with the generated one
+    #
+    ln -s /etc/backup.d/backup2l.conf $conf
 fi
 
-
-#
-#  Install our global file.
-#
-cp /usr/share/bytemark-vhost-simple-backup/backup2l.conf /etc/
+##
+##  Finally, regardless of whether we're upgrading or not, we
+## trigger a rebuild
+##
+cd /etc/backup.d/ && make
 
 
 #DEBHELPER#

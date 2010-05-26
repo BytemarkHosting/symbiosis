@@ -25,10 +25,9 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-
 	dh_installdirs
-	make install prefix=`pwd`/debian/bytemark-vhost-simple-backup
-	cp bug.reports `pwd`/debian/bytemark-vhost-simple-backup/usr/share/bug/bytemark-vhost-simple-backup/control
+	dh_install
+
 
 # Build architecture-dependent files here.
 binary-arch: build install
