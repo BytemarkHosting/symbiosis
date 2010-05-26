@@ -1,6 +1,10 @@
 bytemark-vhost-simple-backup (2010:0525-1) stable; urgency=low
 
   * Move to a modular configuration file.
+    - Added /etc/backup.d/ for the storage of all backup related code.
+    - Added pre-backup.d/ for scripts to run prior to backup execution.
+    - Added post-backup.d/ for scripts to run post-backup.
+    - Attempt to automatically rsync the backup remotely.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 25 May 2010 21:00:12 +0000
 
