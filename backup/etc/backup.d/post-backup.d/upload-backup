@@ -4,6 +4,11 @@
 # backup space associated with this machine and upload the local
 # contents to it.
 #
+#  The way this works is to query the IP address of eth0 against
+# a special zone, and build a backup name from it.
+#
+# Steve
+# --
 #
 
 
@@ -20,7 +25,7 @@ eth0=$(/sbin/ifconfig eth0 | grep 'inet addr:' | awk '{print $2}' | awk -F: '{pr
 
 
 #
-#  Reversed
+#  Reversed octets
 #
 one=$(echo $eth0   | awk -F\. '{print $1}')
 two=$(echo $eth0   | awk -F\. '{print $2}')
