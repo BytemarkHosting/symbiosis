@@ -4,8 +4,9 @@
 # backup space associated with this machine and upload the local
 # contents to it.
 #
-#  The way this works is to query the IP address of eth0 against
-# a special zone, and build a backup name from it.
+#  If there is a file "/etc/bytemark-vhost/dns.d/backup.name" it
+# is assumed to contain the name of the backup space to use, otherwise
+# the name will be determined dynamically via a DNS lookup.
 #
 # Steve
 # --
@@ -18,14 +19,16 @@
 #
 src=/var/backups/
 
+
+
 #
-#  Address of eth0
+#  The IP address associated with the interface eth0.
 #
 eth0=$(/sbin/ifconfig eth0 | grep 'inet addr:' | awk '{print $2}' | awk -F: '{print $2}' )
 
 
 #
-#  Reversed octets
+#  We need the IP reversed on an octet-basis for the DNS lookup..
 #
 one=$(echo $eth0   | awk -F\. '{print $1}')
 two=$(echo $eth0   | awk -F\. '{print $2}')
@@ -36,6 +39,19 @@ four=$(echo $eth0  | awk -F\. '{print $4}')
 #  Get the name via the DNS lookup
 #
 name=$(dig txt  $four.$three.$two.$one.backup-reverse.bytemark.co.uk +short | tr -d \")
+
+
+#
+#  The name might instead be hardwired.
+#
+#  If there is a hardwired result then we'll use that in preference
+# to the name returned from the DNS lookup.
+#
+if [ -e /etc/bytemark-vhost/dns.d/backup.name ]; then
+    name=$(cat /etc/bytemark-vhost/dns.d/backup.name)
+fi
+
+
 
 #
 #  If we didn't get a name then exit.
