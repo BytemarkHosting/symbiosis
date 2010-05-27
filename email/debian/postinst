@@ -2,12 +2,41 @@
 
 set -e
 
+
+# Move a conffile without triggering a dpkg question
+mv_conffile() {
+    local OLDCONFFILE="$1"
+    local NEWCONFFILE="$2"
+
+    [ -e "$OLDCONFFILE" ] || return 0
+
+    echo "Preserving user changes to $NEWCONFFILE ..."
+    mv -f "$NEWCONFFILE" "$NEWCONFFILE".dpkg-new
+    mv -f "$OLDCONFFILE" "$NEWCONFFILE"
+}
+
+case "$1" in
+configure)
+esac
+
 #
 # Skip, if we are not in "configure" state
 #
 if [ "$1" != "configure" ]; then
         echo "I: Skipping configuration"
         exit 0
+fi
+
+#
+# Move bytemark-vhost.d/ to symbiosis.d
+#
+if dpkg --compare-versions "$2" le "$LASTVERSION"; then
+  for d in /etc/exim4/bytemark-vhost.d /etc/dovecot/bytemark-vhost.d ; do
+    [ -d $d ] || continue
+    for f in `find $d -type f` ; do
+      mv_conffile $f ${f/bytemark-vhost.d/symbiosis.d}
+    done
+  done
 fi
 
 #
@@ -29,6 +58,11 @@ adduser clamav Debian-exim
 #  Enable the spamassassin module
 #
 sed -i -e 's/^\(ENABLED=\)0/\11/' /etc/default/spamassassin
+
+#
+# Enable spamassassin daily updates
+#
+sed -i -e 's/^\(CRON=\)0/\11/' /etc/default/spamassassin
 
 #
 #  Make sure ownership is correct on our file
@@ -55,20 +89,13 @@ fi
 for i in spamassassin clamav-daemon exim4 dovecot; do
 
     #
-    #  Stop
+    #  Stop/Start
     #
     if which invoke-rc.d >/dev/null 2>&1; then
         invoke-rc.d $i stop
-    else
-        /etc/init.d/$i stop
-    fi
-
-    #
-    #  Start
-    #
-    if which invoke-rc.d >/dev/null 2>&1; then
         invoke-rc.d $i start
     else
+        /etc/init.d/$i stop
         /etc/init.d/$i start
     fi
 done

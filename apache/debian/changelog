@@ -1,3 +1,10 @@
+libapache2-mod-vhost-bytemark (2010:0525-1) stable; urgency=low
+
+  * Ensure that when we're creating new SSL virtual hosts that we
+    correctly cope with the addition of an SSL bundle.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 25 May 2010 15:00:51 +0000
+
 libapache2-mod-vhost-bytemark (2009:1026-1) stable; urgency=low
 
   * Move logs into the correct location.

@@ -107,8 +107,8 @@ sub processDomain
     {
         if ( !-d "$CONFIG{'prefix'}/$domain/public/$dir" )
         {
-            $CONFIG{ 'verbose' }
-              && print "Creating $CONFIG{'prefix'}/$domain/public/$dir\n";
+            $CONFIG{ 'verbose' } &&
+              print "Creating $CONFIG{'prefix'}/$domain/public/$dir\n";
 
             mkpath( ["$CONFIG{'prefix'}/$domain/public/$dir"], 0 );
         }
@@ -152,8 +152,8 @@ sub processDomain
     #  Create the stub webalizer configuration file and use it
     #
     open( TMP, ">",
-          "$CONFIG{'prefix'}/$domain/public/htdocs/stats/webalizer.conf" )
-      or die
+          "$CONFIG{'prefix'}/$domain/public/htdocs/stats/webalizer.conf" ) or
+      die
       "Failed to create $CONFIG{'prefix'}/$domain/public/htdocs/stats/webalizer.conf - $!";
 
     #
@@ -196,7 +196,7 @@ EOF
     {
         my $date = getDay();
         system(
-               "cd $CONFIG{'prefix'}/$domain/public/logs/  && cat $file >> access.log.$date"
+            "cd $CONFIG{'prefix'}/$domain/public/logs/  && cat $file >> access.log.$date"
         );
     }
 
@@ -208,9 +208,9 @@ EOF
     {
         next if ( -d $file );
 
-        if (    ( $file =~ /\.log$/i )
-             || ( $file =~ /\.resolved$/i )
-             || ( $file =~ /webalizer\.conf$/i ) )
+        if ( ( $file =~ /\.log$/i ) ||
+             ( $file =~ /\.resolved$/i ) ||
+             ( $file =~ /webalizer\.conf$/i ) )
         {
             $CONFIG{ 'verbose' } && print "Removing: $file\n";
             unlink($file);
@@ -224,10 +224,8 @@ EOF
     my $count = 0;
     foreach my $file (
         reverse(
-            sort(
-                glob(
-                    "$CONFIG{'prefix'}/$domain/public/logs/access.log.*"
-                ) ) ) )
+            sort( glob( "$CONFIG{'prefix'}/$domain/public/logs/access.log.*" ) )
+        ) )
     {
         if ( $count > 10 )
         {

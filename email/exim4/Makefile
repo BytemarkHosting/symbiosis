@@ -1,7 +1,7 @@
 program      := $(notdir $(CURDIR))
 conf         := $(program).conf
 conf_tmp     := $(conf).tmp
-snippets_dir := bytemark-vhost.d
+snippets_dir := symbiosis.d
 snippets     := $(shell find $(CURDIR)/$(snippets_dir) -mindepth 1 -regextype posix-basic -type f -regex '.*/[a-z0-9][a-z0-9-]\+' | sort) 
 
 ifeq ($(program),dovecot)
