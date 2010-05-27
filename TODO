@@ -1,10 +1,5 @@
 
-firewall
---------
-
 1.  Fix www-data rule to work for lists of IPs.
-
-
 features
 --------
 
