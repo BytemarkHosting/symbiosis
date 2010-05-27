@@ -14,14 +14,15 @@ $(conf_tmp): Makefile $(snippets)
 	    echo >> $(conf_tmp)  ;\
 	    cat $$s >> $(conf_tmp) ;\
 	done
-	@echo /usr/sbin/exim4 -bV -C $(exim4_conf_tmp) > /dev/null
+	@/bin/bash $(conf_tmp)
 
 $(conf): $(conf_tmp)
 	@mv -fb $(conf_tmp) $(conf)
 
 clean:
+	@rm -f $(conf_tmp)
 	@rm -f $(conf)
 
-.PHONY:  clean
+.PHONY:  clean all 
 
 .PRECIOUS: $(conf)
