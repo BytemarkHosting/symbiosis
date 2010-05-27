@@ -1,17 +1,17 @@
-Source: bytemark-vhost-simple-backup
+Source: symbiosis-backup
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 4.0.0)
+Build-Depends: debhelper (>= 7.0.0), cdbs
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-simple-backup
+Package: symbiosis-backup
+Provides: bytemark-vhost-simple-backup
 Architecture: all
-Depends: backup2l
-Description: Automatically backup your files locally
- When this package is installed all your files will be backed up locally,
- for a period of one week.
+Depends: backup2l, ${misc:Depends}
+Description: Automatically backup your files
+ This package configures backup2l to backup your data.
  .
  This backup won't protect you against system failure, but will prevent
  you from accidental deletions, etc.
