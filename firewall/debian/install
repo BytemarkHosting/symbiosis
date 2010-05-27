@@ -1,0 +1,3 @@
+rule.d                usr/share/firewall
+bin                   usr/
+patterns.d/           etc/firewall

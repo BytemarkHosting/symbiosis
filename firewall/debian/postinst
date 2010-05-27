@@ -102,8 +102,8 @@ fi
 #
 if [ -z "$CHROOT" ]; then
 
-    /usr/bin/firewall --flush
-    /usr/bin/firewall
+    firewall --flush
+    firewall
 
     #
     #  Remove denyhosts.

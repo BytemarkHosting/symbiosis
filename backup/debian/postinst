@@ -41,14 +41,14 @@ if ( ! test -e $conf -a -h $conf ) ; then
     #
     #  Now link in the file with the generated one
     #
-    ln -s /etc/backup.d/backup2l.conf $conf
+    ln -s /etc/bytemark-vhost/backup.d/backup2l.conf $conf
 fi
 
 ##
 ##  Finally, regardless of whether we're upgrading or not, we
 ## trigger a rebuild
 ##
-cd /etc/backup.d/ && make
+cd /etc/bytemark-vhost/backup.d/ && make
 
 
 #DEBHELPER#
