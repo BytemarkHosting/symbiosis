@@ -2,6 +2,7 @@
 firewall
 --------
 
+1. Fix permissions such that the firewall can be edited as "admin"
 
 
 features
@@ -34,6 +35,7 @@ Email
 1. Make sure that exim4 forward-file errors get forwarded on
    somewhere sensible.
 
+2. Enable Bytemark anti-spam service to be used (+dns changes?)
 
 Web
 ---
