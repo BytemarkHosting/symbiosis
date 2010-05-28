@@ -1,4 +1,4 @@
-Source: bytemark-symbiosis-tinydns
+Source: symbiosis-tinydns
 Section: net
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
@@ -6,7 +6,7 @@ Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 4.0.0)
 Standards-Version: 3.8.0
 
-Package: bytemark-symbiosis-tinydns
+Package: symbiosis-tinydns
 Provides: bytemark-vhost-tinydns
 Architecture: all
 Depends: rsync, wget, unzip
