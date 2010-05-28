@@ -88,17 +88,3 @@ pool: all
 	for i in */debian/.package ; do mv `cat $$i`_* out ; done
 	dpkg-scanpackages out /dev/null | gzip > out/Packages.gz
 	dpkg-scansources  out /dev/null | gzip > out/Sources.gz
-
-#
-#  Pull any changes from the remote mercurial repository.
-#
-update:
-	hg pull --update
-
-
-
-etch:
-	hg update -C etch
-
-lenny:
-	hg update -C lenny

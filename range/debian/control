@@ -8,7 +8,7 @@ Standards-Version: 3.8.0
 
 Package: bytemark-vhost-range
 Architecture: all
-Depends: perl, perl-modules, libnet-netmask-perl
+Depends: perl, perl-modules, libnet-whois-ripe-perl
 Description: Determine whether an IP is within Bytemark's range
  This package contains a simple tool to test whether an IP address
  is within a Bytemark allocated range.

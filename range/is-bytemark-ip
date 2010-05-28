@@ -61,8 +61,8 @@ use warnings;
 #  Modules we require
 #
 use Getopt::Long;
-use Net::Netmask;
 use Pod::Usage;
+use Net::Whois::RIPE;
 
 
 #
@@ -80,60 +80,47 @@ parseCommandLineArguments();
 #  Find the (primary) IP address of the system.
 #
 my $ip = shift;
+my $asn = shift;
 
 if ( !defined( $ip ) )
 {
     $ip = findHostDetails();
 }
 
-
-#
-#  We only cope with IPv4 addresses
-#
-if ( $ip =~ /:/ )
+if ( !defined( $asn ) )
 {
-    $CONFIG{ 'verbose' } && print "$ip looks like IPv6\n";
-    print "0\n";
-    exit;
+  $asn = "AS35425";
 }
 
+my $whois = Net::Whois::RIPE->new("whois.ripe.net");
 
-
+# 
+# Whois returns different route types depending if the IP is v4 or v6.
 #
-#  Test that IP to see if it is inside a Bytemark Range.
-#
-foreach my $range (qw! 89.16.160.0/19  80.68.80.0/20 212.110.160.0/19 !)
+if ($ip =~ /^[0-9\.]+$/)
 {
-
-    #
-    #  Create a new netblock object.
-    #
-    my $block = new Net::Netmask($range);
-
-    $CONFIG{ 'verbose' } && print "Testing range: $range\n";
-
-    #
-    #  If the IP is in the range then we're OK
-    #
-    if ( $block->match($ip) )
-    {
-        $CONFIG{ 'verbose' } && print "\tfound\n";
-
-        print "1\n";
-        exit;
-    }
-    else
-    {
-        $CONFIG{ 'verbose' } && print "\tnot found\n";
-    }
+  $CONFIG{ 'verbose' } && print "Doing whois route query for $ip\n";
+  $whois->type("route");
+} 
+elsif ($ip =~ /^[0-9a-f\:]+$/i) 
+{
+  $CONFIG{ 'verbose' } && print "Doing whois route6 query for $ip\n";
+  $whois->type("route6");
 }
 
-#
-#  Failure
-#
-print "0\n";
+my $query = $whois->query($ip);
 
+# 
+# See if it is routed to our AS.
+#
+if ( $query and $query->origin and $query->origin eq $asn) {
+  print "1\n";
+} else {
+  print "0\n";
+  exit 1;
+}
 
+exit 0;
 
 =begin doc
 

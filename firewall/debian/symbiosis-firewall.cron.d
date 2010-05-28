@@ -10,3 +10,9 @@
 
 */15 * * * * root [ -x /usr/bin/firewall-blacklist ] && /usr/bin/firewall-blacklist
 
+
+#
+# Check the firewall works every hour.
+#
+@hourly      root [ -x /usr/bin/firewall ] && /usr/bin/firewall --test
+

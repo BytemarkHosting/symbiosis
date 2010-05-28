@@ -1,7 +1,7 @@
-
 firewall
 --------
 
+1.  Fix www-data rule to work for lists of IPs.
 
 
 features
@@ -16,7 +16,9 @@ features
 4. Add munin?  Yann seems keen - I'm not sure it would be globally
    useful, but its nice to offer graphs to people regardless.
 
+5. The ability to manage / add IPs in a non-root stylee.
 
+6. Ensure each package is IPv6 compatible.
 
 SSL
 ---
@@ -34,6 +36,7 @@ Email
 1. Make sure that exim4 forward-file errors get forwarded on
    somewhere sensible.
 
+2. Enable Bytemark anti-spam service to be used (+dns changes?)
 
 Web
 ---
