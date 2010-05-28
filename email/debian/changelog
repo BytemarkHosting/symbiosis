@@ -1,4 +1,4 @@
-bytemark-vhost-email (20100517144051) lucid; urgency=low
+symbiosis-email (20100517144051) lucid; urgency=low
 
   * Split dovecot config into a multiple file layout (like exim4)
   * Unified exim4 and dovecot makefiles

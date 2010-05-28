@@ -11,7 +11,7 @@ mv_conffile() {
     [ -e "$OLDCONFFILE" ] || return 0
 
     echo "Preserving user changes to $NEWCONFFILE ..."
-    mv -f "$NEWCONFFILE" "$NEWCONFFILE".dpkg-new
+    [ -e "$NEWCONFFILE" ] && mv -f "$NEWCONFFILE" "$NEWCONFFILE".dpkg-new
     mv -f "$OLDCONFFILE" "$NEWCONFFILE"
 }
 
@@ -34,6 +34,7 @@ if dpkg --compare-versions "$2" le "$LASTVERSION"; then
   for d in /etc/exim4/bytemark-vhost.d /etc/dovecot/bytemark-vhost.d ; do
     [ -d $d ] || continue
     for f in `find $d -type f` ; do
+      echo "Moving $f to ${f/bytemark-vhost.d/symbiosis.d}"
       mv_conffile $f ${f/bytemark-vhost.d/symbiosis.d}
     done
   done

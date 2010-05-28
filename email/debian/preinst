@@ -25,7 +25,9 @@ case "$1" in
 install|upgrade)
   if dpkg --compare-versions "$2" le "$LASTVERSION"; then
     for d in /etc/exim4/bytemark-vhost.d /etc/dovecot/bytemark-vhost.d ; do
+      [ -d $d ] || continue
       for f in `find $d -type f` ; do
+        echo "Preparing to remove $f"
         prep_mv_conffile bytemark-vhost-email "$f"
       done
     done
