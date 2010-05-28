@@ -9,7 +9,7 @@ Standards-Version: 3.8.0
 Package: bytemark-symbiosis
 Provides: bytemark-vhost
 Architecture: all
-Depends: bytemark-vhost-crack, bytemark-vhost-email, symbiosis-firewall, bytemark-vhost-ftpd, bytemark-vhost-httpd, bytemark-vhost-key, bytemark-vhost-monit, bytemark-vhost-mysql, bytemark-vhost-pam, bytemark-vhost-phpmyadmin, bytemark-vhost-simple-backup, bytemark-vhost-test, symbiosis-tinydns, bytemark-vhost-updater, bytemark-vhost-webmail
+Depends: bytemark-vhost-crack, bytemark-vhost-email, symbiosis-firewall, bytemark-vhost-ftpd, bytemark-vhost-httpd, bytemark-vhost-key, bytemark-vhost-monit, bytemark-vhost-mysql, bytemark-vhost-pam, bytemark-vhost-phpmyadmin, bytemark-vhost-simple-backup, bytemark-vhost-test, symbiosis-tinydns, symbiosis-updater, bytemark-vhost-webmail
 Description: The bytemark virtual hosting system
  This package is a metapackage which will pull in each package which
  is a component of the Bytemark virtual hosting system.
