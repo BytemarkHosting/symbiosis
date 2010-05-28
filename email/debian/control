@@ -1,4 +1,4 @@
-Source: bytemark-vhost-email
+Source: symbiosis-email
 Section: mail
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
@@ -6,9 +6,10 @@ Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 4.0.0), rdoc, txt2man, cdbs, perl
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-email
+Package: symbiosis-email
 Architecture: all
 Depends: exim4-daemon-heavy, spamassassin, dovecot-imapd, dovecot-pop3d, clamav-daemon, ruby, perl, libsys-syslog-perl, adduser, make, rdoc
+Provides: bytemark-vhost-email
 Description: A complete virtual hosting solution for email
  This package contains the infrastructure and configuration for a
  virtual hosting setup with full support for:
@@ -18,3 +19,12 @@ Description: A complete virtual hosting solution for email
   * IMAP + IMAPS
   * POP3 + POP3S
   * SMTP
+
+Package: bytemark-vhost-email
+Architecture: all
+Depends: symbiosis-email
+Description: A complete virtual hosting solution for email (meta-package)
+ This package is to aid in the renaming process from bytemark-vhost to
+ symbiosis.  This package can be safely removed.
+ .
+ (meta package).
