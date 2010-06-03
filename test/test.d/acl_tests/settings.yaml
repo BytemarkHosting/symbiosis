@@ -22,7 +22,6 @@ relay_from_hosts:
 local_ip: 192.168.0.1
 local_domains: 
   - local.domain
-  - local-domain.com
   - other.domain
   - bytemark.co.uk
 rewrite_domains:
@@ -34,7 +33,4 @@ local_users:
     password: password
   - username: other.user@other.domain
     password: other.password
-  - username: crypted-us_er@local-domain.com
-    password: "crypted.password"
-    crypt_password: "{crypt}a.x6Pi3NvgBSs"
 
