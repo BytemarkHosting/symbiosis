@@ -77,6 +77,14 @@ fi
 echo '1' > /etc/pure-ftpd/conf/TLS
 
 #
+# Update default runlevels.
+#
+if [ -x "/etc/init.d/pure-authd" ]; then
+  update-rc.d pure-authd defaults >/dev/null
+fi
+
+
+#
 #  Restart (or start)
 #
 if [ "$2" = "" ] ; then
