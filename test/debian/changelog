@@ -1,3 +1,9 @@
+symbiosis-test (2010:0603-1) stable; urgency=low
+
+  * Renamed package
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 10:35:42 +0100
+
 bytemark-vhost-test (20090707183253) stable; urgency=low
 
   * Updated bytemark-vhost-test script to call each script locally.

@@ -1,4 +1,4 @@
-Source: bytemark-vhost-crack
+Source: symbiosis-crack
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
@@ -6,7 +6,8 @@ Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 4.0.0), cracklib2-dev
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-crack
+Package: symbiosis-crack
+Provides: bytemark-vhost-crack
 Architecture: any
 Depends: cracklib2
 Description: Test the strength of virtual hosting passwords

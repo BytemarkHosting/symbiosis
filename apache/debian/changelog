@@ -1,6 +1,7 @@
-libapache2-mod-vhost-bytemark (2010:0603-1) stable; urgency=low
+symbiosis-httpd (2010:0603-1) stable; urgency=low
 
   * Correct the missing shebang upon the configure-additional script.
+  * Renamed package
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 3 Jun 2010 10:22:01 +0000
 

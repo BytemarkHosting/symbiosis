@@ -1,4 +1,4 @@
-Source: bytemark-vhost-pam
+Source: symbiosis-pam
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
@@ -6,7 +6,8 @@ Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 4.0.0)
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-pam
+Package: symbiosis-pam
+Provides: bytemark-vhost-pam
 Architecture: all
 Depends: libpam-tmpdir, wbritish, libpam-cracklib
 Description: PAM configuration meta-package

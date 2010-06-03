@@ -1,18 +1,18 @@
-Source: bytemark-vhost
+Source: bytemark-symbiosis
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 4.0.0)
+Build-Depends: debhelper (>= 6.0.0), cdbs
 Standards-Version: 3.8.0
 
 Package: bytemark-symbiosis
 Provides: bytemark-vhost
 Architecture: all
-Depends: bytemark-vhost-crack, bytemark-vhost-email, symbiosis-firewall, bytemark-vhost-ftpd, bytemark-vhost-httpd, bytemark-vhost-key, bytemark-vhost-monit, bytemark-vhost-mysql, bytemark-vhost-pam, bytemark-vhost-phpmyadmin, bytemark-vhost-simple-backup, bytemark-vhost-test, symbiosis-tinydns, symbiosis-updater, bytemark-vhost-webmail
-Description: The bytemark virtual hosting system
+Depends: symbiosis-crack, symbiosis-email, symbiosis-firewall, symbiosis-ftpd, symbiosis-httpd, symbiosis-key, symbiosis-monit, symbiosis-mysql, symbiosis-pam, symbiosis-phpmyadmin, symbiosis-simple-backup, symbiosis-test, symbiosis-tinydns, symbiosis-updater, symbiosis-webmail
+Description: An easy, complete, and Debian-friendly server administration system
  This package is a metapackage which will pull in each package which
- is a component of the Bytemark virtual hosting system.
+ is a component of the Bytemark Symbiosis system.
  .
  Installing this package will completely configure your system for
  the virtual hosting of multiple domains with:
@@ -20,3 +20,14 @@ Description: The bytemark virtual hosting system
   * Webhosting
   * FTP hosting.
   * Email hosting (and webmail).
+
+Package: bytemark-vhost
+Architecture: all
+Depends: bytemark-symbiosis
+Description: An easy, complete, and Debian-friendly server administration system
+ This packages is present to ease the renaming transition and can safely be
+ removed.
+ .
+ (meta package)
+
+

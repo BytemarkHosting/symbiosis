@@ -1,16 +1,15 @@
 #!/bin/bash
 #
 ### BEGIN INIT INFO
-# Provides:          bytemark-vhost
+# Provides:          kytemark-symbiosis
 # Required-Start:    $syslog
 # Required-Stop:     $syslog
 # Should-Start:      $network $named $time
 # Should-Stop:       $network $named $time
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Alert the user that vhost is active.
-# Description:       Alerts the user that the Bytemark vHost system is in use.
-#
+# Short-Description: Alert the user that symbiosis is active.
+# Description:       Alerts the user that the Bytemark Symbiosis system is in use.
 ### END INIT INFO
 #
 
@@ -28,23 +27,23 @@ SELF=$(cd $(dirname $0); pwd -P)/$(basename $0)
 
 case "${1:-''}" in
   'start')
-	log_daemon_msg "Starting vhost init" "vhost"
+	log_daemon_msg "Starting symbiosis init" "symbiosis"
         log_end_msg 0
         cat <<EOF
 = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-   This system is running the Bytemark Virtual Hosting system.
+   This system is running Bytemark Symbiosis.
 
    For documentation please visit
 
-     *  http://vhost.bytemark.co.uk
+     *  http://symbiosis.bytemark.co.uk
 
 = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 EOF
 	;;
 
   'stop')
-	log_daemon_msg "Stopping vhost init" "vhost"
+	log_daemon_msg "Stopping symbiosis init" "symbiosis"
         log_end_msg 0
 
 	;;
@@ -58,7 +57,7 @@ EOF
 	;;
 
   'status')
-        log_action_msg "vhost is running."
+        log_action_msg "symbiosis is running."
   	;;
 
   *)

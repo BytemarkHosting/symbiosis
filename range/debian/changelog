@@ -1,4 +1,4 @@
-symbiosis-range (2010:0528) stable; urgency=low
+symbiosis-range (2010:0528-1) stable; urgency=low
 
   * Moved onto shared ruby library
   * Added backup-space determination
