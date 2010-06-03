@@ -7,10 +7,9 @@ Build-Depends: debhelper (>= 7.0.0), cdbs
 Standards-Version: 3.8.0
 
 Package: symbiosis-firewall
-Provides: bytemark-vhost-firewall
 Architecture: all
 Depends: iptables, dnsutils, iproute, ${misc:Depends}
-Replaces: bytemark-vhost-ssh-protection
+Replaces: bytemark-vhost-ssh-protection, bytemark-vhost-firewall
 Conflicts: bytemark-vhost-ssh-protection (<< 20081110153344)
 Suggests: libnet-dns-perl
 Description: A simple firewall generator for the Bytemark vhost system
