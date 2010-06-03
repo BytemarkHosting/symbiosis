@@ -176,7 +176,7 @@ $CONFIG{ 'blacklist.d' } = "/etc/firewall/blacklist.d/";
 $CONFIG{ 'incoming.d' }  = "/etc/firewall/incoming.d/";
 $CONFIG{ 'outgoing.d' }  = "/etc/firewall/outgoing.d/";
 $CONFIG{ 'local.d' }     = "/etc/firewall/local.d/";
-$CONFIG{ 'rule.d' }      = "/usr/share/firewall/";
+$CONFIG{ 'rule.d' }      = "/usr/share/firewall/rule.d/";
 
 
 
