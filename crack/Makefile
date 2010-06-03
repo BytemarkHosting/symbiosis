@@ -14,15 +14,9 @@ passwd-test: passwd-test.o
 	$(CC) $(LDFLAGS) -o $@ -lcrack $^
 	strip passwd-test
 
-install:
-	mkdir -p $(PREFIX)
-	cp passwd-test $(PREFIX)
-	cp vhost-test-passwords $(PREFIX)
-
 #
 # Documentation
 #
-
 docs: vhost-test-passwords.man
 
 vhost-test-passwords.man:
@@ -33,3 +27,4 @@ vhost-test-passwords.man:
 #
 clean:
 	-rm -f *.o *~ passwd-test vhost-test-passwords.man
+	-rm vhost-test-passwords.1

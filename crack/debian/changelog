@@ -2,6 +2,7 @@ symbiosis-crack (2010:0603) stable; urgency=low
 
   * Renamed package
   * Switched to dpkg-source 3.0 (native) format
+  * Added manpage.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:29 +0100
 
