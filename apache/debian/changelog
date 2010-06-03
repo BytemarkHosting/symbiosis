@@ -1,3 +1,9 @@
+libapache2-mod-vhost-bytemark (2010:0603-1) stable; urgency=low
+
+  * Correct the missing shebang upon the configure-additional script.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 3 Jun 2010 10:22:01 +0000
+
 libapache2-mod-vhost-bytemark (2010:0525-1) stable; urgency=low
 
   * Ensure that when we're creating new SSL virtual hosts that we
