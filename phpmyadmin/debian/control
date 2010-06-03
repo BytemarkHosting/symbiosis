@@ -3,13 +3,14 @@ Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 4.0.0)
+Build-Depends: debhelper (>= 6.0.0), cdbs
 Standards-Version: 3.8.0
+Bugs: https://projects.bytemark.co.uk/projects/bytemarkvhost/issues
 
 Package: symbiosis-phpmyadmin
 Provides: bytemark-vhost-phpmyadmin
 Architecture: all
-Depends: phpmyadmin, bytemark-vhost-mysql
+Depends: phpmyadmin, symbiosis-mysql, ${misc:Depends}
 Description: This package gives remote database access
  This package will enable a global MySQL administrative interface
  which may be used remotely.
