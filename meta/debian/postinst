@@ -97,20 +97,11 @@ done
 uname -snrvm > /etc/motd
 cat >>/etc/motd<<EOF
 
-To access the Bytemark Virtual Host documentation, please visit:
+To access the Bytemark Symbiosis documentation, please visit:
 
-  * http://vhost.bytemark.co.uk/
-
+  * http://symbiosis.bytemark.co.uk/
 
 EOF
-
-
-#
-#  If we have an init script then show it.
-#
-if [ -e /etc/init.d/bytemark-vhost ]; then
-    update-rc.d bytemark-vhost defaults 2>/dev/null >/dev/null
-fi
 
 
 #DEBHELPER#
