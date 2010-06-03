@@ -1,11 +1,11 @@
-symbiosis-range (2010:0528-1) stable; urgency=low
+symbiosis-range (2010:0528) stable; urgency=low
 
   * Moved onto shared ruby library
   * Added backup-space determination
   * Moved onto cdbs 
   * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:33 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:33 +0100
 
 bytemark-vhost-range (20090707153244) stable; urgency=low
 

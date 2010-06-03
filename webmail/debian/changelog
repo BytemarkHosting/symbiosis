@@ -1,9 +1,9 @@
-symbiosis-webmail (2010:0603-1) stable; urgency=low
+symbiosis-webmail (2010:0603) stable; urgency=low
 
   * Renamed packages
   * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:35 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:35 +0100
 
 bytemark-vhost-webmail (20090707153244) stable; urgency=low
 

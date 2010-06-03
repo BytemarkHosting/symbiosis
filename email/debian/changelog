@@ -1,4 +1,4 @@
-symbiosis-email (2010:0603-1) stable; urgency=low
+symbiosis-email (2010:0603) stable; urgency=low
 
   * Split dovecot config into a multiple file layout (like exim4)
   * Unified exim4 and dovecot makefiles
@@ -9,7 +9,7 @@ symbiosis-email (2010:0603-1) stable; urgency=low
   * Renamed packages
   * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:30 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:30 +0100
 
 bytemark-vhost-email (20090707183051) stable; urgency=low
 

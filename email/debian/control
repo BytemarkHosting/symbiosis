@@ -3,12 +3,12 @@ Section: mail
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 4.0.0), rdoc, txt2man, cdbs, perl
+Build-Depends: debhelper (>= 6.0.0), rdoc, txt2man, cdbs, perl
 Standards-Version: 3.8.0
 
 Package: symbiosis-email
 Architecture: all
-Depends: exim4-daemon-heavy, spamassassin, dovecot-imapd, dovecot-pop3d, clamav-daemon, ruby, perl, libsys-syslog-perl, adduser, make, rdoc
+Depends: exim4-daemon-heavy, spamassassin, dovecot-imapd, dovecot-pop3d, clamav-daemon, ruby, perl, libsys-syslog-perl, adduser, make, rdoc, ${misc:Depends}
 Provides: bytemark-vhost-email
 Description: A complete virtual hosting solution for email
  This package contains the infrastructure and configuration for a

@@ -1,4 +1,4 @@
-symbiosis-httpd (2010:0603-1) stable; urgency=low
+symbiosis-httpd (2010:0603) stable; urgency=low
 
   [ Steve Kemp ]
   * Correct the missing shebang upon the configure-additional script.
@@ -7,9 +7,9 @@ symbiosis-httpd (2010:0603-1) stable; urgency=low
   [ Patrick J Cherry ]
   * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:28 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:28 +0100
 
-libapache2-mod-vhost-bytemark (2010:0525-1) stable; urgency=low
+libapache2-mod-vhost-bytemark (2010:0525) stable; urgency=low
 
   * Ensure that when we're creating new SSL virtual hosts that we
     correctly cope with the addition of an SSL bundle.

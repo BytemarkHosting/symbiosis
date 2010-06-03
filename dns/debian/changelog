@@ -1,4 +1,4 @@
-symbiosis-tinydns (2010:0519-1) stable; urgency=low
+symbiosis-tinydns (2010:0519) stable; urgency=low
 
   [ Steve Kemp ]
   * Don't re-upload the generated DNS contents, unless they are
@@ -7,7 +7,7 @@ symbiosis-tinydns (2010:0519-1) stable; urgency=low
   [ Patrick J Cherry ]
   * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:29 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:29 +0100
 
 bytemark-vhost-tinydns (20090901094658) stable; urgency=low
 

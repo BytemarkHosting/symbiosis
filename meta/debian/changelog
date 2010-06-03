@@ -1,4 +1,4 @@
-bytemark-symbiosis (2010:0519-1) stable; urgency=low
+bytemark-symbiosis (2010:0519) stable; urgency=low
 
   [ Steve Kemp ]
   * Renamed the package.
@@ -6,7 +6,7 @@ bytemark-symbiosis (2010:0519-1) stable; urgency=low
   [ Patrick J Cherry ]
   * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:31 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:31 +0100
 
 bytemark-vhost (2009:1029-1) stable; urgency=low
 

@@ -1,9 +1,9 @@
-symbiosis-phpmyadmin (2010:0603-1) stable; urgency=low
+symbiosis-phpmyadmin (2010:0603) stable; urgency=low
 
   * Renamed package
   * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:33 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:33 +0100
 
 bytemark-vhost-phpmyadmin (20090714103058) stable; urgency=low
 

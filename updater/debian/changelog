@@ -1,4 +1,4 @@
-symbiosis-updater (2010:0528-1) stable; urgency=low
+symbiosis-updater (2010:0528) stable; urgency=low
 
   [ Steve Kemp ]
   * Updated package name.
@@ -7,7 +7,7 @@ symbiosis-updater (2010:0528-1) stable; urgency=low
   [ Patrick J Cherry ]
   * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:34 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:34 +0100
 
 bytemark-vhost-updater (2009:1126-1) stable; urgency=low
 
