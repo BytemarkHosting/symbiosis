@@ -196,3 +196,5 @@ if [ -e /var/tmp/update.packages ]; then
     rm -f /var/tmp/update.packages
 fi
 
+
+exit
