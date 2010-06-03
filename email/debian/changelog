@@ -1,4 +1,4 @@
-symbiosis-email (20100517144051) lucid; urgency=low
+symbiosis-email (2010:0603-1) stable; urgency=low
 
   * Split dovecot config into a multiple file layout (like exim4)
   * Unified exim4 and dovecot makefiles
@@ -6,8 +6,9 @@ symbiosis-email (20100517144051) lucid; urgency=low
   * Exim4 no longer delays mail following errors in forward files
   * Regex in /usr/sbin/checkpassword sanitised
   * Bytemark antispam config removed.
+  * Renamed packages
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 17 May 2010 14:40:51 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 10:41:53 +0100
 
 bytemark-vhost-email (20090707183051) stable; urgency=low
 
