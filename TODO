@@ -41,7 +41,3 @@ Email
 Web
 ---
 
-1. move the /usr/share/bytemark into a separate package so that it
-   may be updated  without restarting apache.  (and so we can later move
-   the documentation ito this package: bytemark-vhost-docs)
-
