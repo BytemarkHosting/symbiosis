@@ -7,7 +7,8 @@ Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man
 Standards-Version: 3.8.0
 
 Package: symbiosis-range
-Provides: bytemark-vhost-range
+Replaces: bytemark-vhost-range
+Conflicts: bytemark-vhost-range
 Architecture: all
 Depends: ruby, ${misc:Depends}
 Description: Determine whether an IP is within Bytemark's range

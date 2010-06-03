@@ -8,7 +8,8 @@ Standards-Version: 3.8.0
 Bugs: https://projects.bytemark.co.uk/projects/bytemarkvhost/issues
 
 Package: symbiosis-phpmyadmin
-Provides: bytemark-vhost-phpmyadmin
+Replaces: bytemark-vhost-phpmyadmin
+Conflicts: bytemark-vhost-phpmyadmin
 Architecture: all
 Depends: phpmyadmin, symbiosis-mysql, ${misc:Depends}
 Description: This package gives remote database access

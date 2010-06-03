@@ -20,7 +20,8 @@ Description: A mass-hosting module for Apache 2.x
 
 
 Package: symbiosis-httpd
-Provides: bytemark-vhost-httpd
+Replaces: bytemark-vhost-httpd
+Conflicts: bytemark-vhost-httpd
 Architecture: any
 Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}
 Description: Tools to manage Apache virtual hosting

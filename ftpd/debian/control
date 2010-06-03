@@ -7,7 +7,8 @@ Build-Depends: debhelper (>= 7.0.0), cdbs
 Standards-Version: 3.8.0
 
 Package: symbiosis-ftpd
-Provides: bytemark-vhost-ftpd
+Replaces: bytemark-vhost-ftpd
+Conflicts: bytemark-vhost-ftpd
 Architecture: all
 Depends: pure-ftpd, ${misc:Depends}
 Description: Tools to manage FTP virtual hosting

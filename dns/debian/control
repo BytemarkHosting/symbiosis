@@ -7,11 +7,11 @@ Build-Depends: debhelper (>= 7.0.0)
 Standards-Version: 3.8.0
 
 Package: symbiosis-tinydns
-Provides: bytemark-vhost-tinydns
+Replaces: bytemark-vhost-tinydns
+Conflicts: bytemark-vhost-tinydns, bytemark-vhost-autofs
 Architecture: all
 Depends: rsync, wget, unzip, ${misc:Depends}
-Pre-Depends: bytemark-vhost-range
-Conflicts: bytemark-vhost-autofs
+Pre-Depends: symbiosis-range
 Description: Automatic DNS record creation and uploading for Bytemark customers
  This package contains tools to create TinyDNS files which may be uploaded
  to the Bytemark DNS host.
