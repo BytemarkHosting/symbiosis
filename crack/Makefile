@@ -5,6 +5,8 @@ CC=gcc
 CFLAGS=-g -O2 -Wall
 LDFLAGS=
 
+all: passwd-test docs
+
 #
 #  Make
 #
@@ -18,7 +20,16 @@ install:
 	cp vhost-test-passwords $(PREFIX)
 
 #
+# Documentation
+#
+
+docs: vhost-test-passwords.man
+
+vhost-test-passwords.man:
+	pod2man ./vhost-test-passwords > vhost-test-passwords.man
+
+#
 #  Clean
 #
 clean:
-	-rm -f *.o *~ passwd-test configure-stamp build-stamp
+	-rm -f *.o *~ passwd-test vhost-test-passwords.man
