@@ -1,3 +1,9 @@
+symbiosis-httpd (2010:0603-1) stable; urgency=low
+
+  * Renamed package 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 10:27:17 +0100
+
 libapache2-mod-vhost-bytemark (2010:0525-1) stable; urgency=low
 
   * Ensure that when we're creating new SSL virtual hosts that we

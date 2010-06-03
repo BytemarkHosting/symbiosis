@@ -1,4 +1,4 @@
-Source: libapache2-mod-vhost-bytemark
+Source: symbiosis-httpd
 Section: web
 Priority: optional
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
@@ -19,7 +19,8 @@ Description: A mass-hosting module for Apache 2.x
  * Allows domains to be handled with or without a www. prefix.
 
 
-Package: bytemark-vhost-httpd
+Package: symbiosis-httpd
+Provides: bytemark-vhost-httpd
 Architecture: any
 Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark
 Description: Tools to manage Apache virtual hosting

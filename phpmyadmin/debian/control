@@ -1,4 +1,4 @@
-Source: bytemark-vhost-phpmyadmin
+Source: symbiosis-phpmyadmin
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
@@ -6,7 +6,8 @@ Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 4.0.0)
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-phpmyadmin
+Package: symbiosis-phpmyadmin
+Provides: bytemark-vhost-phpmyadmin
 Architecture: all
 Depends: phpmyadmin, bytemark-vhost-mysql
 Description: This package gives remote database access
