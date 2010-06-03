@@ -4,11 +4,6 @@ It was downloaded from http://src.bytemark.co.uk/trac/bytemark-vhost
 
 Copyright Holder: Copyright (c) 2008-10 Bytemark Computer Consulting Ltd
 
-License:
-
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
 Perl is distributed under licenses:
 
     a) the GNU General Public License as published by the Free Software
@@ -27,8 +22,5 @@ For the mod_vhost_bytemark  component:
   Apache licence, available at /usr/share/common-licenses/Apache-2.0 on Debian
   GNU/Linux systems.
 
-  Copyright (c) 2008-2010 Bytemark Computer Consulting Ltd 
+  Copyright (c) 2008-2010 Bytemark Computer Consulting Ltd
   Copyright (c) 1998-1999 Demon Internet Ltd.
-
-  
- 

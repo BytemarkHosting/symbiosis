@@ -3,6 +3,7 @@ symbiosis-httpd (2010:0603) stable; urgency=low
   [ Steve Kemp ]
   * Correct the missing shebang upon the configure-additional script.
   * Renamed package
+  * Removed full copy of the Apache license.
 
   [ Patrick J Cherry ]
   * Switched to dpkg-source 3.0 (native) format
