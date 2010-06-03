@@ -23,7 +23,7 @@ Package: symbiosis-httpd
 Replaces: bytemark-vhost-httpd
 Conflicts: bytemark-vhost-httpd
 Architecture: any
-Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}
+Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static
 Description: Tools to manage Apache virtual hosting
  This package contains tools to manage the virtual hosting of websites
  with Apache2.
@@ -33,3 +33,11 @@ Description: Tools to manage Apache virtual hosting
  of only a pair of directories.
  .
  Adding new websites doesn't even require you to restart your server.
+
+
+Package: symbiosis-httpd-static
+Architecture: any
+Description: Static files
+ This package contains the static welcome page for the Bytemark Symbiosis
+ system.
+
