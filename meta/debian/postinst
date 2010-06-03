@@ -56,7 +56,7 @@ fi
 #
 #  Shadow passwords must be on
 #
-/sbin/shadowconfig on 2>/dev/null >/dev/null
+shadowconfig on 2>/dev/null >/dev/null
 
 
 #

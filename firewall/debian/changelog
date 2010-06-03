@@ -6,7 +6,7 @@ symbiosis-firewall (2010:0603) stable; urgency=low
   [ Patrick J Cherry ]
   * Switched to dpkg-source 3.0 (native) format
 
- -- Steve Kemp <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:30 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:30 +0100
 
 symbiosis-firewall (2010:0427) stable; urgency=low
 

@@ -3,13 +3,14 @@ Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 4.0.0), cdbs
+Build-Depends: debhelper (>= 7.0.0), cdbs
 Standards-Version: 3.8.0
 
 Package: symbiosis-updater
 Provides: bytemark-vhost-updater
 Architecture: all
 Replaces: cron-apt
+Depends: ${misc:Depends}
 Description: Automatic package upgrades
  This package contains a helper which will automatically apply security
  and vhost package updates once a day.
