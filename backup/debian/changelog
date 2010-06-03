@@ -1,5 +1,6 @@
 symbiosis-backup (2010:0525-1) stable; urgency=low
 
+  [ Steve Kemp ]
   * Move to a modular configuration file.
     - Added /etc/bytemark-vhost/backup.d/ for the storage of all
       backup related code.
@@ -8,7 +9,10 @@ symbiosis-backup (2010:0525-1) stable; urgency=low
     - Attempt to automatically rsync the backup remotely.
   * Renamed to symbiosis-backup
 
- -- Steve Kemp <steve@bytemark.co.uk>  Tue, 25 May 2010 21:00:12 +0000
+  [ Patrick J Cherry ]
+  * Switched to dpkg-source 3.0 (native) format
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:28 +0100
 
 bytemark-vhost-simple-backup (20081110153344) stable; urgency=low
 

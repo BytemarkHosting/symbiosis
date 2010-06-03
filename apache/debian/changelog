@@ -1,9 +1,13 @@
 symbiosis-httpd (2010:0603-1) stable; urgency=low
 
+  [ Steve Kemp ]
   * Correct the missing shebang upon the configure-additional script.
   * Renamed package
 
- -- Steve Kemp <steve@bytemark.co.uk>  Thu, 3 Jun 2010 10:22:01 +0000
+  [ Patrick J Cherry ]
+  * Switched to dpkg-source 3.0 (native) format
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:28 +0100
 
 libapache2-mod-vhost-bytemark (2010:0525-1) stable; urgency=low
 

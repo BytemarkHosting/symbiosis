@@ -2,8 +2,9 @@ symbiosis-key (2010:0603-1) stable; urgency=low
 
   * Renamed package
   * Tidied up packaging
+  * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 10:31:18 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:31 +0100
 
 bytemark-vhost-key (2009:1026-1) stable; urgency=low
 

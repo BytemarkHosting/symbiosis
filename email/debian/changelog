@@ -7,8 +7,9 @@ symbiosis-email (2010:0603-1) stable; urgency=low
   * Regex in /usr/sbin/checkpassword sanitised
   * Bytemark antispam config removed.
   * Renamed packages
+  * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 10:41:53 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:30 +0100
 
 bytemark-vhost-email (20090707183051) stable; urgency=low
 

@@ -1,8 +1,9 @@
 symbiosis-crack (2010:0603) stable; urgency=low
 
   * Renamed package
+  * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 10:28:40 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:29 +0100
 
 bytemark-vhost-crack (20090707153244) stable; urgency=low
 

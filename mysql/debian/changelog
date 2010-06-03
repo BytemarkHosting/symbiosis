@@ -1,8 +1,9 @@
 symbiosis-mysql (2010:0603-1) stable; urgency=low
 
   * Renamed package
+  * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 10:33:07 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:32 +0100
 
 bytemark-vhost-mysql (20090707153244) stable; urgency=low
 

@@ -1,8 +1,9 @@
 symbiosis-pam (2010:0603-1) stable; urgency=low
 
   * Renamed package
+  * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 10:33:46 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:33 +0100
 
 bytemark-vhost-pam (20090707153244) stable; urgency=low
 

@@ -1,8 +1,9 @@
 symbiosis-test (2010:0603-1) stable; urgency=low
 
   * Renamed package
+  * Switched to dpkg-source 3.0 (native) format
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 10:35:42 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:34 +0100
 
 bytemark-vhost-test (20090707183253) stable; urgency=low
 
