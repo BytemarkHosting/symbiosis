@@ -1,20 +1,17 @@
 #
-#  Makefile for the firewall package
+#  Makefile for the updateer package
 #
 
 nop:
 	@echo "Makefile - available targets"
 	@echo " "
-	@echo " all       - generate rules and manpages"
-	@echo " rules     - generate automatic rules"
-	@echo " manpage   - generate manpage for ./bin/firewall"
-	@echo " test      - test firewall installation"
+	@echo " all       - generate manpage"
 	@echo " clean     - clean up"
 	@echo " "
 
 clean:
-	echo "clear" || true
+	rm -f update-packages.1 || true
 
 all:
-	echo "all" || true
+	pod2man update-packages.pod > update-packages.1
 
