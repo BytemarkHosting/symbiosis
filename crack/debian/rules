@@ -26,7 +26,7 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	dh_prep
 	dh_installdirs
 	make install PREFIX=`pwd`/debian/bytemark-vhost-crack/usr/sbin/
 	pod2man ./vhost-test-passwords > `pwd`/debian/bytemark-vhost-crack/usr/share/man/man1/vhost-test-passwords.1
