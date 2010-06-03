@@ -1,4 +1,4 @@
-Source: bytemark-vhost-monit
+Source: symbiosis-monit
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
@@ -6,7 +6,8 @@ Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 4.0.0), rdoc, txt2man
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-monit
+Package: symbiosis-monit
+Provides: bytemark-vhost-monit
 Architecture: all
 Depends: ruby, rdoc, cron
 Conflicts: monit

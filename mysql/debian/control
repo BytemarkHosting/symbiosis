@@ -1,4 +1,4 @@
-Source: bytemark-vhost-mysql
+Source: symbiosis-mysql
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
@@ -6,7 +6,8 @@ Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 4.0.0)
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-mysql
+Package: symbiosis-mysql
+Provides: bytemark-vhost-mysql
 Architecture: all
 Depends: mysql-server, debconf
 Description: A meta-package for MySQL

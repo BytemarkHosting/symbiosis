@@ -1,3 +1,9 @@
+symbiosis-ftpd (2010:0603-1) stable; urgency=low
+
+  * Renamed package
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 10:30:20 +0100
+
 bytemark-vhost-ftpd (2009:1021-1) stable; urgency=low
 
   * Correctly use the epoch.

@@ -1,4 +1,4 @@
-Source: bytemark-vhost-webmail
+Source: symbiosis-webmail
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
@@ -6,7 +6,8 @@ Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 4.0.0)
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-webmail
+Package: symbiosis-webmail
+Provides: bytemark-vhost-webmail
 Architecture: all
 Depends: squirrelmail
 Description: This package gives webmail access
