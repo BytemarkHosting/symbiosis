@@ -7,7 +7,8 @@ Build-Depends: debhelper (>= 7.0.0), cdbs
 Standards-Version: 3.8.0
 
 Package: symbiosis-key
-Provides: bytemark-vhost-key
+Replaces: bytemark-vhost-key
+Conflicts: bytemark-vhost-key
 Architecture: all
 Depends: gnupg, ${misc:Depends}
 Description: The Bytemark Debian package-signing key

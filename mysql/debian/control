@@ -7,7 +7,8 @@ Build-Depends: debhelper (>= 7.0.0)
 Standards-Version: 3.8.0
 
 Package: symbiosis-mysql
-Provides: bytemark-vhost-mysql
+Replaces: bytemark-vhost-mysql
+Conflicts: bytemark-vhost-mysql
 Architecture: all
 Depends: mysql-server, debconf, ${misc:Depends}
 Description: A meta-package for MySQL

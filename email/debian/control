@@ -9,7 +9,8 @@ Standards-Version: 3.8.0
 Package: symbiosis-email
 Architecture: all
 Depends: exim4-daemon-heavy, spamassassin, dovecot-imapd, dovecot-pop3d, clamav-daemon, ruby, perl, libsys-syslog-perl, adduser, make, rdoc, ${misc:Depends}
-Provides: bytemark-vhost-email
+Replaces: bytemark-vhost-email
+Conflicts: bytemark-vhost-email
 Description: A complete virtual hosting solution for email
  This package contains the infrastructure and configuration for a
  virtual hosting setup with full support for:

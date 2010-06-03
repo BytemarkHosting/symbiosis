@@ -7,7 +7,8 @@ Build-Depends: debhelper (>= 7.0.0), rdoc, txt2man
 Standards-Version: 3.8.0
 
 Package: symbiosis-test
-Provides: bytemark-vhost-test
+Replaces: bytemark-vhost-test
+Conflicts: bytemark-vhost-test
 Architecture: all
 Depends: ruby, libopenssl-ruby, ${misc:Depends}
 Description: Self-test scripts for the bytemark vhost project

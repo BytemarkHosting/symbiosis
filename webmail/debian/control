@@ -8,7 +8,8 @@ Standards-Version: 3.8.0
 Bugs: https://projects.bytemark.co.uk/projects/bytemarkvhost/issues
 
 Package: symbiosis-webmail
-Provides: bytemark-vhost-webmail
+Replaces: bytemark-vhost-webmail
+Conflicts: bytemark-vhost-webmail
 Architecture: all
 Depends: squirrelmail, ${misc:Depends}
 Description: This package gives webmail access
