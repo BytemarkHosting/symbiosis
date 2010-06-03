@@ -1,1 +1,2 @@
 /usr/sbin/dovecot_checkpassword /usr/sbin/checkpassword
+/usr/share/man/man1/dovecot_checkpassword.1.gz /usr/share/man/man1/checkpassword.1.gz
