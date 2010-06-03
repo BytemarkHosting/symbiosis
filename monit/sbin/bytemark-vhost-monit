@@ -168,6 +168,15 @@ syslog = Syslog.open(File.basename($0), Syslog::LOG_PID | Syslog::LOG_CONS, Sysl
 syslog.mask = Syslog::LOG_UPTO(Syslog::const_get("LOG_"+level))
 
 #
+# Bail out if dpkg is running.
+#
+
+if File.exists?("/tmp/dpkg.running")
+  print "dpkg running -- not conducting tests." if $VERBOSE
+  exit 0
+end
+
+#
 # Reopen stdout as a stringio, if we're going to send the output by mail
 #
 if send_mail

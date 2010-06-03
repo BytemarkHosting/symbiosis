@@ -76,7 +76,7 @@ linda: all
 #  Run "lintian" on all binary packages to test for Debian policy violations.
 #
 lintian: all
-	lintian -c --suppress-tags 'out-of-date-standards-version,latest-debian-changelog-entry-changed-to-native,empty-binary-package' *.changes
+	lintian -c --suppress-tags 'out-of-date-standards-version,latest-debian-changelog-entry-changed-to-native' *.changes
 
 
 
