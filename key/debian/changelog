@@ -1,6 +1,7 @@
 symbiosis-key (2010:0603-1) stable; urgency=low
 
   * Renamed package
+  * Tidied up packaging
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Jun 2010 10:31:18 +0100
 
