@@ -85,7 +85,7 @@ for i in /srv /srv/* ; do
         if [ -d $i ] ; then
             owner=`stat --format='%U.%G' $i`
             if [ "$owner" = "root.root" ]; then
-                chown -R admin.admin $i
+                chown -R admin:admin $i
             fi
         fi
     fi
