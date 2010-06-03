@@ -1,6 +1,6 @@
 #!/bin/sh
 
-
+set -e
 
 #
 # Skip, if we are not in "configure" state
