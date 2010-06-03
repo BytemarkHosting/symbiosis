@@ -34,7 +34,7 @@ all: dependencies
 	-touch all
 
 changelog:
-	 @date +%Y:%m%d-1
+	@date +%Y:%m%d-1
 
 #
 # If we're using sautobuild, then there is no need to check for dependencies
@@ -61,7 +61,7 @@ clean:
 	-rm libapache*
 	-find . -name '*.bak' -delete
 	-rm */*.1
-	for i in */; do pushd $$i; if [ -e Makefile ]; then make clean; fi ; popd; done
+	for i in */; do pushd $$i; if [ -e Makefile ]; then make clean; fi ; debuild clean ; popd; done
 
 
 
