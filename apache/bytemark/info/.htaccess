@@ -3,6 +3,6 @@ deny from all
 # local system
 allow from 127.0.0.1
 # Office allocation
-89.16.168.128/25
+allow from 89.16.168.128/25
 # openvpn range
 allow from 80.68.83.160/27
