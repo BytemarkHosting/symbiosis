@@ -146,7 +146,7 @@ if ( grep ^Inst "$tmp" 2>/dev/null >/dev/null ) ; then
     #  We're going to update now - overwrite the temporary file
     # with the output of the upgrade
     #
-    /usr/bin/apt-get $OPTIONS -y -u $METHOD &>"$tmp"
+    /usr/bin/apt-get $OPTIONS --yes --force-yes -u $METHOD &>"$tmp"
 
     #
     #  Send output by email if we have an email address setup
