@@ -11,7 +11,7 @@ Replaces: bytemark-vhost-mysql
 Conflicts: bytemark-vhost-mysql
 Architecture: all
 Depends: mysql-server, debconf, ${misc:Depends}
-Description: A meta-package for MySQL
+Description: A metapackage for MySQL
  This package ensures that the MySQL database will have a password setup.
  .
  Without this package installed the PHPMyAdmin package will be uninstallable.

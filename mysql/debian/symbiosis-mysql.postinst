@@ -100,7 +100,7 @@ fi
 #
 if ( grep ^bind-address /etc/mysql/my.cnf >/dev/null 2>/dev/null ); then
     sed -i~ -e "s/^bind-address[ \t]*=[ \t]*127.0.0.1/# \0/" /etc/mysql/my.cnf
-    invoke-rc.d mysql-server restart
+    invoke-rc.d mysql restart
 fi
 
 #DEBHELPER#
