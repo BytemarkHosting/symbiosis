@@ -51,28 +51,28 @@ if ( mysql --user=root --pass="" -e "SHOW DATABASES" 2>/dev/null >/dev/null ); t
     #
     #  Get the root password.
     #
-    db_input high bytemark-vhost-mysql/dbrootpass || true
+    db_input high symbiosis-mysql/dbrootpass || true
     db_go || true
-    db_get bytemark-vhost-mysql/dbrootpass
+    db_get symbiosis-mysql/dbrootpass
     eval rootpass'="$RET"'
 
     #
     #  Forget the answer.
     #
-    db_reset bytemark-vhost-mysql/dbrootpass
+    db_reset symbiosis-mysql/dbrootpass
 
     #
     #  Get the root password again
     #
-    db_input high bytemark-vhost-mysql/confirm || true
+    db_input high symbiosis-mysql/confirm || true
     db_go || true
-    db_get bytemark-vhost-mysql/confirm
+    db_get symbiosis-mysql/confirm
     eval confirm'="$RET"'
 
     #
     #  Forget the answer
     #
-    db_reset bytemark-vhost-mysql/confirm
+    db_reset symbiosis-mysql/confirm
 
     #
     #  Set the password
@@ -90,8 +90,8 @@ if ( mysql --user=root --pass="" -e "SHOW DATABASES" 2>/dev/null >/dev/null ); t
     #
     #  Forget the answer.
     #
-    db_reset bytemark-vhost-mysql/dbrootpass
-    db_reset bytemark-vhost-mysql/confirm
+    db_reset symbiosis-mysql/dbrootpass
+    db_reset symbiosis-mysql/confirm
 
 fi
 
