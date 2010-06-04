@@ -1,8 +1,9 @@
-symbiosis-firewall (2010:0603) stable; urgency=low
+symbiosis-firewall (2010:0604) stable; urgency=low
 
   [ Steve Kemp ]
   * Updated to provide a clean transition.
   * Updated the default location for the firewalls built-in rules
+  * Updated so that the firewall rules use the correct direction.
 
   [ Patrick J Cherry ]
   * Switched to dpkg-source 3.0 (native) format

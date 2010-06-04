@@ -1082,7 +1082,7 @@ sub processRule
                     addRule( $file, "# allow $src\n" );
                     addRule(
                         $file,
-                        "/sbin/iptables --append OUTPUT --protocol $protocol --destination-port $port --src $src -j ACCEPT"
+                        "/sbin/iptables --append INPUT --protocol $protocol --destination-port $port --src $src -j ACCEPT"
                     );
                 }
 
@@ -1097,7 +1097,7 @@ sub processRule
                          "# Incoming connections on $port globally allowed" );
                 addRule(
                     $file,
-                    "/sbin/iptables --append OUTPUT --protocol $protocol --destination-port $port -j ACCEPT"
+                    "/sbin/iptables --append INPUT --protocol $protocol --destination-port $port -j ACCEPT"
                 );
             }
         }
