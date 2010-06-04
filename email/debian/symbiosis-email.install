@@ -3,3 +3,4 @@ dovecot/                   etc/
 sbin/                      usr/
 cron.d/symbiosis-email     etc/cron.d/
 patterns.d/*.patterns      etc/firewall/patterns.d/
+test.d/*                   etc/bytemark-vhost/test.d/

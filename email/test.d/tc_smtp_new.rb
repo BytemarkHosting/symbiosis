@@ -91,7 +91,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def do_acl_setup
     # This file contains the settings we're using in the ACL tests, such as
     # domains.
-    @acl_config = YAML.load_file("acl_tests/settings.yaml")
+    @acl_config = YAML.load_file("exim4_acl_tests/settings.yaml")
 
     # Create srv directories for each of the local domains
     @acl_config['local_domains'].each{ |d| FileUtils.mkdir_p(File.join(@vhost_dir, d, @vhost_config_dir)) }
@@ -306,7 +306,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
     do_acl_setup()
 
     %w(normal_ip blacklisted_ip whitelisted_ip).each do |test|
-      do_acl_script('acl_tests/'+test)
+      do_acl_script('exim4_acl_tests/'+test)
     end
   end
 
@@ -316,25 +316,25 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
     config_dir = File.join(@vhost_dir, @acl_config['local_domains'].first, @vhost_config_dir)
     # If no antispam file is there we should accept
-    do_acl_script('acl_tests/antispam_accept')
+    do_acl_script('exim4_acl_tests/antispam_accept')
 
     # If one is there, we should reject
     FileUtils.touch(File.join(config_dir, "antispam"))
-    do_acl_script('acl_tests/antispam_reject')
+    do_acl_script('exim4_acl_tests/antispam_reject')
 
     # If the files is there, and starts with the word "tag" then accept the
     # mail (but tag it, although we can't test for that here)
     File.open(File.join(config_dir, "antispam"),"w+"){|fh| fh.puts("tag my mail")}
-    do_acl_script('acl_tests/antispam_accept')
+    do_acl_script('exim4_acl_tests/antispam_accept')
 
     # If the file is there and begins with anything other than "tag", then
     # reject the mail.
     File.open(File.join(config_dir, "antispam"),"w+"){|fh| fh.puts("please do not tag my mail")}
-    do_acl_script('acl_tests/antispam_reject')
+    do_acl_script('exim4_acl_tests/antispam_reject')
 
     # Test to make sure that when the file is unreadable, we default to reject
     FileUtils.chmod(0000,File.join(config_dir, "antispam"))
-    do_acl_script('acl_tests/antispam_reject')
+    do_acl_script('exim4_acl_tests/antispam_reject')
   end
 
   def test_acl_check_antivirus
@@ -345,30 +345,29 @@ class Exim4ConfigTest < Test::Unit::TestCase
     # Now do the same checks with anti-virus
     #
     # No anti-virus file? Then accept.
-    do_acl_script('acl_tests/antivirus_accept')
+    do_acl_script('exim4_acl_tests/antivirus_accept')
 
     # OK the file is there now, so reject (as per default)
     FileUtils.touch(File.join(config_dir, "antivirus"))
-    do_acl_script('acl_tests/antivirus_reject')
+    do_acl_script('exim4_acl_tests/antivirus_reject')
 
     # OK, now the file contains "tag" so accept, and tag
     File.open(File.join(config_dir, "antivirus"),"w+"){|fh| fh.puts("tag my mail")}
-    do_acl_script('acl_tests/antivirus_accept')
+    do_acl_script('exim4_acl_tests/antivirus_accept')
 
     # But now it has something other than tag, so reject!
     File.open(File.join(config_dir, "antivirus"),"w+"){|fh| fh.puts("please do not tag my mail")}
-    do_acl_script('acl_tests/antivirus_reject')
+    do_acl_script('exim4_acl_tests/antivirus_reject')
 
     # Test to make sure that when the file is unreadable, we default to reject
     FileUtils.chmod(0000,File.join(config_dir, "antivirus"))
-    do_acl_script('acl_tests/antivirus_reject')
+    do_acl_script('exim4_acl_tests/antivirus_reject')
   end
 
   def test_acl_check_port_587
     do_acl_setup
     # Test we can relay on port 587 from localhost
     # Test we can relay on port 587 from an allowed domain 
-    # Test we can relay on port 587 from a random IP, with authentication
     # Test we cannot relay on port 587 from a random IP, without authentication
 
     username = @acl_config['local_users'].first['username']
@@ -384,12 +383,6 @@ class Exim4ConfigTest < Test::Unit::TestCase
     do_exim4_bh(relay_ip, @acl_config['local_ip']+".587", script)
     
     script[-1][-1] = 550
-    do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip']+".587", script)
-    
-    plain = "\0#{username}\0#{password}".to_a.pack("m").chomp
-    script.insert(1,["AUTH PLAIN #{plain}", 235])
-    script[-1][-1] = 250
-
     do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip']+".587", script)
   end
 
@@ -538,34 +531,14 @@ class Exim4ConfigTest < Test::Unit::TestCase
   # REWRITES
   ################################################################################
 
-  # No rewrite rules, so nothing to do here
+  def test_localhost_rewrite
+    # TODO
+  end
 
   ################################################################################
   # AUTHENTICATION
   ################################################################################
 
-  def test_auth
-    do_acl_setup
-    username = @acl_config['local_users'].first['username']
-    password = @acl_config['local_users'].first['password']
-
-    plain = "\0#{username}\0#{password}".to_a.pack("m").chomp
-    script = [
-      ["EHLO test.test",  250],
-      ["AUTH PLAIN #{plain}", 235]
-    ]
-    do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip'], script)
-
-    enc_username = username.to_a.pack("m").chomp
-    enc_password = password.to_a.pack("m").chomp
-    script = [
-      ["EHLO test.test",  250],
-      ["AUTH LOGIN", 334],
-      ["#{enc_username}", 334],
-      ["#{enc_password}", 235]
-    ]
-    do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip'], script)
-
-  end
+  # This is now done externally.
 
 end
