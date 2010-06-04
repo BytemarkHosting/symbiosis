@@ -9,7 +9,12 @@ features
 
 1. crontabs for each site.
 
-2. per-vhost disable webstats flag.
+2.  While we want stats to be enabled or disabled on a per-domain basis
+   we want the default action, with no need for user-intervention, to be
+   stat generation.
+   On that basis we will always create stats, unless:
+      a) The htdocs/ directory is empty.
+      b) The file /srv/example.com/config/no-stats is present.
 
 3. check for disk space and alert on low-usage.
 
