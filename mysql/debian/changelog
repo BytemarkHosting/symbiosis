@@ -1,9 +1,11 @@
-symbiosis-mysql (2010:0603) stable; urgency=low
+symbiosis-mysql (2010:0604) stable; urgency=low
 
   * Renamed package
   * Switched to dpkg-source 3.0 (native) format
+  * Updated so that MySQL will be configured to listen globally, albeit
+    behind our firewall by default.
 
- -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:32 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 04 Jun 2010 11:05:11 +0000
 
 bytemark-vhost-mysql (20090707153244) stable; urgency=low
 
