@@ -1,3 +1,10 @@
+symbiosis-phpmyadmin (2010:0604) stable; urgency=low
+
+  * Removed our previously overlapping configuration file, and instead
+    symlink in the phpmyadmin package's configuration file.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 04 Jun 2010 16:33:16 +0000
+
 symbiosis-phpmyadmin (2010:0603) stable; urgency=low
 
   * Renamed package
