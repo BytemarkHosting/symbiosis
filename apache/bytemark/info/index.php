@@ -43,7 +43,7 @@ closedir($dir);
   <table>
   <tr><th>Package</th><th>Version</th></tr>
  <?php
-   $packages=`dpkg --list | awk '{print $2}' | grep bytemark|sort -u`;
+   $packages=`dpkg --list | grep ^ii | awk '{print $2}' | egrep '(bytemark|symbiosis)' |sort -u`;
    $array = preg_split( "/\s/", $packages, -1, PREG_SPLIT_NO_EMPTY );
    foreach ( $array as $package ) {
 	$version = `dpkg-query -W -f='\${Version}' $package 2>/dev/null`;
