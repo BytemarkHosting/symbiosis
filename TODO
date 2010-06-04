@@ -26,8 +26,6 @@ SSL
 1. Fixup the SSL certificate for any additional IPs.
    (#227001 has the problem and a solution.)
 
-2. The imager - CERT should be removed, and redone on post-install
-
 
 
 Email
