@@ -1,3 +1,9 @@
+symbiosis-pam (2010:0604) stable; urgency=low
+
+  * Fixed spelling mistake in package description.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 04 Jun 2010 14:40:14 +0100
+
 symbiosis-pam (2010:0603) stable; urgency=low
 
   * Renamed package
