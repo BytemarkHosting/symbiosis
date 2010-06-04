@@ -1,10 +1,11 @@
+This is Symbiosis.
+
 Authors: 
     Steve Kemp <steve@bytemark.co.uk>
     Patrick J. Cherry <patrick@bytemark.co.uk>
 
 Source: 
-    https://projects.bytemark.co.uk/projects/bytemarkvhost/repository
-    hg clone https://projects.bytemark.co.uk/hg/bytemark-vhost/
+    https://projects.bytemark.co.uk/projects/symbiosis/repository
 
 Copyright:
     Copyright (c) 2008-2010 Bytemark Computer Consulting Ltd
