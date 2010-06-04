@@ -12,11 +12,14 @@ fi
 
 
 #
-# Remove our prior configuration file.
+#  Remove old files
 #
-if [ -e /etc/apache2/conf.d/phpmyadmin.vhost.conf ]; then
-    rm /etc/apache2/conf.d/phpmyadmin.vhost.conf
-fi
+for i in phpmyadmin.vhost.conf phpadmin.conf phpmyadmin.conf ; do
+  if [ -e /etc/apache2/conf.d/$i ]; then
+    rm -f /etc/apache2/conf.d/$i
+  fi
+done
+
 
 #
 #  Ensure that the PHPMyAdmin configuration file is included.
