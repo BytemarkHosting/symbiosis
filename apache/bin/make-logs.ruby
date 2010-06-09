@@ -34,6 +34,7 @@
 
 require 'date'
 require 'fileutils'
+require 'getoptlong'
 require 'tmpdir'
 
 
@@ -103,7 +104,7 @@ def add_to_domain(dir, file )
   #  If we have a destination make the logs directory, if missing
   # and append the file to it.
   #
-  if ( dest.length )
+  if ( dest.length > 0 )
     if ( !File.directory?( dest ) )
       FileUtils.mkdir_p( dest )
     end
@@ -131,25 +132,21 @@ def has_content?( domain )
   #
   Dir.foreach("/srv/#{domain}/public/htdocs" ) do |entry|
     next if ( entry =~ /^\./ )
-
     count += 1;
   end
 
-  if ( count == 0 )
-    return false
-  else
-    return true
-  end
+  #
+  #  Did we find something?
+  #
+  return ( count != 0 )
 end
 
 
 #
-#  Are statistics generated for the domain
+#  Are statistics generated for the domain?
 #
 def stats_disabled_for_domain?( domain )
-
   return( File.exists?( "/srv/#{domain}/config/no-stats" ) )
-
 end
 
 
@@ -162,9 +159,26 @@ end
 
 
 #
+# Options parsing
+#
+opts = GetoptLong.new(
+                        [ "--verbose",    "-v", GetoptLong::NO_ARGUMENT ]
+                      )
+
+opts.each do |opt, arg|
+  case opt
+  when "--verbose"
+    $VERBOSE=1
+  end
+end
+
+#
 #  First of all exit if we don't have a logfile.
 #
-exit( 0 ) unless File.exists?( "/var/log/apache2/access.log" );
+if ( !File.exists?( "/var/log/apache2/access.log" ) )
+  puts( "Missing apache logfile: /var/log/apache2/access.log" ) if $VERBOSE
+  exit( 0 );
+end
 
 #
 #  Split the existing logfile into a number of files, one for each
@@ -191,7 +205,7 @@ Dir.foreach(dir) do |entry|
   #
   domain = add_to_domain( dir, entry );
 
-  domains[domain] = 1
+  domains[domain] = 1 if ( domain.length > 0 )
 end
 
 
@@ -201,6 +215,7 @@ end
 #
 domains.each_key do |domain|
 
+  puts "Processing log for domain #{domain}" if $VERBOSE
 
   #
   #  Resolve the logfile, regardless of whether we're going to make
@@ -210,7 +225,7 @@ domains.each_key do |domain|
 
 
   #
-  #  Now if we've got content
+  #  Now if we've got content.
   #
   if ( has_content?(domain) )
 
@@ -219,7 +234,7 @@ domains.each_key do |domain|
     #
     if ( stats_disabled_for_domain?( domain ) )
 
-      puts "Stats disabled for domain: #{domain}"
+      puts "\tStats disabled for domain: #{domain}" if $VERBOSE
 
     else
 
@@ -234,6 +249,9 @@ domains.each_key do |domain|
       #  If the webalizer file isn't present create it
       #
       if ( !File.exists?( "/srv/#{domain}/public/htdocs/stats/webalizer.conf" ) )
+
+        puts "\tCreating webalizer configuration file" if $VERBOSE
+
         File.open( "/srv/#{domain}/public/htdocs/stats/webalizer.conf", "w" ) do |f|
           f.write <<"EOF"
 
@@ -254,16 +272,19 @@ MangleAgents    4
 EOF
                                  end
 
-          #
-          #  Now run it
-          #
-          system( "cd /srv/#{domain}/public/htdocs/stats/ && webalizer -q /srv/#{domain}/public/logs/access.log.resolved" );
+        puts "\tRunning webalizer" if $VERBOSE
+
+
+        #
+        #  Now run it
+        #
+        system( "cd /srv/#{domain}/public/htdocs/stats/ && webalizer -q /srv/#{domain}/public/logs/access.log.resolved" );
       end
     end
 
   else
 
-      puts "Domain has no content: #{domain}"
+      puts "\tDomain has no content: #{domain}"
 
   end
 
@@ -284,7 +305,7 @@ EOF
   #
   date = Date.today.to_s
   File.rename( "/srv/#{domain}/public/logs/access.log.resolved",
-                "/srv/#{domain}/public/logs/access.log.#{date}" )
+               "/srv/#{domain}/public/logs/access.log.#{date}" )
 
 
   #
@@ -293,6 +314,7 @@ EOF
   Dir.new("/srv/#{domain}/public/logs").each do |name|
     if File.file?(name)
       if File.mtime(name) < Time.now - (60 * 60 * 24 * 10)
+        puts "\tCleaning up old logfile: #{name}" if $VERBOSE
         File.unlink(name)
       end
     end
@@ -300,6 +322,6 @@ EOF
 end
 
 #
-#  Finally cleanup the directory
+#  Finally cleanup the temporary directory
 #
 system( "rm -rf #{dir}" )
