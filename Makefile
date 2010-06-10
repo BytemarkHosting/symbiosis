@@ -53,6 +53,7 @@ clean:
 	-rm -f */debian/files
 	-rm -f */debian/*.log
 	-rm bytemark-vhost[-_]*
+	-rm bytemark-symbiosis[-_]*
 	-rm all
 	-rm -rf out/
 	-rm -rf staging/
