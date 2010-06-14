@@ -1,14 +1,14 @@
 #
 #  Nameserver records.
 #
-.$domain::a.ns.bytemark.co.uk
-.$domain::b.ns.bytemark.co.uk
-.$domain::c.ns.bytemark.co.uk
+.$domain::a.ns.bytemark.co.uk:300
+.$domain::b.ns.bytemark.co.uk:300
+.$domain::c.ns.bytemark.co.uk:300
 
 #
 #  The domain name itself
 #
-=$domain:$ip
+=$domain:$ip:300
 
 #
 #  Useful aliases.
