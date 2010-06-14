@@ -14,11 +14,10 @@
 #  Useful aliases.
 #
 +ftp.$domain:$ip:300
-+mx.$domain:$ip:300
 +www.$domain:$ip:300
 
 #
 #  MX record
 #
-@$domain:$ip:mx.$domain:15
+@$domain:$ip:mx.$domain:15:300
 
