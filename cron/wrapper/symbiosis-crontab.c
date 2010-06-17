@@ -182,8 +182,6 @@ int process_domains( const char *dirname )
            }
        }
 
-<<<<<<< /home/steve/hg/vhost.lenny/cron/wrapper/symbiosis-crontab.c
-
        /**
         * Build up the command to run, and execute it.
         */
@@ -191,15 +189,9 @@ int process_domains( const char *dirname )
                 "/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s)",
                 entry, pwd->pw_name  );
        fork_program( command );
-=======
-       snprintf(cmd, sizeof(cmd), "/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s",
-              entry, pwd->pw_name  );
+   }
 
-       system(cmd);
->>>>>>> /tmp/user/1000/symbiosis-crontab.c~other.SXgpWd
-     }
    closedir(dp);
-   return i;
 }
 
 
