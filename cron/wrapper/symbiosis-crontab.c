@@ -62,11 +62,10 @@ void fork_program( char *program )
  * looking for crontabs and invoking our ruby wrapper upon each valid
  * one we find.
  */
-int process_domains( const char *dirname )
+void process_domains( const char *dirname )
 {
    DIR *dp;
    struct dirent *dent;
-   int i = 0;
 
    /**
     * Open the directory.
@@ -75,7 +74,7 @@ int process_domains( const char *dirname )
    {
        if ( g_verbose )
            printf("opendir(%s) - failed\n", dirname );
-       return -1;
+       return;
    }
 
 
