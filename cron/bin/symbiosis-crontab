@@ -1,0 +1,48 @@
+#!/usr/bin/ruby
+
+require 'symbiosis/crontab'
+require 'getoptlong'
+
+test = false
+help = false
+mail_output = true
+
+opts = GetoptLong.new(
+  [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+  [ '--test', '-t', GetoptLong::NO_ARGUMENT ],
+  [ '--no-mail-output', '-n', GetoptLong::NO_ARGUMENT ]
+)
+
+
+opts.each do |opt, arg|
+  case opt
+    when '--help'
+      help = true
+    when '--test'
+      test = true
+    when '--no-mail-output'
+      mail_output = false
+    end
+end
+
+if help
+  puts "Write some help!"
+  exit 0
+end
+
+if ARGV.length != 1
+  puts "Missing filename argument (try --help)"
+  exit 1
+end
+
+filename = ARGV.shift
+
+crontab = Symbiosis::Crontab.new(filename)
+
+if test 
+  crontab.test
+else
+  crontab.mail_output = mail_output
+  crontab.run
+end
+
