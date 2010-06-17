@@ -47,7 +47,6 @@ int process_domains( const char *dirname )
    struct dirent *dent;
    int i = 0;
 
-
    /**
     * Open the directory.
     */
@@ -68,7 +67,7 @@ int process_domains( const char *dirname )
        struct stat crontab;
        struct passwd *pwd;
        char filename[ 1024 ] = { '\0'};
-
+       char cmd[2048] = { '\0'};
 
        /**
         * Get the name.
@@ -149,8 +148,10 @@ int process_domains( const char *dirname )
            }
        }
 
-       printf("system(/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s)\n",
+       snprintf(cmd, sizeof(cmd), "/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s",
               entry, pwd->pw_name  );
+
+       system(cmd);
      }
    closedir(dp);
    return i;
