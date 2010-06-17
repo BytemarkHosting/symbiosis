@@ -40,18 +40,18 @@ class Symbiosis
 
     def test
       cron_env = @environment.merge(ENV){|k,o,n| o}
-      puts "Environment\n"+"-"*11
-      %w(HOME LOGNAME SHELL PATH MAILTO).each do |k|
+      puts "Environment\n"+"-"*72
+      %w(HOME LOGNAME PATH MAILTO).each do |k|
         puts "#{k} = #{cron_env[k]}"
       end
-      puts "\nJobs next due"
-      puts "/"+"-"*78+"\\"
-      puts "| Date                      | Command"
-      puts "+"+"-"*27+"+"+"-"*51
+      puts "="*72+"\n\n"
+      puts "Jobs next due\n"+"-"*72
+      puts "Date                       Command"
+      puts "-"*72
       @records.each do |record|
-        puts "| "+record.next_due.iso8601+" | "+record.command
+        puts record.next_due.iso8601+"  "+record.command
       end
-      puts "\\"+"-"*78+"/"
+      puts "="*72
     end
 
     def run
