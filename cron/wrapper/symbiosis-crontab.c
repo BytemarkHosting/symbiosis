@@ -87,22 +87,18 @@ int process_domains( const char *dirname )
        struct stat domain;
        struct stat crontab;
        struct passwd *pwd;
-<<<<<<< /home/steve/hg/vhost.lenny/cron/wrapper/symbiosis-crontab.c
 
        /**
         * Filename of crontab, if it exists.
         */
        char filename[ 1024 ] = { '\0' };
 
-=======
-       char filename[ 1024 ] = { '\0'};
-       char cmd[2048] = { '\0'};
->>>>>>> /tmp/user/1000/symbiosis-crontab.c~other.SXgpWd
-
        /**
         * Command to run, if any.
         */
        char command[ 1024 ] = { '\0' };
+
+
        /**
         * Get the name.
         */
