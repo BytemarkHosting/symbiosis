@@ -36,6 +36,27 @@ int g_verbose = 0;
 
 
 
+
+/**
+ * fork() so that we can launch a program in the background.
+ */
+void fork_program( char *program )
+{
+  pid_t pid = fork();
+
+  if ( pid == 0 )
+  {
+    system( program );
+  }
+  else if (pid < 0)
+  {
+    printf("Fork failed\n");
+  }
+}
+
+
+
+
 /**
  * Process each entry beneath a given directory,
  * looking for crontabs and invoking our ruby wrapper upon each valid
@@ -67,9 +88,17 @@ int process_domains( const char *dirname )
        struct stat domain;
        struct stat crontab;
        struct passwd *pwd;
-       char filename[ 1024 ] = { '\0'};
+
+       /**
+        * Filename of crontab, if it exists.
+        */
+       char filename[ 1024 ] = { '\0' };
 
 
+       /**
+        * Command to run, if any.
+        */
+       char command[ 1024 ] = { '\0' };
        /**
         * Get the name.
         */
@@ -149,8 +178,14 @@ int process_domains( const char *dirname )
            }
        }
 
-       printf("system(/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s)\n",
-              entry, pwd->pw_name  );
+
+       /**
+        * Build up the command to run, and execute it.
+        */
+       snprintf(command, sizeof(command)-1,
+                "/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s)",
+                entry, pwd->pw_name  );
+       fork_program( command );
      }
    closedir(dp);
    return i;
