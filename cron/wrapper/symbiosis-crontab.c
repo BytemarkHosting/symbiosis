@@ -68,7 +68,6 @@ int process_domains( const char *dirname )
    struct dirent *dent;
    int i = 0;
 
-
    /**
     * Open the directory.
     */
@@ -88,12 +87,17 @@ int process_domains( const char *dirname )
        struct stat domain;
        struct stat crontab;
        struct passwd *pwd;
+<<<<<<< /home/steve/hg/vhost.lenny/cron/wrapper/symbiosis-crontab.c
 
        /**
         * Filename of crontab, if it exists.
         */
        char filename[ 1024 ] = { '\0' };
 
+=======
+       char filename[ 1024 ] = { '\0'};
+       char cmd[2048] = { '\0'};
+>>>>>>> /tmp/user/1000/symbiosis-crontab.c~other.SXgpWd
 
        /**
         * Command to run, if any.
@@ -178,6 +182,7 @@ int process_domains( const char *dirname )
            }
        }
 
+<<<<<<< /home/steve/hg/vhost.lenny/cron/wrapper/symbiosis-crontab.c
 
        /**
         * Build up the command to run, and execute it.
@@ -186,6 +191,12 @@ int process_domains( const char *dirname )
                 "/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s)",
                 entry, pwd->pw_name  );
        fork_program( command );
+=======
+       snprintf(cmd, sizeof(cmd), "/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s",
+              entry, pwd->pw_name  );
+
+       system(cmd);
+>>>>>>> /tmp/user/1000/symbiosis-crontab.c~other.SXgpWd
      }
    closedir(dp);
    return i;
