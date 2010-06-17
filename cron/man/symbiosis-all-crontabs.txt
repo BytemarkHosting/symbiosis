@@ -1,21 +1,9 @@
 
-=head1 NAME
+NAME
 
-symbiosis-crontab - Execute per-domain crontabs
+symbiosis-all-crontabs - Execute crontabs for all Symbiosis domains
 
-=cut
-
-=head1 SYNOPSIS
-
-  symbiosis-crontab [args]
-
-  Args:
-     --verbose   -  Display verbose information about execution.
-
-=cut
-
-
-=head1 ABOUT
+DESCRIPTION
 
 This script is designed to run non-interactively, it will iterate over
 all hosted virtual domains and execute the crontabs which might be present.
@@ -26,29 +14,22 @@ As a security measure it is mandatory that a crontab file, located beneath
 
 For each valid crontab file the B<TODO> ruby script will be launched.
 
-=cut
+OPTIONS
 
-=head1 BUGS
+   --verbose  Display verbose information about execution.
+
+BUGS
 
 None known.
 
-=cut
+AUTHOR
 
-=head1 AUTHOR
+Steve
+--
 
- Steve
- --
-
-=cut
-
-=head1 LICENSE
+LICENSE
 
 Copyright (c) 2010 by Bytemark Computer Consulting Ltd.
 All rights reserved.
 
-This program is free software;
-you can redistribute it and/or modify it under
-the same terms as Perl itself.
-The LICENSE file contains the full text of the license.
 
-=cut

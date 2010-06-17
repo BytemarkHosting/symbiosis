@@ -1,2 +1,2 @@
 # Run our wrapper once per minute, unless the binary has gone away.
-*/1 * * * * root [ -x /sbin/symbiosis-crontab ] && /sbin/symbiosis-crontab
+*/1 * * * * root [ -x /usr/sbin/symbiosis-all-crontabs ] && /usr/sbin/symbiosis-all-crontabs

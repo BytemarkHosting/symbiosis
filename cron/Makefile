@@ -2,13 +2,17 @@
 all: binary man
 
 clean:
-	$(RM) wrapper/symbiosis-crontab || true
-	$(RM) manpages/*.1 || true
+	$(RM) wrapper/symbiosis-all-crontabs
+	$(RM) man/*.man
 
-binary:	wrapper/symbiosis-crontab.c
-	gcc -Wall -o wrapper/symbiosis-crontab wrapper/symbiosis-crontab.c
+binary: wrapper/symbiosis-all-crontabs
 
-man:
-	pod2man ./manpages/symbiosis-crontab.pod > ./manpages/symbiosis-crontab.1
+man: man/symbiosis-all-crontabs.man man/symbiosis-crontab.man
+
+wrapper/symbiosis-all-crontabs:	wrapper/symbiosis-all-crontabs.c
+	gcc -Wall -o wrapper/symbiosis-all-crontabs wrapper/symbiosis-all-crontabs.c
+
+%.man: %.txt
+	txt2man -s 1 -t $(basename $(notdir $<)) $< | sed -e 's/\\\\fB/\\fB/' > $@
 
 .PHONY: binary clean man all
