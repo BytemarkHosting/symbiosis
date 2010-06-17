@@ -149,7 +149,7 @@ int process_domains( const char *dirname )
            }
        }
 
-       printf("system(/bin/su -s /bin/sh -c '/usr/bin/crontab /srv/%s' %s)\n",
+       printf("system(/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s)\n",
               entry, pwd->pw_name  );
      }
    closedir(dp);
