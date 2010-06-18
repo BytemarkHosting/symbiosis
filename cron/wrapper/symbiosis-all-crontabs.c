@@ -1,5 +1,8 @@
 /**
- * setuid crontab wrapper
+ *
+ * A wrapper script which will do some simple permission and file-presence
+ * checks, then launch the symbiosis-crontab command for each domain which
+ * is present.
  *
  * The way this script works is pretty simple:
  *
@@ -42,16 +45,16 @@ int g_verbose = 0;
  */
 void fork_program( char *program )
 {
-  pid_t pid = fork();
+    pid_t pid = fork();
 
-  if ( pid == 0 )
-  {
-    system( program );
-  }
-  else if (pid < 0)
-  {
-    printf("Fork failed\n");
-  }
+    if ( pid == 0 )
+    {
+        system( program );
+    }
+    else if (pid < 0)
+    {
+        printf("Fork failed\n");
+    }
 }
 
 
@@ -99,7 +102,7 @@ void process_domains( const char *dirname )
 
 
        /**
-        * Get the name.
+        * Get the name of this entry beneath /srv
         */
        const char *entry = dent->d_name;
 
@@ -107,8 +110,9 @@ void process_domains( const char *dirname )
        if ( g_verbose )
            printf("Read entry: %s\n", entry );
 
+
        /**
-        * Skip dotfiles
+        * Skip any dotfiles we might have found.
         */
        if ( ( entry == NULL ) ||
             ( entry[0] == '.' ) )
@@ -132,7 +136,18 @@ void process_domains( const char *dirname )
                       entry );
            continue;
        }
+       else
+       {
+           if ( S_ISDIR(crontab.st_mode) )
+           {
+               if ( g_verbose )
+                   printf("\tIgnoring as /srv/%s/config/crontab is a directory\n",
+                          entry);
 
+               continue;
+           }
+
+       }
 
        /**
         * OK we have /srv/$name & /srv/$name/config/crontab.
@@ -181,8 +196,12 @@ void process_domains( const char *dirname )
         * Build up the command to run, and execute it.
         */
        snprintf(command, sizeof(command)-1,
-                "/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s)",
+                "/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s",
                 entry, pwd->pw_name  );
+
+       if ( g_verbose )
+           printf("Launching: %s\n", command );
+
        fork_program( command );
    }
 
@@ -199,13 +218,61 @@ void process_domains( const char *dirname )
 int main( int argc, char *argv[] )
 {
     int i;
+    struct stat statbuf;
 
+    /**
+     * Parse arguments looking for a verbose flag.
+     */
     for ( i = 1; i < argc; i++ )
     {
         if ( strcasecmp( argv[i], "--verbose" ) == 0 )
           g_verbose = 1;
     }
 
+
+    /**
+     * See if we have our helper present.
+     */
+    if ( stat( "/usr/bin/symbiosis-crontab", &statbuf ) != 0 )
+    {
+        if ( g_verbose )
+            printf("Our helper is missing: /usr/bin/symbiosis-crontab\n" );
+
+        return -1;
+    }
+
+
+    /**
+     * Ensure that /srv is present.
+     */
+    if ( stat( "/srv", &statbuf ) != 0 )
+    {
+        if ( g_verbose )
+            printf( "/srv isn't present.\n" );
+
+        return -1;
+    }
+
+    /**
+     * Ensure /srv is a directory.
+     */
+    if ( ! S_ISDIR( statbuf.st_mode ) )
+    {
+        if ( g_verbose )
+            printf( "/srv isn't a directory.\n" );
+
+        return -1;
+    }
+
+
+    /**
+     * OK we're good to proceed.
+     */
     process_domains( "/srv/" );
+
+
+    /**
+     * All done.
+     */
     return 0;
 }
