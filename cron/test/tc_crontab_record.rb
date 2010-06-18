@@ -4,6 +4,77 @@ require 'test/unit'
 require 'symbiosis/crontab'
 require 'pp'
 
+class TestCrontab < Test::Unit::TestCase
+
+  def setup
+    @crontab = nil
+  end
+
+  def teardown
+  end
+
+  def test_documentation_example
+
+    assert_nothing_raised do
+      # Note this crontab has no newline at the end.  Specially for Mr Howells.
+      @crontab = Symbiosis::Crontab.new " 
+#
+# Send any output to Bob
+#
+MAILTO=bob@my-brilliant-site.com
+
+#
+# run at 18:40 every day
+#
+40 18 * * *       echo Hello Dave.
+
+#
+# run at 9am every Monday - Friday
+#
+0   9 * * mon-fri wget http://www.my-brilliant-site.com/cron.php
+
+#
+# Run once a month
+#
+@monthly          /usr/local/bin/monthly-job.sh"
+    end
+
+    assert_equal("bob@my-brilliant-site.com",@crontab.environment["MAILTO"])
+    
+    # Test first entry -- run at 18:40 every day
+    #
+    record = @crontab.records[0]
+    assert_equal([40], record.min)
+    assert_equal([18], record.hour)
+    assert_equal((1..31).to_a, record.mday)
+    assert_equal((1..12).to_a, record.mon)
+    assert_equal((0..6).to_a, record.wday)
+    assert_equal("echo Hello Dave.", record.command)
+
+    # Next entry -- run at 9am every Monday - Friday
+    #
+    record = @crontab.records[1]
+    assert_equal([0], record.min)
+    assert_equal([9], record.hour)
+    assert_equal((1..31).to_a, record.mday)
+    assert_equal((1..12).to_a, record.mon)
+    assert_equal((1..5).to_a, record.wday)
+    assert_equal("wget http://www.my-brilliant-site.com/cron.php", record.command)
+
+    # Next entry -- Run once a month
+    #
+    record = @crontab.records[2]
+    assert_equal([0], record.min)
+    assert_equal([0], record.hour)
+    assert_equal([1], record.mday)
+    assert_equal((1..12).to_a, record.mon)
+    assert_equal((0..6).to_a, record.wday)
+    assert_equal("/usr/local/bin/monthly-job.sh", record.command)
+  end
+
+end
+
+
 class TestCrontabRecord < Test::Unit::TestCase
 
   def setup

@@ -45,13 +45,16 @@ class Symbiosis
     # * environment is a hash containing environment variables set in the crontab
     # * mailcommand 
     #
-    attr_reader :records, :filename, :crontab
+    attr_reader :records, :filename, :crontab, :environment
 
     #
     # This takes an argument of a crontab in a string, or a filename.  If a
     # filename is given, it will be read.  Otherwise the string will be parsed. 
     #
     def initialize(string_or_filename = "")
+      # Must be a string!
+      raise ArgumentError unless string_or_filename.is_a?(String)
+
       @records     = []
       @environment = {}
       if File.exists?(string_or_filename)
@@ -59,7 +62,7 @@ class Symbiosis
         @crontab = File.open(string_or_filename){|fh| fh.read} 
       else
         @filename = "string input"
-        @crontab = @string_or_filename
+        @crontab = string_or_filename
       end
       @mail_output = true
       @mail_command = "/usr/lib/sendmail -t"
