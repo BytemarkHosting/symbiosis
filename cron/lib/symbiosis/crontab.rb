@@ -96,7 +96,7 @@ class Symbiosis
         puts "#{k} = #{cron_env[k]}"
       end
       puts "="*72+"\n\n"
-      puts "Jobs next due\n"+"-"*72
+      puts "Jobs next due -- Local time #{Time.now.iso8601}\n"+"-"*72
       puts "Date                       Command"
       puts "-"*72
       @records.each do |record|
