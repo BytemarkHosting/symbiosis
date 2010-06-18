@@ -223,7 +223,7 @@ class TestCrontabRecord < Test::Unit::TestCase
     @crontab_record = Symbiosis::CrontabRecord.parse("* * * * mon-fri do my bidding")
     assert_equal((1..5).to_a, @crontab_record.wday)
 
-    @crontab_record = Symbiosis::CrontabRecord.parse("* * * * sat,sun do my bidding")
+    @crontab_record = Symbiosis::CrontabRecord.parse("* * * * sat-sun do my bidding")
     assert_equal([0,6], @crontab_record.wday)
 
     # Stupid people not reading instructions.
@@ -250,6 +250,10 @@ class TestCrontabRecord < Test::Unit::TestCase
     # make sure that the regexp starts from the beginning of a word.
     @crontab_record = Symbiosis::CrontabRecord.parse("* * * janjan,marfeb * do my bidding")
     assert_equal([1,3], @crontab_record.mon)
+
+    # Test year boundary parsing
+    @crontab_record = Symbiosis::CrontabRecord.parse("* * * nov-feb * do my bidding")
+    assert_equal([1,2,11,12], @crontab_record.mon)
   end
 
 end

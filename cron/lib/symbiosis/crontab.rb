@@ -284,15 +284,21 @@ class Symbiosis
         r, every = r.split("/")
         every = every ? every.to_i : 1
         f,l = r.split("-")
-        if f == "*"
-          range = first..last
+        range = if f == "*"
+          first..last
         else
           l = f if l.nil?
-          # make sure we have integers, and the range goes the right way
-          f,l = [f,l].collect{|n| n.to_i}.sort
+          # make sure we have integers
+          f,l = [f,l].collect{|n| n.to_i}
+          # make sure everything is within ranges 
           raise CrontabFormatError.new "out of range (#{f} for #{first}..#{last})" unless (first..last).include?(f)
           raise CrontabFormatError.new "out of range (#{l} for #{first}..#{last})" unless (first..last).include?(l)
-          range = f..l
+          # deal with out-of-order ranges
+          if l < f
+            (f..last).to_a + (first..l).to_a
+          else
+            f..l
+          end
         end
         range.to_a.find_all{|i| (i - first) % every == 0}
       }.flatten.sort.uniq
