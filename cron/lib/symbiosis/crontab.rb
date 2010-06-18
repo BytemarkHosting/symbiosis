@@ -1,8 +1,30 @@
+# symbiosis/crontab.rb
 #
 # Based on http://www.notwork.org/~gotoken/ruby/p/crontab/crontab/crontab.rb
+# by Kentaro Goto <gotoken@gmail.com>.
 #
-# Unsure of copyright.
-
+# Modifications were made by Patrick J Cherry <patrick@bytemark.co.uk> for the
+# Bytemark Symbiosis system
+#
+# HISTORY 
+# 
+#  2010-06-17: Reworked for Symbiosis <patrick@bytemark.co.uk>
+#  2001-01-04: (BUG) camma and slash were misinterpreted <gotoken#notwork.org>
+#  2000-12-31: replaced Array#filter with collect! <zn#mbf.nifty.com>
+#  2000-07-06: (bug) Crontab#run throws block <gotoken#notwork.org>
+#  2000-07-03: (bug) open->File::open <gotoken#notwork.org>
+#  2000-04-07: Error is subclass of StandardError <matz#netlab.co.jp>
+#  2000-04-06: Fixed bugs. <c.hintze#gmx.net>
+#  2000-04-06: Started. <gotoken#notwork.org>
+#
+# COPYRIGHT
+#
+# This code is released under the same terms as Ruby itself.  See LICENCE for
+# more details.  
+#
+# (c) 2000-1 Kentaro Goto
+# (c) 2010 Bytemark Computer Consulting Ltd
+#
 
 require 'stringio'
 require 'net/smtp'
@@ -12,8 +34,23 @@ class Symbiosis
 
   class Crontab
     
+    #
+    # Class variables
+    #
+    # * records is an array of crontab records
+    # * filename is the name of the file originally read or "string input" if
+    #   no file was read
+    # * crontab is the original string input to parse.
+    # * mail_output is a flag determining if output should be sent by email
+    # * environment is a hash containing environment variables set in the crontab
+    # * mailcommand 
+    #
     attr_reader :records, :filename, :crontab
 
+    #
+    # This takes an argument of a crontab in a string, or a filename.  If a
+    # filename is given, it will be read.  Otherwise the string will be parsed. 
+    #
     def initialize(string_or_filename = "")
       @records     = []
       @environment = {}
@@ -25,19 +62,30 @@ class Symbiosis
         @crontab = @string_or_filename
       end
       @mail_output = true
+      @mail_command = "/usr/lib/sendmail -t"
 
-      parse(crontab)
+      parse(@crontab)
     end
 
+    # 
+    # An iterator for each record.
+    #
     def each(&block)
       @records.each(&block)
     end
 
+    #
+    # This sets the flag to mail output
+    #
     def mail_output=(n)
       raise ArgumentError unless n.is_a?(TrueClass) or n.is_a?(FalseClass)
       @mail_output = n
     end
 
+    #
+    # This prints the cron environment, and the date/time when each job will
+    # next run.
+    #
     def test
       cron_env = @environment.merge(ENV){|k,o,n| o}
       puts "Environment\n"+"-"*72
@@ -54,6 +102,9 @@ class Symbiosis
       puts "="*72
     end
 
+    #
+    # This runs each crontab record.
+    #
     def run
       old_env = {}
       @environment.each do |k,v|
@@ -95,7 +146,7 @@ class Symbiosis
         mail << ""
         mail << output.join
         if @mail_output
-          IO.popen("/usr/sbin/exim4 -bm -t","w+") do |pipe|
+          IO.popen(@mail_command,"w+") do |pipe|
             pipe.write mail.join("\n")
             pipe.close
           end 
@@ -136,12 +187,14 @@ class Symbiosis
 
     WDAY = %w(sun mon tue wed thu fri sat)
 
+    MON  = %w(jan feb mar apr may jun jul aug sep oct nov dec)
+
     SHORTCUTS = {
        "(?:year|annual)ly"  => "0 0 1 1 *",
-       "monthly"          => "0 0 1 * *",
-       "weekly"           => "0 0 * * 0",
+       "monthly"            => "0 0 1 * *",
+       "weekly"             => "0 0 * * 0",
        "(?:daily|midnight)" => "0 0 * * *",
-       "hourly"           => "0 * * * *"
+       "hourly"             => "0 * * * *"
     }
 
     def self.parse(str)
@@ -157,6 +210,10 @@ class Symbiosis
         
         wday = wday.downcase.gsub(/#{WDAY.join("|")}/){
           WDAY.index($&)
+        }
+        
+        mon = mon.downcase.gsub(/#{MON.join("|")}/){
+          MON.index($&)
         }
 
         self.new(min, hour, mday, mon, wday, command)
