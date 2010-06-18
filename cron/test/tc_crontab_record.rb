@@ -141,4 +141,44 @@ class TestCrontabRecord < Test::Unit::TestCase
     end
   end
 
+  def test_wday_names
+    names = %w(sun mon tue wed thu fri sat sun)
+    values = [0,1,2,3,4,5,6,0]
+    names.each_with_index do |wday,ind|
+      @crontab_record = Symbiosis::CrontabRecord.parse("* * * * #{wday} do my bidding")
+      assert_equal([values[ind]], @crontab_record.wday)
+    end
+
+    @crontab_record = Symbiosis::CrontabRecord.parse("* * * * mon-fri do my bidding")
+    assert_equal((1..5).to_a, @crontab_record.wday)
+
+    @crontab_record = Symbiosis::CrontabRecord.parse("* * * * sat,sun do my bidding")
+    assert_equal([0,6], @crontab_record.wday)
+
+    # Stupid people not reading instructions.
+    @crontab_record = Symbiosis::CrontabRecord.parse("* * * * sUnDaY-SATURDAY do my bidding")
+    assert_equal((0..6).to_a, @crontab_record.wday)
+  end
+
+  def test_mon_names
+    names = %w(jan feb mar apr may jun jul aug sep oct nov dec)
+    values =   [1, 2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12]
+    names.each_with_index do |mon,ind|
+      @crontab_record = Symbiosis::CrontabRecord.parse("* * * #{mon} * do my bidding")
+      assert_equal([values[ind]], @crontab_record.mon)
+    end
+
+    # a range of names
+    @crontab_record = Symbiosis::CrontabRecord.parse("* * * jan,mar,jun-sep * do my bidding")
+    assert_equal([1,3,6,7,8,9], @crontab_record.mon)
+
+    # test long names
+    @crontab_record = Symbiosis::CrontabRecord.parse("* * * january,february,march,april,may,june,july,august,september,october,november,december * do my bidding")
+    assert_equal((1..12).to_a, @crontab_record.mon)
+   
+    # make sure that the regexp starts from the beginning of a word.
+    @crontab_record = Symbiosis::CrontabRecord.parse("* * * janjan,marfeb * do my bidding")
+    assert_equal([1,3], @crontab_record.mon)
+  end
+
 end

@@ -207,13 +207,16 @@ class Symbiosis
         SHORTCUTS.collect{|shortcut, snippet| str.sub!(/\A\s*@#{shortcut}/, snippet)}
 
         min, hour, mday, mon, wday = str.split(/\s+/).first(5)
-        
-        wday = wday.downcase.gsub(/#{WDAY.join("|")}/){
-          WDAY.index($&)
+       
+        # This regexp makes sure we start at a word boundary (\b), and can take
+        # names longer than the ones specified. 
+        wday = wday.downcase.gsub(/\b(#{WDAY.join("|")})[a-z]*/){
+          WDAY.index($1)
         }
-        
-        mon = mon.downcase.gsub(/#{MON.join("|")}/){
-          MON.index($&)
+ 
+        # Same as above, but have to add one, as months start at 1 not 0.
+        mon = mon.downcase.gsub(/\b(#{MON.join("|")})[a-z]*/){
+          MON.index($1)+1
         }
 
         self.new(min, hour, mday, mon, wday, command)
