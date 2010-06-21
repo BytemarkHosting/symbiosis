@@ -1,5 +1,5 @@
 var/backups/localhost/
 var/backups/mysql/
 usr/share/bug/symbiosis-backup/
-etc/bytemark-vhost/backup.d/
+etc/symbiosis/backup.d/
 usr/share/lintian/overrides/

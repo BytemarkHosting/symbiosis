@@ -23,6 +23,6 @@ clean:
 	@rm -f $(conf_tmp)
 	@rm -f $(conf)
 
-.PHONY:  clean all 
+.PHONY:  clean all
 
 .PRECIOUS: $(conf)
