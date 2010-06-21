@@ -18,7 +18,7 @@ create-dns - Create tinydns snippets for each hosted domain
    --manual      Read the manual for this script.
    --verbose     Show useful debugging information.
    --prefix      Directory beneath which domains are found (default: /srv)
-   --template    DNS template file (default: /etc/bytemark-vhost/dns.d/template)
+   --template    DNS template file (default: /etc/symbiosis/dns.d/template)
    --output      Directory where the DNS data should be output (default: /root/BytemarkDNS)
 
 =cut
@@ -73,7 +73,7 @@ my %CONFIG;
 #
 $CONFIG{ 'prefix' }   = "/srv";
 $CONFIG{ 'output' }   = "/root/BytemarkDNS";
-$CONFIG{ 'template' } = "/etc/bytemark-vhost/dns.d/template";
+$CONFIG{ 'template' } = "/etc/symbiosis/dns.d/template";
 
 
 #
