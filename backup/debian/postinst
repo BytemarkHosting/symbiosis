@@ -53,5 +53,14 @@ cd /etc/symbiosis/backup.d/ && make
 ##
 ln -sf /etc/symbiosis/backup.d/backup2l.conf $conf
 
+
+#
+#  Obsolete files?  Remove them
+#
+if [ -d /etc/bytemark-vhost/backup.d ]; then
+    rm -rf  /etc/bytemark-vhost/backup.d
+fi
+
+
 #DEBHELPER#
 exit 0
