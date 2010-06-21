@@ -11,10 +11,13 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
-#  Remove old file
+#  Remove old and obsolete files/directories.
 #
 if [ -e /etc/bytemark.dns.template ]; then
     rm -f /etc/bytemark.dns.template
+fi
+if [ -d /etc/bytemark-vhost/dns.d ]; then
+    rm -rf /etc/bytemark-vhost/dns.d
 fi
 
 
