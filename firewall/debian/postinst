@@ -53,7 +53,6 @@ if [ "$incoming" = "0" ]; then
     touch  /etc/firewall/incoming.d/50-pop3
     touch  /etc/firewall/incoming.d/55-dns
     touch  /etc/firewall/incoming.d/60-pop3s
-    touch  /etc/firewall/incoming.d/65-mysql
     touch  /etc/firewall/incoming.d/70-smtp
     touch  /etc/firewall/incoming.d/75-ntp
     touch  /etc/firewall/incoming.d/80-smtps
