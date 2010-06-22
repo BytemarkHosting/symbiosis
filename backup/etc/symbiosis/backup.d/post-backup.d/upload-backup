@@ -4,7 +4,7 @@
 # backup space associated with this machine and upload the local
 # contents to it.
 #
-#  If there is a file "/etc/bytemark-vhost/dns.d/backup.name" it
+#  If there is a file "/etc/symbiosis/dns.d/backup.name" it
 # is assumed to contain the name of the backup space to use, otherwise
 # the name will be determined dynamically via a DNS lookup.
 #
@@ -47,8 +47,8 @@ name=$(dig txt  $four.$three.$two.$one.backup-reverse.bytemark.co.uk +short | tr
 #  If there is a hardwired result then we'll use that in preference
 # to the name returned from the DNS lookup.
 #
-if [ -e /etc/bytemark-vhost/dns.d/backup.name ]; then
-    name=$(cat /etc/bytemark-vhost/dns.d/backup.name)
+if [ -e /etc/symbiosis/dns.d/backup.name ]; then
+    name=$(cat /etc/symbiosis/dns.d/backup.name)
 fi
 
 

@@ -11,14 +11,14 @@
 #
 # -d, --directory <directory>:
 #   The directory which contains the scripts to be run.  The default is
-#   /etc/bytemark-vhost/monit.d/
+#   /etc/symbiosis/monit.d/
 #
 # -m, --send-mail:
 #   If any of the tests fail, send an email containing a pass/fail summary.
 #   Use the verbose flag if more detail is required.
 #
 # -a, --always-mail:
-#   Always send the email summary.   
+#   Always send the email summary.
 #
 # -t, --mailto <email>:
 #   Set the to address for the email notification.  The default address is
@@ -56,7 +56,7 @@
 #
 # If a script exits with a status equal to certain pre-defined values, it is
 # deemed to be a bad test.  Results of tests returning any of these bad
-# statuses are not routinely reported.  
+# statuses are not routinely reported.
 #
 # Currently the bad test statuses are
 #   * EX_USAGE (64) -- command line usage error
@@ -115,7 +115,7 @@ mailfrom_addr = user+"@"+hostname
 mailto_addr   = "root@"+hostname
 always_mail   = false
 send_mail     = false
-dir           = "/etc/bytemark-vhost/monit.d/"
+dir           = "/etc/symbiosis/monit.d/"
 level         = "INFO"
 
 #
@@ -148,7 +148,7 @@ opts.each do |opt, arg|
     RDoc::usage
   when "--mailto"
     send_mail = true
-    mailto_addr = arg 
+    mailto_addr = arg
   when "--mailfrom"
     mailfrom_addr = arg
   when "--directory"
@@ -158,7 +158,7 @@ opts.each do |opt, arg|
   end
 end
 
-unless %w(EMERG ALARM CRIT ERR WARNING NOTICE INFO DEBUG).include?(level) 
+unless %w(EMERG ALARM CRIT ERR WARNING NOTICE INFO DEBUG).include?(level)
   raise "Bad log level #{level}"
 end
 #
@@ -233,18 +233,18 @@ tests.each do |test|
     #
     raise RuntimeError, "Somehow the command #{cmd} didn't execute." unless $?.is_a?(Process::Status)
     raise RuntimeError, "Process IDs don't match." if pid != $?.pid
-    
+
     err = SystemExit.new($?.exitstatus)
     err.set_backtrace cmd_output
 
     raise err unless $?.success?
 
-    # 
+    #
     # Log retry success
     #
     msg = "#{test}: PASS" + (retried ? " (on retry)": "")
     if retried
-      retried_tests << test 
+      retried_tests << test
       syslog.log(Syslog::LOG_INFO, msg)
     end
     puts " * "+msg
@@ -259,22 +259,22 @@ tests.each do |test|
     #
     # Check the exitstatus
     #
-    case 
-      # 
+    case
+      #
       # These are two config failures, that we'll ignore
       # These next two codes are returned by bash/sh
       #
       when [SystemExit::EX_USAGE, SystemExit::EX_CONFIG, 126, 127].include?(err.status)
         msg = "#{test}: Usage/config failure"
         syslog.log(Syslog::LOG_INFO, msg)
-        puts " * "+msg 
+        puts " * "+msg
         duff_tests << test
 
       #
       # If we get a temporary failure, retry!
       #
       when ( SystemExit::EX_TEMPFAIL == err.status and not retried )
-        msg = "#{test}: Temporary failure -- retrying" 
+        msg = "#{test}: Temporary failure -- retrying"
         syslog.log(Syslog::LOG_INFO, msg)
         puts " * "+msg if $VERBOSE
 
@@ -282,7 +282,7 @@ tests.each do |test|
         retry
 
       else
-        # 
+        #
         # Log the failure
         #
         msg = "#{test}: FAIL: #{err.to_s}"
@@ -306,7 +306,7 @@ puts "-"*72 if $VERBOSE
 msg = []
 n_actual_tests = tests.length - duff_tests.length
 msg << "#{duff_tests.length}/#{tests.length} not conducted due to configuration / usage errors" if duff_tests.length > 0
-msg << "#{n_actual_tests - retried_tests.length - failed_tests.length}/#{n_actual_tests} tests passed on first attempt." 
+msg << "#{n_actual_tests - retried_tests.length - failed_tests.length}/#{n_actual_tests} tests passed on first attempt."
 msg << "#{retried_tests.length}/#{n_actual_tests} tests passed on second attempt." if retried_tests.length > 0
 msg << "#{failed_tests.length}/#{n_actual_tests} tests failed."  if failed_tests.length > 0
 
@@ -322,10 +322,10 @@ EOF
 
 #
 # set stdout back to normal if needed
-# 
+#
 $stdout = STDOUT if $stdout.is_a?(StringIO)
 
-if send_mail and (always_mail or failed_tests.length > 0) 
+if send_mail and (always_mail or failed_tests.length > 0)
   msg =<<EOF
 To: #{mailto_addr}
 From: #{mailfrom_addr}
