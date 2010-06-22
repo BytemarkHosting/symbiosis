@@ -3,14 +3,14 @@
                          {exists{CLAMAV_SOCKET}} \
                        }}
         malware      = */defer_ok
-        add_header   = X-Anti-Virus: infected ${malware_name}
+        set acl_m3   = $acl_m3\nX-Anti-Virus: infected ${malware_name}
 
   warn  condition    = ${if and{\
                          {def:acl_m2} \
                          {exists{CLAMAV_SOCKET}} \
                        }}
         !malware     = */defer_ok
-        add_header   = X-Anti-Virus: not infected
+        set acl_m3   = $acl_m3\nX-Anti-Virus: clean
 
   deny  condition    = ${if and{\
                          {eq{$acl_m2}{reject}} \

@@ -59,3 +59,6 @@ no_queue_list_requires_admin
 daemon_smtp_ports = 25 : 465 : 587
 
 
+# Use the system filter to remove extra headers
+system_filter = ETC_DIR/exim4/system_filter
+
