@@ -7,13 +7,21 @@
 #
 
 
+PREFIX=/etc/symbiosis/test.d
+
+if [ ! -d $PREFIX ]; then
+    exit
+fi
+
 #
 #  Go to the correct directory
 #
-cd /etc/bytemark-vhost/test.d/
+cd $PREFIX
 
-for i in /etc/bytemark-vhost/test.d/tc_*.rb ; do
-
+#
+#  Run all tests.
+#
+for i in $PREFIX/tc_*.rb ; do
     if [ -e $i ]; then
         if [ -x $i ]; then
             echo "Running  : $(basename $i)"

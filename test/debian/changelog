@@ -1,3 +1,10 @@
+symbiosis-test (2010:0623) stable; urgency=low
+
+  * Updated to load tests from /etc/symbiosis/test.d/ not
+    /etc/bytemark-vhost.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 23 Jun 2010 12:14:16 +0000
+
 symbiosis-test (2010:0610) stable; urgency=low
 
   * Updated standards versions.
