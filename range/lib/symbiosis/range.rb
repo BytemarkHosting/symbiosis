@@ -8,7 +8,7 @@ module Symbiosis
 
   class Range
 
-    BYTEMARK_RANGES = %w(80.68.80.0/20 89.16.160.0/20 212.110.160.0/19 2001:41c8::/32).collect{|i| IPAddr.new(i)}
+    BYTEMARK_RANGES = %w(80.68.80.0/20 89.16.160.0/19 212.110.160.0/19 2001:41c8::/32).collect{|i| IPAddr.new(i)}
 
     BACKUP_SPACE_FILENAME = "/etc/symbiosis/dns.d/backup.name"
 
