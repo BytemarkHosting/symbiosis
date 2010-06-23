@@ -45,7 +45,7 @@ This firewall script is designed to be simple to use, while still
 allowing a reasonable level of control over your system.
 
 The firewall generator will read a number of files located beneath
-the directory /etc/firewall and automatically use the names of those
+the directory /etc/symbiosis/firewall and automatically use the names of those
 files to construct a complete iptables-based firewall script.
 
 The script will be executed once it has been generated, and then
@@ -63,16 +63,16 @@ you simply need to create files in the directories the script reads:
 
 =over 8
 
-=item /etc/firewall/blacklist.d/
+=item /etc/symbiosis/firewall/blacklist.d/
 Any file present in this directory is assumed to be the IP address of a machine you wish to globally prevent connections from.
 
-=item /etc/firewall/incoming.d/
+=item /etc/symbiosis/firewall/incoming.d/
 This directory is examined to determine which rules should be applied to incoming connections.
 
-=item /etc/firewall/outgoing.d/
+=item /etc/symbiosis/firewall/outgoing.d/
 This directory is examined to determine which rules should be applied to outgoing connections.
 
-=item /etc/firewall/local.d/
+=item /etc/symbiosis/firewall/local.d/
 Executable shell-scripts in this directory are executed after the firewall
 is installed.
 
@@ -172,10 +172,10 @@ my %SERVICE;
 #
 #  Directories we examine.
 #
-$CONFIG{ 'blacklist.d' } = "/etc/firewall/blacklist.d/";
-$CONFIG{ 'incoming.d' }  = "/etc/firewall/incoming.d/";
-$CONFIG{ 'outgoing.d' }  = "/etc/firewall/outgoing.d/";
-$CONFIG{ 'local.d' }     = "/etc/firewall/local.d/";
+$CONFIG{ 'blacklist.d' } = "/etc/symbiosis/firewall/blacklist.d/";
+$CONFIG{ 'incoming.d' }  = "/etc/symbiosis/firewall/incoming.d/";
+$CONFIG{ 'outgoing.d' }  = "/etc/symbiosis/firewall/outgoing.d/";
+$CONFIG{ 'local.d' }     = "/etc/symbiosis/firewall/local.d/";
 $CONFIG{ 'rule.d' }      = "/usr/share/firewall/rule.d/";
 
 
@@ -210,7 +210,7 @@ loadKernelModules();
 
 
 #
-#  Fix ownership of the /etc/firewall hierarchy
+#  Fix ownership of the /etc/symbiosis/firewall hierarchy
 #
 fixOwnership();
 
@@ -267,7 +267,7 @@ foreach my $entry (@outgoing)
 #
 #  Is the firewall disabled?
 #
-if ( -e "/etc/firewall/disabled" )
+if ( -e "/etc/symbiosis/firewall/disabled" )
 {
     unlink($tempfile);
     exit;
@@ -1393,10 +1393,10 @@ sub loadKernelModules
 
 =begin doc
 
-Ensure that /etc/firewall is owned by the admin user, such that
+Ensure that /etc/symbiosis/firewall is owned by the admin user, such that
 we can allow the user to make changes via sftp.
 
-NOTE:  We explicitly change the permissions of /etc/firewall, not
+NOTE:  We explicitly change the permissions of /etc/symbiosis/firewall, not
 the directory the user has setup - we do that so that somebody couldn't
 run "firewall --incoming-d=/tmp" to change the ownership of /tmp, for example.
 
@@ -1421,7 +1421,7 @@ sub fixOwnership
     #
     #  OK we know we have an admin user.
     #
-    system( "chown", "-R", "admin:admin", "/etc/firewall" );
+    system( "chown", "-R", "admin:admin", "/etc/symbiosis/firewall" );
 
 }
 

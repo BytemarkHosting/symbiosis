@@ -37,27 +37,27 @@ firewall-blacklist - A simple script to mitigate against dictionary attacks.
 =head1 ABOUT
 
   This script is designed to look over the system logs and blacklist
- hosts which are attempting dictionary attacks.
+hosts which are attempting dictionary attacks.
 
   The way that the script detects addresses which are worthy of blacklisting
- is via the use of pattern files.  All pattern files located beneath
- /etc/firewall/patterns.d/ are loaded and applied.  These pattern files
- contain the name of a file to examine and a list of regular expressions
- which will be tested for within that named logfile.
+is via the use of pattern files.  All pattern files located beneath
+/etc/symbiosis/firewall/patterns.d/ are loaded and applied.  These pattern
+files contain the name of a file to examine and a list of regular expressions
+which will be tested for within that named logfile.
 
-  Any IPs which are blocked will be logged to syslog, and similarly the
- removal of the blocks will also be logged to syslog.
+ Any IPs which are blocked will be logged to syslog, and similarly the
+removal of the blocks will also be logged to syslog.
 
 =cut
 
 
 =head1 DISABLING
 
-  If you don't wish to use this script simply touch the file:
+If you don't wish to use this script simply touch the file:
 
 =for example begin
 
-  /etc/firewall/disabled.blacklist
+  /etc/symbiosis/firewall/disabled.blacklist
 
 =for example end
 
@@ -66,8 +66,8 @@ firewall-blacklist - A simple script to mitigate against dictionary attacks.
 
 =head1 WHITELISTING
 
- The file /etc/firewall/whitelist.d/ will be consulted - any IP address
- listed in that directory will be ignored.
+ The file /etc/symbiosis/firewall/whitelist.d/ will be consulted - any IP
+address listed in that directory will be ignored.
 
 =cut
 
@@ -83,7 +83,7 @@ firewall-blacklist - A simple script to mitigate against dictionary attacks.
 
 =head1 LICENSE
 
-Copyright (c) 2008,2009 by Bytemark Computer Consulting Ltd.  All rights reserved.
+Copyright (c) 2008-2010 by Bytemark Computer Consulting Ltd.  All rights reserved.
 
 This program is free software;
 you can redistribute it and/or modify it under
@@ -109,9 +109,9 @@ use Sys::Syslog;
 #  Configuration variables
 #
 my %CONFIG;
-$CONFIG{ 'input' }     = "/etc/firewall/patterns.d/";
-$CONFIG{ 'blacklist' } = "/etc/firewall/blacklist.d/";
-$CONFIG{ 'whitelist' } = "/etc/firewall/whitelist.d/";
+$CONFIG{ 'input' }     = "/etc/symbiosis/firewall/patterns.d/";
+$CONFIG{ 'blacklist' } = "/etc/symbiosis/firewall/blacklist.d/";
+$CONFIG{ 'whitelist' } = "/etc/symbiosis/firewall/whitelist.d/";
 $CONFIG{ 'verbose' }   = 0;
 $CONFIG{ 'attempts' } = 20;    # count of attacks before blacklisting
 $CONFIG{ 'expire' }   = 2;     # number of days to keep records
@@ -127,7 +127,7 @@ parseCommandLineArguments();
 #
 #  If the firewall is disabled then exit
 #
-if ( -e "/etc/firewall/disabled" )
+if ( -e "/etc/symbiosis/firewall/disabled" )
 {
     $CONFIG{ 'verbose' } && print "Firewall disabled\n";
 
@@ -137,7 +137,7 @@ if ( -e "/etc/firewall/disabled" )
 #
 #  If just the blacklister is disabled then exit
 #
-if ( -e "/etc/firewall/disabled.blacklist" )
+if ( -e "/etc/symbiosis/firewall/disabled.blacklist" )
 {
     $CONFIG{ 'verbose' } && print "Blacklister disabled\n";
     cleanBlacklist();
@@ -147,7 +147,7 @@ if ( -e "/etc/firewall/disabled.blacklist" )
     # reload the firewall to make sure changes take effect.
     #
     if ( ( -x "/usr/bin/firewall" ) &&
-         ( recentlyModified("/etc/firewall/disabled") ) )
+         ( recentlyModified("/etc/symbiosis/firewall/disabled") ) )
     {
         $CONFIG{ 'verbose' } && print "Reloading firewall\n";
         system("/usr/bin/firewall");

@@ -1,3 +1,10 @@
+symbiosis-firewall (2010:0623) stable; urgency=low
+
+  * Updated to use /etc/symbiosis/firewall as the prefix
+    directory rather than /etc/firewall
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 23 Jun 2010 10:20:30 +0000
+
 symbiosis-firewall (2010:0604) stable; urgency=low
 
   [ Steve Kemp ]
