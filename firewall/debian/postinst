@@ -42,7 +42,7 @@ if [ -d $OLD -a -d $OLD/incoming.d -a -d $OLD/outgoing.d ]; then
     #
     #  Move each file
     #
-    for i in incoming.d/ local.d/ outgoing.d/ patterns.d/ whitelist.d/ ; do
+    for i in blacklist.d/ incoming.d/ local.d/ outgoing.d/ patterns.d/ whitelist.d/ ; do
 
         #
         #  Make sure the dest exists.
@@ -89,6 +89,10 @@ fi
 if [ -e /opt/bytemark/no-firewall ]; then
     touch $PREFIX/disabled
     rm /opt/bytemark/no-firewall
+fi
+
+if [ -e /etc/firewall.exceptions ]; then
+    rm -f /etc/firewall.exceptions
 fi
 
 #
