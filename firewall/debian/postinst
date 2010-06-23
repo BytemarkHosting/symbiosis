@@ -26,10 +26,27 @@ OLD=/etc/firewall
 #  If we have the old tree then move it into place.
 #
 if [ -d $OLD -a -d $OLD/incoming.d -a -d $OLD/outgoing.d ]; then
+
+    #
+    #  Make sure we have the new directory.
+    #
     if [ ! -d $PREFIX ]; then
         mkdir -p $PREFIX
     fi
+
+    #
+    #  Remove the blacklisted IPs, they'll return
+    #
+    rm -rf $OLD/blacklist.d || true
+
+    #
+    #  Move the old tree.
+    #
     mv $OLD/* $PREFIX/
+
+    #
+    #  Remove the old tree.
+    #
     rmdir $OLD
 fi
 
