@@ -40,14 +40,32 @@ if [ -d $OLD -a -d $OLD/incoming.d -a -d $OLD/outgoing.d ]; then
     rm -rf $OLD/blacklist.d || true
 
     #
-    #  Move the old tree.
+    #  Move each file
     #
-    mv $OLD/* $PREFIX/
+    for i in incoming.d/ local.d/ outgoing.d/ patterns.d/ whitelist.d/ ; do
+
+        #
+        #  Make sure the dest exists.
+        #
+        mkdir -p $PREFIX/$i     || true
+        mv $OLD/$i/* $PREFIX/$i || true
+        rm -rf $OLD/$i          || true
+    done
+
+    #
+    #  Disable if we should
+    #
+    if [ -e $OLD/disabled ]; then
+        touch $PREFIX/disabled
+    fi
+    if [ -e $OLD/disabled.blacklist ]; then
+        touch $PREFIX/disabled.blacklist
+    fi
 
     #
     #  Remove the old tree.
     #
-    rmdir $OLD
+    rm -rf $OLD || true
 fi
 
 
