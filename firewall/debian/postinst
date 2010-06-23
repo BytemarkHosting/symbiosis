@@ -48,8 +48,14 @@ if [ -d $OLD -a -d $OLD/incoming.d -a -d $OLD/outgoing.d ]; then
         #  Make sure the dest exists.
         #
         mkdir -p $PREFIX/$i     || true
-        mv $OLD/$i/* $PREFIX/$i || true
-        rm -rf $OLD/$i          || true
+
+        #
+        # Move any contents
+        #
+        if [ -d $OLD/$i ]; then
+            mv $OLD/$i/* $PREFIX/$i || true
+            rm -rf $OLD/$i          || true
+        fi
     done
 
     #
