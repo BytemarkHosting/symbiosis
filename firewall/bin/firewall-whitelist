@@ -1,0 +1,122 @@
+#!/usr/bin/ruby
+# 
+# NAME
+#
+#   firewall-whitelist -- Automatically whitelist IP addresses.
+#
+# SYNOPSIS
+#
+#  Help Options:
+#
+#   --help        Show the help information for this script.
+#   --verbose     Show debugging information.
+#
+# This script is designed to automatically whitelist IP addresses which
+# have been used to successfully login via SSH.
+#
+# It does this by parsing the output of the "last" command, and creating
+# entries in /etc/symbiosis/firewall/whitelist.d/
+#
+# AUTHOR
+#
+#   Steve Kemp <steve@bytemark.co.uk>
+#
+
+#
+#  Modules we require
+#
+
+require 'getoptlong'
+require 'ipaddr'
+
+opts = GetoptLong.new(
+    [ '--help',    '-h', GetoptLong::NO_ARGUMENT ],
+    [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ]
+)
+
+
+help = false
+$VERBOSE = false
+show_all = false
+
+opts.each do |opt,arg|
+  case opt
+    when '--help'
+      help = true
+    when '--verbose'
+      $VERBOSE = true
+    when '--show-all'
+      show_all = true
+  end
+end
+
+#
+# CAUTION! Here be quality kode.
+#
+if help
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
+
+  lines.each do |line|
+    line.chomp!
+    break if line.empty?
+    puts line[2..-1].to_s
+  end
+
+  exit 0
+end
+
+ip_addresses = {}
+
+
+#
+#  Run last to find the IPs, store unique ones in a hash.
+#
+IO.popen("/usr/bin/last -i") {|pipe| pipe.readlines}.each do |l|
+  next unless l =~ /[ \t]((\d{1,3}\.){3,3}\d{1,3}|[0-9a-f:]+)[ \t]/ 
+  ip_addresses[ $1 ] = 1
+end
+
+
+#
+#  Did we update?
+#
+updated=false
+
+#
+#  Iterate over each IP
+#
+ip_addresses.each_key do |ip|
+  if ( ( ip =~ /^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$/ ) &&
+       ( ip !~ /^(127|0)\./ ) )
+
+    puts "Found IP address: #{ip}" if ( $VERBOSE )
+
+    if ( File.exists?( "/etc/symbiosis/firewall/whitelist.d/#{ip}" ) )
+      puts "\tAlready whitelisted" if ( $VERBOSE )
+    else
+      # ensure the direcotry exists.
+      if ( ! File.directory?( "/etc/symbiosis/firewall/whitelist.d" ) )
+        system( "mkdir -p /etc/symbiosis/firewall/whitelist.d" )
+      end
+
+      # create the file
+      system( "touch /etc/symbiosis/firewall/whitelist.d/#{ip}" )
+
+      updated=true
+      puts "\tAdding to whitelist" if ( $VERBOSE )
+    end
+  end
+end
+
+
+
+#
+#  Finally re-run the firewall if we updated
+#
+if ( updated )
+
+  puts "Updated whitelist, re-running firewall" if ( $VERBOSE )
+
+  system( "/usr/bin/firewall" )
+end

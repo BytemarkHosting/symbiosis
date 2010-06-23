@@ -16,7 +16,13 @@ clean:
 	if [ -d ./man ] ; then rm -rf ./man ; fi
 	if [ -d ./i ] ; then rm -rf ./i ; fi
 
-manpage: ./bin/firewall
+
+man/%.man: ./bin/%
+	[ -d man ] || mkdir man
+	RUBYLIB=./lib $<  --help | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
+
+
+manpage: ./bin/firewall man/firewall-whitelist.man
 	if ! [ -d ./man ] ; then mkdir ./man ; fi
 	pod2man ./bin/firewall > ./man/firewall.1
 	pod2man ./bin/firewall-logtail > ./man/firewall-logtail.1
