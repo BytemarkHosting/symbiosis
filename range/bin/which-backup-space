@@ -63,9 +63,30 @@ if help
   exit 0
 end
 
-if show_all
-  puts Symbiosis::Range.backup_spaces.join("\n")
+if ARGV.length > 0
+
+  # Collect each of the args, rejecting duff IPs.
+
+  ips = ARGV.collect do |arg| 
+    begin
+      IPAddr.new(arg)
+    rescue ArgumentError
+      warn "Could not parse '#{arg}' as an IP address"
+      # do nothing
+      nil
+    end
+  end.reject{|ip| ip.nil? }
 else
-  puts Symbiosis::Range.backup_spaces.first + "\n"
+  ips = Symbiosis::Range.ip_addresses
+end
+
+backup_spaces = Symbiosis::Range.backup_spaces(ips)
+
+exit 1 if backup_spaces.empty?
+
+if show_all
+  puts backup_spaces.join("\n")
+else
+  puts backup_spaces.first
 end
 

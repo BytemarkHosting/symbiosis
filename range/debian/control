@@ -1,14 +1,16 @@
-Source: bytemark-vhost-range
+Source: symbiosis-range
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 4.0.0)
+Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-range
+Package: symbiosis-range
+Replaces: bytemark-vhost-range
+Conflicts: bytemark-vhost-range
 Architecture: all
-Depends: perl, perl-modules, libnet-whois-ripe-perl
+Depends: ruby, ${misc:Depends}
 Description: Determine whether an IP is within Bytemark's range
  This package contains a simple tool to test whether an IP address
  is within a Bytemark allocated range.

@@ -1,0 +1,35 @@
+
+NAME
+
+symbiosis-all-crontabs - Execute crontabs for all Symbiosis domains
+
+DESCRIPTION
+
+This script is designed to run non-interactively, it will iterate over
+all hosted virtual domains and execute the crontabs which might be present.
+
+As a security measure it is mandatory that a crontab file, located beneath
+/srv/example.com/config/crontab is owned by the same Unix UID which owns
+/srv/example.com.
+
+For each valid crontab file the B<TODO> ruby script will be launched.
+
+OPTIONS
+
+   --verbose  Display verbose information about execution.
+
+BUGS
+
+None known.
+
+AUTHOR
+
+Steve
+--
+
+LICENSE
+
+Copyright (c) 2010 by Bytemark Computer Consulting Ltd.
+All rights reserved.
+
+

@@ -1,3 +1,10 @@
+symbiosis-monit (2010:0603) stable; urgency=low
+
+  * Renamed package
+  * Switched to dpkg-source 3.0 (native) format
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:32 +0100
+
 bytemark-vhost-monit (2009:1028-1) stable; urgency=low
 
   * Avoid running if the bytemark-vhost-updater lockfile is present.

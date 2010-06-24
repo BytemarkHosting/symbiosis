@@ -1,13 +1,13 @@
-Source: libapache2-mod-vhost-bytemark
+Source: symbiosis-httpd
 Section: web
 Priority: optional
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
-Build-Depends: debhelper (>= 4.2.20), apache2-dev
+Build-Depends: debhelper (>= 7.0.0), apache2-dev
 Standards-Version: 3.8.0
 
 Package: libapache2-mod-vhost-bytemark
 Architecture: any
-Depends: apache2.2-common, ${shlibs:Depends}
+Depends: apache2.2-common, ${shlibs:Depends}, ${misc:Depends}
 Description: A mass-hosting module for Apache 2.x
  This module allows you to easily host multiple virtual hosts with
  a single simple configuration file.
@@ -19,9 +19,11 @@ Description: A mass-hosting module for Apache 2.x
  * Allows domains to be handled with or without a www. prefix.
 
 
-Package: bytemark-vhost-httpd
+Package: symbiosis-httpd
+Replaces: bytemark-vhost-httpd
+Conflicts: bytemark-vhost-httpd
 Architecture: any
-Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark
+Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static
 Description: Tools to manage Apache virtual hosting
  This package contains tools to manage the virtual hosting of websites
  with Apache2.
@@ -31,3 +33,11 @@ Description: Tools to manage Apache virtual hosting
  of only a pair of directories.
  .
  Adding new websites doesn't even require you to restart your server.
+
+
+Package: symbiosis-httpd-static
+Architecture: any
+Description: Static files
+ This package contains the static welcome page for the Bytemark Symbiosis
+ system.
+

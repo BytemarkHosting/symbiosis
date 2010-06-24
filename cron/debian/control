@@ -1,0 +1,14 @@
+Source: symbiosis-cron
+Section: admin
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Build-Depends: debhelper (>= 7.0.0),  cdbs, txt2man
+Standards-Version: 3.8.0
+
+Package: symbiosis-cron
+Architecture: any
+Depends: ruby, cron, ${shlibs:Depends}, ${misc:Depends}
+Description: Provide per-domain crontab support
+ This package provides a setuid wrapper script which allows each hosted
+ domain to have crontab entries, executed as the appropriate domain owner.

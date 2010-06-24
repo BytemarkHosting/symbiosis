@@ -13,7 +13,7 @@ fi
 #
 #  Add the keys
 #
-for i in /usr/share/bytemark-vhost-key/*.pub; do
+for i in /usr/share/symbiosis-key/*.pub; do
   apt-key add $i
 done
 

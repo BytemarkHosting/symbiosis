@@ -1,4 +1,16 @@
-libapache2-mod-vhost-bytemark (2010:0525-1) stable; urgency=low
+symbiosis-httpd (2010:0604) stable; urgency=low
+
+  [ Steve Kemp ]
+  * Correct the missing shebang upon the configure-additional script.
+  * Renamed package
+  * Removed full copy of the Apache license.
+
+  [ Patrick J Cherry ]
+  * Switched to dpkg-source 3.0 (native) format
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 04 Jun 2010 09:44:09 +0100
+
+libapache2-mod-vhost-bytemark (2010:0525) stable; urgency=low
 
   * Ensure that when we're creating new SSL virtual hosts that we
     correctly cope with the addition of an SSL bundle.

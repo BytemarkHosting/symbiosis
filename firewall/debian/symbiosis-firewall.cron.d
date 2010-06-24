@@ -10,6 +10,12 @@
 
 */15 * * * * root [ -x /usr/bin/firewall-blacklist ] && /usr/bin/firewall-blacklist
 
+#
+#  Whitelist valid IP addresses every hour, but outside the scope of the
+# firewall test.
+#
+30   * * * * root [ -x /usr/bin/firewall-whitelist ] && /usr/bin/firewall-whitelist
+
 
 #
 # Check the firewall works every hour.

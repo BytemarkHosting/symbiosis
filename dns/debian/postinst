@@ -1,6 +1,5 @@
 #!/bin/sh
 
-set -e
 
 #
 # Skip, if we are not in "configure" state
@@ -11,17 +10,20 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
-#  Remove old file
+#  Remove old and obsolete files/directories.
 #
 if [ -e /etc/bytemark.dns.template ]; then
     rm -f /etc/bytemark.dns.template
+fi
+if [ -d /etc/bytemark-vhost/dns.d ]; then
+    rm -rf /etc/bytemark-vhost/dns.d
 fi
 
 
 #
 #  If we're not on a Bytemark host then we do nothing.
 #
-bytemark=`/sbin/is-bytemark-ip`;
+bytemark=`is-bytemark-ip`;
 
 if [ ! "$bytemark" ]; then
     if [ -x /root/BytemarkDNS/upload ]; then

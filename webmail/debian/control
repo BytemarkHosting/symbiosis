@@ -1,14 +1,17 @@
-Source: bytemark-vhost-webmail
+Source: symbiosis-webmail
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 4.0.0)
+Build-Depends: debhelper (>= 7.0.0), cdbs
 Standards-Version: 3.8.0
+Bugs: https://projects.bytemark.co.uk/projects/bytemarkvhost/issues
 
-Package: bytemark-vhost-webmail
+Package: symbiosis-webmail
+Replaces: bytemark-vhost-webmail
+Conflicts: bytemark-vhost-webmail
 Architecture: all
-Depends: squirrelmail
+Depends: squirrelmail, ${misc:Depends}
 Description: This package gives webmail access
  This package will enable a global webmail system for all domains hosted
  using the Bytemark system.

@@ -1,0 +1,95 @@
+Mail received detailing copyright for
+http://www.notwork.org/~gotoken/ruby/p/crontab/crontab/crontab.rb
+
+-------------------------------------------------------------------------------
+
+Return-path: <gotoken@gmail.com>
+Envelope-to: patrick@bytemark.co.uk
+Delivery-date: Fri, 18 Jun 2010 02:53:58 +0100
+Received: from nog.sh.bytemark.co.uk ([212.110.161.168])
+	by bytemail.bytemark.co.uk with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.69)
+	(envelope-from <gotoken@gmail.com>)
+	id 1OPQmM-0004oQ-7q
+	for patrick@bytemark.co.uk; Fri, 18 Jun 2010 02:53:58 +0100
+Received: from nospam1.sh.bytemark.co.uk ([89.16.184.148])
+	by nog.sh.bytemark.co.uk with esmtp (Exim 4.69)
+	(envelope-from <gotoken@gmail.com>)
+	id 1OPQmM-0006hI-3O
+	for patrick@bytemark.co.uk; Fri, 18 Jun 2010 02:53:58 +0100
+Received: from mail-px0-f169.google.com ([209.85.212.169])
+	by nospam1.sh.bytemark.co.uk with esmtp (Exim 4.71)
+	(envelope-from <gotoken@gmail.com>)
+	id 1OPQmG-0006do-6Q
+	for patrick@bytemark.co.uk; Fri, 18 Jun 2010 02:53:58 +0100
+Received: by pxi14 with SMTP id 14so272173pxi.14
+        for <patrick@bytemark.co.uk>; Thu, 17 Jun 2010 18:53:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=gamma;
+        h=domainkey-signature:received:received:message-id:from:to
+         :content-type:content-transfer-encoding:x-mailer:mime-version
+         :subject:date:cc;
+        bh=1t4/TiECB8k8k0b5dB3s7RQbU748Ot2ZpnC37eanIrg=;
+        b=eS0WaujNZBYaU3ZeeTTtu/DNTbAzAcJrSbzyoqH5sqk78qJWLFEC3LIJJOohrWB2iJ
+         iuonEtkbfbw6nYL/+tNzETIsazWAH4fdxh7Dm9gy+SXMmhH39mUIC6HNn60EHlYLbZS3
+         xETU044liuOG6yWGZnd+FmjOvRT8apmAYAIy4=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=gmail.com; s=gamma;
+        h=message-id:from:to:content-type:content-transfer-encoding:x-mailer
+         :mime-version:subject:date:cc;
+        b=VlEQd1+pUfm+SYZ9Drsf/Qv/YG61y1CnWvte1LgwhNR2e+fhAM381U5LNmEwEVArf1
+         z/HZSl6XiPuFyi17RPOX/jMB0cGGE8tBD3UJc7NUi4tCOq0s4OVOrwINZMkEBvEw9MCZ
+         0FnpdpQ7wxKYVZ43FaaZlIq/WjiQdFgtd79qk=
+Received: by 10.142.55.4 with SMTP id d4mr220524wfa.309.1276826028887;
+        Thu, 17 Jun 2010 18:53:48 -0700 (PDT)
+Received: from [126.230.145.132] (pw126230145132.16.tss.panda-world.ne.jp [126.230.145.132])
+        by mx.google.com with ESMTPS id c14sm8592551waa.13.2010.06.17.18.53.45
+        (version=TLSv1/SSLv3 cipher=RC4-MD5);
+        Thu, 17 Jun 2010 18:53:47 -0700 (PDT)
+Message-Id: <D94F77DF-390D-489B-94B9-A081B5508D4B@gmail.com>
+From: Kentaro Goto <gotoken@gmail.com>
+To: Patrick J Cherry <patrick@bytemark.co.uk>
+Content-Type: text/plain;
+	charset=us-ascii;
+	format=flowed;
+	delsp=yes
+Content-Transfer-Encoding: 7bit
+X-Mailer: iPhone Mail (7E18)
+Mime-Version: 1.0 (iPhone Mail 7E18)
+Subject: Re: crontab.rb
+Date: Fri, 18 Jun 2010 10:53:30 +0900
+Cc: "gotoken@notwork.org" <gotoken@notwork.org>
+Content-Length: 895
+
+Hi,
+
+It should be Ruby's or something to give permissions as wide as any  
+Ruby implementaions. So now I'm deciding that crontab.rb is released  
+under Ruby's license.  Any better license?  Comments are welcome.
+
+Any way, thanks much for asking about and being interested in my old  
+small work :)
+
+
+Gotoken
+
+
+On 2010/06/17, at 23:00, Patrick J Cherry <patrick@bytemark.co.uk>  
+wrote:
+
+> Hi there,
+>
+> I'm wondering what licence
+> http://www.notwork.org/~gotoken/ruby/p/crontab/crontab/crontab.rb is
+> released under?  I've found it very handy and I'm planning on using it
+> in an open source project, but I wish to attribute your work  
+> correctly.
+>
+> Thanks!
+>
+> -- 
+> Patrick J Cherry                               Bytemark Hosting  
+> Support
+>                                            http://www.bytemark.co.uk/
+>                                             tel: +44 (0) 1904 890 890
+

@@ -1,0 +1,10 @@
+# Exim filter
+
+# Add/remove headers
+if first_delivery then
+  # Remove headers
+  headers remove X-Spam-Score:X-Spam-Report:X-Spam-Checker-Version:X-Spam-Status:X-Spam-Level:X-Spam-Bar:X-Anti-Virus
+  if $acl_m3 is not "" then
+    headers add $acl_m3
+  endif
+endif

@@ -1,14 +1,16 @@
-Source: bytemark-vhost-key
+Source: symbiosis-key
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 4.0.0)
+Build-Depends: debhelper (>= 7.0.0), cdbs
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-key
+Package: symbiosis-key
+Replaces: bytemark-vhost-key
+Conflicts: bytemark-vhost-key
 Architecture: all
-Depends: gnupg
+Depends: gnupg, ${misc:Depends}
 Description: The Bytemark Debian package-signing key
  This package contains a key which may be used to validate the signature
  of the Bytemark Virtual Hosting repository.

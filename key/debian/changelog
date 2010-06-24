@@ -1,3 +1,11 @@
+symbiosis-key (2010:0603) stable; urgency=low
+
+  * Renamed package
+  * Tidied up packaging
+  * Switched to dpkg-source 3.0 (native) format
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:31 +0100
+
 bytemark-vhost-key (2009:1026-1) stable; urgency=low
 
   * Install both keys to plain files beneath

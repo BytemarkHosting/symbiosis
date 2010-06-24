@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+#  Run each of our test scripts.
+#
+# Steve
+# --
+#
+
+
+PREFIX=/etc/symbiosis/test.d
+
+if [ ! -d $PREFIX ]; then
+    exit
+fi
+
+#
+#  Go to the correct directory
+#
+cd $PREFIX
+
+#
+#  Run all tests.
+#
+for i in $PREFIX/tc_*.rb ; do
+    if [ -e $i ]; then
+        if [ -x $i ]; then
+            echo "Running  : $(basename $i)"
+            ./$(basename $i)
+            echo "Completed: $(basename $i)"
+        else
+            echo "Ignoring non-executable $i"
+        fi
+    fi
+done

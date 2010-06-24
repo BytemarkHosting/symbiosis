@@ -1,0 +1,14 @@
+Template: symbiosis-mysql/dbrootpass
+Type: password
+Description: Please enter a new MySQL root password
+ You currently have no password setup for your MySQL installation, this
+ is insecure.
+ .
+ Please enter a password for the root user to use for MySQL.  If you don't
+ do this then your MySQL server will be insecure!
+
+Template: smybiosis-mysql/confirm
+Type: password
+Description: Please confirm your new MySQL root password
+ Please confirm your password for the root user to use for MySQL.
+

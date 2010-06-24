@@ -1,0 +1,116 @@
+#!/bin/sh
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+        echo "I: Skipping configuration"
+        exit 0
+fi
+
+#
+#  See if we have a password?
+#
+if ( mysql --user=root --pass="" -e "SHOW DATABASES" 2>/dev/null >/dev/null ); then
+
+    #
+    #  Do we have a password setup?  If so use it.
+    #
+    for i in if [ -e /etc/symbiosis/.passwd /etc/bytemark-vhost/.vhost.pass /etc/.vhost.pass ; do
+
+        if [ -e $i ]; then
+
+            echo "+--------------------------------------------+"
+            echo "|                                            |"
+            echo "|    Password setup from stored plaintext    |"
+            echo "|                                            |"
+            echo "+--------------------------------------------+"
+
+            #
+            # get the password
+            #
+            pass=`cat $i`
+
+
+            #
+            #  This is a migration to make sure we store the 
+            # password somewhere safe.
+            #
+            if [ ! -d /etc/symbiosis ]; then
+                mkdir -p /etc/symbiosis
+            fi
+            echo "$pass" > /etc/symbiosis/.passwd
+
+            #
+            #  Set it & exit
+            #
+            mysqladmin --user=root password "$pass"
+            exit 0;
+        fi
+    done
+
+    # Source the debconf library.
+    #
+    . /usr/share/debconf/confmodule
+
+    db_version 2.0
+
+    #
+    #  Get the root password.
+    #
+    db_input high symbiosis-mysql/dbrootpass || true
+    db_go || true
+    db_get symbiosis-mysql/dbrootpass
+    eval rootpass'="$RET"'
+
+    #
+    #  Forget the answer.
+    #
+    db_reset symbiosis-mysql/dbrootpass
+
+    #
+    #  Get the root password again
+    #
+    db_input high symbiosis-mysql/confirm || true
+    db_go || true
+    db_get symbiosis-mysql/confirm
+    eval confirm'="$RET"'
+
+    #
+    #  Forget the answer
+    #
+    db_reset symbiosis-mysql/confirm
+
+    #
+    #  Set the password
+    #
+    if [ "$confirm" = "$rootpass" ]; then
+        mysqladmin --user=root password "$rootpass"
+    else
+        echo "+-------------------------------------------------+"
+        echo "|                                                 |"
+        echo "| Password mismatch.  Leaving root password empty |"
+        echo "|                                                 |"
+        echo "+-------------------------------------------------+"
+    fi
+
+    #
+    #  Forget the answer.
+    #
+    db_reset symbiosis-mysql/dbrootpass
+    db_reset symbiosis-mysql/confirm
+
+fi
+
+#
+#  If we're not binding globally then fix things, and restart.
+#
+if ( grep ^bind-address /etc/mysql/my.cnf >/dev/null 2>/dev/null ); then
+    sed -i~ -e "s/^bind-address[ \t]*=[ \t]*127.0.0.1/# \0/" /etc/mysql/my.cnf
+    invoke-rc.d mysql restart
+fi
+
+#DEBHELPER#
+exit 0

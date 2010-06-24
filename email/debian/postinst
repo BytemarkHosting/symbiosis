@@ -2,42 +2,12 @@
 
 set -e
 
-
-# Move a conffile without triggering a dpkg question
-mv_conffile() {
-    local OLDCONFFILE="$1"
-    local NEWCONFFILE="$2"
-
-    [ -e "$OLDCONFFILE" ] || return 0
-
-    echo "Preserving user changes to $NEWCONFFILE ..."
-    [ -e "$NEWCONFFILE" ] && mv -f "$NEWCONFFILE" "$NEWCONFFILE".dpkg-new
-    mv -f "$OLDCONFFILE" "$NEWCONFFILE"
-}
-
-case "$1" in
-configure)
-esac
-
 #
 # Skip, if we are not in "configure" state
 #
 if [ "$1" != "configure" ]; then
         echo "I: Skipping configuration"
         exit 0
-fi
-
-#
-# Move bytemark-vhost.d/ to symbiosis.d
-#
-if dpkg --compare-versions "$2" le "$LASTVERSION"; then
-  for d in /etc/exim4/bytemark-vhost.d /etc/dovecot/bytemark-vhost.d ; do
-    [ -d $d ] || continue
-    for f in `find $d -type f` ; do
-      echo "Moving $f to ${f/bytemark-vhost.d/symbiosis.d}"
-      mv_conffile $f ${f/bytemark-vhost.d/symbiosis.d}
-    done
-  done
 fi
 
 #
@@ -90,14 +60,12 @@ fi
 for i in spamassassin clamav-daemon exim4 dovecot; do
 
     #
-    #  Stop/Start
+    # Restart
     #
     if which invoke-rc.d >/dev/null 2>&1; then
-        invoke-rc.d $i stop
-        invoke-rc.d $i start
+        invoke-rc.d $i restart
     else
-        /etc/init.d/$i stop
-        /etc/init.d/$i start
+        /etc/init.d/$i restart
     fi
 done
 

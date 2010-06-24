@@ -1,3 +1,10 @@
+symbiosis-webmail (2010:0603) stable; urgency=low
+
+  * Renamed packages
+  * Switched to dpkg-source 3.0 (native) format
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:35 +0100
+
 bytemark-vhost-webmail (20090707153244) stable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches

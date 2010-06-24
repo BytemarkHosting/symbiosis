@@ -1,0 +1,57 @@
+
+=head1 NAME
+
+update-packages - Apply security and other package updates
+
+=cut
+
+=head1 SYNOPSIS
+
+  update-packages [args]
+
+=cut
+
+
+=head1 ABOUT
+
+This script is designed to run non-interactively and apply any pending
+security and system package updates, using the Debian apt-get system.
+
+The script will read a special sources list file which will contain
+references to repositories which may be upgraded.
+
+By default the script will archive the results of its upgrades
+=cut
+
+=head1 FILES
+
+The system will invoke B<apt-get> against the file
+B</etc/apt/sources.list.security> and archive the results of any updates
+applied to the directory B</var/log/update-packages/>
+
+=cut
+
+=head1 BUGS
+
+None known.
+
+=cut
+
+=head1 AUTHOR
+
+ Steve
+ --
+
+=cut
+
+=head1 LICENSE
+
+Copyright (c) 2008-2010 by Bytemark Computer Consulting Ltd.
+All rights reserved.
+
+This program is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut

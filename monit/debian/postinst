@@ -17,5 +17,22 @@ if [ -e /etc/cron.d/bytemark-service-monitor ] ; then
   rm -f /etc/cron.d/bytemark-service-monitor
 fi
 
+
+#
+#  Remove old packaging mistake, if it still exists.
+#
+if [ -e /etc/bytemark-vhost/cron.d/bytemark-service-monitor ]; then
+  rm -f /etc/bytemark-vhost/cron.d/bytemark-service-monitor
+fi
+
+if [ -d /etc/bytemark-vhost/cron.d ]; then
+    rm -rf /etc/bytemark-vhost/cron.d
+fi
+
+if [ -d /etc/bytemark-vhost/monit.d ]; then
+    rm -rf /etc/bytemark-vhost/monit.d
+fi
+
+
 #DEBHELPER#
 exit 0

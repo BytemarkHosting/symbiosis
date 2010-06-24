@@ -34,7 +34,7 @@ all: dependencies
 	-touch all
 
 changelog:
-	 @date +%Y:%m%d-1
+	@date +%Y:%m%d-1
 
 #
 # If we're using sautobuild, then there is no need to check for dependencies
@@ -53,6 +53,7 @@ clean:
 	-rm -f */debian/files
 	-rm -f */debian/*.log
 	-rm bytemark-vhost[-_]*
+	-rm bytemark-symbiosis[-_]*
 	-rm all
 	-rm -rf out/
 	-rm -rf staging/
@@ -61,7 +62,7 @@ clean:
 	-rm libapache*
 	-find . -name '*.bak' -delete
 	-rm */*.1
-	for i in */; do pushd $$i; if [ -e Makefile ]; then make clean; fi ; popd; done
+	for i in */; do pushd $$i; if [ -e Makefile ]; then make clean; fi ; debuild clean ; popd; done
 
 
 
@@ -76,7 +77,7 @@ linda: all
 #  Run "lintian" on all binary packages to test for Debian policy violations.
 #
 lintian: all
-	lintian *.changes
+	lintian -c --suppress-tags 'out-of-date-standards-version,latest-debian-changelog-entry-changed-to-native' *.changes
 
 
 

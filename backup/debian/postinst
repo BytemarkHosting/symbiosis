@@ -38,17 +38,28 @@ if ( ! test -e $conf -a -h $conf ) ; then
     #
     mv $conf $conf.old >/dev/null 2>/dev/null || true
 
-    #
-    #  Now link in the file with the generated one
-    #
-    ln -s /etc/bytemark-vhost/backup.d/backup2l.conf $conf
 fi
+
 
 ##
 ##  Finally, regardless of whether we're upgrading or not, we
 ## trigger a rebuild
 ##
-cd /etc/bytemark-vhost/backup.d/ && make
+cd /etc/symbiosis/backup.d/ && make
+
+
+##
+##  Now link the backup2 configuration file with the generated one
+##
+ln -sf /etc/symbiosis/backup.d/backup2l.conf $conf
+
+
+#
+#  Obsolete files?  Remove them
+#
+if [ -d /etc/bytemark-vhost/backup.d ]; then
+    rm -rf  /etc/bytemark-vhost/backup.d
+fi
 
 
 #DEBHELPER#

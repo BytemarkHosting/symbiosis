@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+### BEGIN INIT INFO
+# Provides:          bytemark-symbiosis
+# Required-Start:    $syslog
+# Required-Stop:     $syslog
+# Should-Start:      $network $named $time
+# Should-Stop:       $network $named $time
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Alert the user that symbiosis is active.
+# Description:       Inform the user that Bytemark Symbiosis system is installe.
+### END INIT INFO
+#
+
+set -e
+set -u
+
+. /lib/lsb/init-functions
+
+# Safeguard (relative paths, core dumps..)
+cd /
+umask 077
+
+SELF=$(cd $(dirname $0); pwd -P)/$(basename $0)
+
+
+case "${1:-''}" in
+  'start')
+	log_daemon_msg "Starting symbiosis init" "symbiosis"
+        log_end_msg 0
+        cat <<EOF
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+   This system is running Bytemark Symbiosis.
+
+   For documentation please visit
+
+     *  http://symbiosis.bytemark.co.uk/
+
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+EOF
+	;;
+
+  'stop')
+	log_daemon_msg "Stopping symbiosis init" "symbiosis"
+        log_end_msg 0
+
+	;;
+
+  'restart'|'reload'|'force-reload')
+	set +e; $SELF stop; set -e
+	$SELF start
+	;;
+
+  'status')
+        log_action_msg "symbiosis is running."
+  	;;
+
+  *)
+	echo "Usage: $SELF start|stop|restart|reload|force-reload|status"
+	exit 1
+	;;
+esac
+

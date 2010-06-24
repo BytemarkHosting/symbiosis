@@ -1,14 +1,16 @@
-Source: bytemark-vhost-test
+Source: symbiosis-test
 Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 4.0.0), rdoc, txt2man
+Build-Depends: debhelper (>= 7.0.0), rdoc, txt2man, cdbs
 Standards-Version: 3.8.0
 
-Package: bytemark-vhost-test
+Package: symbiosis-test
+Replaces: bytemark-vhost-test
+Conflicts: bytemark-vhost-test
 Architecture: all
-Depends: ruby, libopenssl-ruby
+Depends: ruby, libopenssl-ruby, ${misc:Depends}
 Description: Self-test scripts for the bytemark vhost project
  This package contains code to run self-tests upon an installation of the
  Bytemark Virtual Hosting project.

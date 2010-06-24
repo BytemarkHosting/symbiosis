@@ -1,11 +1,30 @@
-symbiosis-firewall (2010:0427-1) stable; urgency=low
+symbiosis-firewall (2010:0623) stable; urgency=low
+
+  * Updated to use /etc/symbiosis/firewall as the prefix
+    directory rather than /etc/firewall
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 23 Jun 2010 10:20:30 +0000
+
+symbiosis-firewall (2010:0604) stable; urgency=low
+
+  [ Steve Kemp ]
+  * Updated to provide a clean transition.
+  * Updated the default location for the firewalls built-in rules
+  * Updated so that the firewall rules use the correct direction.
+
+  [ Patrick J Cherry ]
+  * Switched to dpkg-source 3.0 (native) format
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:30 +0100
+
+symbiosis-firewall (2010:0427) stable; urgency=low
 
   * Renamed the main package.
     - But still "Provide:" the old name.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 27 Apr 2010 16:00:16 +0000
 
-bytemark-vhost-firewall (2010:0421-1) stable; urgency=low
+bytemark-vhost-firewall (2010:0421) stable; urgency=low
 
   * Install a trivial manpage for `firewall-logtail`.
 

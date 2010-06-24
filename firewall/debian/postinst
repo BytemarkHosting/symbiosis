@@ -11,11 +11,88 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
+#  The prefix of our tree.
+#
+PREFIX=/etc/symbiosis/firewall
+
+#
+#  The old tree.
+#
+OLD=/etc/firewall
+
+
+
+#
+#  If we have the old tree then move it into place.
+#
+if [ -d $OLD -a -d $OLD/incoming.d -a -d $OLD/outgoing.d ]; then
+
+    #
+    #  Make sure we have the new directory.
+    #
+    if [ ! -d $PREFIX ]; then
+        mkdir -p $PREFIX
+    fi
+
+    #
+    #  Remove the blacklisted IPs, they'll return
+    #
+    rm -rf $OLD/blacklist.d || true
+
+    #
+    #  Move each file
+    #
+    for i in blacklist.d/ incoming.d/ local.d/ outgoing.d/ patterns.d/ whitelist.d/ ; do
+
+        #
+        #  Make sure the dest exists.
+        #
+        mkdir -p $PREFIX/$i     || true
+
+        #
+        # Move any contents
+        #
+        if [ -d $OLD/$i ]; then
+            mv $OLD/$i/* $PREFIX/$i || true
+            rm -rf $OLD/$i          || true
+        fi
+    done
+
+    #
+    #  Disable if we should
+    #
+    if [ -e $OLD/disabled ]; then
+        touch $PREFIX/disabled
+    fi
+    if [ -e $OLD/disabled.blacklist ]; then
+        touch $PREFIX/disabled.blacklist
+    fi
+
+    #
+    #  Remove the old tree.
+    #
+    rm -rf $OLD || true
+fi
+
+
+#
+#  Otherwise we have to make a new prefix and start from scratch
+#
+if [ ! -d $PREFIX ]; then
+    mkdir -p $PREFIX
+fi
+
+
+#
 #  If we're disabled then disable ourself
 #
 if [ -e /opt/bytemark/no-firewall ]; then
-    touch /etc/firewall/disabled
+    touch $PREFIX/disabled
     rm /opt/bytemark/no-firewall
+fi
+
+if [ -e /etc/firewall.exceptions ]; then
+    rm -f /etc/firewall.exceptions
 fi
 
 #
@@ -29,7 +106,7 @@ fi
 #  See if there are any entries present.
 #
 incoming=0
-for i in /etc/firewall/incoming.d/*-*; do
+for i in $PREFIX/incoming.d/*-*; do
     if [ -e $i ]; then
         incoming=1
     fi
@@ -39,62 +116,61 @@ if [ "$incoming" = "0" ]; then
 
     echo "Creating default rules for the incoming firewall"
 
-    if  [ ! -d /etc/firewall/incoming.d/ ]; then
-        mkdir -p /etc/firewall/incoming.d/
-        touch  /etc/firewall/incoming.d/.empty
+    if  [ ! -d $PREFIX/incoming.d/ ]; then
+        mkdir -p $PREFIX/incoming.d/
+        touch  $PREFIX/incoming.d/.empty
     fi
 
-    touch  /etc/firewall/incoming.d/00-ssh
-    touch  /etc/firewall/incoming.d/05-ping
-    touch  /etc/firewall/incoming.d/10-http
-    touch  /etc/firewall/incoming.d/20-ftp
-    touch  /etc/firewall/incoming.d/30-imap
-    touch  /etc/firewall/incoming.d/40-imaps
-    touch  /etc/firewall/incoming.d/50-pop3
-    touch  /etc/firewall/incoming.d/55-dns
-    touch  /etc/firewall/incoming.d/60-pop3s
-    touch  /etc/firewall/incoming.d/65-mysql
-    touch  /etc/firewall/incoming.d/70-smtp
-    touch  /etc/firewall/incoming.d/75-ntp
-    touch  /etc/firewall/incoming.d/80-smtps
-    touch  /etc/firewall/incoming.d/85-submission
-    touch  /etc/firewall/incoming.d/99-reject
-    touch  /etc/firewall/incoming.d/00-related
-    touch  /etc/firewall/incoming.d/00-established
+    touch  $PREFIX/incoming.d/00-ssh
+    touch  $PREFIX/incoming.d/05-ping
+    touch  $PREFIX/incoming.d/10-http
+    touch  $PREFIX/incoming.d/20-ftp
+    touch  $PREFIX/incoming.d/30-imap
+    touch  $PREFIX/incoming.d/40-imaps
+    touch  $PREFIX/incoming.d/50-pop3
+    touch  $PREFIX/incoming.d/55-dns
+    touch  $PREFIX/incoming.d/60-pop3s
+    touch  $PREFIX/incoming.d/70-smtp
+    touch  $PREFIX/incoming.d/75-ntp
+    touch  $PREFIX/incoming.d/80-smtps
+    touch  $PREFIX/incoming.d/85-submission
+    touch  $PREFIX/incoming.d/99-reject
+    touch  $PREFIX/incoming.d/00-related
+    touch  $PREFIX/incoming.d/00-established
 
     #
     #  Now create our outgoing directory, if it is missing.
     #
-    if  [ ! -d /etc/firewall/outgoing.d/ ]; then
-        mkdir -p /etc/firewall/outgoing.d/
-        touch /etc/firewall/outgoing.d/.empty
+    if  [ ! -d $PREFIX/outgoing.d/ ]; then
+        mkdir -p $PREFIX/outgoing.d/
+        touch $PREFIX/outgoing.d/.empty
     fi
 
     #
     #  Default outgoing rules.
     #
     echo "Creating default rules for firewall"
-    touch /etc/firewall/outgoing.d/50-www-data
+    touch $PREFIX/outgoing.d/50-www-data
 fi
 
 
 #
 #  Make sure that DNS is unconditionally allowed.
 #
-touch  /etc/firewall/incoming.d/55-dns
+touch  $PREFIX/incoming.d/55-dns
 
 
 
 #
 #  Cope with prior mistaken rules
 #
-if [ -e /etc/firewall/outgoing.d/00-established ]; then
+if [ -e $PREFIX/outgoing.d/00-established ]; then
 
     # create rule in correct directory.
-    touch /etc/firewall/incoming.d/00-established
+    touch $PREFIX/incoming.d/00-established
 
     # remove the wrong file.
-    rm /etc/firewall/outgoing.d/00-established
+    rm $PREFIX/outgoing.d/00-established
 fi
 
 #

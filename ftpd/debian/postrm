@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+#
+# Remove from the rc levels.
+#
+if [ "$1" = "purge" ] ; then
+  update-rc.d pure-authd remove >/dev/null || exit $?
+fi
+
+#DEBHELPER#
+exit 0

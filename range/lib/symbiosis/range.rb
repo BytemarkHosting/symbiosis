@@ -8,9 +8,9 @@ module Symbiosis
 
   class Range
 
-    BYTEMARK_RANGES = %w(80.68.80.0/20 89.16.160.0/20 212.110.160.0/19 2001:41c8::/32).collect{|i| IPAddr.new(i)}
+    BYTEMARK_RANGES = %w(80.68.80.0/20 89.16.160.0/19 212.110.160.0/19 2001:41c8::/32).collect{|i| IPAddr.new(i)}
 
-    BACKUP_SPACE_FILENAME = "/etc/bytemark-vhost/dns.d/backup.name"
+    BACKUP_SPACE_FILENAME = "/etc/symbiosis/dns.d/backup.name"
 
     #
     # Checks to see if an IP is in the Bytemark ranges.
@@ -36,7 +36,7 @@ module Symbiosis
       end
       ip_addresses
     end
-    
+
     #
     # Returns all global IPv4 addresses in use by a machine, as an array of
     # IPAddr objects.
@@ -44,7 +44,7 @@ module Symbiosis
     def self.ipv4_addresses
       self.ip_addresses.select{|ip| ip.ipv4?}
     end
-    
+
     #
     # Returns all global IPv6 addresses in use by a machine, as an array of
     # IPAddr objects.
@@ -97,7 +97,7 @@ module Symbiosis
 
         # Form the reverse lookup string
         lookup = ip.reverse.gsub(/(ip6|in-addr).arpa\Z/,"backup-reverse.bytemark.co.uk")
-        
+
         warn "Doing lookup of #{lookup} for #{ip}..." if $VERBOSE
 
         # Do the lookup

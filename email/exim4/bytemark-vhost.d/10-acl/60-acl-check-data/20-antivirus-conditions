@@ -1,0 +1,22 @@
+  warn  condition    = ${if and{\
+                         {def:acl_m2} \
+                         {exists{CLAMAV_SOCKET}} \
+                       }}
+        malware      = */defer_ok
+        set acl_m3   = $acl_m3\nX-Anti-Virus: infected ${malware_name}
+
+  warn  condition    = ${if and{\
+                         {def:acl_m2} \
+                         {exists{CLAMAV_SOCKET}} \
+                       }}
+        !malware     = */defer_ok
+        set acl_m3   = $acl_m3\nX-Anti-Virus: clean
+
+  deny  condition    = ${if and{\
+                         {eq{$acl_m2}{reject}} \
+                         {exists{CLAMAV_SOCKET}} \
+                       }}
+        malware      = */defer_ok
+        message      = This message rejected by this domain's anti-virus system.  Please contact the \
+                       postmaster at the domain in question if this is unexpected.
+

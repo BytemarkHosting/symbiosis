@@ -1,0 +1,3 @@
+wrapper/symbiosis-all-crontabs    /usr/sbin/
+bin/* usr/bin/
+lib/* usr/lib/ruby/1.8/

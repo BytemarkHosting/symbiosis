@@ -1,3 +1,10 @@
+symbiosis-ftpd (2010:0603) stable; urgency=low
+
+  * Renamed package
+  * Switched to dpkg-source 3.0 (native) format
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:31 +0100
+
 bytemark-vhost-ftpd (2009:1021-1) stable; urgency=low
 
   * Correctly use the epoch.

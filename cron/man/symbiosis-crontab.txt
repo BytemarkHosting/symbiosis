@@ -1,0 +1,58 @@
+NAME
+
+symbiosis-crontab - Execute an individual crontab
+
+SYNOPSIS
+
+  symbiosis-crontab [--help] [--test] [--no-mail-output] /path/to/crontab
+
+DESCRIPTION
+
+  This script is used for parsing and executing the per-domain
+  crontabs that can be used in the Bytemark Symbiosis system.
+
+  This script will only run when called as a normal user, i.e. with a
+  user ID of greater than or equal to 1000.
+
+OPTIONS
+
+  --help  Show a brief help message
+
+  --test  Do not execute the crontab, just show information about the
+          environment and when the jobs will next run.
+
+  --no-mail-output  Do not mail any output, even if a MAILTO
+          environment variable is set
+
+USAGE
+
+  This script is called on a per crontab basis.  It can accept the
+  formatting of a standard crontab(5) file.
+
+  The environment variables PATH and MAILTO can be set.  PATH
+  determines where symbiosis-crontab will look for its binaries.
+  MAILTO determines where the output will be sent to.
+
+  In the absence of a MAILTO, the output will get sent to the standard
+  output.
+
+  The --test option can be useful for determining when the commands
+  will next get executed.
+
+  Full documentation is available at http://symbiosis.bytemark.co.uk/docs
+
+BUGS
+
+  The @reboot shortcut is not understood.
+
+  The --test option can be very slow, due to a duff algorithm being
+  used.
+
+AUTHOR
+
+ Patrick J Cherry <patrick@bytemark.co.uk>
+
+LICENSE
+
+Copyright (c) 2010 by Bytemark Computer Consulting Ltd.
+All rights reserved.

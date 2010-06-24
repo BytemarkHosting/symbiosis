@@ -1,4 +1,5 @@
 #!/usr/bin/make -f
+# export DH_VERBOSE=1
 
 configure: configure-stamp
 configure-stamp:
@@ -20,7 +21,7 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	dh_prep
 	dh_installdirs
 	dh_install
 
