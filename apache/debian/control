@@ -8,6 +8,7 @@ Standards-Version: 3.8.0
 Package: libapache2-mod-vhost-bytemark
 Architecture: any
 Depends: apache2.2-common, ${shlibs:Depends}, ${misc:Depends}
+Pre-Depends: symbiosis-common
 Description: A mass-hosting module for Apache 2.x
  This module allows you to easily host multiple virtual hosts with
  a single simple configuration file.
@@ -24,6 +25,7 @@ Replaces: bytemark-vhost-httpd
 Conflicts: bytemark-vhost-httpd
 Architecture: any
 Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static
+Pre-Depends: symbiosis-common
 Description: Tools to manage Apache virtual hosting
  This package contains tools to manage the virtual hosting of websites
  with Apache2.
