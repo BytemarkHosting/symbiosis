@@ -89,6 +89,14 @@ for i in /etc/bytemark-vhost/.vhost.pass /etc/.vhost.pass ; do
     fi
 done
 
+#
+#  If we have a stored password, in plaintext no less, ensure that
+# it isn't visible to the world.
+#
+if [ -e /etc/symbiosis/.passwd ]; then
+    chown root.root /etc/symbiosis/.passwd
+    chmod 0600      /etc/symbiosis/.passwd
+fi
 
 
 #
