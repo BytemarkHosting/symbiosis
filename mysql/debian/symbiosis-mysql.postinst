@@ -36,8 +36,7 @@ if ( mysql --user=root --pass="" -e "SHOW DATABASES" 2>/dev/null >/dev/null ); t
             #
             mysqladmin --user=root password "$pass"
             exit 0;
-        fi
-    done
+    fi
 
     # Source the debconf library.
     #
