@@ -18,9 +18,7 @@ if ( mysql --user=root --pass="" -e "SHOW DATABASES" 2>/dev/null >/dev/null ); t
     #
     #  Do we have a password setup?  If so use it.
     #
-    for i in if [ -e /etc/symbiosis/.passwd /etc/bytemark-vhost/.vhost.pass /etc/.vhost.pass ; do
-
-        if [ -e $i ]; then
+    if [ -e /etc/symbiosis/.passwd ]; then
 
             echo "+--------------------------------------------+"
             echo "|                                            |"
@@ -31,17 +29,7 @@ if ( mysql --user=root --pass="" -e "SHOW DATABASES" 2>/dev/null >/dev/null ); t
             #
             # get the password
             #
-            pass=`cat $i`
-
-
-            #
-            #  This is a migration to make sure we store the 
-            # password somewhere safe.
-            #
-            if [ ! -d /etc/symbiosis ]; then
-                mkdir -p /etc/symbiosis
-            fi
-            echo "$pass" > /etc/symbiosis/.passwd
+            pass=`cat /etc/symbiosis/.passwd`
 
             #
             #  Set it & exit
