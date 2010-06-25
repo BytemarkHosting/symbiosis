@@ -23,19 +23,6 @@ EOF
 
 fi
 
-#
-#  Fix all perms
-#
-for i in /srv /srv/* ; do
-    if [ -e $i ]; then
-        if [ -d $i ] ; then
-            owner=`stat --format='%U.%G' $i`
-            if [ "$owner" = "root.root" ]; then
-                chown -R admin:admin $i
-            fi
-        fi
-    fi
-done
 
 #
 #  Update /etc/motd.

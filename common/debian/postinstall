@@ -115,5 +115,21 @@ if [ $(ls -l /srv/ | grep ^d | wc -l) -lt 1 ] ; then
     chown -R admin:admin /srv/
 fi
 
+
+#
+#  Fix all perms
+#
+for i in /srv /srv/* ; do
+    if [ -e $i ]; then
+        if [ -d $i ] ; then
+            owner=`stat --format='%U.%G' $i`
+            if [ "$owner" = "root.root" ]; then
+                chown -R admin:admin $i
+            fi
+        fi
+    fi
+done
+
+
 #DEBHELPER#
 exit 0
