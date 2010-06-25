@@ -110,7 +110,7 @@ if [ $(ls -l /srv/ | grep ^d | wc -l) -lt 1 ] ; then
     #
     if [ -s /etc/symbiosis/.passwd ]; then
         cat /etc/symbiosis/.passwd  > /srv/$(hostname --fqdn)/mailboxes/root/password
-    done
+    fi
 
     chown -R admin:admin /srv/
 fi
