@@ -15,11 +15,16 @@
  */
 
 /*
- * mod_vhost_alias.c: support for dynamically configured mass virtual hosting
+ * mod_vhost_bytemark.c: support for dynamically configured mass virtual
+ * hosting for Bytemark Symbiosis.
  *
+ * This software is based upon mod_vhost_alias.c, which was released under the
+ * Apache licence, version 2.0.
+ *
+ * Copyright (c) 2008-2010 Bytemark Computer Consulting Ltd.
  * Copyright (c) 1998-1999 Demon Internet Ltd.
  *
- * This software was submitted by Demon Internet to the Apache Software Foundation
+ * mod_vhost_alias.c was submitted by Demon Internet to the Apache Software Foundation
  * in May 1999. Future revisions and derivatives of this source code
  * must acknowledge Demon Internet as the original contributor of
  * this module. All other licensing and usage conditions are those

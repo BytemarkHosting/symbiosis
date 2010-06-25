@@ -1,26 +1,65 @@
-This package was debianized by Steve Kemp <steve@bytemark.co.uk>
+This is Symbiosis.
 
-It was downloaded from https://projects.bytemark.co.uk/projects/bytemarkvhost/repository
+Authors: 
+    Steve Kemp <steve@bytemark.co.uk>
+    Patrick J. Cherry <patrick@bytemark.co.uk>
 
-Copyright Holder: Copyright (c) 2008-10 Bytemark Computer Consulting Ltd
+Source: 
+    https://projects.bytemark.co.uk/projects/symbiosis/repository
 
-Perl is distributed under licenses:
+Copyright:
+    Copyright (c) 2008-2010 Bytemark Computer Consulting Ltd
 
-    a) the GNU General Public License as published by the Free Software
-       Foundation; either version 1, or (at your option) any later
-       version, or
+Licence:
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-    b) the "Artistic License" which comes with Perl.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-    On Debian GNU/Linux systems, the complete text of the GNU General
-    Public License can be found in /usr/share/common-licenses/GPL' and
-    the Artistic Licence in /usr/share/common-licenses/Artistic'.
+    You should have received a copy of the GNU General Public License with
+    the Debian GNU/Linux distribution in file /usr/share/common-licenses/GPL;
+    if not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+    Suite 500 Boston, MA 02110-1335 USA  
 
-For the mod_vhost_bytemark  component:
+On Debian systems, the complete text of the GNU General Public
+Licence, version 2, can be found in /usr/share/common-licenses/GPL-2.
 
-  This was based on mod_vhost_alias which is distributed under the terms of the
-  Apache licence, available at /usr/share/common-licenses/Apache-2.0 on Debian
-  GNU/Linux systems.
+------------------------------------------------------------------------
 
-  Copyright (c) 2008-2010 Bytemark Computer Consulting Ltd
+SPECIFIC LICENCES
+
+src/mod_vhost_bytemark.c, and /usr/lib/apache2/modules/mod_vhost_bytemark.so:
+
+This is based on mod_vhost_alias.c.
+
+Authors
+  Tony Finch <fanf@demon.net> <dot@dotat.at>
+  Steve Kemp <steve@bytemark.co.uk>
+
+Original Source:
+  http://svn.apache.org/viewvc/httpd/httpd/tags/2.2.14/modules/mappers/mod_vhost_alias.c?view=co
+
+Copyright
   Copyright (c) 1998-1999 Demon Internet Ltd.
+  Copyright (c) 2008-2010 Bytemark Computer Consulting Ltd
+
+Licence:
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+On Debian systems, the complete text of the Apache Licence, Version 2.0
+can be found in /usr/share/common-licenses/Apache-2
