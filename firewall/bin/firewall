@@ -1184,7 +1184,7 @@ sub processRuleTemplate
                 foreach my $src (@acl)
                 {
                     my $copy = $line;
-                    $copy =~ s/\$SRC/$src/g;
+                    $copy =~ s/\$SRC/--src $src/g;
                     print SCRIPT $copy . "\n";
                 }
             }
@@ -1201,7 +1201,7 @@ sub processRuleTemplate
                 foreach my $dst (@acl)
                 {
                     my $copy = $line;
-                    $copy =~ s/\$DEST/$dst/g;
+                    $copy =~ s/\$DEST/--dest $dst/g;
                     print SCRIPT $copy . "\n";
                 }
             }
