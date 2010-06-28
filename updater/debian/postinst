@@ -20,8 +20,8 @@ fi
 #
 #  Make sure we notify the local sysadmin
 #
-if [ ! -e /etc/symbiosis-update.conf ]; then
-    echo "EMAIL=root" >/etc/symbiosis-update.conf
+if [ ! -e /etc/symbiosis/updater ]; then
+    echo "EMAIL=root" >/etc/symbiosis/updater
 fi
 
 #

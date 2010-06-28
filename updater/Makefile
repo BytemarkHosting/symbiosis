@@ -13,5 +13,5 @@ clean:
 	rm -f *.1 || true
 
 all:
-	pod2man symbiosis-update.pod > symbiosis-update.1
+	pod2man symbiosis-updater.pod > symbiosis-updater.1
 

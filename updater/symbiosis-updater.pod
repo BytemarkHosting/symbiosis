@@ -1,13 +1,13 @@
 
 =head1 NAME
 
-symbiosis-update - Apply security and other package updates
+symbiosis-updater - Apply security and other package updates
 
 =cut
 
 =head1 SYNOPSIS
 
-  symbiosis-update [args]
+  symbiosis-updater [args]
 
 =cut
 
@@ -21,13 +21,14 @@ The script will read a special sources list file which will contain
 references to repositories which may be upgraded.
 
 By default the script will archive the results of its upgrades
+
 =cut
 
 =head1 FILES
 
 The system will invoke B<apt-get> against the file
 B</etc/apt/sources.list.security> and archive the results of any updates
-applied to the directory B</var/log/update-packages/>
+applied to the directory B</var/log/symbiosis-updater/>
 
 =cut
 

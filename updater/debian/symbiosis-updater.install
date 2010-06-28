@@ -1,2 +1,2 @@
-cron/symbiosis-update   etc/cron.d/
-symbiosis-update        usr/bin/
+cron/symbiosis-updater   etc/cron.d/
+symbiosis-updater        usr/bin/

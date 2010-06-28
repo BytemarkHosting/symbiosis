@@ -59,8 +59,8 @@ METHOD="dist-upgrade"
 #  Source a config file if it exists, that'll allow
 # the settings above to be overridden.
 #
-if [ -e /etc/symbiosis-update.conf ]; then
-    . /etc/symbiosis-update.conf
+if [ -e /etc/symbiosis/updater ]; then
+    . /etc/symbiosis/updater
 fi
 
 
