@@ -1,13 +1,13 @@
 
 =head1 NAME
 
-update-packages - Apply security and other package updates
+symbiosis-update - Apply security and other package updates
 
 =cut
 
 =head1 SYNOPSIS
 
-  update-packages [args]
+  symbiosis-update [args]
 
 =cut
 

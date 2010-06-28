@@ -59,15 +59,15 @@ METHOD="dist-upgrade"
 #  Source a config file if it exists, that'll allow
 # the settings above to be overridden.
 #
-if [ -e /etc/update-packages.conf ]; then
-    . /etc/update-packages.conf
+if [ -e /etc/symbiosis-update.conf ]; then
+    . /etc/symbiosis-update.conf
 fi
 
 
 #
 #  Exit silently if we shouldn't run
 #
-if [ -e /etc/update-packages.disabled ]; then
+if [ -e /etc/symbiosis-update.disabled ]; then
     exit
 fi
 

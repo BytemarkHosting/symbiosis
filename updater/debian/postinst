@@ -20,16 +20,25 @@ fi
 #
 #  Make sure we notify the local sysadmin
 #
-if [ ! -e /etc/update-packages.conf ]; then
-    echo "EMAIL=root" >/etc/update-packages.conf
+if [ ! -e /etc/symbiosis-update.conf ]; then
+    echo "EMAIL=root" >/etc/symbiosis-update.conf
 fi
 
 #
-#  Remove the cron.daily job
+#  remove old config file
 #
-if [ -e /etc/cron.daily/update-packages ] ; then
-    rm -f /etc/cron.daily/update-packages
+if [ -e /etc/update-packages.conf ]; then
+    rm /etc/update-packages.conf
 fi
+
+#
+#  Remove the old files we might have had present by accident
+#
+for i in /etc/cron.daily/update-packages /etc/cron.d/bytemark-vhost-updater ; do
+    if [ -e $i ]; then
+        rm -f $i ;
+    fi
+done
 
 
 #DEBHELPER#

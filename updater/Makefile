@@ -10,8 +10,8 @@ nop:
 	@echo " "
 
 clean:
-	rm -f update-packages.1 || true
+	rm -f *.1 || true
 
 all:
-	pod2man update-packages.pod > update-packages.1
+	pod2man symbiosis-update.pod > symbiosis-update.1
 

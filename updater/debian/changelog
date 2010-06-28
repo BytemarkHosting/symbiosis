@@ -1,3 +1,10 @@
+symbiosis-updater (2010:0628) stable; urgency=low
+
+  * Renamed our binaries to be "symbiosis-update", rather
+    than any other name referring to vhost.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 28 Jun 2010 09:44:09 +0000
+
 symbiosis-updater (2010:0528) stable; urgency=low
 
   [ Steve Kemp ]

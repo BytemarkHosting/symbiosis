@@ -1,2 +1,2 @@
-cron/bytemark-vhost-updater   etc/cron.d/
-update-packages               usr/bin/
+cron/symbiosis-update   etc/cron.d/
+symbiosis-update        usr/bin/
