@@ -34,7 +34,7 @@ fi
 #
 #  Remove the old files we might have had present by accident
 #
-for i in /etc/cron.daily/update-packages /etc/cron.d/bytemark-vhost-updater ; do
+for i in /etc/cron.daily/update-packages /etc/cron.d/bytemark-vhost-updater /etc/cron.d/symbiosis-update ; do
     if [ -e $i ]; then
         rm -f $i ;
     fi

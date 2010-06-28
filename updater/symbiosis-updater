@@ -66,9 +66,9 @@ fi
 
 #
 #  Exit silently if we shouldn't run - this is configured
-# via "disabled=1" in /etc/symbiosis/updater
+# via "DISABLED=1" in /etc/symbiosis/updater
 #
-if [ ! -z "$disabled" -a "$disabled" ];  then
+if [ ! -z "$DISABLED" -a "$DISABLED" ];  then
     exit
 fi
 
@@ -109,7 +109,7 @@ touch /var/tmp/update.packages
 #
 # Sleep a random amount of time, max ten minutes, unless running under sudo.
 #
-if [ -z "$SUDO_USER" ]; then
+if [ ! -z "$SSH_TTY" ]; then
     splay=$RANDOM
 
     #

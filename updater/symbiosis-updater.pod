@@ -30,7 +30,7 @@ To disable the updater please run the following command:
 
 =for example begin
 
-echo "disabled=1" >> /etc/symbiosis/updater
+echo "DISABLED=1" >> /etc/symbiosis/updater
 
 =for example end
 
