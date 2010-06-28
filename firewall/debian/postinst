@@ -53,8 +53,8 @@ if [ -d $OLD -a -d $OLD/incoming.d -a -d $OLD/outgoing.d ]; then
         # Move any contents
         #
         if [ -d $OLD/$i ]; then
-            mv $OLD/$i/* $PREFIX/$i || true
-            rm -rf $OLD/$i          || true
+            mv $OLD/$i/* $PREFIX/$i >/dev/null 2>/dev/null || true
+            rm -rf $OLD/$i          >/dev/null 2>/dev/null || true
         fi
     done
 
