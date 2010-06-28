@@ -1,4 +1,4 @@
-symbiosis-firewall (2010:0623) stable; urgency=low
+symbiosis-firewall (2010:0628) stable; urgency=low
 
   * Updated to use /etc/symbiosis/firewall as the prefix
     directory rather than /etc/firewall
