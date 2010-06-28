@@ -24,6 +24,20 @@ By default the script will archive the results of its upgrades
 
 =cut
 
+=head1 DISABLING
+
+To disable the updater please run the following command:
+
+=for example begin
+
+echo "disabled=1" >> /etc/symbiosis/updater
+
+=for example end
+
+This will ensure the updater exits.
+
+=cut
+
 =head1 FILES
 
 The system will invoke B<apt-get> against the file

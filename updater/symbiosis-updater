@@ -65,9 +65,10 @@ fi
 
 
 #
-#  Exit silently if we shouldn't run
+#  Exit silently if we shouldn't run - this is configured
+# via "disabled=1" in /etc/symbiosis/updater
 #
-if [ -e /etc/symbiosis-update.disabled ]; then
+if [ ! -z "$disabled" -a "$disabled" ];  then
     exit
 fi
 
