@@ -521,7 +521,8 @@ sub processRules
         #
         # Ignore whitelisted IPs
         #
-        next if ( -e $CONFIG{ 'whitelist' } . "/$ip" );
+        next if ( ( -e $CONFIG{ 'whitelist' } . "/$ip" ) ||
+                  ( -e $CONFIG{ 'whitelist' } . "/$ip.auto" ) );
 
         #
         # The ports which were affected.
