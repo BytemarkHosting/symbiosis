@@ -23,6 +23,7 @@ firewall - A simple firewall generator
   Paths:
 
    --blacklist-d  A directory containing blacklisted hosts/ips.
+   --whitelist-d  A directory containing whitelisted hosts/ips.
    --incoming-d   The directory where incoming configuration is made.
    --outgoing-d   The directory where outgoing configuration is made.
    --local-d      A local directory containing scripts to execute afterwards.
@@ -75,6 +76,10 @@ This directory is examined to determine which rules should be applied to outgoin
 =item /etc/symbiosis/firewall/local.d/
 Executable shell-scripts in this directory are executed after the firewall
 is installed.
+
+=item /etc/symbiosis/firewall/whitelist.d/
+Any file present in this directory is assumed to be the IP address of a machine you wish to globally allow connections from.
+
 
 =back
 
@@ -174,9 +179,10 @@ my %SERVICE;
 #
 $CONFIG{ 'blacklist.d' } = "/etc/symbiosis/firewall/blacklist.d/";
 $CONFIG{ 'incoming.d' }  = "/etc/symbiosis/firewall/incoming.d/";
-$CONFIG{ 'outgoing.d' }  = "/etc/symbiosis/firewall/outgoing.d/";
 $CONFIG{ 'local.d' }     = "/etc/symbiosis/firewall/local.d/";
+$CONFIG{ 'outgoing.d' }  = "/etc/symbiosis/firewall/outgoing.d/";
 $CONFIG{ 'rule.d' }      = "/usr/share/firewall/rule.d/";
+$CONFIG{ 'whitelist.d' } = "/etc/symbiosis/firewall/whitelist.d/";
 
 
 
@@ -223,9 +229,15 @@ my $tempfile = createTemporaryFile();
 
 
 #
+#  Whitelist any special sources immediately.
+#
+processWhitelist($tempfile);
+
+
+#
 #  Blacklist any blacklisted sources immediately.
 #
-createBlacklist($tempfile);
+processBlacklist($tempfile);
 
 
 #
@@ -397,6 +409,7 @@ sub parseCommandLineArguments
                       "no-root",       \$CONFIG{ 'no-root' },
                       "incoming-d=s",  \$CONFIG{ 'incoming.d' },
                       "blacklist-d=s", \$CONFIG{ 'blacklist.d' },
+                      "whitelist-d=s", \$CONFIG{ 'whitelist.d' },
                       "outgoing-d=s",  \$CONFIG{ 'outgoing.d' },
                       "rule-d=s",      \$CONFIG{ 'rule.d' },
                       "servics=s",     \$CONFIG{ 'services' },
@@ -613,6 +626,92 @@ EOF
 
 
 
+
+=begin doc
+
+For each file which is named with an IP address in our whitelist
+directory update our script to allow it.
+
+=end doc
+
+=cut
+
+
+sub processWhitelist
+{
+    my ($file) = (@_);
+
+
+    #
+    #  Open our temporary firewall script to append the new
+    # entries to it.
+    #
+    open( FILE, ">>", $file ) or
+      die "ERROR: failed to append to temporary file $file - $!";
+
+
+    #
+    #  For each file.
+    #
+    foreach my $file ( sort( glob( $CONFIG{ 'whitelist.d' } . "/*" ) ) )
+    {
+
+        #
+        #  If it is a file, and not a directory.
+        #
+        if ( ( -e $file ) && ( !-d $file ) )
+        {
+
+            #
+            #  The name of the file will be an IP, optionally
+            # with an ".auto" suffix.
+            #
+            my $name = basename($file);
+
+            #
+            #  Strip suffix, if present.
+            #
+            $name =~ s/\.auto$//g if ( $name =~ /\.auto$/i );
+
+            #
+            #  If it is an IPv4 address.
+            #
+            if ( $name =~ /^([0-9\.]+)$/ )
+            {
+
+                # ignore localhost.
+                next if ( $name =~ /^127.0./ );
+
+                $CONFIG{ 'verbose' } &&
+                  print "Whitelisting IP address: $name\n";
+
+                print FILE "\n";
+                print FILE "# whitelisted IP: $name due to $file\n";
+                print FILE
+                  "/sbin/iptables -A INPUT -p all --src $name -j ACCEPT\n";
+            }
+
+            #
+            # Is it an IPv6 address?
+            #
+            if ( ( $name =~ /:/ ) &&
+                 ( isIPv6() ) )
+            {
+                print FILE
+                print FILE "\n";
+                print FILE "# whitelisted IP: $name due to $file\n";
+                print FILE
+                  "/sbin/ip6tables -A INPUT -p all --src $name -j ACCEPT\n";
+            }
+        }
+    }
+
+    close(FILE);
+}
+
+
+
+
 =begin doc
 
 For each file which is named with an IP address in our blacklist
@@ -623,21 +722,21 @@ directory update our script to drop it.
 =cut
 
 
-sub createBlacklist
+sub processBlacklist
 {
     my ($file) = (@_);
 
 
     #
     #  Open our temporary firewall script to append the new
-    # blacklisted entries to it.
+    # entries to it.
     #
     open( FILE, ">>", $file ) or
       die "ERROR: failed to append to temporary file $file - $!";
 
 
     #
-    #  For each blacklist-file.
+    #  For each file.
     #
     foreach my $file ( sort( glob( $CONFIG{ 'blacklist.d' } . "/*" ) ) )
     {
@@ -654,6 +753,11 @@ sub createBlacklist
             my $name = basename($file);
 
             #
+            #  Strip the suffix.
+            #
+            $name =~ s/\.auto$//g if ( $name =~ /\.auto$/i );
+
+            #
             #  If the file is zero-bytes in size we block all
             # incoming access from the named IP.
             #
@@ -668,8 +772,7 @@ sub createBlacklist
                 #
                 #  If it is an IPv4 address.
                 #
-                if ( ( $name =~ /^([0-9\.]+)$/ ) ||
-                     ( $name =~ /^([0-9\.]+).auto$/i ) )
+                if ( $name =~ /^([0-9\.]+)$/ )
                 {
 
                     # ignore localhost.
@@ -681,7 +784,9 @@ sub createBlacklist
                     $CONFIG{ 'verbose' } &&
                       print "Blacklisting IP address: $name\n";
 
-                    print FILE "# blacklisted IP: $name\n";
+
+                    print FILE "\n";
+                    print FILE "# blacklisted IP: $name due to $file\n";
                     print FILE
                       "/sbin/iptables -A INPUT -p all --src $name -j REJECT -m state --state NEW\n";
                 }
@@ -692,6 +797,9 @@ sub createBlacklist
                 if ( ( $name =~ /:/ ) &&
                      ( isIPv6() ) )
                 {
+                    print FILE "\n";
+                    print FILE "# blacklisted IP: $name due to $file\n";
+                    print FILE
                     print FILE
                       "/sbin/ip6tables -A INPUT -p all --src $name -j REJECT -m state --state NEW\n";
                 }
@@ -729,15 +837,11 @@ sub createBlacklist
                 #
                 #  Blacklist
                 #
-                if ( ( $name =~ /^([0-9\.]+)$/ ) ||
-                     ( $name =~ /^([0-9\.]+).auto$/i ) )
+                if ( $name =~ /^([0-9\.]+)$/ )
                 {
 
                     # ignore localhost.
                     next if ( $name =~ /^127.0/ );
-
-                    # strip ".auto" if present.
-                    $name =~ s/\.auto$//g;
 
                     foreach my $port (@ports)
                     {
