@@ -37,4 +37,4 @@ test:
 	if [ ! -d ./i/blacklist.d/ ]; then mkdir ./i/blacklist.d/; fi
 	touch ./i/incoming.d/00-ssh
 	touch ./i/incoming.d/05-ping
-	sudo ./bin/firewall --incoming-d=./i/incoming.d --outgoing-d=./i/outgoing.d/ --rule-d=./rule.d/ --no-exec --verbose --blacklist-d=./i/blacklist  --no-delete --verbose
+	sudo ./bin/firewall --incoming-d=./i/incoming.d --outgoing-d=./i/outgoing.d/ --rule-d=./rule.d/ --no-exec --verbose --blacklist-d=./i/blacklist.d --whitelist-d=./i/whitelist.d  --no-delete --verbose
