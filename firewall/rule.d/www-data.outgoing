@@ -21,8 +21,8 @@
 /sbin/iptables -D OUTPUT -j no_www    >/dev/null 2>/dev/null
 /sbin/iptables --flush no_www         >/dev/null 2>/dev/null
 /sbin/iptables --delete-chain no_www  >/dev/null 2>/dev/null
-/sbin/iptables --new-chain no_www
-/sbin/iptables -A OUTPUT -j no_www
+/sbin/iptables --new-chain no_www     >/dev/null 2>/dev/null
+/sbin/iptables -A OUTPUT -j no_www    >/dev/null 2>/dev/null
 
 
 #  Loopback traffic is fine
