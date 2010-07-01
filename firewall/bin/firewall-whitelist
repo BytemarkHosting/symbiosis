@@ -144,9 +144,10 @@ end
 
 
 #
-#  Finally re-run the firewall if we updated
+#  Finally re-run the firewall if we updated, or if we removed
+# an expired entry.
 #
-if ( updated )
+if ( ( updated ) || ( expired ) )
 
   puts "Updated whitelist, re-running firewall" if ( $VERBOSE )
 
