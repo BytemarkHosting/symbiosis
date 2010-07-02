@@ -32,6 +32,13 @@ if [ -e /etc/update-packages.conf ]; then
 fi
 
 #
+#  Remove old configuration file.
+#
+if [ -e /etc/cron.daily/cron-apt ]; then
+    rm /etc/cron.daily/cron-apt
+fi
+
+#
 #  Remove the old files we might have had present by accident
 #
 for i in /etc/cron.daily/update-packages /etc/cron.d/bytemark-vhost-updater /etc/cron.d/symbiosis-update ; do
