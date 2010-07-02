@@ -1,11 +1,10 @@
 usr/bin
-etc/cron.hourly
 etc/network/if-up.d
 etc/network/if-down.d
 usr/share/man/man1
-etc/firewall/incoming.d/
-etc/firewall/local.d/
-etc/firewall/outgoing.d/
-etc/firewall/blacklist.d/
-etc/firewall/patterns.d/
-etc/firewall/whitelist.d/
+etc/symbiosis/firewall/incoming.d/
+etc/symbiosis/firewall/local.d/
+etc/symbiosis/firewall/outgoing.d/
+etc/symbiosis/firewall/blacklist.d/
+etc/symbiosis/firewall/patterns.d/
+etc/symbiosis/firewall/whitelist.d/
