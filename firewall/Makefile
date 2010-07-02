@@ -15,6 +15,8 @@ nop:
 clean:
 	if [ -d ./man ] ; then rm -rf ./man ; fi
 	if [ -d ./i ] ; then rm -rf ./i ; fi
+	make -C ext clean
+	$(RM) ext/Makefile
 
 
 man/%.man: ./bin/%
@@ -41,5 +43,12 @@ test: ext/symbiosis_utmp.so
 	touch ./i/incoming.d/00-ssh
 	touch ./i/incoming.d/05-ping
 	fakeroot ./bin/firewall --incoming-d=./i/incoming.d --outgoing-d=./i/outgoing.d/ --rule-d=./rule.d/ --no-exec --verbose --blacklist-d=./i/blacklist.d --whitelist-d=./i/whitelist.d  --no-delete --verbose
+
+
+ext/symbiosis_utmp.so: ext/Makefile
+	make -C ext $(notdir $@)
+
+ext/Makefile: ext/extconf.rb
+	cd ext/ && ruby $(notdir $<)
 
 .PHONY: test
