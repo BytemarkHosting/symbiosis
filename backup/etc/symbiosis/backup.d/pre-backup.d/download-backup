@@ -4,8 +4,12 @@
 # --------
 #
 # This script is designed to determine the name of any remote
-# backup space associated with this machine and upload the local
-# archive, produced by backup2l, to this location.
+# backup space associated with this machine and upload any files
+# stored within that backup space, previously produced by backup2l,
+# to the local machine.
+#
+# This is designed to ensure that no local backups are lost if the
+# machine is re-imaged, or local backups are removed due to user-error
 #
 #
 # Override
@@ -49,9 +53,9 @@ if [ -e /etc/symbiosis/dns.d/backup.name ]; then
     fi
 
     #
-    #  Otherwise we can rsync immediately from the specified location
+    #  Otherwise we can rsync immediately to the specified location
     #
-    rsync -vazr $(cat /etc/symbiosis/dns.d/backup.name) /var/backups
+    rsync -vazr /var/backups $(cat /etc/symbiosis/dns.d/backup.name)
     exit 0;
 fi
 
@@ -119,6 +123,6 @@ name=$(echo $name | awk -F\. '{print $1}' )
 #
 #    example.backup.bytemark.co.uk::example/example.vm.bytemark.co.uk/
 #
-rsync -vazr $name.backup.bytemark.co.uk::$name/$(hostname --fqdn)/  /var/backups
+rsync -vazr /var/backups $name.backup.bytemark.co.uk::$name/$(hostname --fqdn)/
 
 exit 0

@@ -1,13 +1,14 @@
-symbiosis-backup (2010:0525) stable; urgency=low
+symbiosis-backup (2010:0701) stable; urgency=low
 
   [ Steve Kemp ]
+  * Renamed to symbiosis-backup
   * Move to a modular configuration file.
     - Added /etc/bytemark-vhost/backup.d/ for the storage of all
       backup related code.
     - Added pre-backup.d/ for scripts to run prior to backup execution.
     - Added post-backup.d/ for scripts to run post-backup.
-    - Attempt to automatically rsync the backup remotely.
-  * Renamed to symbiosis-backup
+    - Attempt to automatically rsync the backup remotely, both before
+      and after a backup runs.
 
   [ Patrick J Cherry ]
   * Switched to dpkg-source 3.0 (native) format
