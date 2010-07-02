@@ -1,5 +1,4 @@
 usr/bin
-etc/cron.hourly
 etc/network/if-up.d
 etc/network/if-down.d
 usr/share/man/man1
