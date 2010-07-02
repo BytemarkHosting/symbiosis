@@ -3,12 +3,12 @@ Section: net
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man
+Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man, ruby-pkg-tools, ruby-dev
 Standards-Version: 3.8.0
 
 Package: symbiosis-firewall
-Architecture: all
-Depends: iptables, dnsutils, iproute, ruby
+Architecture: any
+Depends: iptables, dnsutils, iproute, ruby, ${shlibs:Depends}, ${misc:Depends}
 Replaces: bytemark-vhost-ssh-protection, bytemark-vhost-firewall
 Conflicts: bytemark-vhost-firewall, bytemark-vhost-ssh-protection (<< 20081110153344)
 Suggests: libnet-dns-perl

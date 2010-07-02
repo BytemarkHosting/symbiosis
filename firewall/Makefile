@@ -30,11 +30,16 @@ manpage: ./bin/firewall man/firewall-whitelist.man
 
 all: manpage
 
-test:
+distclean: clean
+
+test: ext/symbiosis_utmp.so
+	cd test && ruby ./tc_symbiosis_utmp.rb
 	if [ ! -d ./i ]; then mkdir ./i ; fi
 	if [ ! -d ./i/incoming.d/ ]; then mkdir ./i/incoming.d/; fi
 	if [ ! -d ./i/outgoing.d/ ]; then mkdir ./i/outgoing.d/; fi
 	if [ ! -d ./i/blacklist.d/ ]; then mkdir ./i/blacklist.d/; fi
 	touch ./i/incoming.d/00-ssh
 	touch ./i/incoming.d/05-ping
-	sudo ./bin/firewall --incoming-d=./i/incoming.d --outgoing-d=./i/outgoing.d/ --rule-d=./rule.d/ --no-exec --verbose --blacklist-d=./i/blacklist.d --whitelist-d=./i/whitelist.d  --no-delete --verbose
+	fakeroot ./bin/firewall --incoming-d=./i/incoming.d --outgoing-d=./i/outgoing.d/ --rule-d=./rule.d/ --no-exec --verbose --blacklist-d=./i/blacklist.d --whitelist-d=./i/whitelist.d  --no-delete --verbose
+
+.PHONY: test

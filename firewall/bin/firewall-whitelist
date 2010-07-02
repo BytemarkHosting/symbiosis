@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#! /usr/bin/ruby1.8
 #
 # NAME
 #
@@ -32,6 +32,7 @@
 
 require 'getoptlong'
 require 'ipaddr'
+require 'symbiosis/utmp'
 
 opts = GetoptLong.new(
     [ '--help',    '-h', GetoptLong::NO_ARGUMENT ],
@@ -97,18 +98,10 @@ end
 puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
 
 
-
-ip_addresses = {}
-
-
 #
-#  Run last to find the IPs, store unique ones in a hash.
+# Fetch the IP addresses
 #
-IO.popen("/usr/bin/last -i") {|pipe| pipe.readlines}.each do |l|
-  next unless l =~ /[ \t]((\d{1,3}\.){3,3}\d{1,3}|[0-9a-f:]+)[ \t]/
-  ip_addresses[ $1 ] = 1
-end
-
+ip_addresses = Symbiosis::Utmp.read.collect{|entry| entry["ip"]}
 
 #
 #  Did we update?
@@ -118,9 +111,21 @@ updated=false
 #
 #  Iterate over each IP
 #
-ip_addresses.each_key do |ip|
-  if ( ( ip =~ /^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$/ ) &&
-       ( ip !~ /^(127|0)\./ ) )
+ip_addresses.each do |ip|
+  #
+  # We only want IP addresses.
+  #
+  next unless ip.is_a?(IPAddr)
+
+  #
+  # FIXME: Need better IPv6 conditions.
+  #
+  if ( ( ip.ipv4? and 
+         !( IPAddr.new("127.0.0.1/8").include?(ip) or IPAddr.new("0.0.0.0") == ip )
+       ) or (
+         ip.ipv6? and IPAddr.new("2000::/3").include?(ip)
+       ) 
+     )
 
     puts "Found IP address: #{ip}" if ( $VERBOSE )
 
