@@ -8,7 +8,7 @@ symbiosis-backup (2010:0705) stable; urgency=low
     - Added pre-backup.d/ for scripts to run prior to backup execution.
     - Added post-backup.d/ for scripts to run post-backup.
     - Attempt to automatically rsync the backup remotely, both before
-      and after a backup runs.
+      and after the backup execution.
 
   [ Patrick J Cherry ]
   * Switched to dpkg-source 3.0 (native) format
