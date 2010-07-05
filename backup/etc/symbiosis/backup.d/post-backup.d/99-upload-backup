@@ -29,15 +29,7 @@
 
 
 #
-#  Local backup directory.
-#
-src=/var/backups/
-
-
-
-#
 #  The remote rsync location might be hardwired.
-#
 #
 if [ -e /etc/symbiosis/dns.d/backup.name ]; then
 
@@ -51,7 +43,7 @@ if [ -e /etc/symbiosis/dns.d/backup.name ]; then
     #
     #  Otherwise we can rsync immediately from the specified location
     #
-    rsync -vazr $(cat /etc/symbiosis/dns.d/backup.name) /var/backups
+    rsync -vazr /var/backups/ $(cat /etc/symbiosis/dns.d/backup.name)
     exit 0;
 fi
 
@@ -119,6 +111,6 @@ name=$(echo $name | awk -F\. '{print $1}' )
 #
 #    example.backup.bytemark.co.uk::example/example.vm.bytemark.co.uk/
 #
-rsync -vazr $name.backup.bytemark.co.uk::$name/$(hostname --fqdn)/  /var/backups
+rsync -vazr /var/backups/ $name.backup.bytemark.co.uk::$name/$(hostname --fqdn)/
 
 exit 0
