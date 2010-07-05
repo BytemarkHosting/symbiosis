@@ -4,7 +4,7 @@
 # --------
 #
 # This script is designed to determine the name of any remote
-# backup space associated with this machine and upload any files
+# backup space associated with this machine and download any files
 # stored within that backup space, previously produced by backup2l,
 # to the local machine.
 #
@@ -23,7 +23,7 @@
 # Disabling
 # ---------
 #
-# To disable uploads completely create the an empty file named
+# To disable uploads/downloads completely create the empty file named
 # "/etc/symbiosis/dns.d/backup.name".
 #
 # Steve
@@ -55,7 +55,7 @@ if [ -e /etc/symbiosis/dns.d/backup.name ]; then
     #
     #  Otherwise we can rsync immediately to the specified location
     #
-    rsync -vazr /var/backups $(cat /etc/symbiosis/dns.d/backup.name)
+    rsync -vazr $(cat /etc/symbiosis/dns.d/backup.name) /var/backups
     exit 0;
 fi
 
@@ -123,6 +123,5 @@ name=$(echo $name | awk -F\. '{print $1}' )
 #
 #    example.backup.bytemark.co.uk::example/example.vm.bytemark.co.uk/
 #
-rsync -vazr /var/backups $name.backup.bytemark.co.uk::$name/$(hostname --fqdn)/
-
+rsync -vazr $name.backup.bytemark.co.uk::$name/$(hostname --fqdn)/ /var/backups
 exit 0
