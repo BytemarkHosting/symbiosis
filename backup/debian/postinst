@@ -60,6 +60,11 @@ ln -sf /etc/symbiosis/backup.d/backup2l.conf $conf
 if [ -d /etc/bytemark-vhost/backup.d ]; then
     rm -rf  /etc/bytemark-vhost/backup.d
 fi
+for i in download-backup dump-mysql ; do
+    if [ -e /etc/symbiosis/backup.d/pre-backup.d/$i ]; then
+        rm /etc/symbiosis/backup.d/pre-backup.d/$i
+    fi
+done
 
 
 #DEBHELPER#
