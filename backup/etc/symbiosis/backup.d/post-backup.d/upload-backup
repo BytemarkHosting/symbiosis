@@ -19,7 +19,7 @@
 # Disabling
 # ---------
 #
-# To disable uploads completely create the an empty file named
+# To disable uploads completely create the empty file named
 # "/etc/symbiosis/dns.d/backup.name".
 #
 # Steve
