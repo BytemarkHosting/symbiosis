@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+#
+# symbiosis-combine-ssl
+#
+# TODO: document
+#
+#
+
+
+basename = ARGV[0] || "ssl"
+combined = []
+
+raise ArgumentError, "Bad-looking basename" unless basename =~ /^([A-Za-z0-9]+\.?)*$/
+
+raise Errno::EEXIST, "#{basename}.combined" if File.exists?("#{basename}.combined")
+
+%w(key crt).each do |ext|
+  combined += File.open("#{basename}.#{ext}"){|fh| fh.readlines}.collect{|l| l.chomp}
+end
+
+File.open("#{basename}.combined","w+"){|fh| fh.puts combined.join("\n")}
+
