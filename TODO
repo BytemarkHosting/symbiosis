@@ -31,7 +31,9 @@ SSL
 1. Fixup the SSL certificate for any additional IPs.
    (#227001 has the problem and a solution.)
 
-
+2. Change create-ssl-sites to guess at key, crt, and combined SSL stuff, such
+that the docs say "save the key as ssl.key, and the cert as ssl.crt", whilst
+maintaining having a combined crt/key as ssl.key.
 
 Email
 -----
