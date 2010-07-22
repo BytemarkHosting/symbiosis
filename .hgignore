@@ -51,6 +51,19 @@ syntax: glob
 
 
 #
+#  Firewall
+#
+./firewall/ext/*.o
+./firewall/ext/*.so
+./firewall/man/
+./firewall/debian/symbiosis-firewall/
+./firewall/.config-symbiosis-firewall
+./firewall/InstalledFiles
+./firewall/debian-setup.rb
+./firewall/ext/Makefile
+
+
+#
 #  FTP
 #
 ./ftpd/debian/symbiosis-ftpd/
