@@ -1,0 +1,26 @@
+syntax: glob
+
+#
+#  GLobal
+#
+*/build-stamp
+*/configure-stamp
+*/debian/*.log
+*/debian/*.substvars
+*/debian/files
+
+#
+#  Per-Package
+#
+./apache/*/.libs/*
+./apache/debian/libapache2-mod-ruid/
+./apache/debian/libapache2-mod-vhost-bytemark
+./apache/debian/symbiosis-httpd-static/
+./apache/debian/symbiosis-httpd/
+./apache/ruid/mod_ruid.la
+./apache/ruid/mod_ruid.lo
+./apache/ruid/mod_ruid.slo
+./apache/vhost-alias/mod_vhost_bytemark.la
+./apache/vhost-alias/mod_vhost_bytemark.lo
+./apache/vhost-alias/mod_vhost_bytemark.slo
+./apache/vhost-alias/test-strip
