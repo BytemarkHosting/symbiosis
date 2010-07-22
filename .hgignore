@@ -53,6 +53,10 @@ syntax: glob
 ./meta/debian/*.debhelper
 ./meta/debian/bytemark-vhost/
 
+#
+#  PAM
+#
+./pam/debian/symbiosis-pam/
 
 #
 #  Test
