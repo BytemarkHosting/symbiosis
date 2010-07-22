@@ -40,6 +40,14 @@ syntax: glob
 ./ftpd/debian/*.debhelper
 
 #
+#  Meta
+#
+./meta/debian/bytemark-symbiosis/
+./meta/debian/*.debhelper
+./meta/debian/bytemark-vhost/
+
+
+#
 #  Test
 #
 ./test/debian/symbiosis-test/
