@@ -9,7 +9,8 @@ configure-stamp:
 build: configure-stamp build-stamp
 build-stamp:
 	dh_testdir
-	cd src && make
+	cd src  && make
+	cd ruid && make
 	touch build-stamp
 
 clean:

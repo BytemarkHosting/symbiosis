@@ -25,6 +25,7 @@ test:
 
 clean:
 	cd src && make clean
+	cd ruid && make clean
 	@find . -name '.*~' -exec rm \{\} \;
 	@find . -name '.#*' -exec rm \{\} \;
 	@find . -name 'configure-stamp' -exec rm \{\} \;

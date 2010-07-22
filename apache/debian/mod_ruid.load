@@ -1,0 +1,6 @@
+LoadModule   ruid_module   /usr/lib/apache2/modules/mod_ruid.so
+User         www-data
+Group        www-data
+RMode        stat
+RGroups      www-data
+

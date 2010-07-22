@@ -20,6 +20,16 @@ Description: A mass-hosting module for Apache 2.x
  * Allows domains to be handled with or without a www. prefix.
 
 
+Package: libapache2-mod-ruid
+Architecture: any
+Depends: apache2.2-common, ${shlibs:Depends}, ${misc:Depends}
+Build-Depends: libcap-dev
+Pre-Depends: symbiosis-common
+Description: A per-uid module for Apache 2.x
+ This module allows you to run PHP scripts, CGI scripts, and similar
+ on a per-UID basis.
+ .
+
 Package: symbiosis-httpd
 Replaces: bytemark-vhost-httpd
 Conflicts: bytemark-vhost-httpd
