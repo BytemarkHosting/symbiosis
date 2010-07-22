@@ -30,7 +30,7 @@ manpage: ./bin/firewall man/firewall-whitelist.man
 	pod2man ./bin/firewall-logtail > ./man/firewall-logtail.1
 	pod2man ./bin/firewall-blacklist > ./man/firewall-blacklist.1
 
-all: manpage
+all: manpage ext/symbiosis_utmp.so
 
 distclean: clean
 
