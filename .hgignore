@@ -12,6 +12,10 @@ syntax: glob
 #
 #  Per-Package
 #
+
+#
+#  Apache
+#
 ./apache/*/.libs/*
 ./apache/debian/libapache2-mod-ruid/
 ./apache/debian/libapache2-mod-vhost-bytemark
@@ -24,3 +28,9 @@ syntax: glob
 ./apache/vhost-alias/mod_vhost_bytemark.lo
 ./apache/vhost-alias/mod_vhost_bytemark.slo
 ./apache/vhost-alias/test-strip
+
+
+#
+#  Test
+#
+./test/debian/symbiosis-test/
