@@ -78,3 +78,8 @@ syntax: glob
 #  Test
 #
 ./test/debian/symbiosis-test/
+
+#
+#  Updater
+#
+./updater/debian/symbiosis-updater/
