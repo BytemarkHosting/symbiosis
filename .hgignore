@@ -44,11 +44,15 @@ syntax: glob
 ./cron/debian/symbiosis-cron/
 
 #
+#  DNS
+#
+./dns/debian/symbiosis-tinydns/
+
+#
 #  Email
 #
 ./email/debian/symbiosis-email/
 ./email/man/*.man
-
 
 #
 #  Firewall
@@ -61,7 +65,6 @@ syntax: glob
 ./firewall/InstalledFiles
 ./firewall/debian-setup.rb
 ./firewall/ext/Makefile
-
 
 #
 #  FTP
