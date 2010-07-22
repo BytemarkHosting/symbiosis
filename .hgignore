@@ -88,3 +88,8 @@ syntax: glob
 #  Updater
 #
 ./updater/debian/symbiosis-updater/
+
+#
+#  Webmail
+#
+./webmail/debian/symbiosis-webmail/
