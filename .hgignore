@@ -34,6 +34,11 @@ syntax: glob
 
 
 #
+#  Common
+#
+./common/debian/symbiosis-common/
+
+#
 #  Cron
 #
 ./cron/debian/symbiosis-cron/
