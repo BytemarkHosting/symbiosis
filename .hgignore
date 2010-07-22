@@ -59,6 +59,11 @@ syntax: glob
 ./pam/debian/symbiosis-pam/
 
 #
+#  PHPMyAdmin
+#
+./phpmyadmin/debian/symbiosis-phpmyadmin/
+
+#
 #  Test
 #
 ./test/debian/symbiosis-test/
