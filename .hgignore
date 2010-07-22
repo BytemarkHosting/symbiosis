@@ -34,6 +34,13 @@ syntax: glob
 
 
 #
+#  Email
+#
+./email/debian/symbiosis-email/
+./email/man/*.man
+
+
+#
 #  FTP
 #
 ./ftpd/debian/symbiosis-ftpd/
