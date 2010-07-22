@@ -9,7 +9,7 @@ configure-stamp:
 build: configure-stamp build-stamp
 build-stamp:
 	dh_testdir
-	cd src  && make
+	cd vhost-alias && make
 	cd ruid && make
 	touch build-stamp
 

@@ -2,7 +2,7 @@ Source: symbiosis-httpd
 Section: web
 Priority: optional
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), apache2-dev
+Build-Depends: debhelper (>= 7.0.0), apache2-dev, libcap-dev
 Standards-Version: 3.8.0
 
 Package: libapache2-mod-vhost-bytemark
@@ -24,7 +24,6 @@ Package: libapache2-mod-ruid
 Provides: symbiosis-ruid
 Architecture: any
 Depends: apache2.2-common, ${shlibs:Depends}, ${misc:Depends}, libcap2
-Build-Depends: libcap-dev
 Description: A per-uid module for Apache 2.x
  This module allows you to run PHP scripts, CGI scripts, and similar
  on a per-UID basis.
@@ -50,6 +49,7 @@ Description: Tools to manage Apache virtual hosting
 
 
 Package: symbiosis-httpd-static
+Depends: ${misc:Depends}
 Architecture: any
 Description: Static files
  This package contains the static welcome page for the Bytemark Symbiosis
