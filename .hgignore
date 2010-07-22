@@ -34,6 +34,11 @@ syntax: glob
 
 
 #
+#  Cron
+#
+./cron/debian/symbiosis-cron/
+
+#
 #  Email
 #
 ./email/debian/symbiosis-email/
