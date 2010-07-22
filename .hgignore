@@ -64,6 +64,12 @@ syntax: glob
 ./phpmyadmin/debian/symbiosis-phpmyadmin/
 
 #
+#  Range
+#
+./range/debian/symbiosis-range/
+./range/man/*.man
+
+#
 #  Test
 #
 ./test/debian/symbiosis-test/
