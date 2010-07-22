@@ -1,3 +1,6 @@
+#
+#
+#
 syntax: glob
 
 #
@@ -29,6 +32,12 @@ syntax: glob
 ./apache/vhost-alias/mod_vhost_bytemark.slo
 ./apache/vhost-alias/test-strip
 
+
+#
+#  FTP
+#
+./ftpd/debian/symbiosis-ftpd/
+./ftpd/debian/*.debhelper
 
 #
 #  Test
