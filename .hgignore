@@ -32,11 +32,17 @@ syntax: glob
 ./apache/vhost-alias/mod_vhost_bytemark.slo
 ./apache/vhost-alias/test-strip
 
+#
+#  Backup
+#
+./backup/debian/symbiosis-backup/
 
 #
 #  Common
 #
 ./common/debian/symbiosis-common/
+./common/man/
+
 
 #
 #  Cron
@@ -80,6 +86,18 @@ syntax: glob
 ./meta/debian/bytemark-vhost/
 
 #
+#  Monit
+#
+./monit/rdoc/
+./monit/debian/symbiosis-monit/
+
+#
+#  MySQL
+#
+./mysql/debian/symbiosis-mysql/
+
+
+#
 #  PAM
 #
 ./pam/debian/symbiosis-pam/
@@ -104,6 +122,8 @@ syntax: glob
 #  Updater
 #
 ./updater/debian/symbiosis-updater/
+./updater/*.1
+
 
 #
 #  Webmail
