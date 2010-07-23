@@ -15,6 +15,7 @@ nop:
 clean:
 	if [ -d ./man ] ; then rm -rf ./man ; fi
 	if [ -d ./i ] ; then rm -rf ./i ; fi
+	cd ext && ruby extconf.rb
 	make -C ext clean
 	$(RM) ext/Makefile
 
