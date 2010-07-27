@@ -413,6 +413,13 @@ if __FILE__ == $0 then
   end
 
   #
+  # Ensure we're root
+  #
+  if ( ENV['USER'] != "root" )
+    puts "You must run this script as root"
+  end
+
+  #
   #  Do we need to restart apache?
   #
   $RESTART=false
