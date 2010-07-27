@@ -1,7 +1,26 @@
 #!/usr/bin/ruby
+#
+# NAME
+#
+#   create-ssl-sites -- Auto-configure SSL sites
+#
+# SYNOPSIS
+#
+#  Help Options:
+#
+#   --help        Show the help information for this script.
+#   --verbose     Show debugging information.
+#
+#
+# AUTHOR
+#
+#   Steve Kemp <steve@bytemark.co.uk>
+#
+
 
 require 'erb'
 require 'getoptlong'
+
 require 'symbiosis/domains.rb'
 
 
@@ -18,12 +37,14 @@ class SSLConfiguration
   attr_reader :domain
 
 
+
   #
   # Constructor.
   #
   def initialize( domain )
     @domain = domain
   end
+
 
 
   #
@@ -56,12 +77,14 @@ class SSLConfiguration
   end
 
 
+
   #
   # Is there an Apache site enabled for this domain?
   #
   def site_enabled?
     File.exists?( "/etc/apache2/sites-enabled/#{@domain}.ssl" )
   end
+
 
 
   #
@@ -76,6 +99,7 @@ class SSLConfiguration
   end
 
 
+
   #
   # Remove the apache file.
   #
@@ -88,8 +112,9 @@ class SSLConfiguration
     if ( File.exists?( "/etc/apache2/sites-available/#{@domain}.ssl" ) )
       File.unlink( "/etc/apache2/sites-available/#{@domain}.ssl" )
     end
-
   end
+
+
 
   #
   # Get the IP
@@ -97,6 +122,7 @@ class SSLConfiguration
   def ip
     File.open("/srv/#{@domain}/config/ip"){|fh| fh.readlines}.first.chomp
   end
+
 
 
   #
@@ -109,6 +135,8 @@ class SSLConfiguration
       ""
     end
   end
+
+
 
   #
   # Return the certificate file
@@ -139,8 +167,9 @@ class SSLConfiguration
     end
 
     ""
-
   end
+
+
 
   #
   # Update Apache to create a site for this domain.
@@ -302,28 +331,50 @@ EOF
                   "/etc/apache2/sites-enabled/#{@domain}.ssl" )
 
   end
+
+
 end
 
 
 
 
 #
-#  Entry point
+#  Entry point to the code
 #
 if __FILE__ == $0 then
 
-  VERBOSE = false
+  $VERBOSE = false
+  $HELP    = false
 
   opts = GetoptLong.new(
+                        [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
                         [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ]
                         )
 
 
   opts.each do |opt, arg|
     case opt
+    when '--help'
+      $HELP = true
     when '--verbose'
       $VERBOSE = true
     end
+  end
+
+  #
+  # CAUTION! Here be quality kode.
+  #
+  if $HELP
+    # Open the file, stripping the shebang line
+    lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
+
+    lines.each do |line|
+      line.chomp!
+      break if line.empty?
+      puts line[2..-1].to_s
+    end
+
+    exit 0
   end
 
   #
