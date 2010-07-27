@@ -45,6 +45,12 @@ syntax: glob
 
 
 #
+#  Crack
+#
+./crack/debian/symbiosis-crack/
+
+
+#
 #  Cron
 #
 ./cron/debian/symbiosis-cron/
