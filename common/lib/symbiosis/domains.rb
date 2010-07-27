@@ -40,17 +40,18 @@ class Symbiosis
     # Return each domain name
     #
     def domains
+      results = Array.new
 
       #
       #  For each domain.
       #
       Dir.foreach( @prefix ) do |domain|
         if ( domain !~ /^\./ )
-          push domains,domain
+          results.push(domain)
         end
       end
 
-      domains
+      results
     end
 
   end

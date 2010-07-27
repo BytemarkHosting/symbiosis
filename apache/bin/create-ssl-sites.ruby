@@ -2,7 +2,7 @@
 
 require 'erb'
 require 'getoptlong'
-
+require 'symbiosis/domains.rb'
 
 
 
@@ -334,7 +334,8 @@ if __FILE__ == $0 then
   #
   #  For each domain.
   #
-  Dir.foreach( "/srv/" ) do |domain|
+  helper = Symbiosis::Domains.new()
+  helper.domains.each do |domain|
 
 
     #
