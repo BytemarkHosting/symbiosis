@@ -11,6 +11,11 @@
 #   --help        Show the help information for this script.
 #   --verbose     Show debugging information.
 #
+# DETAILS
+#
+#   This script is designed to iterate over the domains hosted
+#  upon a Symbiosis system, and configure Apache to listen appropriate
+#  when a domain is configured for SSL hosting and not yet configured.
 #
 # AUTHOR
 #
