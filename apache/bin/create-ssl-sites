@@ -6,6 +6,11 @@
 #
 # SYNOPSIS
 #
+#  General Options:
+#
+#   --force       Force the re-creation of all SSL sites.
+#   --template    Specify an alternative template file to read.
+#
 #  Help Options:
 #
 #   --help        Show the help information for this script.
