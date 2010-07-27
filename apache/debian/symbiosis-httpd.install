@@ -1,4 +1,5 @@
-bin/create-ssl-sites     etc/cron.hourly/
-bin/configure-additional etc/cron.hourly/
-bin/make-logs            etc/cron.daily/
-etc/*                    etc/
+bin/create-ssl-sites      etc/cron.hourly/
+bin/configure-additional  etc/cron.hourly/
+bin/make-logs             etc/cron.daily/
+bin/symbiosis-combine-ssl usr/bin
+etc/*                     etc/
