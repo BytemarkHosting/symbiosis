@@ -1,3 +1,9 @@
+symbiosis-common (2010:0727) stable; urgency=low
+
+  * Install lib/symbiosis/domains.rb
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 27 Jul 2010 12:40:00 +0000
+
 symbiosis-common (2010:0625) stable; urgency=low
 
   * New package
