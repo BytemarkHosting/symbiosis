@@ -31,7 +31,7 @@ class SSLConfiguration
   #
   # SSL is enabled if we have:
   #
-  #  /srv/$domain/config/ip 
+  #  /srv/$domain/config/ip
   #
   # And one of:
   #
@@ -338,56 +338,50 @@ if __FILE__ == $0 then
   helper.domains.each do |domain|
 
 
+    puts "Domain: #{domain} " if ( $VERBOSE )
+
     #
-    # Skip dotfiles
+    #  Create a helper for the domain.
     #
-    if ( domain !~ /^\./ )
+    helper = SSLConfiguration.new( domain )
 
-      puts "Domain: #{domain} " if ( $VERBOSE )
+    #
+    #  If SSL is not enabled then we can skip
+    #
+    if ( helper.ssl_enabled? )
+
+      puts "\tSSL is enabled" if ( $VERBOSE )
 
       #
-      #  Create a helper for the domain.
+      #  If there is already a site enabled we only
+      # need to touch it if one of the SSL-files is more
+      # recent than the generated file.
       #
-      helper = SSLConfiguration.new( domain )
-
+      #  e.g. User adds /config/ssl.combined and a site
+      # is generated but broken because a mandatory bundle is missing.
       #
-      #  If SSL is not enabled then we can skip
-      #
-      if ( helper.ssl_enabled? )
+      if ( helper.site_enabled? )
 
-        puts "\tSSL is enabled" if ( $VERBOSE )
+        puts "\tSite already present" if ( $VERBOSE )
 
-        #
-        #  If there is already a site enabled we only
-        # need to touch it if one of the SSL-files is more
-        # recent than the generated file.
-        #
-        #  e.g. User adds /config/ssl.combined and a site
-        # is generated but broken because a mandatory bundle is missing.
-        #
-        if ( helper.site_enabled? )
-
-          puts "\tSite already present" if ( $VERBOSE )
-
-          puts "TODO:"
-          puts "TODO: check if a key is more recent than the site"
-          puts "TODO:"
-        else
-
-          puts "\tSite not already present" if ( $VERBOSE )
-
-          #
-          # Create site.
-          #
-          helper.create_ssl_site()
-
-          $RESTART=true
-        end
-
+        puts "TODO:"
+        puts "TODO: check if a key is more recent than the site"
+        puts "TODO:"
       else
-        puts "\tSSL is not enabled" if ( $VERBOSE )
 
+        puts "\tSite not already present" if ( $VERBOSE )
+
+        #
+        # Create site.
+        #
+        helper.create_ssl_site()
+
+        $RESTART=true
       end
+
+    else
+      puts "\tSSL is not enabled" if ( $VERBOSE )
+
     end
   end
 
