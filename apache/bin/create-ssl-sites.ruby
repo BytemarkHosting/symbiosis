@@ -122,7 +122,7 @@ class SSLConfiguration
 
 
   #
-  # Get the IP
+  # Get the IP for this domain.
   #
   def ip
     File.open("/srv/#{@domain}/config/ip"){|fh| fh.readlines}.first.chomp
@@ -338,6 +338,36 @@ EOF
   end
 
 
+
+  #
+  # Does the SSL site need updating because a file is more
+  # recent than the generated Apache site?
+  #
+  def outdated?
+
+    #
+    # creation time of the (previously generated) SSL-site.
+    #
+    site = File.ctime( "/etc/apache2/sites-available/#{@domain}.ssl" )
+
+
+    #
+    #  For each configuration file see if it is more recent
+    #
+    files = %w( ssl.combined ssl.key ssl.bundle ip )
+
+    files.each do |file|
+      if ( File.exists?( "/srv/#{@domain}/config/#{file}" ) )
+        ctime = File.ctime("/srv/#{@domain}/config/#{file}" )
+        if ( ctime > site )
+          return true
+        end
+      end
+    end
+
+    false
+  end
+
 end
 
 
@@ -420,9 +450,16 @@ if __FILE__ == $0 then
 
         puts "\tSite already present" if ( $VERBOSE )
 
-        puts "TODO:"
-        puts "TODO: check if a key is more recent than the site"
-        puts "TODO:"
+        if ( helper.outdated? )
+
+          puts "\tRecreating as it is older than the input file(s)" if ( $VERBOSE )
+          helper.remove_site()
+          helper.create_ssl_site()
+          $RESTART = true
+        else
+
+          puts "\tLeaving as-is" if ( $VERBOSE )
+        end
       else
 
         puts "\tSite not already present" if ( $VERBOSE )
