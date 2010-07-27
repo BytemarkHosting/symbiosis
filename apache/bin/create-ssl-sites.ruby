@@ -60,12 +60,7 @@ class SSLConfiguration
   # Is there an Apache site enabled for this domain?
   #
   def site_enabled?
-
-    if ( File.exists?( "/etc/apache2/sites-enabled/#{@domain}.ssl" ) )
-      true
-    else
-      false
-    end
+    File.exists?( "/etc/apache2/sites-enabled/#{@domain}.ssl" )
   end
 
 
@@ -293,6 +288,9 @@ NameVirtualHost <%= ip() %>:80
 
 EOF
 
+    #
+    # Write out to sites-enabled
+    #
     File.open( "/etc/apache2/sites-available/#{@domain}.ssl", "w" ) do |file|
       file.write template.result(binding)
     end
@@ -360,8 +358,12 @@ if __FILE__ == $0 then
 
         #
         #  If there is already a site enabled we only
-        # need to touch it if the date has changed.
-        ##
+        # need to touch it if one of the SSL-files is more
+        # recent than the generated file.
+        #
+        #  e.g. User adds /config/ssl.combined and a site
+        # is generated but broken because a mandatory bundle is missing.
+        #
         if ( helper.site_enabled? )
 
           puts "\tSite already present" if ( $VERBOSE )
