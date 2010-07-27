@@ -17,14 +17,12 @@ passwd-test: passwd-test.o
 #
 # Documentation
 #
-docs: vhost-test-passwords.man
-
-vhost-test-passwords.man:
-	pod2man ./vhost-test-passwords > vhost-test-passwords.man
+docs:
+	pod2man ./test-symbiosis-passwords > test-symbiosis-passwords.man
+	pod2man ./passwd-test.c            > passwd-test.man
 
 #
 #  Clean
 #
 clean:
-	-rm -f *.o *~ passwd-test vhost-test-passwords.man
-	-rm vhost-test-passwords.1
+	-rm -f *.o *~ passwd-test *.man

@@ -1,2 +1,2 @@
-passwd-test          /usr/sbin/
-vhost-test-passwords /usr/sbin/
+passwd-test              /usr/sbin/
+test-symbiosis-passwords /usr/sbin/
