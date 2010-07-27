@@ -1,6 +1,8 @@
 symbiosis-crack (2010:0627) stable; urgency=low
 
-  * Added manpage for the 'passwd-test' binary.
+  * Install both our binaries to /usr/bin rather than /usr/sbin.
+  * Added manpage for the 'passwd-test' binary which was missing one.
+  * Add a cronjob to test the passwords.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 27 Jul 2010 15:22:51 +0000
 

@@ -1,2 +1,3 @@
-passwd-test              /usr/sbin/
-test-symbiosis-passwords /usr/sbin/
+passwd-test              /usr/bin/
+test-symbiosis-passwords /usr/bin/
+etc/cron.d/              /etc/
