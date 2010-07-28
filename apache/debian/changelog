@@ -1,10 +1,10 @@
-symbiosis-httpd (2010:0727) stable; urgency=low
+symbiosis-httpd (2010:0728) stable; urgency=low
 
   [ Steve Kemp ]
   * Use a template file for the SSL-site creation, and honour the flag
     /srv/example.com/config/ssl-only
 
- -- Steve Kemp <steve@bytemark.co.uk>  Tue, 27 Jul 2010 14:00:41 +0000
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jul 2010 13:33:31 +0000
 
 symbiosis-httpd (2010:0722) stable; urgency=low
 
