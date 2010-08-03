@@ -8,6 +8,7 @@ vhost_no_local_mail:
   condition  = ${if and{ \
                  {!exists{VHOST_DIR/$domain/VHOST_MAILBOX_DIR/}} \
                  {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/default_forward}} \
+                 {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/aliases}} \
                 }}
   transport = remote_smtp
   same_domain_copy_routing = yes
