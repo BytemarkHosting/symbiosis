@@ -24,6 +24,11 @@ fi
 ##
 conf=/etc/backup2l.conf
 
+#
+#  The default directories to backup
+#
+SRCLIST=(/etc /root /srv /home /var/mail /var/lib /usr/local /var/backups/mysql)
+
 ##
 ##  If we're migrated then we'll have the file /etc/backup2l.conf
 ## be a symlink to the generated file.
@@ -38,7 +43,17 @@ if ( ! test -e $conf -a -h $conf ) ; then
     #
     mv $conf $conf.old >/dev/null 2>/dev/null || true
 
+    #
+    # Source the file to find the backup directories.
+    #
+    . $conf.old
 fi
+
+
+#
+#  Ensure our list of directories is setup
+#
+perl -pi -e "s!#SRCLIST#!${SRCLIST[*]}!g" /etc/symbiosis/backup.d/conf.d/10-directories.conf
 
 
 ##
