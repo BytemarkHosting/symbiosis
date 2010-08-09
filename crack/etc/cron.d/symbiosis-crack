@@ -1,9 +1,13 @@
 #
-#  Test the strength of system passwords, once per hour.
+#  Test the strength of user passwords.
 #
 #  Output will be sent to root by email.
 #
 
 
-1 * * * * root [ -x /usr/bin/test-symbiosis-passwords ] && /usr/bin/test-symbiosis-passwords
+# hourly check
+1  * * * * root [ -x /usr/bin/test-symbiosis-passwords ] && /usr/bin/test-symbiosis-passwords --hourly
+# weekly check
+47 6 * * 7 root [ -x /usr/bin/test-symbiosis-passwords ] && /usr/bin/test-symbiosis-passwords --weekly
+
 
