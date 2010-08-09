@@ -1,3 +1,10 @@
+symbiosis-crack (2010:0809) stable; urgency=low
+
+  * Updated the cronjob to run in either an hourly or weekly mode.
+  * The alerted email contains useful information.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 9 Aug 2010 09:07:51 +0000
+
 symbiosis-crack (2010:0627) stable; urgency=low
 
   * Install both our binaries to /usr/bin rather than /usr/sbin.
