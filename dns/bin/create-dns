@@ -10,7 +10,7 @@ create-dns - Create tinydns snippets for each hosted domain
 
   Options:
 
-   --force       Force the DNS data to be uploaded, even if no changes.
+   --force       Force the DNS data to be uploaded, even if not changed.
 
   Help Options:
 
@@ -18,18 +18,20 @@ create-dns - Create tinydns snippets for each hosted domain
    --manual      Read the manual for this script.
    --verbose     Show useful debugging information.
    --prefix      Directory beneath which domains are found (default: /srv)
-   --template    DNS template file (default: /etc/symbiosis/dns.d/template)
-   --output      Directory where the DNS data should be output (default: /root/BytemarkDNS)
+   --template    DNS template file
+                 (default: /etc/symbiosis/dns.d/template)
+   --output      Directory where the DNS data should be output
+                 (default: /root/BytemarkDNS)
 
 =cut
 
 
 =head1 ABOUT
 
-  The create-dns script is used to generate a valid TinyDNS file for
- each hosted domain.
+The create-dns script is used to generate a valid TinyDNS file for
+each hosted domain.
 
-  These snippets will then be uploaded to the Bytemark DNS server(s).
+These snippets will then be uploaded to the Bytemark DNS server(s).
 
 =cut
 
@@ -611,14 +613,14 @@ sub hasDataChanged
     #
     my $result = $hash->hexdigest;
 
+
     #
     #  If there is no existing record, then create one.
     #
-    #  If there is no hash then we've not changed.
+    #  If there is no hash then we've changed.
     #
     if ( !-e "/root/BytemarkDNS/.hash" )
     {
-        print "HASH MISSING\n";
         open( FILE, ">", "/root/BytemarkDNS/.hash" );
         print FILE $result . "\n";
         close(FILE);
