@@ -1,3 +1,10 @@
+symbiosis-tinydns (2010:0810) stable; urgency=low
+
+  * Avoid displaying obsolete debugging information when first
+    running.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 10 Aug 2010 10:33:01 +0000
+
 symbiosis-tinydns (2010:0519) stable; urgency=low
 
   [ Steve Kemp ]
