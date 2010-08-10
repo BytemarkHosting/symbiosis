@@ -1,8 +1,13 @@
 order deny,allow
 deny from all
+
 # local system
 allow from 127.0.0.1
+
 # Office allocation
 allow from 89.16.168.128/25
-# openvpn range
+
+# openvpn ranges
 allow from 80.68.83.160/27
+allow from 212.110.162.224/27
+
