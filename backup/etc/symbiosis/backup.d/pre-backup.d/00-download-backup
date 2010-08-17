@@ -53,9 +53,9 @@ if [ -e /etc/symbiosis/dns.d/backup.name ]; then
     fi
 
     #
-    #  Otherwise we can rsync immediately to the specified location
+    #  Otherwise we can rsync immediately from the specified location
     #
-    rsync -vazr $(cat /etc/symbiosis/dns.d/backup.name) /var/backups/
+    rsync -vazr $(cat /etc/symbiosis/dns.d/backup.name)/localhost/ /var/backups/localhost/
     exit 0;
 fi
 
@@ -123,5 +123,5 @@ name=$(echo $name | awk -F\. '{print $1}' )
 #
 #    example.backup.bytemark.co.uk::example/example.vm.bytemark.co.uk/
 #
-rsync -vazr $name.backup.bytemark.co.uk::$name/$(hostname --fqdn)/ /var/backups/
+rsync -vazr $name.backup.bytemark.co.uk::$name/$(hostname --fqdn)/localhost/ /var/backups/localhost/
 exit 0
