@@ -31,11 +31,12 @@
 #
 
 require 'symbiosis/range'
+require 'fileutils'
 
 #
 #  Local backup directory.
 #
-src = "/var/backups/"
+src = "/var/backups"
 
 #
 # Automatically determine the primary backup space
@@ -56,11 +57,13 @@ end
 #
 if name =~ /\.backup\.bytemark\.co\.uk$/
   # Grab the FQDN
-  fqdn = `hostname --fqdn`
+  fqdn = `hostname --fqdn`.chomp
   dest = name+"::"+name.split(".").first+"/"+fqdn
 else
   dest = name
 end
+
+FileUtils.mkdir_p("#{src}/localhost") unless File.directory?("#{src}/localhost")
 
 #
 #  Now rsync.
@@ -70,7 +73,11 @@ end
 #
 #    example.backup.bytemark.co.uk::example/example.vm.bytemark.co.uk/
 #
-`rsync -vazr #{dest}/localhost/ #{src}/localhost/`
+puts "Ensuring directory structure is present..."
+puts `rsync --verbose --human-readable --dirs #{src}/localhost #{dest}/`
+
+puts "\nSynchronising backups from #{dest}/localhost..."
+puts `rsync --verbose --archive --recursive --human-readable #{dest}/localhost/ #{src}/localhost/`
 
 #
 # Exit with the exit status of the rsync command

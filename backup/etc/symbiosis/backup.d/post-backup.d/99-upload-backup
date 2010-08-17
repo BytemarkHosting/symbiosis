@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/ruby
 #
 # Overview
 # --------
@@ -26,82 +26,42 @@
 # --
 #
 
-
-
-#
-#  The remote rsync location might be hardwired.
-#
-if [ -e /etc/symbiosis/dns.d/backup.name ]; then
-
-    #
-    #  If the file is empty then we just abort.
-    #
-    if [ ! -s /etc/symbiosis/dns.d/backup.name ]; then
-        exit 0;
-    fi
-
-    #
-    #  Otherwise we can rsync immediately from the specified location
-    #
-    rsync -vazr /var/backups/ $(cat /etc/symbiosis/dns.d/backup.name)
-    exit 0;
-fi
-
-
-
-
-###
-##
-#
-#  OK we don't have an explicit name specified, so we need to look it up
-# dynamically.
-#
-##
-###
-
-
+require 'symbiosis/range'
 
 #
-#  Find the IP address associated with eth0.
+#  Local backup directory.
 #
-eth0=$(/sbin/ifconfig eth0 | grep 'inet addr:' | awk '{print $2}' | awk -F: '{print $2}' )
-
-
+src = "/var/backups/"
 
 #
-#  We need the IP reversed on an octet-basis for the DNS lookup.
+# Automatically determine the primary backup space
 #
-one=$(echo $eth0   | awk -F\. '{print $1}')
-two=$(echo $eth0   | awk -F\. '{print $2}')
-three=$(echo $eth0 | awk -F\. '{print $3}')
-four=$(echo $eth0  | awk -F\. '{print $4}')
-
-
-
-#
-#  Attempt to find the name of the associated backup space via a
-# DNS lookup.
-#
-name=$(dig txt  $four.$three.$two.$one.backup-reverse.bytemark.co.uk +short | tr -d \")
-
-
+name = Symbiosis::Range.primary_backup_space.to_s
 
 #
 #  If we didn't get a name then exit.
 #
-if [ -z "$name" ]; then
-    echo "Failed to determine backup space name for $eth0"
-    exit 0
-fi
-
+if name.empty?
+  puts "Failed to determine backup space name.  Not downloading existing backups."
+  exit 0
+end
 
 #
-#  OK we got a name of the form "foo.backup.bytemark.co.uk"
+#  If we got a name of the form "foo.backup.bytemark.co.uk" truncate at the
+#  first part.  Otherwise use the name untouched.
 #
-#  Truncate at the first part.
-#
-name=$(echo $name | awk -F\. '{print $1}' )
-
+if name =~ /\.backup\.bytemark\.co\.uk$/
+  #  If the name of the machine is example.vm.bytemark.co.uk we'll expect
+  # to upload to:
+  #
+  #    example.backup.bytemark.co.uk::example/example.vm.bytemark.co.uk/
+  #
+  
+  fqdn = `hostname --fqdn`.chomp
+  dest = name+"::"+name.split(".").first+"/"+fqdn
+else
+  dest = name
+end
 
 #
 #  Now rsync.
@@ -111,6 +71,11 @@ name=$(echo $name | awk -F\. '{print $1}' )
 #
 #    example.backup.bytemark.co.uk::example/example.vm.bytemark.co.uk/
 #
-rsync -vazr /var/backups/ $name.backup.bytemark.co.uk::$name/$(hostname --fqdn)/
+puts "Sending backups to #{dest}...\n"
 
-exit 0
+puts `rsync --delete-before --delete-excluded --exclude 'localhost/TMP.*' --verbose --archive --recursive --no-perms --no-owner --no-group --human-readable #{src} #{dest}`
+
+#
+# Exit with the exit status of the rsync command
+#
+exit $?.exitstatus
