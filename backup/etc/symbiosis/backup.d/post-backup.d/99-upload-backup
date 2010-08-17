@@ -41,7 +41,7 @@ if [ -e /etc/symbiosis/dns.d/backup.name ]; then
     fi
 
     #
-    #  Otherwise we can rsync immediately from the specified location
+    #  Otherwise we can rsync immediately to the specified location
     #
     rsync -vazr /var/backups/ $(cat /etc/symbiosis/dns.d/backup.name)
     exit 0;
