@@ -1,3 +1,10 @@
+symbiosis-common (2010:0817) stable; urgency=low
+
+  * Updated the post-installation script to make /etc/symbiosis if
+    it isn't present.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 17 Aug 2010 11:11:11 +0000
+
 symbiosis-common (2010:0727) stable; urgency=low
 
   * Install lib/symbiosis/domains.rb

@@ -13,9 +13,6 @@
 
 
 
-set -e
-
-
 
 #
 # Skip, if we are not in "configure" state
@@ -83,6 +80,7 @@ passwd=""
 for i in /etc/bytemark-vhost/.vhost.pass /etc/.vhost.pass ; do
     if [ -e $i ]; then
         if [ -s $i ]; then
+            mkdir -p /etc/symbiosis || true
             cat $i > /etc/symbiosis/.passwd
         fi
         rm -f $i
