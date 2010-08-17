@@ -1,3 +1,10 @@
+symbiosis-backup (2010:0817) stable; urgency=low
+
+  * Only sync down the contents of /localhost/, if present,
+    to avoid overwritting uncommited changes.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 17 Aug 2010 10:00:01 +0000
+
 symbiosis-backup (2010:0803) stable; urgency=low
 
   * Updated to preserve any custome source list upon upgrade.
