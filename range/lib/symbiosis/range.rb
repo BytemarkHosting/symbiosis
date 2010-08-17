@@ -121,7 +121,7 @@ module Symbiosis
     #
     def self.primary_backup_space
       if File.exists?(BACKUP_SPACE_FILENAME)
-        File.open(BACKUP_SPACE_FILENAME){|fh| fh.readlines}.first.chomp
+        File.open(BACKUP_SPACE_FILENAME){|fh| fh.readlines}.first.to_s.chomp
       else
         self.backup_spaces.first
       end
