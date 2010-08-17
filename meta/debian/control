@@ -29,6 +29,6 @@ Description: An easy, complete, and Debian-friendly server administration system
  This package is present to ease the renaming transition and can safely be
  removed.
  .
- (meta package)
+ (metapackage)
 
 

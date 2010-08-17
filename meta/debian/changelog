@@ -1,6 +1,7 @@
 bytemark-symbiosis (2010:0817) stable; urgency=low
 
   * Remove the old bytemark-vhost init script.
+  * Changed "metapackage" & "meta package" to "meta-package" in our description.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 17 Aug 2010 10:11:12 +0000
 
