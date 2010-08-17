@@ -73,6 +73,11 @@ fi
 
 
 #
+# Make sure /etc/symbiosis exists
+#
+[ -d /etc/symbiosis ] || mkdir -p /etc/symbiosis
+
+#
 #  If we have a plaintext password stored in a previous location then
 # we should move it to the new location.
 #

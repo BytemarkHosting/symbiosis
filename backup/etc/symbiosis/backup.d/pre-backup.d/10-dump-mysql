@@ -29,3 +29,7 @@ for i in /var/lib/mysql/*/; do
 
 done
 
+#
+# Exit sanely.
+#
+exit 0
