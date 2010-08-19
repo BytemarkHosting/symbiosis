@@ -17,7 +17,7 @@
 </table>
 </blockquote>
 
-<h1>Vhost Information</h1>
+<h1>Symbiosis Information</h1>
 <blockquote>
 <p>The following virtual domains are hosted upon this machine:</p>
 <blockquote>
@@ -39,7 +39,7 @@ closedir($dir);
 
 <h1>Package Information</h1>
 <blockquote>
-<p>The following vhost packages are installed:</p>
+<p>The following bytemark / symbiosis packages are installed:</p>
   <table>
   <tr><th>Package</th><th>Version</th></tr>
  <?php
