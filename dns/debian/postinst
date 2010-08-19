@@ -91,7 +91,7 @@ done
 #
 #  Now regenerate and re-upload all DNS files.
 #
-/etc/cron.hourly/create-dns
+/sbin/symbiosis-dns-generate
 
 
 #DEBHELPER#
