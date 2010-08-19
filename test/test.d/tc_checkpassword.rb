@@ -1,14 +1,14 @@
 #!/usr/bin/ruby
 
 require 'test/unit'
-require 'bytemark/vhost/test/mail'
+require 'symbiosis/test/mail'
 require 'pp'
 require 'etc'
 
 class TestCheckpassword < Test::Unit::TestCase
 
   def setup
-    @domain = Bytemark::Vhost::Test::Mail.new()
+    @domain = Symbiosis::Test::Mail.new()
     @domain.create
   end
 
@@ -40,7 +40,7 @@ class TestCheckpassword < Test::Unit::TestCase
     msg = nil
     status = nil
     mailbox = @domain.add_mailbox("test_-12311.testeything")
-    mailbox.password = Bytemark::Vhost::Test.random_string
+    mailbox.password = Symbiosis::Test.random_string
 
     assert_nothing_raised{ msg, status = do_checkpassword_test(mailbox.username, mailbox.password) }
     assert_equal(0, status)

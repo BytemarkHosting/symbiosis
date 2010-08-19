@@ -1,3 +1,9 @@
+symbiosis-test (2010:0817) stable; urgency=low
+
+  * Renamed testing modules from Bytemark::Vhost to Symbiosis
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 19 Aug 2010 14:31:13 +0100
+
 symbiosis-test (2010:0623) stable; urgency=low
 
   * Updated to load tests from /etc/symbiosis/test.d/ not

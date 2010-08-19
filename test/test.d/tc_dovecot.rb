@@ -3,19 +3,19 @@
 require 'test/unit'
 require 'net/imap'
 require 'net/pop'
-require 'bytemark/vhost/test/mail'
+require 'symbiosis/test/mail'
 
 class TestDovecot < Test::Unit::TestCase
 
   def setup
-    @domain = Bytemark::Vhost::Test::Mail.new()
+    @domain = Symbiosis::Test::Mail.new()
     @domain.create
 
     @mailbox = @domain.add_mailbox("test")
-    @mailbox.password = Bytemark::Vhost::Test.random_string
+    @mailbox.password = Symbiosis::Test.random_string
     
     @mailbox_crypt = @domain.add_mailbox("te-s.t_crypt")
-    @mailbox_crypt.password = Bytemark::Vhost::Test.random_string
+    @mailbox_crypt.password = Symbiosis::Test.random_string
     @mailbox_crypt.crypt_password 
 
     Net::IMAP.debug = true if $DEBUG

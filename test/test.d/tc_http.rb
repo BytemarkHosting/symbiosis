@@ -5,7 +5,7 @@
 #
 
 
-require 'bytemark/vhost/test/http'
+require 'symbiosis/test/http'
 require 'socket'
 require 'test/unit'
 
@@ -15,7 +15,7 @@ class TestHTTP < Test::Unit::TestCase
     #
     #  Create the domain
     #
-    @domain = Bytemark::Vhost::Test::Http.new()
+    @domain = Symbiosis::Test::Http.new()
     @domain.create()
 
     #

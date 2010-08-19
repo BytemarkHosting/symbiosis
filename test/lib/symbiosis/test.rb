@@ -1,8 +1,7 @@
 
 require "fileutils"
 
-module Bytemark
-  module Vhost
+  module Symbiosis
     module Test
 
       # This function uses the FileUtils mkdir_p command to make a directory.
@@ -108,5 +107,4 @@ module Bytemark
 
     end
   end
-end
 
