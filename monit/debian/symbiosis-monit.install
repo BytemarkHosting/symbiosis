@@ -1,6 +1,6 @@
-sbin/bytemark-vhost-monit     usr/sbin/
+sbin/symbiosis-monit          usr/sbin/
 monit.d/*                     etc/symbiosis/monit.d/
 cron.d/*                      etc/cron.d/
-bug.report                    usr/share/bug/bytemark-vhost-monit/control
+bug.report                    usr/share/bug/symbiosis-monit/control
 lib/*                         usr/lib/ruby/1.8/
 etc/apt.conf.d/*              etc/apt.conf.d/

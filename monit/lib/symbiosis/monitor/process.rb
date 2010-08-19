@@ -1,6 +1,5 @@
 
-module Bytemark
-  module Vhost
+module Symbiosis
     module Monitor
       class Process
 
@@ -88,5 +87,4 @@ module Bytemark
         end
       end
     end
-  end
 end

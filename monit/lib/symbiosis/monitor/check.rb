@@ -1,15 +1,14 @@
-require 'bytemark/vhost/monitor/process'
-require 'bytemark/vhost/monitor/tcpconnection'
+require 'symbiosis/monitor/process'
+require 'symbiosis/monitor/tcpconnection'
 require 'systemexit'
 
-module Bytemark
-  module Vhost
+module Symbiosis
     module Monitor
       class Check
         attr_reader :name
 
         def initialize
-          @process = Bytemark::Vhost::Monitor::Process.new
+          @process = Symbiois::Monitor::Process.new
         end
 
 
@@ -38,7 +37,7 @@ module Bytemark
                 begin
                   while (line = infile.gets)
                     line.chomp!
-                    if ( line =~ /(apt|bytemark-vhost-updater|debconf|dpkg|apt-get|aptitude|debconf)/i )
+                    if ( line =~ /(apt|(bytemark-vhost|symbiosis)-updater|debconf|dpkg|apt-get|aptitude|debconf)/i )
                       found = true
                       puts "Skipping alerts due to running process: #{line}"
                     end
@@ -101,9 +100,9 @@ module Bytemark
         end
 
         # This tests a TCP connection and the responses it receives.  It takes
-        # a single argument of a Bytemark::Vhost::Monitor::TCPConnection object
+        # a single argument of a Symbiois::Monitor::TCPConnection object
         def do_tcpconnection_check(connection)
-          raise ArgumentError unless connection.is_a?(Bytemark::Vhost::Monitor::TCPConnection)
+          raise ArgumentError unless connection.is_a?(Symbiois::Monitor::TCPConnection)
           begin
             puts "Testing connection to #{connection.host}:#{connection.port}"
             connection.do_check
@@ -148,6 +147,5 @@ module Bytemark
         end
       end
     end
-  end
 end
 
