@@ -1,15 +1,25 @@
 Steps for Autobuilding and C-I
 ==============================
 
-* Use old dedicated box as a autobuild host
+* Use old dedicated (AMD64) box as a autobuild host
+
 * Post-commit hook to build packages on autobuild host
   --> email dev-list on error
-* If the build succeeds,  create new dated repo with both AMD64 & i386 packges.
+
+* If the build succeeds,  create new dated repo with packages.
+  --> Link /autobuild/current -> /autobuild/YYYYMMDD-HH:MM so that
+  the most recent is available.
+  --> Remove builds older than one month.
+
 * Deploy a new VM on the machine, using the current Symbiosis image on the
   imager.
+
 * Once installed, and upgraded to the current stable packages, run tests.
   --> email dev-list if these tests fail
+
 * If tests pass, upgrade to newly built packages, run tests
   --> email dev-list if these tests fail
+
+* If tests pass, remove machine.
 
 
