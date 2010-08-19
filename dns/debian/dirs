@@ -1,4 +1,4 @@
-etc/cron.hourly
+sbin/
 etc/symbiosis/dns.d/
 usr/share/bug/bytemark-vhost-tinydns
 etc/exim4/bytemark-vhost.d
