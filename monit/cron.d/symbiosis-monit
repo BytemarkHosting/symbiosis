@@ -1,0 +1,1 @@
+0-59/2 * * * *   root  /usr/sbin/symbiosis-monit -m -d /etc/symbiosis/monit.d

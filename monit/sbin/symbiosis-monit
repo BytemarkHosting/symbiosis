@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
 # = NAME
 #
-# bytemark-vhost-monit - Bytemark Vhost Service Monitor
+# symbiosis-monit - Symbiosis Service Monitor
 #
 # = SYNOPSIS
 #
-# bytemark-vhost-monit [OPTIONS]
+# symbiosis-monit [OPTIONS]
 #
 # = USAGE
 #
@@ -330,7 +330,7 @@ if send_mail and (always_mail or failed_tests.length > 0)
 To: #{mailto_addr}
 From: #{mailfrom_addr}
 Date: #{Time.now.rfc822}
-Subject: [bytemark-vhost] Service test report
+Subject: [symbiosis] Service test report
 
 EOF
   msg += output.string
