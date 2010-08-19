@@ -19,6 +19,11 @@ if [ -d /etc/bytemark-vhost/dns.d ]; then
     rm -rf /etc/bytemark-vhost/dns.d
 fi
 
+#
+#  Remove the cron.hourly script
+#
+rm -f /etc/cron.hourly/create-dns 2>/dev/null >/dev/null || true
+
 
 #
 #  If we're not on a Bytemark host then we do nothing.
