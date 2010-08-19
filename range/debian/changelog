@@ -1,3 +1,9 @@
+symbiosis-range (2010:0819) stable; urgency=low
+
+  * Added new Bytemark range of 46.43.0.0/18
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 19 Aug 2010 14:16:37 +0100
+
 symbiosis-range (2010:0528) stable; urgency=low
 
   * Moved onto shared ruby library

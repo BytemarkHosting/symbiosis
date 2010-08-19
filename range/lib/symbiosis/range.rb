@@ -8,7 +8,7 @@ module Symbiosis
 
   class Range
 
-    BYTEMARK_RANGES = %w(80.68.80.0/20 89.16.160.0/19 212.110.160.0/19 2001:41c8::/32).collect{|i| IPAddr.new(i)}
+    BYTEMARK_RANGES = %w(80.68.80.0/20 89.16.160.0/19 212.110.160.0/19 46.43.0.0/18 2001:41c8::/32).collect{|i| IPAddr.new(i)}
 
     BACKUP_SPACE_FILENAME = "/etc/symbiosis/dns.d/backup.name"
 
@@ -117,7 +117,7 @@ module Symbiosis
     #
     # This returns the primary backup space.  This is defined as the first in
     # the list returned by backup_spaces OR whatever is contained in a file
-    # called /etc/bytemark-vhost/dns.d/backup.name
+    # called /etc/symbiosis/dns.d/backup.name
     #
     def self.primary_backup_space
       if File.exists?(BACKUP_SPACE_FILENAME)
