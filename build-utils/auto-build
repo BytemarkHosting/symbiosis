@@ -145,3 +145,5 @@ lvremove --force /dev/symbiosis-builder-vol/lenny-i386  >>$log 2>&1
 lvremove --force /dev/symbiosis-builder-vol/lenny-amd64 >>$log 2>&1
 
 mv $log /var/www/auto-built-$time/log.file
+ln -s /var/www/auto-built-$time /var/www/current
+
