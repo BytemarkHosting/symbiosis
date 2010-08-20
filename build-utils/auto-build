@@ -25,6 +25,14 @@ LC_ALL=en_US
 packages=dpkg-dev,devscripts,build-essential,fakeroot,make,mercurial,perl-modules
 
 
+#
+#  Ensure we have debootstrap
+#
+if [ ! -x /usr/sbin/debootstrap ]; then
+    echo "Missing debootstrap"
+    exit 1
+fi
+
 
 #
 #  See if we're already mounted.
