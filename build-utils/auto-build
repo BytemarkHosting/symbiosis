@@ -8,6 +8,11 @@
 #
 #
 
+#
+#  Setup a sane PATH
+#
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/X11
+
 
 #
 #  The date for logging purposes.
