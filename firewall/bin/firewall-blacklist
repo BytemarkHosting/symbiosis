@@ -604,6 +604,8 @@ sub expireBlacklist
     #
     foreach my $file ( sort( glob("$CONFIG{'blacklist'}/*.auto") ) )
     {
+        next unless( -e $file );
+
         my $age = -M $file;
         if ( int($age) > $CONFIG{ 'expire' } )
         {
