@@ -15,8 +15,8 @@ Setup
 
 Create your rules by touching files in:
 
-         /etc/firewall/incoming.d/
-         /etc/firewall/outgoing.d/
+         /etc/symbiosis/firewall/incoming.d/
+         /etc/symbiosis/firewall/outgoing.d/
 
 The filenames you choose must be of the form "$number-$name", where
 number is used purely for sorting purposes.  The name you use will
@@ -33,10 +33,10 @@ Simple Example
 The following defines a system which will only accept incoming connections
 for SSH and SMTP
 
-        rm /etc/firewall/incoming.d/*
-        touch /etc/firewall/incoming.d/10-smtp
-        touch /etc/firewall/incoming.d/20-ssh
-        touch /etc/firewall/incoming.d/99-drop
+        rm /etc/symbiosis/firewall/incoming.d/*
+        touch /etc/symbiosis/firewall/incoming.d/10-smtp
+        touch /etc/symbiosis/firewall/incoming.d/20-ssh
+        touch /etc/symbiosis/firewall/incoming.d/99-drop
 
 
 Complex Example
@@ -45,10 +45,10 @@ Complex Example
 The following example will accept incoming SMTP connections from anywhere
 but only SSH from a single IP address:
 
-        rm /etc/firewall/incoming.d/*
-        touch /etc/firewall/incoming.d/10-smtp
-        touch /etc/firewall/incoming.d/99-drop
-        echo "192.168.1.1" > /etc/firewall/incoming.d/20-ssh
+        rm /etc/symbiosis/firewall/incoming.d/*
+        touch /etc/symbiosis/firewall/incoming.d/10-smtp
+        touch /etc/symbiosis/firewall/incoming.d/99-drop
+        echo "192.168.1.1" > /etc/symbiosis/firewall/incoming.d/20-ssh
 
 
 Naming
