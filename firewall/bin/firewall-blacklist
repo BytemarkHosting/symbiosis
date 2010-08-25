@@ -555,7 +555,7 @@ sub processRules
                     #
                     # log the new block to syslog.
                     #
-                    syslog( 'info', "blacklist adding: $ip" );
+                    syslog( 'info', "firewall-blacklist adding: $ip" );
 
                     $count += 1;
                 }
@@ -620,7 +620,7 @@ sub expireBlacklist
                 $ip = $2;
             }
 
-            syslog( 'info', "blacklist removing: $ip" );
+            syslog( 'info', "firewall-blacklist removing: $ip" );
             $changed += 1;
         }
 
@@ -650,7 +650,7 @@ sub expireBlacklist
               print "Removing file: $file due to it being whitelisted.\n";
             unlink($file);
 
-            syslog( 'info', "blacklist removing: $ip" );
+            syslog( 'info', "firewall-blacklist removing: $ip" );
 
             $changed += 1;
         }

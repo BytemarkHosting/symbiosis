@@ -1,9 +1,10 @@
-symbiosis-firewall (2010:0823) stable; urgency=low
+symbiosis-firewall (2010:0825) stable; urgency=low
 
   * Correctly process whitelisted IP addresses.
   * Expire whitelisted entries which are older than 8 days.
   * The blacklister will honour even auto-whitelisted IPs.
   * Updated to avoid issues with unused blacklist files.
+  * Log firewall actions to a file, not to stdout.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 1 Jul 2010 12:00:00 +0000
 

@@ -182,6 +182,7 @@ $CONFIG{ 'incoming.d' }  = "/etc/symbiosis/firewall/incoming.d/";
 $CONFIG{ 'local.d' }     = "/etc/symbiosis/firewall/local.d/";
 $CONFIG{ 'outgoing.d' }  = "/etc/symbiosis/firewall/outgoing.d/";
 $CONFIG{ 'rule.d' }      = "/usr/share/firewall/rule.d/";
+$CONFIG{ 'log.d' }       = "/var/log/";
 $CONFIG{ 'whitelist.d' } = "/etc/symbiosis/firewall/whitelist.d/";
 
 
@@ -308,7 +309,29 @@ if ( $CONFIG{ 'flush' } )
 unless ( $CONFIG{ 'no-execute' } )
 {
     $CONFIG{ 'verbose' } && print "Executing : $tempfile\n";
-    system($tempfile );
+
+    #
+    #  Get the log directory
+    #
+    my $log = $CONFIG{'log.d'} || undef;
+    if ( $log && -d $log )
+    {
+        $CONFIG{'verbose'} && print "Logging to $log\n";
+        $log = " >>/$log/firewall.log 2>>$log/firewall.err";
+    }
+    else
+    {
+        $log = "";
+    }
+
+    #
+    #  Run the firewall - logging appropriately.
+    #
+    system( "$tempfile $log" );
+
+    #
+    #  All done.
+    #
     $CONFIG{ 'verbose' } && print "Done\n";
 }
 
