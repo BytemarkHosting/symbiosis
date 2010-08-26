@@ -156,5 +156,5 @@ if ( ( updated ) || ( expired ) )
 
   puts "Updated whitelist, re-running firewall" if ( $VERBOSE )
 
-  system( "/usr/bin/firewall" )
+  system( "/usr/bin/firewall >>/var/log/firewall.log 2>>/var/log/firewall.err" )
 end

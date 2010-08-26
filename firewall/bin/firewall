@@ -165,6 +165,7 @@ my %CONFIG;
 #  Modules we should try to load.
 #
 my %MODULES = ( "ip_conntrack_ftp" => 1,
+                "iptable_filter"   => 1,
                 "ip_conntrack"     => 1 );
 
 
@@ -182,7 +183,6 @@ $CONFIG{ 'incoming.d' }  = "/etc/symbiosis/firewall/incoming.d/";
 $CONFIG{ 'local.d' }     = "/etc/symbiosis/firewall/local.d/";
 $CONFIG{ 'outgoing.d' }  = "/etc/symbiosis/firewall/outgoing.d/";
 $CONFIG{ 'rule.d' }      = "/usr/share/firewall/rule.d/";
-$CONFIG{ 'log.d' }       = "/var/log/";
 $CONFIG{ 'whitelist.d' } = "/etc/symbiosis/firewall/whitelist.d/";
 
 
@@ -311,18 +311,9 @@ unless ( $CONFIG{ 'no-execute' } )
     $CONFIG{ 'verbose' } && print "Executing : $tempfile\n";
 
     #
-    #  Get the log directory
+    #  Ensure we log to a sane file.
     #
-    my $log = $CONFIG{'log.d'} || undef;
-    if ( $log && -d $log )
-    {
-        $CONFIG{'verbose'} && print "Logging to $log\n";
-        $log = " >>/$log/firewall.log 2>>$log/firewall.err";
-    }
-    else
-    {
-        $log = "";
-    }
+    my $log = " >>/var/log/firewall.log 2>>/var/log/firewall.err";
 
     #
     #  Run the firewall - logging appropriately.
@@ -1507,8 +1498,21 @@ machine might have a statically compiled kernel for example.
 
 sub loadKernelModules
 {
+
+    #
+    #  If we don't have the helper available we're out of luck.
+    #
     return if ( !-x "/sbin/modprobe" );
 
+    #
+    #  If we don't have a module-aware kernel we're out of luck.
+    #
+    return if ( !-e "/proc/modules" );
+
+
+    #
+    #  Load the modules.
+    #
     foreach my $mod ( keys %MODULES )
     {
         $CONFIG{ 'verbose' } && print "Loading kernel module: $mod\n";

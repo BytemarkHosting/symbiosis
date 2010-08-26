@@ -150,7 +150,13 @@ if ( -e "/etc/symbiosis/firewall/disabled.blacklist" )
          ( recentlyModified("/etc/symbiosis/firewall/disabled") ) )
     {
         $CONFIG{ 'verbose' } && print "Reloading firewall\n";
-        system("/usr/bin/firewall");
+
+        #
+        #  Ensure we log sanely.
+        #
+        my $log = " >>/var/log/firewall.log 2>>/var/log/firewall.err";
+
+        system("/usr/bin/firewall $log");
     }
     exit;
 }
