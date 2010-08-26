@@ -2,14 +2,13 @@
 #  Ruby class for working with the mail settings of a domain
 #
 
-require 'bytemark/vhost/test/vhostdomain'
-require 'bytemark/vhost/test/mailbox'
+require 'symbiosis/test/symbiosisdomain'
+require 'symbiosis/test/mailbox'
 require 'fileutils'
 
-module Bytemark
-  module Vhost
+  module Symbiosis
     module Test
-      class Mail < VhostDomain 
+      class Mail < SymbiosisDomain 
 
         def initialize
           super
@@ -46,5 +45,4 @@ module Bytemark
       end
     end
   end
-end
 

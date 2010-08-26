@@ -27,11 +27,15 @@ a:
 
 
 #
-#  Make all packages.
+#  Make all packages - ensuring that the output goes into the ./output
+# directory.
 #
 all: dependencies
-	for i in */; do if [ `which sautobuild` ] ; then sautobuild $$i ; else pushd $$i ; debuild --no-tgz-check -sa -us -uc ; popd ; fi ; done
-	-touch all
+	mkdir -p ./output || true
+	for i in */debian/; do pushd $$(dirname $$i) ; ../build-utils/mybuild ; popd ; done
+	(cd output/ ; dpkg-scanpackages . /dev/null | gzip > Packages.gz)
+	(cd output/ ; dpkg-scansources  . /dev/null | gzip > Sources.gz)
+
 
 changelog:
 	@date +%Y:%m%d-1
@@ -40,7 +44,7 @@ changelog:
 # If we're using sautobuild, then there is no need to check for dependencies
 #
 dependencies:
-	-[ `which sautobuild` ] || ./meta/dependencies
+	for i in */debian/; do pushd $$(dirname $$i) ; ../build-utils/dependencies --install  ; popd ; done
 	touch dependencies
 
 #
@@ -49,6 +53,7 @@ dependencies:
 clean:
 	-rm */build-stamp
 	-rm */configure-stamp
+	-rm -rf ./output/
 	-rm -rf */debian/bytemar*/
 	-rm -f */debian/files
 	-rm -f */debian/*.log
@@ -79,13 +84,3 @@ linda: all
 lintian: all
 	lintian -c --suppress-tags 'out-of-date-standards-version,latest-debian-changelog-entry-changed-to-native' *.changes
 
-
-
-#
-# Create a suitable pool
-#
-pool: all
-	[ -d out ] || mkdir out
-	for i in */debian/.package ; do mv `cat $$i`_* out ; done
-	dpkg-scanpackages out /dev/null | gzip > out/Packages.gz
-	dpkg-scansources  out /dev/null | gzip > out/Sources.gz

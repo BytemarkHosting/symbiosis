@@ -1,3 +1,12 @@
+symbiosis-tinydns (2010:08119) stable; urgency=low
+
+  * Moved the script out of /etc/cron.hourly/create-dns and to
+    /sbin/symbiosis-dns-generate.
+  * Invoke once per-hour to upload if changed.
+  * Always upload DNS data once per day.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 19 Aug 2010 14:15:16 +0000
+
 symbiosis-tinydns (2010:0810) stable; urgency=low
 
   * Avoid displaying obsolete debugging information when first

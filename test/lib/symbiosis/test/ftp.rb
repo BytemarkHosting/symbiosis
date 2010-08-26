@@ -2,12 +2,11 @@
 #  Ruby class for working with the FTP settings of a domain
 #
 
-require 'bytemark/vhost/test/vhostdomain'
+require 'symbiosis/test/symbiosisdomain'
 
-module Bytemark
-  module Vhost
+  module Symbiosis
     module Test
-      class Ftp < VhostDomain
+      class Ftp < SymbiosisDomain
 
         #
         # Create the public directories so that we can login
@@ -38,4 +37,3 @@ module Bytemark
       end
     end
   end
-end

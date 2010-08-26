@@ -1,0 +1,154 @@
+#!/bin/sh
+#
+#  This is the simple auto-builder process which is designed to
+# auto-build the Symbiosis files.
+#
+# Steve
+# --
+#
+#
+
+#
+#  Setup a sane PATH
+#
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/X11
+
+
+#
+#  The date for logging purposes.
+#
+time=$(date +%Y%m%d-%H)
+log=/var/log/build.$time
+
+
+LANG=en_US
+LC_ALL=en_US
+
+#
+#  The packages we need in the debootstrap-created system.
+#
+packages=dpkg-dev,devscripts,build-essential,fakeroot,make,mercurial,perl-modules
+
+
+#
+#  Ensure we have debootstrap
+#
+if [ ! -x /usr/sbin/debootstrap ]; then
+    echo "Missing debootstrap"
+    exit 1
+fi
+
+
+#
+#  See if we're already mounted.
+#
+if ( grep /mnt/lenny /proc/mounts >/dev/null 2>/dev/null ); then
+    echo "Autobuilder has our LVM snapshots mounted - error"
+    exit 1
+fi
+
+#
+#  See if we failed to cleanup
+#
+if [ -e  /dev/mapper/symbiosis--builder--vol-lenny--amd64 ]; then
+    echo "LVM volume (lenny.amd64) already present - aborting"
+    exit 1
+fi
+if [ -e /dev/mapper/symbiosis--builder--vol-lenny--i386 ]; then
+    echo "LVM volume (lenny.i386) already present - aborting"
+    exit 1
+fi
+
+
+#
+#
+#  Create scratch volumes, format them, and mount them.
+#
+for arch in i386 amd64 ; do
+
+    #
+    #  Create the volume, test it worked.
+    #
+    echo -e "\nCreating LVM volume\n" >> $log
+
+    lvcreate --name=lenny-$arch --size=50g symbiosis-builder-vol  2>&1 >> $log
+    if [ ! -e  /dev/mapper/symbiosis--builder--vol-lenny--$arch ]; then
+        echo "Failed to create LVM volume (lenny.$arch) - aborting"
+        exit 1
+    fi
+
+
+    #
+    #  Make a filesystem
+    #
+    echo -e "\nCreating filesystem\n" >> $log
+    mkfs.ext3 /dev/symbiosis-builder-vol/lenny-$arch >/dev/null 2>/dev/null
+
+    if [ ! -d /mnt/lenny-$arch ]; then
+        mkdir /mnt/lenny-$arch
+    fi
+
+    #
+    # Mount it
+    #
+    echo -e "\nMounting filesystem\n" >> $log
+    mount /dev/symbiosis-builder-vol/lenny-$arch /mnt/lenny-$arch
+
+done
+
+
+#
+#  Create the debootstrap installasion
+#
+echo -e "\nCreating System - lenny amd64\n" >> $log
+debootstrap --include=$packages lenny /mnt/lenny-amd64 http://mirror.bytemark.co.uk/debian  >>$log 2>&1
+if [ ! -x /mnt/lenny-amd64/bin/ls ]; then
+    echo "debootstrap of lenny.amd64 failed"
+    exit 1
+fi
+
+echo -e "\nCreating System - lenny i386\n" >> $log
+debootstrap --include=$packages --arch=i386 lenny /mnt/lenny-i386 http://mirror.bytemark.co.uk/debian  >>$log 2>&1
+if [ ! -x /mnt/lenny-i386/bin/ls ]; then
+    echo "debootstrap of lenny.amd64 failed"
+    exit 1
+fi
+
+
+#
+#  Now build
+#
+for arch in i386 amd64 ; do
+
+    echo -e "\n\nCloning source for - lenny $arch\n\n"  >> $log
+    chroot /mnt/lenny-$arch hg clone http://projects.bytemark.co.uk/hg/Symbiosis   >>$log 2>&1
+
+
+    echo -e "\n\nBuilding  source for - lenny $arch\n\n" >> $log
+    chroot /mnt/lenny-$arch make -C /Symbiosis all  >>$log 2>&1
+
+    #
+    # Move the output
+    #
+    mkdir -p /var/www/auto-built-$time || true
+    mv  /mnt/lenny-$arch/Symbiosis/output /var/www/auto-built-$time/$arch
+done
+
+
+#
+#  Unmount and cleanup
+#
+echo -e "\nUnmounting\n\n" >> $log
+umount /mnt/lenny-i386    >>$log 2>&1
+umount /mnt/lenny-amd64   >>$log 2>&1
+
+#
+#  Remove
+#
+echo -e "\nRemoving volumes\n\n" >> $log
+lvremove --force /dev/symbiosis-builder-vol/lenny-i386  >>$log 2>&1
+lvremove --force /dev/symbiosis-builder-vol/lenny-amd64 >>$log 2>&1
+
+mv $log /var/www/auto-built-$time/log.file
+ln -s /var/www/auto-built-$time /var/www/current
+

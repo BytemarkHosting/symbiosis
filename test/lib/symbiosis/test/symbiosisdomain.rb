@@ -2,12 +2,11 @@
 #  Ruby class for creating a new domain
 #
 
-require 'bytemark/vhost/test'
+require 'symbiosis/test'
 
-module Bytemark
-  module Vhost
+  module Symbiosis
     module Test
-      class VhostDomain
+      class SymbiosisDomain
   
         attr_accessor :user, :group
         attr_reader :name
@@ -17,7 +16,7 @@ module Bytemark
         #
         def initialize( name = nil )
           if ( name.nil? )
-            @name = Bytemark::Vhost::Test.random_string(10)+".test"
+            @name = Bytemark::Symbiosis::Test.random_string(10)+".test"
           else
             @name = name
           end
@@ -56,7 +55,7 @@ module Bytemark
         def get_param(setting, config_dir = "config")
           config_dir = File.join(self.directory, config_dir) unless config_dir[0] == "/"
 
-          Bytemark::Vhost::Test.get_param(setting, config_dir)
+          Bytemark::Symbiosis::Test.get_param(setting, config_dir)
         end
 
         #
@@ -67,18 +66,17 @@ module Bytemark
           
           create_dir(config_dir) unless File.exists?(config_dir)
 
-          Bytemark::Vhost::Test.set_param(setting, value, config_dir)
+          Bytemark::Symbiosis::Test.set_param(setting, value, config_dir)
         end
 
         def create_dir(d)
           return if File.directory?(d)
           
-          Bytemark::Vhost::Test.mkdir(d, :mode => 0755, :user => @user, :group => @group)
+          Bytemark::Symbiosis::Test.mkdir(d, :mode => 0755, :user => @user, :group => @group)
         end
 
       end
     end
   end
-end
 
 

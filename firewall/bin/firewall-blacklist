@@ -150,7 +150,13 @@ if ( -e "/etc/symbiosis/firewall/disabled.blacklist" )
          ( recentlyModified("/etc/symbiosis/firewall/disabled") ) )
     {
         $CONFIG{ 'verbose' } && print "Reloading firewall\n";
-        system("/usr/bin/firewall");
+
+        #
+        #  Ensure we log sanely.
+        #
+        my $log = " >>/var/log/firewall.log 2>>/var/log/firewall.err";
+
+        system("/usr/bin/firewall $log");
     }
     exit;
 }
@@ -555,7 +561,7 @@ sub processRules
                     #
                     # log the new block to syslog.
                     #
-                    syslog( 'info', "blacklist adding: $ip" );
+                    syslog( 'info', "firewall-blacklist adding: $ip" );
 
                     $count += 1;
                 }
@@ -604,6 +610,8 @@ sub expireBlacklist
     #
     foreach my $file ( sort( glob("$CONFIG{'blacklist'}/*.auto") ) )
     {
+        next unless( -e $file );
+
         my $age = -M $file;
         if ( int($age) > $CONFIG{ 'expire' } )
         {
@@ -618,7 +626,7 @@ sub expireBlacklist
                 $ip = $2;
             }
 
-            syslog( 'info', "blacklist removing: $ip" );
+            syslog( 'info', "firewall-blacklist removing: $ip" );
             $changed += 1;
         }
 
@@ -648,7 +656,7 @@ sub expireBlacklist
               print "Removing file: $file due to it being whitelisted.\n";
             unlink($file);
 
-            syslog( 'info', "blacklist removing: $ip" );
+            syslog( 'info', "firewall-blacklist removing: $ip" );
 
             $changed += 1;
         }

@@ -27,9 +27,9 @@ install: build
 	dh_prep
 
 	dh_installdirs
-	cp bin/create-dns `pwd`/debian/symbiosis-tinydns/etc/cron.hourly/
+	cp bin/symbiosis-dns-generate `pwd`/debian/symbiosis-tinydns/sbin/symbiosis-dns-generate
 	cp bytemark.dns.template `pwd`/debian/symbiosis-tinydns/etc/symbiosis/dns.d/template
-	chmod 755 `pwd`/debian/symbiosis-tinydns/etc/cron.hourly/create-dns
+	chmod 755 `pwd`/debian/symbiosis-tinydns/sbin/symbiosis-dns-generate
 	cp bug.report `pwd`/debian/symbiosis-tinydns/usr/share/bug/bytemark-vhost-tinydns/control
 
 	cp -R ./exim4/bytemark-vhost.d `pwd`/debian/symbiosis-tinydns/etc/exim4/

@@ -2,12 +2,11 @@
 #  Ruby class for working with a HTTP domain.
 #
 
-require 'bytemark/vhost/test/vhostdomain'
+require 'symbiosis/test/symbiosisdomain'
 
-module Bytemark
-  module Vhost
+  module Symbiosis
     module Test
-      class Http < VhostDomain
+      class Http < SymbiosisDomain
 
         def create
           super
@@ -54,6 +53,5 @@ module Bytemark
       end
     end
   end
-end
 
 

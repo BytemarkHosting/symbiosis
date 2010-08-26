@@ -5,7 +5,7 @@
 #
 
 
-require 'bytemark/vhost/test/ftp'
+require 'symbiosis/test/ftp'
 require 'net/ftp'
 require 'test/unit'
 
@@ -15,13 +15,13 @@ class TestFTP < Test::Unit::TestCase
     #
     #  Create the domain
     #
-    @domain = Bytemark::Vhost::Test::Ftp.new()
+    @domain = Symbiosis::Test::Ftp.new()
     @domain.create()
 
     #
     #  Set the password to a random string.
     #
-    @domain.password = Bytemark::Vhost::Test.random_string()
+    @domain.password = Symbiosis::Test.random_string()
   end
 
   def teardown

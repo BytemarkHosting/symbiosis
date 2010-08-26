@@ -1,8 +1,7 @@
 require 'socket'
 require 'timeout'
 
-module Bytemark
-  module Vhost
+module Symbiosis
     module Monitor
       class TCPConnection
 
@@ -59,6 +58,5 @@ module Bytemark
         end
       end
     end
-  end
 end
 

@@ -1,8 +1,8 @@
 #!/usr/bin/ruby 
 #
-require 'bytemark/vhost/monitor/check'
+require 'symbiosis/monitor/check'
 
-class PureAuthdCheck < Bytemark::Vhost::Monitor::Check
+class PureAuthdCheck < Symbiosis::Monitor::Check
 
   def initialize
     super

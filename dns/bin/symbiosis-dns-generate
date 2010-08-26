@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-create-dns - Create tinydns snippets for each hosted domain
+symbiosis-dns-generate - Create tinydns snippets for each hosted domain
 
 =cut
 
@@ -598,6 +598,14 @@ sub hasDataChanged
 
     foreach my $file (@files)
     {
+        #
+        #  Add the name of the file.
+        #
+        $hash->add( $file );
+
+        #
+        #  Now add the contents of the file.
+        #
         open( FILE, "<", $file ) or
           die "Failed to open $file - $!";
 
@@ -617,7 +625,7 @@ sub hasDataChanged
     #
     #  If there is no existing record, then create one.
     #
-    #  If there is no hash then we've changed.
+    #  (If there is no hash then we've changed.)
     #
     if ( !-e "/root/BytemarkDNS/.hash" )
     {
@@ -643,11 +651,14 @@ sub hasDataChanged
     #
     if ( $result eq $line )
     {
+        #
+        #  No change.
+        #
         return 0;
     }
 
     #
-    #  Hash differs.  Record it.
+    #  Hash differs.  Store the new one.
     #
     open( FILE, ">", "/root/BytemarkDNS/.hash" );
     print FILE $result . "\n";

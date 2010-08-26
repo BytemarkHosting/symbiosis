@@ -1,0 +1,70 @@
+#!/usr/bin/perl -w
+#
+#  Given a package name and version we find the name of the
+# changes file that "debuild" will produce, and move the contents
+# of that file and the file itself to our output directory.
+#
+# Steve
+# --
+#
+
+
+use strict;
+use warnings;
+
+#
+#  Get the package, and version.
+#
+my ( $pkg, $ver ) = (@ARGV);
+
+#
+#  Strip the version.
+#
+( $ver = $ver ) =~ s/^\d+://;
+
+
+#
+#  The name of the changes file.
+#
+my $arch = `file /bin/ls`;
+chomp($arch);
+if ( $arch =~ /x86-64/ )
+{
+    $arch = "amd64";
+}
+else
+{
+    $arch = "i386";
+}
+
+my $changes = $pkg . "_" . $ver . "_" . $arch . ".changes";
+my $build   = $pkg . "_" . $ver . "_" . $arch . ".build";
+
+
+#
+#  Get the file
+#
+open( FILE, "<", $changes ) or
+  die "Failed to open $changes - $!";
+my $files = 0;
+while ( my $line = <FILE> )
+{
+    chomp($line);
+    if ( $line =~ /^Files:/ )
+    {
+        $files = 1;
+    }
+    else
+    {
+        next unless ($files);
+    }
+    if ( $line =~ /[ \t]([^ \t]+)$/ )
+    {
+        my $file = $1;
+
+        system("mv $file ./output/");
+    }
+}
+close(FILE);
+system("mv $changes ./output/");
+system("mv $build ./output/");
