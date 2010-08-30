@@ -1,2 +1,3 @@
-bin   usr/
-lib/* usr/lib/ruby/1.8/
+bin        usr/
+lib/*      usr/lib/ruby/1.8/
+perl-lib/* usr/share/perl5/

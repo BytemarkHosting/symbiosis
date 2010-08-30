@@ -1,3 +1,9 @@
+symbiosis-common (2010:0830) stable; urgency=low
+
+  * Install a small library of Perl functions.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 30 Aug 2010 09:44:09 +0000
+
 symbiosis-common (2010:0817) stable; urgency=low
 
   * Updated the post-installation script to make /etc/symbiosis if

@@ -97,7 +97,7 @@ done
 # it isn't visible to the world.
 #
 if [ -e /etc/symbiosis/.passwd ]; then
-    chown root.root /etc/symbiosis/.passwd
+    chown root:root /etc/symbiosis/.passwd
     chmod 0600      /etc/symbiosis/.passwd
 fi
 
