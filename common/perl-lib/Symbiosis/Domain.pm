@@ -13,7 +13,8 @@ Symbiosis::Domain - A module for working with a single Symbiosis domain.
     use strict;
 
     my $helper     = Symbiosis::Domain->new( path => '/srv/example.com' );
-    my( $uid,gid ) = $helper->getOwner();
+
+    # more code.
 
 =for example end
 
@@ -58,7 +59,7 @@ require AutoLoader;
 @ISA    = qw(Exporter AutoLoader);
 @EXPORT = qw();
 
-($VERSION) = '$Revision: 1.69 $' =~ m/Revision:\s*(\S+)/;
+($VERSION) = "1.1";
 
 
 
@@ -76,7 +77,7 @@ use File::Basename;
 
 =head2 new
 
-  Create a new instance of this object.
+Create a new instance of this object.
 
 =cut
 
@@ -137,9 +138,10 @@ sub path
 
 }
 
+
 =begin doc
 
-The domain exists?
+Does this domain exist?
 
 =end doc
 
@@ -157,7 +159,7 @@ sub exists
 
 =begin doc
 
-Does this domain appear to be setup for an FTP login.
+Does this domain appear to be setup for an FTP login?
 
 =end doc
 

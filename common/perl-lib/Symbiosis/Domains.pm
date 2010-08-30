@@ -38,7 +38,7 @@ require AutoLoader;
 @ISA    = qw(Exporter AutoLoader);
 @EXPORT = qw();
 
-($VERSION) = '$Revision: 1.69 $' =~ m/Revision:\s*(\S+)/;
+($VERSION) = "1.1";
 
 
 
