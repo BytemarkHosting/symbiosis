@@ -9,3 +9,6 @@ docs: man/encrypt_password.man
 
 clean:
 	$(RM) -r man
+
+test:
+	prove --shuffle tests/*.t
