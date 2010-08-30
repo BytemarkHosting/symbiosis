@@ -119,6 +119,40 @@ sub name
 }
 
 
+=begin doc
+
+Return the path to the domain.
+
+=end doc
+
+=cut
+
+sub path
+{
+    my( $self ) = ( @_ );
+
+    my $path = $self->{ 'path' } || die "No path given in constructor";
+
+    return ( $path );
+
+}
+
+=begin doc
+
+The domain exists?
+
+=end doc
+
+=cut
+
+sub exists
+{
+    my ($self) = (@_);
+
+    my $path = $self->{ 'path' } || die "No path given in constructor";
+
+    return ( -d $path );
+}
 
 
 =begin doc
