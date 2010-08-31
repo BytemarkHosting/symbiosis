@@ -186,12 +186,12 @@ Given an FTP password test to see if this matches reality.
 
 sub loginFTP
 {
-    my ( $self, $passwd ) = (@_);
+    my ( $self, $password_given ) = (@_);
 
     #
     #  Empty passwords are forbidden.
     #
-    return 0 if ( !defined($passwd) || !length($passwd) );
+    return 0 if ( !defined($password_given) || !length($password_given) );
 
     #
     #  If the domain isn't setup for FTP then we cannot
@@ -222,40 +222,41 @@ sub loginFTP
     #  OK we have read a password.  We have two cases,
     # a plaintext password and a crypt password.
     #
-    if ( $password eq $passwd )
-    {
-        return 1;
-    }
-
-    #
     #  Did we read a crypted password?
+    #
+    #  Explanation of the regex.  The {CRYPT} bit is an optional thing to show
+    #  that the password is crypted.  The ?: before that bit means that it
+    #  doesn't use an anchor, so $1 is the next bracketed bit, which is the
+    #  hash, including the salt.
     #
     if ( $password =~ /^(?:{CRYPT})?([0-9a-z\$.\/]+)$/i )
     {
-        my ( $salt, $hash ) = ( $1, $2 );
+        # 
+        # The hash, including the salt is in $1.
+        #
+        my $hash = $1;
 
-        if ( $salt && $hash && ( crypt( $password, $salt ) eq $hash ) )
+        #
+        # Crypt compares the given password (plain text) with the hash.  See
+        # man 3 crypt
+        #
+        if ( $hash && ( crypt( $password_given, $hash ) eq $hash ) )
         {
             return 1;
         }
     }
 
+    # 
+    # OK fall back to a plain-text password
     #
-    #  Final option - MD5 sum
-    #
-    my $ctx = Digest::MD5->new();
-    $ctx->add($passwd);
-
-    #
-    #  Compare the hex digits
-    #
-    if ( lc( $ctx->hexdigest() ) eq lc($password) )
+    if ( $password eq $password_given )
     {
         return 1;
     }
 
+
     #
-    #  All three methods failed.
+    #  Both methods failed.
     #
     return 0;
 }

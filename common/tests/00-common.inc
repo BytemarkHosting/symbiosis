@@ -81,7 +81,7 @@ and return the plaintext that will be corresponding to it.
 
 =cut
 
-sub writeMD5Password
+sub writeCryptPassword
 {
     my ($file) = (@_);
 
@@ -91,14 +91,16 @@ sub writeMD5Password
     my $pass = join( '', map {( 'a' .. 'z' )[rand 26]} 0 .. 12 );
 
     #
-    #  Now write out that in an MD5 sense.
+    # Add some salt
     #
-    my $ctx = Digest::MD5->new();
-    $ctx->add($pass);
+    my $salt = '$1$'.join( '', map {( 'a' .. 'z' )[rand 26]} 0 .. 2 ).'$';
 
+    #
+    #  Now write out 
+    #
     open( FILE, ">", $file ) or
       die "Failed to write to $file - $!";
-    print FILE $ctx->hexdigest() . "\n";
+    print FILE crypt($pass,$salt) . "\n";
     close(FILE);
 
     return ($pass);
