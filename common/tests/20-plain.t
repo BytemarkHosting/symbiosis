@@ -50,7 +50,7 @@ while ( $count < 10 )
     #
     #  OK now we should find there is an FTP password.
     #
-    ok( $helper->isFTP(), " After setting an MD5 password it is FTP-aware" );
+    ok( $helper->isFTP(), " After setting a password it is FTP-aware" );
 
     #
     #  Finally does the login work?
