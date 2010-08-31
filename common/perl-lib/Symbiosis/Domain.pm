@@ -27,8 +27,8 @@ This module contains code for working with a single Symbiosis domain.
 
 =head1 FTP LOGINS
 
-For a domain to be enabled for FTP there are three ways you can save
-the passwrod in /srv/example.com/config/ftp-password:
+For a domain to be enabled for FTP there are two ways you can save
+the password in /srv/example.com/config/ftp-password:
 
 =over 8
 
@@ -38,12 +38,9 @@ For example you could write "blah" in the password.
 =item As a crypted string.
 Using the Perl crypt function.
 
-=item As an MD5 digest.
-For example "echo -n 'my password' | md5sum"
-
 =back
 
-Each of these will be tested in turn.
+Each of these will be tested in turn, with the crypted version tested first.
 
 =cut
 
@@ -69,8 +66,6 @@ require AutoLoader;
 use strict;
 use warnings;
 
-
-use Digest::MD5;
 use File::Basename;
 
 
@@ -194,8 +189,7 @@ sub loginFTP
     return 0 if ( !defined($password_given) || !length($password_given) );
 
     #
-    #  If the domain isn't setup for FTP then we cannot
-    # be correct.
+    #  If the domain isn't setup for FTP then we cannot be correct.
     #
     return 0 if ( !$self->isFTP() );
 
@@ -204,7 +198,6 @@ sub loginFTP
     #
     open( my $handle, "<", $self->{ 'path' } . "/config/ftp-password" ) or
       return 0;
-
     my $password = <$handle> || undef;
     close($handle);
 
@@ -231,7 +224,7 @@ sub loginFTP
     #
     if ( $password =~ /^(?:{CRYPT})?([0-9a-z\$.\/]+)$/i )
     {
-        # 
+        #
         # The hash, including the salt is in $1.
         #
         my $hash = $1;
@@ -246,7 +239,7 @@ sub loginFTP
         }
     }
 
-    # 
+    #
     # OK fall back to a plain-text password
     #
     if ( $password eq $password_given )
