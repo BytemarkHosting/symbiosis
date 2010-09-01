@@ -1,3 +1,9 @@
+symbiosis-ftpd (2010:0901) stable; urgency=low
+
+  * Updated to use the common library code for performing FTP logins.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 01 Sep 2010 12:13:14 +0000
+
 symbiosis-ftpd (2010:0603) stable; urgency=low
 
   * Renamed package
