@@ -21,6 +21,13 @@ features
 4. Ensure each package is IPv6 compatible.
 
 
+PHPMyADMIN
+----------
+
+  Force it to run over SSL?
+    Pro: more secure.
+    Con: People will see self-signed warnings.
+
 SSL
 ---
 
