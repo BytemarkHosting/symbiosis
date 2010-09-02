@@ -1,8 +1,6 @@
 firewall
 --------
 
-0.  Add lock file to firewall* binaries to prevent them being able to be run
-    simultaneously.
 1.  Fix www-data rule to work for lists of IPs.
 
 

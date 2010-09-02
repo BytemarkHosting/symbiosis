@@ -166,7 +166,8 @@ my %CONFIG;
 #
 my %MODULES = ( "ip_conntrack_ftp" => 1,
                 "iptable_filter"   => 1,
-                "ip_conntrack"     => 1 );
+                "ip_conntrack"     => 1
+              );
 
 
 #
@@ -184,6 +185,7 @@ $CONFIG{ 'local.d' }     = "/etc/symbiosis/firewall/local.d/";
 $CONFIG{ 'outgoing.d' }  = "/etc/symbiosis/firewall/outgoing.d/";
 $CONFIG{ 'rule.d' }      = "/usr/share/firewall/rule.d/";
 $CONFIG{ 'whitelist.d' } = "/etc/symbiosis/firewall/whitelist.d/";
+$CONFIG{ 'lock' }        = "/var/lock/lck.firewall";
 
 
 
@@ -214,6 +216,59 @@ my %SERVICES = parseServices();
 #        (e.g. Virtual machines might have non-modular kernels.)
 #
 loadKernelModules();
+
+
+#
+#  Ensure we're the only version running.
+#
+if ( -e $CONFIG{ 'lock' } )
+{
+    $CONFIG{ 'verbose' } && print "Lockfile present\n";
+
+    #
+    #  See how old the lockfile is.
+    #
+    my ( $dev,  $ino,   $mode,  $nlink, $uid,     $gid, $rdev,
+         $size, $atime, $mtime, $ctime, $blksize, $blocks
+       ) = stat( $CONFIG{ 'lock' } );
+
+    my $now = time;
+
+    if ( ( $now - $mtime ) > 60 * 60 )
+    {
+        $CONFIG{ 'verbose' } && print "Lockfile is _old_ removing\n";
+
+        unlink( $CONFIG{ 'lock' } );
+    }
+
+    #
+    #  OK the lockfile is present
+    #
+    my $count = 0;
+
+    while ( ( -e $CONFIG{ 'lock' } ) && ( $count < 10 ) )
+    {
+        $CONFIG{ 'verbose' } && print "\tSleeping for 30 seconds\n";
+        sleep(30);
+
+        $count += 1;
+    }
+
+    if ( -e $CONFIG{ 'lock' } )
+    {
+        print "Failed to outwait the lockfile\n";
+        exit 1;
+    }
+}
+
+#
+#  OK create the lockfile.
+#
+open( LOCK, ">", $CONFIG{ 'lock' } ) or
+  die "Failed to create lockfile - $CONFIG{'lock'} - $!";
+print LOCK "\n";
+close(LOCK);
+
 
 
 #
@@ -260,6 +315,7 @@ if ( scalar(@devices) < 1 )
 {
     print "We failed to find any network devices\n";
     print "Aborting\n";
+
     exit;
 }
 
@@ -283,6 +339,7 @@ foreach my $entry (@outgoing)
 if ( -e "/etc/symbiosis/firewall/disabled" )
 {
     unlink($tempfile);
+    unlink( $CONFIG{ 'lock' } );
     exit;
 }
 
@@ -299,6 +356,7 @@ flushAllRules() unless ( $CONFIG{ 'no-flush' } );
 if ( $CONFIG{ 'flush' } )
 {
     unlink($tempfile);
+    unlink( $CONFIG{ 'lock' } );
     exit 0;
 }
 
@@ -318,7 +376,7 @@ unless ( $CONFIG{ 'no-execute' } )
     #
     #  Run the firewall - logging appropriately.
     #
-    system( "$tempfile $log" );
+    system("$tempfile $log");
 
     #
     #  All done.
@@ -390,6 +448,7 @@ unless ( $CONFIG{ 'no-delete' } )
     unlink($tempfile);
 }
 
+unlink( $CONFIG{ 'lock' } );
 exit 0;
 
 
@@ -711,8 +770,7 @@ sub processWhitelist
             if ( ( $name =~ /:/ ) &&
                  ( isIPv6() ) )
             {
-                print FILE
-                print FILE "\n";
+                print FILE print FILE "\n";
                 print FILE "# whitelisted IP: $name due to $file\n";
                 print FILE
                   "/sbin/ip6tables -A INPUT -p all --src $name -j ACCEPT\n";
@@ -813,8 +871,7 @@ sub processBlacklist
                 {
                     print FILE "\n";
                     print FILE "# blacklisted IP: $name due to $file\n";
-                    print FILE
-                    print FILE
+                    print FILE print FILE
                       "/sbin/ip6tables -A INPUT -p all --src $name -j REJECT -m state --state NEW\n";
                 }
             }
