@@ -1,4 +1,4 @@
-symbiosis-firewall (2010:0902) stable; urgency=low
+symbiosis-firewall (2010:0903) stable; urgency=low
 
   * Correctly process whitelisted IP addresses.
   * Expire whitelisted entries which are older than 8 days.
@@ -7,6 +7,8 @@ symbiosis-firewall (2010:0902) stable; urgency=low
   * Log firewall actions to a file, not to STDOUT/STDERR.
     - The logfiles are also used by the blacklist/whitelist components.
   * Lock the firewall to prevent multiple executions.
+  * When blacklisting IPs count multiple destination port probes
+    as equal.  e.g. ssh + smtp failures are summed, not treated separately.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 2 Sep 2010 12:14:16 +0000
 

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-firewall-blacklist - A simple script to mitigate against dictionary attacks.
+firewall-blacklist - A simple script to mitigate dictionary attacks.
 
 =cut
 
@@ -36,16 +36,19 @@ firewall-blacklist - A simple script to mitigate against dictionary attacks.
 
 =head1 ABOUT
 
-  This script is designed to look over the system logs and blacklist
-hosts which are attempting dictionary attacks.
+This script is designed to look over the system logs and blacklist
+hosts which appear to be performing dictionary attacks; that is making
+multiple connection attempts with different usernames and passwords
+and attempting to login to systems they shouldn't.
 
-  The way that the script detects addresses which are worthy of blacklisting
+The way that the script detects addresses which are worthy of blacklisting
 is via the use of pattern files.  All pattern files located beneath
-/etc/symbiosis/firewall/patterns.d/ are loaded and applied.  These pattern
-files contain the name of a file to examine and a list of regular expressions
-which will be tested for within that named logfile.
+B</etc/symbiosis/firewall/patterns.d/> are loaded and applied.
 
- Any IPs which are blocked will be logged to syslog, and similarly the
+The pattern files contain the name of a logfile to examine and a list
+of regular expressions which will be tested for within that named logfile.
+
+Any IPs which are blocked will be logged to syslog, and similarly the
 removal of the blocks will also be logged to syslog.
 
 =cut
@@ -66,7 +69,7 @@ If you don't wish to use this script simply touch the file:
 
 =head1 WHITELISTING
 
- The file /etc/symbiosis/firewall/whitelist.d/ will be consulted - any IP
+The file /etc/symbiosis/firewall/whitelist.d/ will be consulted - any IP
 address listed in that directory will be ignored.
 
 =cut
@@ -455,12 +458,20 @@ sub processRules
     #
     #  Pattern to match an IP address, including the ::ffff: prefix.
     #
+    #  TODO: Make sure we also have IPv6 patterns in the future.
+    #
     my $ip = "(?:::ffff:)?([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)";
 
     #
-    #  List of IPs to blacklist
+    #  IPs we see accessing.
     #
-    my %BLACKLIST;
+    my %IPS;
+
+    #
+    #  List ports the given IP has accessed.
+    #
+    my %PORTS;
+
 
     #
     #  If the file doesn't exist we'll return
@@ -472,15 +483,29 @@ sub processRules
     }
 
 
+    #
+    #  Read the file, using the logtail script so we only
+    # process new additions.
+    #
     open( FILE, "/usr/bin/firewall-logtail $file|" ) or
       die "failed to read logfile: $file - $!";
 
+    #
+    #  Process each line
+    #
     foreach my $line (<FILE>)
     {
+
+        #
+        #  Skip empty lines, and remove newlines.
+        #
         next if ( !defined($line) || !length($line) );
         chomp($line);
         next if ( !defined($line) || !length($line) );
 
+        #
+        #  Process each line against our patterns.
+        #
         foreach my $rule (@rules)
         {
 
@@ -498,25 +523,43 @@ sub processRules
                 my $match = $1;
 
                 #
-                # Record the blacklist
+                # We make two records here.
                 #
-                $BLACKLIST{ $match }->{ $ports } += 1;
+                ##
+                #
+                #  $IPS{"1.2.3.4"} which matches the attack from 1.2.3.4
+                #
+                #  $PORTS{"1.2.3.4"}{22} which is the port-specific count.
+                #
+                ##
+                #
+                $PORTS{ $match }->{ $ports } += 1;
+                $IPS{ $match } += 1;
             }
         }
     }
     close(FILE);
 
+
+
     #
     #  Now for each dropping host we'll have a multi-dimensional
     # hash which looks like:
     #
-    #   $HASH{'1.2.3.4'}{'22'} = 23
+    #   $PORTS{'1.2.3.4'}{'22'} = 23
     #
     #  That shows that the IP 1.2.3.4 hit port 22 23 times
     #
     #
+    #  We'll also have:
+    #
+    #   $IPS{'1.2.3.4'} = 23;
+    #
+    #  Which shows we saw 23 hits from the given IP - where the
+    # port accessed is irrelevant.
+    #
     my $count = 0;
-    foreach my $ip ( keys %BLACKLIST )
+    foreach my $ip ( keys %IPS )
     {
 
         #
@@ -527,26 +570,49 @@ sub processRules
         #
         # Ignore whitelisted IPs
         #
-        next if ( ( -e $CONFIG{ 'whitelist' } . "/$ip" ) ||
-                  ( -e $CONFIG{ 'whitelist' } . "/$ip.auto" ) );
+        next
+          if ( ( -e $CONFIG{ 'whitelist' } . "/$ip" ) ||
+               ( -e $CONFIG{ 'whitelist' } . "/$ip.auto" ) );
+
 
         #
-        # The ports which were affected.
+        # Get the global count for this IP.
         #
-        foreach my $p ( keys %{ $BLACKLIST{ $ip } } )
+        my $attempts = $IPS{ $ip };
+
+        #
+        # If too high we want to block each port they've
+        # accessed.
+        #
+        if ( $attempts >= $CONFIG{ 'attempts' } )
         {
 
-            my $attempts = $BLACKLIST{ $ip }->{ $p };
-            if ( $attempts >= $CONFIG{ 'attempts' } )
+            #
+            #  If they're not already blacklisted.
+            #
+            if ( !-e "$CONFIG{'blacklist'}/$ip.auto" )
             {
-                if ( !-e "$CONFIG{'blacklist'}/$ip.auto" )
-                {
-                    if ( !-d "$CONFIG{'blacklist'}" )
-                    {
-                        system( "mkdir", "-p", $CONFIG{ 'blacklist' } );
-                    }
 
-                    open( LOG, ">", "$CONFIG{'blacklist'}/$ip.auto" );
+                #
+                #  Ensure there is a blacklist directory
+                #
+                if ( !-d "$CONFIG{'blacklist'}" )
+                {
+                    system( "mkdir", "-p", $CONFIG{ 'blacklist' } );
+                }
+
+
+                #
+                #  Write out the record.
+                #
+                open( LOG, ">", "$CONFIG{'blacklist'}/$ip.auto" );
+
+
+                #
+                #  Write out the ports they accessed.
+                #
+                foreach my $p ( keys %{ $PORTS{ $ip } } )
+                {
                     if ( ($p) && ( $p !~ /^all$/i ) )
                     {
                         foreach my $block ( split( /,/, $p ) )
@@ -554,29 +620,29 @@ sub processRules
                             print LOG $block . "\n";
                         }
                     }
-                    close(LOG);
-
-                    $CONFIG{ 'verbose' } && print "Blacklisting: $ip\n";
-
-                    #
-                    # log the new block to syslog.
-                    #
-                    syslog( 'info', "firewall-blacklist adding: $ip" );
-
-                    $count += 1;
                 }
-                else
-                {
-                    $CONFIG{ 'verbose' } &&
-                      print "Ignoring blacklisted IP: $ip\n";
-                }
+                close(LOG);
+
+                $CONFIG{ 'verbose' } && print "Blacklisting: $ip\n";
+
+                #
+                # log the new block to syslog.
+                #
+                syslog( 'info', "firewall-blacklist adding: $ip" );
+
+                $count += 1;
             }
             else
             {
                 $CONFIG{ 'verbose' } &&
-                  print
-                  "Allowing IP $ip only made $attempts (<$CONFIG{'attempts'} ) attempts\n";
+                  print "Ignoring blacklisted IP: $ip\n";
             }
+        }
+        else
+        {
+            $CONFIG{ 'verbose' } &&
+              print
+              "Allowing IP $ip only made $attempts (<$CONFIG{'attempts'} ) attempts\n";
         }
     }
 
@@ -610,7 +676,7 @@ sub expireBlacklist
     #
     foreach my $file ( sort( glob("$CONFIG{'blacklist'}/*.auto") ) )
     {
-        next unless( -e $file );
+        next unless ( -e $file );
 
         my $age = -M $file;
         if ( int($age) > $CONFIG{ 'expire' } )
