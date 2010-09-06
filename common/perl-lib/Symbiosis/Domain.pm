@@ -211,6 +211,21 @@ sub loginFTP
     #
     chomp($password);
 
+    return $self->checkPassword($password_given, $password)
+}
+
+=begin doc
+
+Check a password.  This is used for both FTP and mail logins.
+
+=end doc
+
+=cut
+
+sub checkPassword
+{
+    my ( $self, $password_given, $password ) = (@_);
+
     #
     #  OK we have read a password.  We have two cases,
     # a plaintext password and a crypt password.
@@ -253,7 +268,6 @@ sub loginFTP
     #
     return 0;
 }
-
 
 
 #
