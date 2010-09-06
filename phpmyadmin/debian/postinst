@@ -32,9 +32,9 @@ fi
 #  Restart Apache2 to ensure this change is picked up.
 #
 if which invoke-rc.d >/dev/null 2>&1; then
-    invoke-rc.d apache2 restart
+    invoke-rc.d apache2 restart || true
 else
-    /etc/init.d/apache2 restart
+    /etc/init.d/apache2 restart || true
 fi
 
 #DEBHELPER#
