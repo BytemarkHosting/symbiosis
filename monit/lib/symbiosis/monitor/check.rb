@@ -9,7 +9,7 @@ module Symbiosis
         attr_reader :name
 
         def initialize
-          @process = Symbiois::Monitor::Process.new
+          @process = Symbiosis::Monitor::Process.new
         end
 
 
@@ -80,9 +80,9 @@ module Symbiosis
         end
 
         # This tests a TCP connection and the responses it receives.  It takes
-        # a single argument of a Symbiois::Monitor::TCPConnection object
+        # a single argument of a Symbiosis::Monitor::TCPConnection object
         def do_tcpconnection_check(connection)
-          raise ArgumentError unless connection.is_a?(Symbiois::Monitor::TCPConnection)
+          raise ArgumentError unless connection.is_a?(Symbiosis::Monitor::TCPConnection)
           begin
             puts "Testing connection to #{connection.host}:#{connection.port}"
             connection.do_check
