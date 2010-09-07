@@ -2,5 +2,21 @@
 
 set -e
 
+#
+# Remove the existing link.
+#
+if [ -e /etc/apache2/conf.d/phpmyadmin.conf ]; then
+    rm -f /etc/apache2/conf.d/phpmyadmin.conf
+fi
+
+#
+#  Restart Apache2.
+#
+if which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d apache2 force-reload
+else
+    /etc/init.d/apache2 force-reload
+fi
+
 #DEBHELPER#
 exit 0
