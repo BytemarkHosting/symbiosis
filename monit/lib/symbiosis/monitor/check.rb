@@ -1,6 +1,7 @@
 require 'symbiosis/monitor/process'
 require 'symbiosis/monitor/tcpconnection'
 require 'systemexit'
+require 'fcntl'
 
 module Symbiosis
     module Monitor
@@ -16,38 +17,17 @@ module Symbiosis
         #  Should we ignore failures because apt-get|aptitude|dpkg is running?
         #
         def should_ignore?
-          found = false
-
-          #
-          #  Our update package script will create a lockfile.
-          #
-          #  Similarly we've configured dpkg to create a file when
-          # it starts
-          #
-          return true if ( File.exists?( "/tmp/dpkg.running" ) ||
-                           File.exists?( "/var/tmp/update.packages" ) )
-
-          #
-          #  Final chance - avoid alerting if we have a system
-          # process running which looks related to system updates.
-          #
-          Dir.foreach("/proc/") do |entry|
-            if ( File.directory?( "/proc/#{entry}" ) && ( entry =~ /([0-9]+)/ ) )
-              File.open( "/proc/#{entry}/cmdline", "r") do |infile|
-                begin
-                  while (line = infile.gets)
-                    line.chomp!
-                    if ( line =~ /(apt|(bytemark-vhost|symbiosis)-updater|debconf|dpkg|apt-get|aptitude|debconf)/i )
-                      found = true
-                      puts "Skipping alerts due to running process: #{line}"
-                    end
-                  end
-                rescue
-                end
-              end
-            end
+          f = File.open('/var/lib/dpkg/lock','w+')
+  
+          begin 
+            # Check the dpkg lock
+            x = f.fcntl(Fcntl::F_SETLK, [Fcntl::F_WRLCK, IO::SEEK_SET, 0].pack("III"))
+            f.close
+            return false
+          rescue Errno::EACCES, Errno::EAGAIN => err
+            f.close
+            return true
           end
-          found
         end
 
 
