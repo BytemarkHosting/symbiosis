@@ -16,7 +16,7 @@ require 'symbiosis/test'
         #
         def initialize( name = nil )
           if ( name.nil? )
-            @name = Bytemark::Symbiosis::Test.random_string(10)+".test"
+            @name = Symbiosis::Test.random_string(10)+".test"
           else
             @name = name
           end
@@ -55,7 +55,7 @@ require 'symbiosis/test'
         def get_param(setting, config_dir = "config")
           config_dir = File.join(self.directory, config_dir) unless config_dir[0] == "/"
 
-          Bytemark::Symbiosis::Test.get_param(setting, config_dir)
+          Symbiosis::Test.get_param(setting, config_dir)
         end
 
         #
@@ -66,13 +66,13 @@ require 'symbiosis/test'
           
           create_dir(config_dir) unless File.exists?(config_dir)
 
-          Bytemark::Symbiosis::Test.set_param(setting, value, config_dir)
+          Symbiosis::Test.set_param(setting, value, config_dir)
         end
 
         def create_dir(d)
           return if File.directory?(d)
           
-          Bytemark::Symbiosis::Test.mkdir(d, :mode => 0755, :user => @user, :group => @group)
+          Symbiosis::Test.mkdir(d, :mode => 0755, :user => @user, :group => @group)
         end
 
       end
