@@ -1,3 +1,11 @@
+symbiosis-email (2010:0908) lucid; urgency=low
+
+  * Added in localhost rewriting
+  * Fixed tests
+  * Fixed vhost_aliases router to behave like vhost_forward
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Sep 2010 11:58:06 +0100
+
 symbiosis-email (2010:0603) stable; urgency=low
 
   * Split dovecot config into a multiple file layout (like exim4)
