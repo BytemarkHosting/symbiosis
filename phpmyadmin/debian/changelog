@@ -1,3 +1,10 @@
+symbiosis-phpmyadmin (2010:0908) stable; urgency=low
+
+  * Changed prerm to clean up after itself, and also changed restart to
+    reload in postinst
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Sep 2010 14:32:37 +0100
+
 symbiosis-phpmyadmin (2010:0604) stable; urgency=low
 
   * Removed our previously overlapping configuration file, and instead

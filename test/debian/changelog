@@ -1,3 +1,9 @@
+symbiosis-test (2010:0908) stable; urgency=low
+
+  * Fixed spelling mistake in module name
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Sep 2010 14:31:14 +0100
+
 symbiosis-test (2010:0817) stable; urgency=low
 
   * Renamed testing modules from Bytemark::Vhost to Symbiosis
