@@ -38,11 +38,8 @@ SSL
 Email
 -----
 
-1. Make sure that exim4 forward-file errors get forwarded on
-   somewhere sensible.
-
-2. Enable Bytemark anti-spam service to be used (+dns changes?)
-
+  Cause mail to be rejected/deferred at SMTP time if the any forward
+  rules specify :fail: or :defer:.
 
 Forums
 ------
