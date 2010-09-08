@@ -23,7 +23,7 @@ fi
 #
 #  Add the user
 #
-adduser clamav Debian-exim
+adduser clamav Debian-exim 
 
 #
 #  Enable the spamassassin module
@@ -40,6 +40,12 @@ sed -i -e 's/^\(CRON=\)0/\11/' /etc/default/spamassassin
 #
 touch /etc/exim4/rewrites
 chown Debian-exim /etc/exim4/rewrites
+
+#
+# Copy any existing files in /etc/exim4/bytemark-vhost.d, backing up anything
+# in the way.
+#
+cp -a -b -S .dpkg-new /etc/exim4/bytemark-vhost.d /etc/exim4/symbiosis.d
 
 
 #
