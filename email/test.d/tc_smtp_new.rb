@@ -85,7 +85,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   end
 
   def teardown
-    FileUtils.rm_rf(@tempdir) if @tempdir =~/^\/tmp/
+    FileUtils.rm_rf(@tempdir) if @tempdir =~/^\/tmp/ and !$DEBUG
   end
 
   def do_acl_setup
@@ -186,9 +186,9 @@ class Exim4ConfigTest < Test::Unit::TestCase
         when /^mail to ([^\s]+) is discarded$/
           this_destination = ":blackhole:"
           this_transport = ":blackhole:"
-        when /^([^\s]+) cannot be resolved at this time:$/
+        when /^([^\s]+) cannot be resolved at this time:/
           this_transport = ":defer:"
-        when /^([^\s]+) is undeliverable:$/
+        when /^([^\s]+) is undeliverable:/
           this_transport = ":fail:"
       end
     end
@@ -310,7 +310,26 @@ class Exim4ConfigTest < Test::Unit::TestCase
     end
   end
 
+  def is_running?(pidfile)
+    # make sure the pidfile exists
+    return false unless File.exists?(pidfile)
+
+    pid = File.open(pidfile){|fh| fh.gets}.chomp
+    # Check the pid
+    return false unless File.exists?("/proc/#{pid}")
+
+    # OK everything is working
+    return true
+  end
+
   def test_acl_check_spam
+
+    # Only run these tests if SA is running
+    if !is_running?('/var/run/spamd.pid')
+      puts "Spamassassin not running"
+      return
+    end
+
     # setup the acl
     do_acl_setup()
 
@@ -338,6 +357,12 @@ class Exim4ConfigTest < Test::Unit::TestCase
   end
 
   def test_acl_check_antivirus
+    # Only run these tests if clam is running
+    if !is_running?('/var/run/clamav/clamd.pid')
+      puts "Clamav not running"
+      return
+    end
+
     # setup the acl
     do_acl_setup()
 
@@ -391,8 +416,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   ################################################################################
 
   def test_router_dnslookup
-
-    do_exim4_bt("test@gmail.com", "test@gmail.com", "dnslookup", "remote_smtp")
+    do_exim4_bt("test@example.com", "test@example.com", "dnslookup", "remote_smtp")
   end
 
 #  def test_router_vhost_rewrites
@@ -403,13 +427,13 @@ class Exim4ConfigTest < Test::Unit::TestCase
 #    @acl_config['rewrite_domains'].each {|from, to| do_exim4_bt("user@"+from, "user@"+to) }
 #  end
 
-  def test_router_vhost_dnslookup_no_mailbox_dir
+  def test_router_vhost_no_local_mail
     do_acl_setup
     domain = @acl_config['local_domains'].last
     do_exim4_bt("test@"+domain, "test@"+domain, "vhost_no_local_mail", "remote_smtp")
   end
 
-  def test_router_vhost_aliases
+  def test_router_vhost_forward
     do_acl_setup
     domain = @acl_config['local_domains'].first
 
@@ -432,6 +456,17 @@ class Exim4ConfigTest < Test::Unit::TestCase
     end
   end
 
+  def test_router_vhost_vacation
+    do_acl_setup
+    domain = @acl_config['local_domains'].first
+    lp = "vacation_test"
+    mailbox = File.join(@vhost_dir, domain, @vhost_mailbox_dir, lp)
+    FileUtils.mkdir_p(mailbox)
+    File.open(File.join(mailbox,"vacation"),"w+"){|fh| fh.puts "I'm away until forever"}
+    do_exim4_bt(lp+"@"+domain, lp+"@"+domain, "vhost_vacation", "vhost_vacation")
+    # TODO This needs to be tested to make sure it doesn't reply to junk.
+  end
+
   def test_router_vhost_mailbox
     do_acl_setup()
     @acl_config['local_users'].each do |u|
@@ -439,6 +474,46 @@ class Exim4ConfigTest < Test::Unit::TestCase
       local_part, domain = [$1, $2]
       do_exim4_bt(u['username'],File.join(@vhost_dir,domain,@vhost_mailbox_dir,local_part,"Maildir/"), "vhost_mailbox", "address_directory")
     end
+  end
+
+  def test_router_vhost_aliases
+    do_acl_setup()
+    domain = @acl_config['local_domains'].first
+
+    alias_fn = File.join(@vhost_dir, domain, "config", "aliases")
+    aliases = [
+      [ "alias_test1", "test1@remote.domain", nil, nil ],
+      [ "alias_test2", "|/a-really-secure-programme", "vhost_aliases", "address_pipe" ],
+      [ "alias_test3", "/straight/to/a/file", "vhost_aliases", "address_file" ],
+      [ "alias_test4", "/straight/to/a/directory/", "vhost_aliases", "address_directory" ],
+      [ "alias_test5", ":blackhole:", "vhost_aliases", ":blackhole:" ],
+      [ "alias_test6", ":fail:", "vhost_aliases", ":fail:" ],
+      [ "alias_test7", ":defer:", "vhost_aliases", ":defer:" ],
+    ]
+    File.open(alias_fn,"w+"){|fh| aliases.each{|a| fh.puts a.first(2).join(": ")}}
+
+    aliases.each do |lp, action, router, transport|
+      # change the action for testing
+      action = lp+"@"+domain if action == ":fail:" or action == ":defer:" or action == ":unknown:"
+      do_exim4_bt(lp+"@"+domain, action, router, transport)
+    end
+  end
+
+  def test_router_vhost_aliases_check
+    do_acl_setup()
+    domain = "local.domain"
+    alias_fn = File.join(@vhost_dir, domain, "config", "aliases")
+    aliased_lp = "alias_check1"
+    actual_lp = "real_test1"
+    mailbox = File.join(@vhost_dir, domain, @vhost_mailbox_dir, actual_lp)
+    FileUtils.mkdir_p(mailbox)
+    # Write the aliases file
+    File.open(File.join(@vhost_dir,domain,"config/aliases"),"w+"){|fh| fh.puts("#{aliased_lp}: #{actual_lp}")}
+
+    FileUtils.chown_R("1000","1000", File.join(@vhost_dir,domain))
+
+    do_acl_script('exim4_acl_tests/router_vhost_aliases_check')
+
   end
 
   def test_router_vhost_default_forward
@@ -455,6 +530,13 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
     # Now make sure we can...
     do_exim4_bt("nobody@"+domain,"/tmp/default_forward/", "vhost_default_forward", "address_directory")
+  end
+
+  def test_router_vhost_default_forward_check
+
+  end
+
+  def test_router_vhost_postmaster
   end
 
   def test_router_system_aliases
@@ -532,7 +614,21 @@ class Exim4ConfigTest < Test::Unit::TestCase
   ################################################################################
 
   def test_localhost_rewrite
-    # TODO
+    do_acl_setup
+
+    if File.exists?('/etc/hostname')
+      this_hostname = File.read('/etc/hostname').chomp
+    end
+
+    if this_hostname == "localhost"
+      puts "Cannot do localhost rewrite tests, since this host thinks it is called localhost."
+      return 
+    end
+
+    lp = "rewrite_test"
+    mailbox = File.join(@vhost_dir, this_hostname, @vhost_mailbox_dir, lp)
+    FileUtils.mkdir_p(mailbox)
+    do_exim4_bt(lp+"@localhost", mailbox+"/Maildir/", "vhost_mailbox", "address_directory")
   end
 
   ################################################################################

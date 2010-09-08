@@ -1,0 +1,7 @@
+
+#
+# Rewrite localhost to the primary hostname
+#
+*@localhost  $1@$primary_hostname E
+
+
