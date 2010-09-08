@@ -1,4 +1,4 @@
-symbiosis-email (2010:0908) lucid; urgency=low
+symbiosis-email (2010:0908) stable; urgency=low
 
   * Added in localhost rewriting
   * Fixed tests
