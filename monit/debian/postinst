@@ -17,6 +17,12 @@ if [ -e /etc/cron.d/bytemark-service-monitor ] ; then
   rm -f /etc/cron.d/bytemark-service-monitor
 fi
 
+#
+#  Cronjob needs to be removed on upgrade.
+#
+if [ -e /etc/cron.d/bytemark-vhost-monit ]; then
+  rm -f  /etc/cron.d/bytemark-vhost-monit
+fi
 
 #
 #  Remove old packaging mistake, if it still exists.

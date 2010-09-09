@@ -1,3 +1,10 @@
+symbiosis-monit (2010:0909) stable; urgency=low
+
+  * Removed the obsolete bytemark-vhost-monit cronjob.
+  * Update the current cronjob to exit if the script isn't installed.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 09 Sep 2010 12:00:21 +0000
+
 symbiosis-monit (2010:0908) stable; urgency=low
 
   * Fixed spelling mistake that caused all the tests to fail all the time.
