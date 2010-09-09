@@ -32,7 +32,7 @@ install: build
 	chmod 755 `pwd`/debian/symbiosis-tinydns/sbin/symbiosis-dns-generate
 	cp bug.report `pwd`/debian/symbiosis-tinydns/usr/share/bug/bytemark-vhost-tinydns/control
 
-	cp -R ./exim4/bytemark-vhost.d `pwd`/debian/symbiosis-tinydns/etc/exim4/
+	cp -R ./exim4/symbiosis.d `pwd`/debian/symbiosis-tinydns/etc/exim4/
 #	pod2man ./create-dns > `pwd`/debian/bytemark-symbiosis-tinydns/usr/share/man/man1/create-dns.1
 #	gzip -9 `pwd`/debian/bytemark-symbiosis-tinydns/usr/share/man/man1/create-dns.1
 
