@@ -45,7 +45,10 @@ chown Debian-exim /etc/exim4/rewrites
 # Copy any existing files in /etc/exim4/bytemark-vhost.d, backing up anything
 # in the way.
 #
-cp -a -b -S .dpkg-new /etc/exim4/bytemark-vhost.d/* /etc/exim4/symbiosis.d
+if [ -d /etc/exim4/bytemark-vhost.d ] ; then
+  cp -a -b -S .dpkg-new /etc/exim4/bytemark-vhost.d/* /etc/exim4/symbiosis.d
+  rm -rf /etc/exim4/bytemark-vhost.d
+fi
 
 
 #
