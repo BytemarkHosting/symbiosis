@@ -1,10 +1,11 @@
-symbiosis-email (2010:0908) stable; urgency=low
+symbiosis-email (2010:0909) stable; urgency=low
 
   * Added in localhost rewriting
   * Fixed tests
   * Fixed vhost_aliases router to behave like vhost_forward
+  * Only run our rewriter cronjob if the script is available.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Sep 2010 11:58:06 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 09 Sep 2010 12:05:12 +0100
 
 symbiosis-email (2010:0603) stable; urgency=low
 

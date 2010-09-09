@@ -3,5 +3,5 @@
 # exim for domain rewrites.
 #
 
-*/1 * * * * Debian-exim /usr/sbin/exim_rewrite_scan /etc/exim4/exim4.conf
+*/1 * * * * Debian-exim [ -x /usr/sbin/exim_rewrite_scan ] && /usr/sbin/exim_rewrite_scan  /etc/exim4/exim4.conf
 
