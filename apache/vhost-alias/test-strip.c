@@ -38,7 +38,6 @@ int main( int argc, char *argv[] )
                        "/srv/.",
                        "/srv/..",
                        "/srv/...",
-                       //#electronicnews/public/htdocs/own",
   };
 
   int i = 0;
