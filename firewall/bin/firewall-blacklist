@@ -679,6 +679,8 @@ sub expireBlacklist
         next unless ( -e $file );
 
         my $age = -M $file;
+        $age    = 0 if ( !defined($age) );
+
         if ( int($age) > $CONFIG{ 'expire' } )
         {
             $CONFIG{ 'verbose' } && print "Expiring file: $file\n";
