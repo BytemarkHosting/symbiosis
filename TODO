@@ -52,7 +52,3 @@ Web
 ---
 
   Nick documented django setup: #258941
-
-  Add wildcard support, in the same way we handle the www. prefix
- being optional
-

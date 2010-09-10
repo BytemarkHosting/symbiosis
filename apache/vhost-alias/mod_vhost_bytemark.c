@@ -409,26 +409,40 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
 
 
     /*
-     * Steve: remove "www." prefix after /srv  if the named
-     * path doesn't exist.
+     * A this point we either have a request which points to a file
+     * on disk - or not.
      *
-     *  This means that a request for www.foo.com & foo.com may both be
-     * handled via /srv/foo.com/public/htdocs/.
+     * If the request doesn't exist on disk we can *attempt* to remap
+     * that to the real file.
      *
-     *  For people wishing to use a different prefix than /srv/ they should
-     * update the "prefix" setting below, and things should continue to work
-     * as expected.
+     * If this remapping fails we dont' care as the result will be a 404,
+     * and that would have happened anyway.
      *
      */
     {
       struct stat buffer;
 
+      /**
+       * If we have:
+       *
+       *  A request.
+       *  That mapped to a filename.
+       *  Which doesn't exist.
+       *
+       * Then:
+       *
+       *  Attempt to fix.
+       *
+       */
       if ( ( NULL != r ) &&
            ( NULL != r->filename ) &&
            ( stat( r->filename, &buffer ) < 0 ) )
         {
 
-
+          /**
+           * Here we strip out the first part of the name
+           * after the /srv prefix.
+           */
           update_vhost_request( r->filename );
         }
     }
