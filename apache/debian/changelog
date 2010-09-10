@@ -1,10 +1,11 @@
-symbiosis-httpd (2010:0728) stable; urgency=low
+symbiosis-httpd (2010:0910) stable; urgency=low
 
   [ Steve Kemp ]
   * Use a template file for the SSL-site creation, and honour the flag
     /srv/example.com/config/ssl-only
+  * Updated the Bytemark VPN ranges.
 
- -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jul 2010 13:33:31 +0000
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 10 Sep 2010 15:16:17 +0000
 
 symbiosis-httpd (2010:0722) stable; urgency=low
 
