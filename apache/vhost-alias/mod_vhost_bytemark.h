@@ -57,7 +57,7 @@ void update_vhost_request( char *path )
    * Copy from the /srv marker to the period.
    */
   memcpy( path + strlen( "/srv/" ), per + 1,
-         strlen( per+1) );
+         strlen( per+1 ) + 1 );
 }
 
 
