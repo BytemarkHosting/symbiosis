@@ -96,7 +96,7 @@ done
 #
 #  Now regenerate and re-upload all DNS files.
 #
-/sbin/symbiosis-dns-generate
+symbiosis-dns-generate
 
 
 #DEBHELPER#
