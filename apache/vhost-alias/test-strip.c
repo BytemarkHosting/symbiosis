@@ -35,6 +35,10 @@ int main( int argc, char *argv[] )
                        "/srv/electronicnews.co.uk/cgi-bin/formail.cgi",
                        "/srv/www.electronicnews.co.uk/cgi-bin/formail.cgi",
                        "/srv/cake.electronicnews.co.uk/cgi-bin/formail.cgi",
+                       "/srv/.",
+                       "/srv/..",
+                       "/srv/...",
+                       //#electronicnews/public/htdocs/own",
   };
 
   int i = 0;

@@ -415,7 +415,7 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
      * If the request doesn't exist on disk we can *attempt* to remap
      * that to the real file.
      *
-     * If this remapping fails we dont' care as the result will be a 404,
+     * If this remapping fails we don't care as the result will be a 404,
      * and that would have happened anyway.
      *
      */
@@ -441,7 +441,15 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
 
           /**
            * Here we strip out the first part of the name
-           * after the /srv prefix.
+           * after the /srv prefix which will result in
+           * a request being rewritten from (for example)
+           *
+           *   /srv/test.example.com/public/htdocs/test/index.php
+           *
+           * to:
+           *
+           *   /srv/example.com/public/htdocs/test/index.php
+           *
            */
           update_vhost_request( r->filename );
         }
