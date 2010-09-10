@@ -53,11 +53,7 @@
 #include "http_core.h"
 #include "http_request.h"  /* for ap_hook_translate_name */
 
-/* steve: needed for stat() */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
+#include "mod_vhost_bytemark.h"
 
 module AP_MODULE_DECLARE_DATA vhost_bytemark_module;
 
@@ -411,6 +407,7 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
         r->filename = apr_pstrcat(r->pool, buf, uri, NULL);
     }
 
+
     /*
      * Steve: remove "www." prefix after /srv  if the named
      * path doesn't exist.
@@ -428,19 +425,12 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
 
       if ( ( NULL != r ) &&
            ( NULL != r->filename ) &&
-           ( stat( r->filename, &buffer ) < 0 ) ) {
+           ( stat( r->filename, &buffer ) < 0 ) )
+        {
 
-        char prefix[] = "/srv";
 
-        /* find "www." which we hope will be after /srv/ */
-        char *p = strstr( r->filename, "www." );
-
-        if ( ( p != NULL ) && ( p == r->filename + strlen(prefix) + 1 ) )  {
-
-          /* strlen( "www." ) == 4  */
-          memcpy( p ,  p +4, strlen(p) - 4 + 1) ;
+          update_vhost_request( r->filename );
         }
-      }
     }
 
     /**
