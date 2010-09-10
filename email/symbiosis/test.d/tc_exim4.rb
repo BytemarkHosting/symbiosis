@@ -1,4 +1,6 @@
-$: << ".."
+#!/usr/bin/ruby
+
+$: << "../.."
 
 exit 0 if Process.euid != 0
 
@@ -48,8 +50,8 @@ class Exim4ConfigTest < Test::Unit::TestCase
     FileUtils.chown_R("Debian-exim", "Debian-exim", File.join(@tempdir, "spool"))
 
     # Copy all the config snippets over
-    FileUtils.cp_r(File.join("..", "exim4","symbiosis.d"),File.join(@tempdir,"exim4"))
-    FileUtils.cp_r(File.join("..", "exim4","Makefile"),File.join(@tempdir,"exim4"))
+    FileUtils.cp_r(File.join("../..", "exim4","symbiosis.d"),File.join(@tempdir,"exim4"))
+    FileUtils.cp_r(File.join("../..", "exim4","Makefile"),File.join(@tempdir,"exim4"))
 
     # We need to know where the test exim4.conf is so we can pass it to exim4
     # when testing
