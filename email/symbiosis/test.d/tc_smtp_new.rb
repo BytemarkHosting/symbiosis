@@ -1,5 +1,7 @@
 $: << ".."
 
+exit 0 if Process.euid != 0
+
 # require 'bytemark_vhost_mail'
 require 'test/unit'
 require "tempfile"
