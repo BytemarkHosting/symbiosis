@@ -100,7 +100,7 @@ file "Release" => ["Sources.gz", "Sources", "Packages.gz", "Packages"] do |t|
   #
   release =<<EOF
 Archive: #{DISTRO}
-Label: Ruby gem conversions for #{DISTRO} from apt-ruby.bytemark.co.uk
+Label: Symbiosis
 Origin: Bytemark Hosting
 Architectures: amd64 i386 source
 Components: main
