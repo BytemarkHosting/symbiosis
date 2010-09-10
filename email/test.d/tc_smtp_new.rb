@@ -46,7 +46,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
     FileUtils.chown_R("Debian-exim", "Debian-exim", File.join(@tempdir, "spool"))
 
     # Copy all the config snippets over
-    FileUtils.cp_r(File.join("..", "exim4","bytemark-vhost.d"),File.join(@tempdir,"exim4"))
+    FileUtils.cp_r(File.join("..", "exim4","symbiosis.d"),File.join(@tempdir,"exim4"))
     FileUtils.cp_r(File.join("..", "exim4","Makefile"),File.join(@tempdir,"exim4"))
 
     # We need to know where the test exim4.conf is so we can pass it to exim4
@@ -54,7 +54,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
     @exim4_conf = File.join(@tempdir, "exim4", "exim4.conf")
 
     # Read in our current exim4.conf so we can modify it
-    macro_snippet_fn = File.join(@tempdir, "exim4", "bytemark-vhost.d", "00-main", "10-base-macros")
+    macro_snippet_fn = File.join(@tempdir, "exim4", "symbiosis.d", "00-main", "10-base-macros")
     macro_snippet = File.open(macro_snippet_fn,"r"){|fh| fh.read}
 
     # Change where exim thinks /etc is
@@ -77,7 +77,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
     File.open(macro_snippet_fn, "w+"){|fh| fh.puts(macro_snippet)}
     
     # Add in the spool directory 
-    File.open(File.join(@tempdir, "exim4",  "bytemark-vhost.d", "00-main", "11-spool-directory"), "w") do |fh|
+    File.open(File.join(@tempdir, "exim4",  "symbiosis.d", "00-main", "11-spool-directory"), "w") do |fh|
       fh.puts("spool_directory = "+File.join(@tempdir, "spool"))
     end
 
