@@ -1,0 +1,6 @@
+sbin                  usr/
+template              etc/symbiosis/dns.d/
+bug.report            usr/share/bug/bytemark-vhost-tinydns/control
+exim4                 etc/
+
+
