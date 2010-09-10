@@ -15,7 +15,11 @@ all: $(conf)
 $(conf): check
 	@mv -fb $(conf_tmp) $(conf)
 
-$(conf_tmp): distclean Makefile $(snippets)
+#
+# Add an explicit dependency on the header, to make sure that the snippets
+# directory has at least that bit.
+#
+$(conf_tmp): distclean Makefile $(snippets) $(CURDIR)/$(snippets_dir)/00-header
 	@for s in $(snippets) ; do \
 	    echo "# ------------------------------------------------------------------------------" >>  $(conf_tmp)  ;\
 	    echo "# $$s" >> $(conf_tmp)  ;\

@@ -45,7 +45,7 @@ fi
 #
 #  Rebuild exim if we need to
 #
-if [ -e /etc/exim4/Makefile ]; then
+if [ -e /etc/exim4/Makefile -a -e /etc/exim4/symbiosis.d/00-header ]; then
 
     #
     #  Rebuild exim4
