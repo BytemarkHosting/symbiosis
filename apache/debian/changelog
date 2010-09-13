@@ -5,8 +5,9 @@ symbiosis-httpd (2010:0913) stable; urgency=low
     /srv/example.com/config/ssl-only
   * Updated the Bytemark VPN ranges.
   * Added a more complete test-suite for the mod_vhost_bytemark module.
+  * Updated template location.
 
- -- Steve Kemp <steve@bytemark.co.uk>  Mon, 13 Sep 2010 10:20:30 +0000
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 13 Sep 2010 15:33:51 +0000
 
 symbiosis-httpd (2010:0722) stable; urgency=low
 

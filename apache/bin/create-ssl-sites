@@ -189,7 +189,7 @@ class SSLConfiguration
     #
     #  If we have no template file use the default.
     #
-    tf = "/etc/symbios/apache.d/ssl.template.erb" if ( tf.nil?)
+    tf = "/etc/symbiosis/apache.d/ssl.template.erb" if ( tf.nil?)
 
 
     #
