@@ -73,10 +73,22 @@ void update_vhost_request( char *path )
   char *per = NULL;
 
   /**
+   * Ensure we received an input.
+   */
+  if ( NULL == path )
+    return ;
+
+  /**
    * Find /srv as a sanity check
    */
-  srv = strstr(path,"/srv/" );
+  srv = strstr(path,"/srv/");
   if ( NULL == srv )
+    return;
+
+  /**
+   * We expect /srv to be at the front of the string.
+   */
+  if ( srv != path )
     return;
 
   /**
@@ -88,7 +100,7 @@ void update_vhost_request( char *path )
     return;
 
   /**
-   * We want to ensure there is content after the 
+   * We want to ensure there is content after the
    * period.
    */
   if ( per[1] == '\0' )
