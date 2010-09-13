@@ -20,7 +20,7 @@ clean:
 	@if [ -e ./test-strip ]; then rm -f ./test-strip ; fi
 
 test: test-strip.c
-	gcc -o test-strip test-strip.c
+	gcc -Wall -Werror -o test-strip test-strip.c
 	./test-strip
 
 install:
