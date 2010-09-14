@@ -1,3 +1,10 @@
+symbiosis-common (2010:0914) stable; urgency=low
+
+  * Added test suite
+  * Fixed password check to work
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:43:37 +0100
+
 symbiosis-common (2010:0830) stable; urgency=low
 
   * Install a small library of Perl functions.
