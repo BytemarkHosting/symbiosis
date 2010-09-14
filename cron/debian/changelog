@@ -1,3 +1,15 @@
+symbiosis-cron (2010:0914) stable; urgency=low
+
+  * Added makefile to build packages
+  * Added ruby script to process crontabs
+  * Fixed copyright file
+  * Extracted crontab code to ruby library
+  * Added manpage
+  * Added test suite
+  * Renamed c wrapper script
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:48:37 +0100
+
 symbiosis-cron (2010:0617) stable; urgency=low
 
   * Initial release.
