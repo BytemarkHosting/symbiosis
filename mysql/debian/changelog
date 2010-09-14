@@ -1,3 +1,9 @@
+symbiosis-mysql (2010:0914) stable; urgency=low
+
+  * Tidied packaging 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:57:59 +0100
+
 symbiosis-mysql (2010:0604) stable; urgency=low
 
   * Renamed package

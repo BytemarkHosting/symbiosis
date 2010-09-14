@@ -1,3 +1,9 @@
+symbiosis-pam (2010:0914) stable; urgency=low
+
+  * Tidied packaging
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:59:05 +0100
+
 symbiosis-pam (2010:0604) stable; urgency=low
 
   * Fixed spelling mistake in package description.

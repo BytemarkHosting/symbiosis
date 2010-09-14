@@ -1,3 +1,15 @@
+symbiosis-email (2010:0914) stable; urgency=low
+
+  * Moved config from bytemark-vhost.d to symbiosis.d
+  * Moved checkpassword script to dovecot_checkpassword
+  * Added manpages
+  * Tidied packaging
+  * Updated Makefiles to check for 00-header before rebuilding the
+    configuration files for exim4 and dovecot.
+  * Added tests to the symbiosis-test directory
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:53:23 +0100
+
 symbiosis-email (2010:0909) stable; urgency=low
 
   * Added in localhost rewriting

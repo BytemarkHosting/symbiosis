@@ -1,3 +1,9 @@
+symbiosis-test (2010:0914) stable; urgency=low
+
+  * Removed dovecot test -- now in email package.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 22:00:54 +0100
+
 symbiosis-test (2010:0908) stable; urgency=low
 
   * Fixed spelling mistake in module name
