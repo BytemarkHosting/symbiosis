@@ -1,3 +1,10 @@
+symbiosis-key (2010:0914) stable; urgency=low
+
+  * Add new key
+  * Remove old keys in post inst 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:36:39 +0100
+
 symbiosis-key (2010:0603) stable; urgency=low
 
   * Renamed package

@@ -17,6 +17,15 @@ for i in /usr/share/symbiosis-key/*.pub; do
   apt-key add $i
 done
 
+#
+# Remove any old keys
+#
+for i in 9703BD62 F3562818 ; do
+  apt-key list | grep -q $i
+  if [ $? -eq 0 ] ; then
+    apt-key del $i
+  fi
+done
 
 #DEBHELPER#
 exit 0
