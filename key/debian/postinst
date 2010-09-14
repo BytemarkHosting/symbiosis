@@ -14,17 +14,14 @@ fi
 #  Add the keys
 #
 for i in /usr/share/symbiosis-key/*.pub; do
-  apt-key add $i
+  apt-key add $i > /dev/null 2>&1
 done
 
 #
 # Remove any old keys
 #
 for i in 9703BD62 F3562818 ; do
-  apt-key list | grep -q $i
-  if [ $? -eq 0 ] ; then
-    apt-key del $i
-  fi
+  apt-key del $i > /dev/null 2>&1 || echo "Key $i not found"
 done
 
 #DEBHELPER#

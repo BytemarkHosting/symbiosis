@@ -1,3 +1,9 @@
+symbiosis-updater (2010:0914) stable; urgency=low
+
+  * Renamed symbiosis-update to symbiosis-updater
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 22:02:28 +0100
+
 symbiosis-updater (2010:0628) stable; urgency=low
 
   * Renamed our binaries to be "symbiosis-update", rather
