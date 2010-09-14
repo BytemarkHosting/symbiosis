@@ -1,3 +1,9 @@
+symbiosis-crack (2010:0914) stable; urgency=low
+
+  * Updated URL in test-symbiosis-passwords 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:46:57 +0100
+
 symbiosis-crack (2010:0809) stable; urgency=low
 
   * Updated the cronjob to run in either an hourly or weekly mode.
