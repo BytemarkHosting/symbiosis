@@ -9,8 +9,8 @@
  * Request for test.example.com -> /srv/example.com/public/htdocs
  * Request for example.com      -> /srv/example.com/public/htdocs
  *
- * In short we drop the first period-deliminated section of the
- * filename, after /srv/, and hope for the best.
+ * In short if a request for a file doesn't exist we'll remove sections of
+ * the requested hostname until we find a directory which exists.
  *
  * This code is only invoked in a situation where a 404 would have
  * resulted anyway so if it fails it fails.
@@ -65,9 +65,9 @@
  * We want toremove components of that name until we find something
  * that does exist, if we can.
  *
- * If we cannot find somethign that does exist, by removing components
- * from the hostname field then we'll simply return the string unmodified.
- * which will allow Apache to handle it as-is.
+ * If we cannot find something which exists, by removing components
+ * from the hostname field, then we'll simply return the string
+ * unmodified - which will allow Apache to handle it as-is.
  *
  *
  * NOTE: We can always successfully remove string-components in-place
@@ -83,7 +83,6 @@ void update_vhost_request( char *path )
   int host;
 
 
-
   /**
    * Ensure we received an input.
    */
@@ -92,7 +91,7 @@ void update_vhost_request( char *path )
 
 
   /**
-   * Find /srv as a sanity check - it should be first.
+   * Find /srv as a sanity check - it should be first part of the string.
    */
   srv = strstr(path,"/srv/");
   if ( ( NULL == srv ) || ( srv != path ) )
@@ -100,15 +99,19 @@ void update_vhost_request( char *path )
 
 
   /**
-   * If the request exists we're golden - we shouldn't be
-   * called in this case, but it doesn't hurt to try.
+   * If the request exists we're golden.
+   *
+   * NOTE: We shouldn't be called in this case, but it doesn't hurt to try.
    */
   if ( stat( path, &statbuf ) == 0 )
     return;
 
 
+  /**
+   * Log the missing request.
+   */
   fprintf(stderr,"mod_vhost_bytemark.c: path not found %s\n", path);
-  fflush(stderr);
+
 
   /**
    * OK at this point we have a request which points to a file
@@ -141,10 +144,22 @@ void update_vhost_request( char *path )
 
 
   /**
-   * We want to bump-past this.
+   * We want to bump-past the slash.
    */
   per +=1;
+
+
+  /**
+   * The length of the hostname in the request.
+   */
   host = per - srv - strlen("/srv/");
+  if ( host > 128 )
+  {
+    fprintf(stderr,"mod_vhost_bytemark.c: hostname too long: %d bytes\n",host);
+    return;
+  }
+
+
 
   /**
    * Try increasingly stat()ing over parts of the hostname
@@ -161,17 +176,23 @@ void update_vhost_request( char *path )
     strcpy(buffer,"/srv/" );
     strncpy( buffer+5,srv+4 + i, host - i );
 
+
+    /**
+     * If we can successfully state "/srv/" + $hostname
+     * then we'll update the string with that name.
+     */
     if ( stat( buffer, &statbuf) == 0 )
-      {
-        memcpy( path+5, srv+4+i, strlen(srv+4+i)+1 );
-        fprintf(stderr,"mod_vhost_bytemark.c: succeeded on %s -> %s\n",buffer, path);
-        fflush(stderr);
-        return;
-      }
+    {
+      memcpy( path+5, srv+4+i, strlen(srv+4+i)+1 );
+      fprintf(stderr,"mod_vhost_bytemark.c: succeeded on %s -> %s\n",buffer, path);
+      return;
+    }
   }
 
+  /**
+   * Failure -> 404.
+   */
   fprintf(stderr,"mod_vhost_bytemark.c: giving up\n" );
-  fflush(stderr);
 }
 
 
