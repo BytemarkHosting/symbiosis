@@ -307,7 +307,8 @@ file "#{ENV["HOME"]}/htdocs/#{release}/amd64" => "#{ENV["HOME"]}/htdocs/#{releas
   sh "cd #{t.prerequisites.first} && ln -sf . #{t.name}"
 end
 
-desc "Upload packages to the local tree" => "#{ENV['HOME']}/htdocs/#{release}/Release.gpg"
+desc "Upload packages to the local tree" 
+task "upload" => "#{ENV['HOME']}/htdocs/#{release}/Release.gpg"
 
 desc "Upload packages to live tree"
 task "upload-live" => ["#{ENV['HOME']}/htdocs/#{release}", "#{ENV["HOME"]}/htdocs/#{release}/amd64", "#{ENV["HOME"]}/htdocs/#{release}/i386"] do |t|
