@@ -295,7 +295,7 @@ file "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
   rm "#{ENV['HOME']}/htdocs/#{release}"
 end
 
-file "#{ENV["HOME"]}/htdocs/#{release}" => "#{ENV['HOME']}/htdocs/#{hg_number}" do |t|
+file "#{ENV["HOME"]}/htdocs/#{release}" => "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" do |t|
   sh "cd #{t.prerequisites.first} && ln -sf . #{t.name}"
 end
 
@@ -308,7 +308,7 @@ file "#{ENV["HOME"]}/htdocs/#{release}/amd64" => "#{ENV["HOME"]}/htdocs/#{releas
 end
 
 desc "Upload packages to the local tree" 
-task "upload" => "#{ENV['HOME']}/htdocs/#{release}/Release.gpg"
+task "upload" => ["#{ENV["HOME"]}/htdocs/#{release}/i386", "#{ENV['HOME']}/htdocs/#{release}/amd64"]
 
 desc "Upload packages to live tree"
 task "upload-live" => ["#{ENV['HOME']}/htdocs/#{release}", "#{ENV["HOME"]}/htdocs/#{release}/amd64", "#{ENV["HOME"]}/htdocs/#{release}/i386"] do |t|
