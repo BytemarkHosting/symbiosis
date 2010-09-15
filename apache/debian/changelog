@@ -6,7 +6,7 @@ symbiosis-httpd (2010:0915) stable; urgency=low
   * Updated the Bytemark VPN ranges.
   * Added a more complete test-suite for the mod_vhost_bytemark module.
   * Updated template location for SSL-creation.
-  * Updated to handle wildcards via stat().
+  * Updated to handle wildcards via improved stat() method.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 15 Sep 2010 12:55:21 +0000
 
