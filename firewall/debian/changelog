@@ -1,3 +1,10 @@
+symbiosis-firewall (2010:0915) stable; urgency=low
+
+  * Don't re-run the firewall unless we've genuinely removed
+    a whitelisted entry, or added a new one.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 15 Sep 2010 17:18:19 +0000
+
 symbiosis-firewall (2010:0910) stable; urgency=low
 
   * Correctly process whitelisted IP addresses.

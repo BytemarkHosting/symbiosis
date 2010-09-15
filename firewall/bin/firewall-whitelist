@@ -149,12 +149,11 @@ end
 
 
 #
-#  Finally re-run the firewall if we updated, or if we removed
-# an expired entry.
+# Re-run the firewall if we updated, or if we expired an existing entry.
 #
-if ( ( updated ) || ( expired ) )
+if ( ( updated ) || ( expired > 0 ) )
 
-  puts "Updated whitelist, re-running firewall" if ( $VERBOSE )
+  puts "Something changed: Re-running firewall" if ( $VERBOSE )
 
   system( "/usr/bin/firewall >>/var/log/firewall.log 2>>/var/log/firewall.err" )
 end
