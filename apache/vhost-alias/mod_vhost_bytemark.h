@@ -59,18 +59,30 @@
 /**
  * This is where the magic happens.
  *
- * Given a name like /srv/boo.example.com/public/htdocs
+ * We'll be passed a path to a request, on disk, which doesn't exist
+ * such as: /srv/www.example.com/public/htdocs
  *
- * Remove "boo." from the name.  In place.
+ * We want toremove components of that name until we find something
+ * that does exist, if we can.
  *
- * NOTE: We can remove things in-place as the string is *always*
- *       reduced in length.
+ * If we cannot find somethign that does exist, by removing components
+ * from the hostname field then we'll simply return the string unmodified.
+ * which will allow Apache to handle it as-is.
+ *
+ *
+ * NOTE: We can always successfully remove string-components in-place
+ *      as this always *reduces* the string in length.
  *
  */
 void update_vhost_request( char *path )
 {
   char *srv = NULL;
   char *per = NULL;
+  struct stat statbuf;
+  int i;
+  int host;
+
+
 
   /**
    * Ensure we received an input.
@@ -78,42 +90,88 @@ void update_vhost_request( char *path )
   if ( NULL == path )
     return ;
 
-  /**
-   * Find /srv as a sanity check
-   */
-  srv = strstr(path,"/srv/");
-  if ( NULL == srv )
-    return;
 
   /**
-   * We expect /srv to be at the front of the string.
+   * Find /srv as a sanity check - it should be first.
    */
-  if ( srv != path )
+  srv = strstr(path,"/srv/");
+  if ( ( NULL == srv ) || ( srv != path ) )
     return;
+
+
+  /**
+   * If the request exists we're golden - we shouldn't be
+   * called in this case, but it doesn't hurt to try.
+   */
+  if ( stat( path, &statbuf ) == 0 )
+    return;
+
+
+  fprintf(stderr,"mod_vhost_bytemark.c: path not found %s\n", path);
+  fflush(stderr);
+
+  /**
+   * OK at this point we have a request which points to a file
+   * which doesn't exist.
+   *
+   * So we might have:
+   *
+   *   /srv/www.example.com/public/htdocs/index.php
+   *
+   * We take the first component of that string "www.example.com"
+   * and will remove successive parts over time.
+   *
+   * If _any_ of those result in a stat() succeeding we update
+   * and return.
+   *
+   * If they do not we will assume mod_rewrite, mod_userdir, mod_alias,
+   * or "something else" will patch up - otherwise we'll end up with
+   * a 404.
+   *
+   */
+
 
   /**
    * OK we want to find the string after /srv/
-   * but before the first period.
+   * but before the first slash
    */
-  per = strstr( path + strlen("/srv/" ), "." );
+  per = strstr( path + strlen("/srv/" ), "/" );
   if ( per == NULL )
     return;
 
-  /**
-   * We want to ensure there is content after the
-   * period.
-   */
-  if ( per[1] == '\0' )
-    return;
-
 
   /**
-   * OK at this point we've found /srv/xxxxx.
-   *
-   * Copy from the /srv marker to the period.
+   * We want to bump-past this.
    */
-  memcpy( path + strlen( "/srv/" ), per + 1,
-         strlen( per+1 ) + 1 );
+  per +=1;
+  host = per - srv - strlen("/srv/");
+
+  /**
+   * Try increasingly stat()ing over parts of the hostname
+   * until we find a match.
+   */
+  for ( i = 1; i < host; i++ )
+  {
+    char buffer[1024];
+
+    /**
+     * Build up each part of the name.
+     */
+    memset(buffer, '\0', sizeof(buffer));
+    strcpy(buffer,"/srv/" );
+    strncpy( buffer+5,srv+4 + i, host - i );
+
+    if ( stat( buffer, &statbuf) == 0 )
+      {
+        memcpy( path+5, srv+4+i, strlen(srv+4+i)+1 );
+        fprintf(stderr,"mod_vhost_bytemark.c: succeeded on %s -> %s\n",buffer, path);
+        fflush(stderr);
+        return;
+      }
+  }
+
+  fprintf(stderr,"mod_vhost_bytemark.c: giving up\n" );
+  fflush(stderr);
 }
 
 

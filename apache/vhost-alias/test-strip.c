@@ -97,86 +97,26 @@ main (int argc, char *argv[])
    * This is our array of test cases.
    */
     struct test_case tests[] = {
-        {
-         "/tmp",
-         "/tmp",
-         },
 
         {
-         "/srv",
-         "/srv",
+          "/srv/www.foo.com/public/htdocs/index.php",
+          "/srv/foo.com/public/htdocs/index.php",
          },
-
         {
-         "/srv.",
-         "/srv.",
+          "/srv/foo.com/public/htdocs/index.php",
+          "/srv/foo.com/public/htdocs/index.php",
          },
-
         {
-         "/srv/",
-         "/srv/",
-         },
-
-        {
-         "/srv//www.foo.com/public/htdocs",
+         "/srv/bar.bar.foo.com/public/htdocs",
          "/srv/foo.com/public/htdocs",
          },
-
-        {
-         "/tmp/srv",
-         "/tmp/srv",
-         },
-
-        {
-
-         "/srv/www.foo.com/public/htdocs/srv",
-         "/srv/foo.com/public/htdocs/srv",
-         },
-
-        {
-         "/tmp/www.foo.com/public/htdocs/srv",
-         "/tmp/www.foo.com/public/htdocs/srv",
-         },
-
-        {
-         "/tmp/www.foo.com/public/htdocs/srv/example.com",
-         "/tmp/www.foo.com/public/htdocs/srv/example.com",
-         },
-
-        {
-         "/srv/www.foo.com/public/htdocs",
-         "/srv/foo.com/public/htdocs",
-         },
-
-        {
-         "/srv/foo.com/public/htdocs",
-         "/srv/com/public/htdocs",
-         },
-
         {
          "/srv/.foo.com/public/htdocs",
          "/srv/foo.com/public/htdocs",
          },
-
         {
-         "/srv/malformed-com/public/htdocs/",
-         "/srv/malformed-com/public/htdocs/",
-         },
-
-        {
-         "/srv/malformed-com/public/htdocs/.",
-         "/srv/malformed-com/public/htdocs/.",
-         },
-
-        {
-         "/srv/malformed-com/public/htdocs/.x",
-         "/srv/x",
-         },
-
-        /* This test is expected to only strip the first prefix. */
-        {
-         "/srv/bar.bar.foo.com/public/htdocs",
-         "/srv/bar.foo.com/public/htdocs",
+         "/srv/this.is.insane.foo.com/public/htdocs",
+         "/srv/foo.com/public/htdocs",
          },
 
         {

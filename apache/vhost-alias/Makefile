@@ -3,8 +3,7 @@
 #  Version setup by "make" in parent directory
 #
 
-all:	mod_vhost_bytemark test
-
+all:	mod_vhost_bytemark 
 
 mod_vhost_bytemark:	mod_vhost_bytemark.c
 	apxs2 -Wc,-Werror $(DEF) -ca mod_vhost_bytemark.c
@@ -21,7 +20,8 @@ clean:
 
 test: test-strip.c
 	gcc -Wall -Werror -o test-strip test-strip.c
-	./test-strip
+	mkdir /srv/foo.com || true
+	./test-strip 2>/dev/null
 
 install:
 	apxs2 -cia -Wc,-Werror $(DEF) mod_vhost_bytemark.c
