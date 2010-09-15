@@ -8,43 +8,27 @@ checkout the current repository and execute a build of our packages.
 This build-process should be 100% automatic, and should allow us to be
 alerted of failures via Email notications.
 
+Setup
+=====
 
-Assumptions
------------
+The autobuilding is done by sbuild using a series of basic pre-deployed
+chroots.  These chroots are set up by mk-sbuild-lv which is stolen from the
+ubuntu-dev-tools, but perfectly usable under Debian.
 
-It is assumed that the starting point for an auto-build will be a
-debootstrap produced installation of Debian.
+In order to build successfully, the following packages are required on the
+autobuild host itself (not the chroots):
+ * rake
+ * dpkg-dev
+ * gpg
+ * sbuild
 
-The only tools required by default will be:
+Then to build, the Rakefile in the repository can be used.  To see the
+available tasks, run `rake -T'.
 
-  * make to build the code.
-  * mercurial to fetch the source.
-  * The minimal Debian package building-utilities.
+In summary:
 
-The chroot will be created like so:
-
-
-
-   # packages=dpkg-dev,devscripts,build-essential,fakeroot,make,mercurial,perl-modules
-   # debootstrap --include=$packages lenny /tmp/lenny http://mirror.bytemark.co.uk/debian
-
-
-Given that chroot environment we should be able to fetch and build the
-most recent version of the Symbiosis project via:
-
-   # chroot /tmp/lenny hg clone http://projects.bytemark.co.uk/hg/Symbiosis  || echo "failed"
-
-   # chroot /tmp/lenny make -C /Symbiosis all || echo "FAILED"
-
-The expected result will be that /Symbiosis/output will contain :
-
-  * A collection of binary packages.
-  * A collection of source packages.
-  * A "Packages.gz" file, and "Sources.gz" file.
-
-It will also know how to send email on the event of failure.
-
-
+ * rake all    : builds all packages
+ * rake upload : copies packages to $HOME/htdocs/
 
 Steps for Autobuilding and C-I
 ==============================
@@ -70,4 +54,9 @@ Steps for Autobuilding and C-I
 
 * If tests pass, remove machine.
 
+Bits that are missing
+=====================
+
+ * No emails on failure
+ * No auto-testing VM set up
 
