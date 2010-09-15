@@ -291,7 +291,7 @@ file "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
   rsync_excludes.each do |ex|
     cmd << "--exclude '#{ex}'"
   end
-  sh "#{cmd.join(" ")} $PWD/ #{t}"
+  sh "#{cmd.join(" ")} $PWD/ #{ENV['HOME']}/htdocs/#{hg_number}"
   rm "#{ENV['HOME']}/htdocs/#{release}"
 end
 
