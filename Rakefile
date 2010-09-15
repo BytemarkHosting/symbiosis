@@ -283,30 +283,35 @@ rsync_args = %w(
 
 rsync_excludes = %w(*/ Makefile Rakefile TODO README .hgignore AUTOBUILD)
 
-release = `hg id -n -r tip`.chomp
+number  = `hg id -n -r tip`.chomp
+release = "lenny"
 
-file "#{ENV['HOME']}/htdocs/#{release}" => "Release.gpg"  do |t|
+file "#{ENV['HOME']}/htdocs/#{hg_number}" => "Release.gpg"  do |t|
   cmd = %w(rsync) + rsync_args
   rsync_excludes.each do |ex|
     cmd << "--exclude '#{ex}'"
   end
   sh "#{cmd.join(" ")} $PWD/ #{t}"
-  rm "#{ENV['HOME']}/htdocs/current"
+  rm "#{ENV['HOME']}/htdocs/#{release}"
 end
 
-file "#{ENV["HOME"]}/htdocs/current" => "#{ENV['HOME']}/htdocs/#{release}" do |t|
-  ln_sf t.prerequisites.first, t.name
+file "#{ENV["HOME"]}/htdocs/#{release}" => "#{ENV['HOME']}/htdocs/#{hg_number}" do |t|
+  cd t.prerequisites.first
+  ln_sf ".", t.name
 end
 
-file "#{ENV["HOME"]}/htdocs/current/i386" => "#{ENV["HOME"]}/htdocs/current" do |t|
-  ln_sf t.prerequisites.first, t.name
+file "#{ENV["HOME"]}/htdocs/#{release}/i386" => "#{ENV["HOME"]}/htdocs/#{release}" do |t|
+  cd t.prerequisites.first
+  ln_sf ".", t.name
 end
 
-file "#{ENV["HOME"]}/htdocs/current/amd64" => "#{ENV["HOME"]}/htdocs/current" do |t|
-  ln_sf t.prerequisites.first, t.name
+file "#{ENV["HOME"]}/htdocs/#{release}/amd64" => "#{ENV["HOME"]}/htdocs/#{release}" do |t|
+  cd t.prerequisites.first
+  ln_sf ".", t.name
 end
-
 
 desc "Upload packages to live tree"
-task "upload" => ["#{ENV['HOME']}/htdocs/#{release}", "#{ENV["HOME"]}/htdocs/current/amd64", "#{ENV["HOME"]}/htdocs/current/i386"]
+task "upload" => ["#{ENV['HOME']}/htdocs/#{hg_number}", "#{ENV["HOME"]}/htdocs/#{release}/amd64", "#{ENV["HOME"]}/htdocs/#{release}/i386"]
+  sh "rsync -Prat --delete #{prerequisites.first} repo@mirroir.sh:htdocs/symbiosis/#{release}/
+end
 
