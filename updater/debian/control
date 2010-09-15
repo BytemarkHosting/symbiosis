@@ -8,7 +8,7 @@ Standards-Version: 3.8.0
 
 Package: symbiosis-updater
 Replaces: bytemark-vhost-updater, cron-apt
-Conflicts: bytemark-vhost-updater
+Conflicts: bytemark-vhost-updater, cron-apt
 Architecture: all
 Depends: ${misc:Depends}
 Description: Automatic package upgrades

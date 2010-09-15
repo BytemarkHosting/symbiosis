@@ -1,3 +1,9 @@
+symbiosis-updater (2010:0915) stable; urgency=low
+
+  * Added cron-apt conflict
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 15 Sep 2010 10:09:57 +0100
+
 symbiosis-updater (2010:0914) stable; urgency=low
 
   * Renamed symbiosis-update to symbiosis-updater
