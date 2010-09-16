@@ -295,7 +295,7 @@ file "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
 end
 
 file "#{ENV["HOME"]}/htdocs/#{release}" => "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" do |t|
-  sh "cd #{t.prerequisites.first} && ln -sf #{hg_number} #{release}" 
+  sh "cd #{ENV["HOME"]}/htdocs && ln -sf #{hg_number} #{release}"
 end
 
 AVAILABLE_BUILD_ARCH.each do |arch|
