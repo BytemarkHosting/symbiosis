@@ -15,6 +15,16 @@ CLOBBER.add %w(Packages Sources Packages.gz Sources.gz Release Release.gpg *.deb
 DISTRO = File.basename(FileUtils.pwd)
 
 #
+# Monkey patch rake to output on stdout like normal people
+#
+module RakeFileUtils
+  # Send the message to the default rake output (which is $stderr).
+  def rake_output_message(message)
+    $stdout.puts(message)
+  end
+end
+
+#
 # This returns a list of all packages with the following format:
 #
 #  [name, Debian version, distro, architecture]
