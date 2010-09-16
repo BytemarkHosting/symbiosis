@@ -239,7 +239,7 @@ rule(/^([^_]+)_([^_]+)_(#{AVAILABLE_BUILD_ARCH.join("|")}).changes$/ => [
   #
   # Now call sbuild and debsign
   #
-  sh "sbuild #{(target_arch == "all" ? "--arch-all" : "")} --arch=#{arch} --dist=#{distro} #{t.source}"
+  sh "sbuild #{(target_arch == "all" ? "--arch-all" : "")} --nolog --arch=#{arch} --dist=#{distro} #{t.source}"
 #  sh "debsign #{t.name}"
 end
 
