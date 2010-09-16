@@ -277,41 +277,38 @@ rsync_args = %w(
    --recursive 
    --partial 
    --verbose
-   --times
    --copy-links
 )
 
 rsync_excludes = %w(*/ Makefile Rakefile TODO README .hgignore AUTOBUILD .hgtags)
 
 hg_number  = `hg id -n -r tip`.chomp
-release = "lenny"
+release = "current"
 
 file "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
   cmd = %w(rsync) + rsync_args
   rsync_excludes.each do |ex|
     cmd << "--exclude '#{ex}'"
   end
-  sh "#{cmd.join(" ")} $PWD/ #{ENV['HOME']}/htdocs/#{hg_number}"
+  sh "#{cmd.join(" ")} --times $PWD/ #{ENV['HOME']}/htdocs/#{hg_number}"
   rm "#{ENV['HOME']}/htdocs/#{release}"
 end
 
 file "#{ENV["HOME"]}/htdocs/#{release}" => "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" do |t|
-  sh "cd #{t.prerequisites.first} && ln -sf . #{t.name}"
+  sh "cd #{t.prerequisites.first} && ln -sf #{hg_number} #{release}" 
 end
 
-file "#{ENV["HOME"]}/htdocs/#{release}/i386" => "#{ENV["HOME"]}/htdocs/#{release}" do |t|
-  sh "cd #{t.prerequisites.first} && ln -sf . #{t.name}"
-end
-
-file "#{ENV["HOME"]}/htdocs/#{release}/amd64" => "#{ENV["HOME"]}/htdocs/#{release}" do |t|
-  sh "cd #{t.prerequisites.first} && ln -sf . #{t.name}"
-end
+AVAILABLE_BUILD_ARCH.each do |arch|
+  file "#{ENV["HOME"]}/htdocs/#{release}/#{arch}" => "#{ENV["HOME"]}/htdocs/#{release}" do |t|
+    sh "cd #{t.prerequisites.first} && ln -sf . #{arch}"
+  end
+end 
 
 desc "Upload packages to the local tree" 
-task "upload" => ["#{ENV["HOME"]}/htdocs/#{release}/i386", "#{ENV['HOME']}/htdocs/#{release}/amd64"]
+task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/#{release}/#{arch}"}
 
-desc "Upload packages to live tree"
-task "upload-live" => ["#{ENV['HOME']}/htdocs/#{release}", "#{ENV["HOME"]}/htdocs/#{release}/amd64", "#{ENV["HOME"]}/htdocs/#{release}/i386"] do |t|
-  sh "rsync -Prat --delete #{t.prerequisites.first} repo@mirroir.sh:htdocs/symbiosis/#{release}/"
+desc "Upload packages to mirror. !DANGER!" 
+task "upload-live" => ["#{ENV['HOME']}/htdocs/lenny"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/lenny/#{arch}"} do |t|
+  sh "rsync -Pr --delete #{t.prerequisites.first} repo@mirroir.sh:htdocs/symbiosis/lenny/"
 end
 
