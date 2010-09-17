@@ -1,3 +1,10 @@
+symbiosis-httpd (2010:0917) stable; urgency=low
+
+  [ Steve Kemp ]
+  * Don't log mod_vhost_alias_bytemark messages to /var/log/apache2/error.log
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 17 Sep 2010 12:33:45 +0000
+
 symbiosis-httpd (2010:0915) stable; urgency=low
 
   [ Steve Kemp ]

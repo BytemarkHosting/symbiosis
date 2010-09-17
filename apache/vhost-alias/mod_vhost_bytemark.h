@@ -110,8 +110,9 @@ void update_vhost_request( char *path )
   /**
    * Log the missing request.
    */
+#if 0
   fprintf(stderr,"mod_vhost_bytemark.c: path not found %s\n", path);
-
+#endif
 
   /**
    * OK at this point we have a request which points to a file
@@ -155,7 +156,9 @@ void update_vhost_request( char *path )
   host = per - srv - strlen("/srv/");
   if ( host > 128 )
   {
+#if 0
     fprintf(stderr,"mod_vhost_bytemark.c: hostname too long: %d bytes\n",host);
+#endif
     return;
   }
 
@@ -184,7 +187,9 @@ void update_vhost_request( char *path )
     if ( stat( buffer, &statbuf) == 0 )
     {
       memcpy( path+5, srv+4+i, strlen(srv+4+i)+1 );
+#if 0
       fprintf(stderr,"mod_vhost_bytemark.c: succeeded on %s -> %s\n",buffer, path);
+#endif
       return;
     }
   }
@@ -192,7 +197,9 @@ void update_vhost_request( char *path )
   /**
    * Failure -> 404.
    */
+#if 0
   fprintf(stderr,"mod_vhost_bytemark.c: giving up\n" );
+#endif
 }
 
 
