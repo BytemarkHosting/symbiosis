@@ -15,16 +15,6 @@ CLOBBER.add %w(Packages Sources Packages.gz Sources.gz Release Release.gpg *.deb
 DISTRO = File.basename(FileUtils.pwd)
 
 #
-# Monkey patch rake to output on stdout like normal people
-#
-module RakeFileUtils
-  # Send the message to the default rake output (which is $stderr).
-  def rake_output_message(message)
-    $stdout.puts(message)
-  end
-end
-
-#
 # This returns a list of all packages with the following format:
 #
 #  [name, Debian version, distro, architecture]
@@ -249,7 +239,7 @@ rule(/^([^_]+)_([^_]+)_(#{AVAILABLE_BUILD_ARCH.join("|")}).changes$/ => [
   #
   # Now call sbuild and debsign
   #
-  sh "sbuild #{(target_arch == "all" ? "--arch-all" : "")} --nolog --arch=#{arch} --dist=#{distro} #{t.source}"
+  sh "sbuild #{(target_arch == "all" ? "--arch-all" : "")} --arch=#{arch} --dist=#{distro} #{t.source}"
 #  sh "debsign #{t.name}"
 end
 
@@ -287,38 +277,41 @@ rsync_args = %w(
    --recursive 
    --partial 
    --verbose
+   --times
    --copy-links
 )
 
 rsync_excludes = %w(*/ Makefile Rakefile TODO README .hgignore AUTOBUILD .hgtags)
 
 hg_number  = `hg id -n -r tip`.chomp
-release = "current"
+release = "lenny"
 
 file "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
   cmd = %w(rsync) + rsync_args
   rsync_excludes.each do |ex|
     cmd << "--exclude '#{ex}'"
   end
-  sh "#{cmd.join(" ")} --times $PWD/ #{ENV['HOME']}/htdocs/#{hg_number}"
+  sh "#{cmd.join(" ")} $PWD/ #{ENV['HOME']}/htdocs/#{hg_number}"
   rm "#{ENV['HOME']}/htdocs/#{release}"
 end
 
 file "#{ENV["HOME"]}/htdocs/#{release}" => "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" do |t|
-  sh "cd #{ENV["HOME"]}/htdocs && ln -sf #{hg_number} #{release}"
+  sh "cd #{File.dirname(t.prerequisites.first)} && ln -sf . #{t.name}"
 end
 
-AVAILABLE_BUILD_ARCH.each do |arch|
-  file "#{ENV["HOME"]}/htdocs/#{release}/#{arch}" => "#{ENV["HOME"]}/htdocs/#{release}" do |t|
-    sh "cd #{t.prerequisites.first} && ln -sf . #{arch}"
-  end
-end 
+file "#{ENV["HOME"]}/htdocs/#{release}/i386" => "#{ENV["HOME"]}/htdocs/#{release}" do |t|
+  sh "cd #{t.prerequisites.first} && ln -sf . #{t.name}"
+end
+
+file "#{ENV["HOME"]}/htdocs/#{release}/amd64" => "#{ENV["HOME"]}/htdocs/#{release}" do |t|
+  sh "cd #{t.prerequisites.first} && ln -sf . #{t.name}"
+end
 
 desc "Upload packages to the local tree" 
-task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/#{release}/#{arch}"}
+task "upload" => ["#{ENV["HOME"]}/htdocs/#{release}/i386", "#{ENV['HOME']}/htdocs/#{release}/amd64"]
 
-desc "Upload packages to mirror. !DANGER!" 
-task "upload-live" => ["#{ENV['HOME']}/htdocs/lenny"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/lenny/#{arch}"} do |t|
-  sh "rsync -Pr --delete #{t.prerequisites.first} repo@mirroir.sh:htdocs/symbiosis/lenny/"
+desc "Upload packages to live tree"
+task "upload-live" => ["#{ENV['HOME']}/htdocs/#{release}", "#{ENV["HOME"]}/htdocs/#{release}/amd64", "#{ENV["HOME"]}/htdocs/#{release}/i386"] do |t|
+  sh "rsync -Prat --delete #{t.prerequisites.first} repo@mirroir.sh:htdocs/symbiosis/#{release}/"
 end
 
