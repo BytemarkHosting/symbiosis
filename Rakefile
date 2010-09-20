@@ -296,7 +296,7 @@ file "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
 end
 
 file "#{ENV["HOME"]}/htdocs/#{release}" => "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" do |t|
-  sh "cd #{t.prerequisites.first} && ln -sf . #{t.name}"
+  sh "cd #{File.dirname(t.prerequisites.first)} && ln -sf . #{t.name}"
 end
 
 file "#{ENV["HOME"]}/htdocs/#{release}/i386" => "#{ENV["HOME"]}/htdocs/#{release}" do |t|
