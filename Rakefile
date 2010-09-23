@@ -282,6 +282,23 @@ namespace :pkg do
 
 end
 
+desc "Check which packages need their changelogs updating"
+task "check_changelogs" do
+  need_updating = []
+  source_dirs.each do |d|
+    ch_r = `hg log -l 1 --template '{rev}' #{d}/debian/changelog`.to_i
+    d_r  = `hg log -l 1 --template '{rev}' #{d}/**`.to_i
+    need_updating << d if ch_r < d_r
+  end
+
+  if need_updating.length > 0
+    puts "The following packages need to have their changelogs updated:"
+    puts " * "+need_updating.join("\n * ")
+  else
+    puts "All package changelogs are up-to-date."
+  end
+end
+
 
 rsync_args = %w(
    --recursive 
