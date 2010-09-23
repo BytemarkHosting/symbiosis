@@ -2,5 +2,4 @@ bin/create-ssl-sites      etc/cron.hourly/
 bin/configure-additional  etc/cron.hourly/
 bin/make-logs             etc/cron.daily/
 bin/symbiosis-combine-ssl usr/bin
-bin/symbiosis-httpd-ip    usr/bin
 etc/*                     etc/

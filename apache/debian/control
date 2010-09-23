@@ -36,7 +36,7 @@ Replaces: bytemark-vhost-httpd
 Conflicts: bytemark-vhost-httpd
 Architecture: any
 Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static
-Pre-Depends: symbiosis-common
+Pre-Depends: symbiosis-common, symbiosis-range
 Description: Tools to manage Apache virtual hosting
  This package contains tools to manage the virtual hosting of websites
  with Apache2.

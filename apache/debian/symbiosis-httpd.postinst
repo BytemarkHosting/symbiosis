@@ -39,7 +39,7 @@ done
 #
 #  Find IP address of the primary interfaces
 #
-ip=$(/usr/bin/symbiosis-httpd-ip)
+ip=$(/usr/bin/symbiosis-ip)
 
 
 #
