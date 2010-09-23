@@ -1,3 +1,10 @@
+symbiosis-range (2010:0923) stable; urgency=low
+
+  * Added new helper script "symbiosis-ip" to determine the primary
+    IP Address of this system.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 23 Sep 2010 10:00:01 +0100
+
 symbiosis-range (2010:0819) stable; urgency=low
 
   * Added new Bytemark range of 46.43.0.0/18

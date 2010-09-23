@@ -1,0 +1,66 @@
+#!/usr/bin/ruby
+# 
+# NAME
+#
+#   symbiosis-ip -- Determine the primary IP address of this system
+#
+# SYNOPSIS
+#
+#  Help Options:
+#
+#   --help        Show the help information for this script.
+#   --verbose     Show debugging information.
+#
+# Output the system's primary IP address, which will traditionally
+# belong to eth0, or bond0.
+#
+# AUTHOR
+#
+#   Patrick J. Cherry <patrick@bytemark.co.uk>
+#
+
+#
+#  Modules we require
+#
+
+require 'getoptlong'
+require 'symbiosis/range'
+
+opts = GetoptLong.new(
+    [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+    [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ]
+)
+
+help = false
+$VERBOSE = false
+show_all = false
+
+opts.each do |opt,arg|
+  case opt
+    when '--help'
+      help = true
+    when '--verbose'
+      $VERBOSE = true
+    when '--show-all'
+      show_all = true
+  end
+end
+
+#
+# CAUTION! Here be quality kode.
+#
+if help
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
+
+  lines.each do |line|
+    line.chomp!
+    break if line.empty?
+    puts line[2..-1].to_s
+  end
+
+  exit 0
+end
+
+ips = Symbiosis::Range.ip_addresses
+puts ips.first()
