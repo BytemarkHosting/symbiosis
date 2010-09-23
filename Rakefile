@@ -288,7 +288,11 @@ task "check_changelogs" do
   source_dirs.each do |d|
     ch_r = `hg log -l 1 --template '{rev}' #{d}/debian/changelog`.to_i
     d_r  = `hg log -l 1 --template '{rev}' #{d}/**`.to_i
-    need_updating << d if ch_r < d_r
+    if ch_r < d_r
+      ch_ch = `hg log -r #{ch_r} --template 'changelog: {rev}: {author|user}: {date|shortdate}'`
+      d_ch =  `hg log -r #{d_r} --template 'directory: {rev}: {author|user}: {date|shortdate}'`
+      need_updating << d + "\n    " + ch_ch + "\n    " + d_ch
+    end
   end
 
   if need_updating.length > 0
