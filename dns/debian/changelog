@@ -1,3 +1,9 @@
+symbiosis-tinydns (2010:0923) stable; urgency=low
+
+  * Pre-Depend upon symbiosis-range - no longer assume eth0.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 23 Sep 2010 10:12:14 +0000
+
 symbiosis-tinydns (2010:0913) stable; urgency=low
 
   * Moved the script out of /etc/cron.hourly/create-dns and to

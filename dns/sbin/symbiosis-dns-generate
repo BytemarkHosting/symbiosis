@@ -499,16 +499,21 @@ sub readFile
 
 sub findHostDetails
 {
-
     #
-    #   Find IP
+    #  Find via the helper script.
     #
-    my $ip = `/sbin/ifconfig eth0 | grep 'inet addr'`;
-    if ( $ip =~ /addr:([^ ]*) / )
+    if ( -x "/usr/bin/symbiosis-ip" )
     {
-        $ip = $1;
+        my $ip = `/usr/bin/symbiosis-ip`;
+        chomp( $ip );
+        return( $ip );
     }
-    return ($ip);
+    else
+    {
+        print "/usr/bin/symbiosis-ip is missing\n";
+        print "To fix: apt-get update;apt-get upgrade; apt-get install symbiosis-range\n";
+        exit 1;
+    }
 
 }
 
