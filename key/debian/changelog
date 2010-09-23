@@ -1,3 +1,9 @@
+symbiosis-key (2010:0923) stable; urgency=low
+
+  * New release.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 23 Sep 2010 10:13:01 +0100
+
 symbiosis-key (2010:0914) stable; urgency=low
 
   * Add new key
