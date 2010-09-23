@@ -296,8 +296,9 @@ task "check_changelogs" do
   end
 
   if need_updating.length > 0
-    puts "The following packages need to have their changelogs updated:"
+    puts "The following packages _probably_ need new changelog entries:"
     puts " * "+need_updating.join("\n * ")
+    puts "Note that this is only a very rough check!"
   else
     puts "All package changelogs are up-to-date."
   end
