@@ -21,7 +21,7 @@ configure-additional - Create Apache configuration files.
 
 This script is designed to create per-site Apache virtual host files
 for each domain hosted upon the machine which has a different IP
-address than that allocated to eth0.
+address than that allocated to the system's primary IP.
 
 The intention is that such domains will be determined dynamically,
 but that any existing files will be left untouched.  ie.  Once we
