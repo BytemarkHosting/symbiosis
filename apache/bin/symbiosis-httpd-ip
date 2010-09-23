@@ -1,0 +1,209 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+symbiosis-httpd-ip - Return the primary IP of this system.
+
+=cut
+
+=head1 SYNOPSIS
+
+  Help Options:
+
+   --help        Show the help information for this script.
+   --manual      Read the manual for this script.
+   --verbose     Show useful debugging information.
+
+=cut
+
+
+=head1 ABOUT
+
+This script is designed to find the primary IP address of this system
+taking care to work regardless of the devide in use.
+
+=cut
+
+
+=head1 AUTHOR
+
+ Steve
+ --
+
+=cut
+
+=head1 LICENSE
+
+Copyright (c) 2008-2010 by Bytemark Computer Consulting Ltd.
+All rights reserved.
+
+This program is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
+
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+
+
+#
+#  Configuration variables
+#
+my %CONFIG;
+
+
+#
+#  Parse command line
+#
+parseCommandLineArguments();
+
+
+#
+#  Find the IP addresses on the system.
+#
+my %IPS = findIPs();
+
+
+#
+#  Lookup /etc/hostname and see what the name is
+#
+my $hostname = readFile( "/etc/hostname" );
+
+$CONFIG{'verbose'} && print "Local hostname is : $hostname\n";
+
+
+#
+#  If we found /etc/hostname to contain a line of
+# text then we'll look for the corresponding IP in /etc/hosts.
+#
+if ( defined $hostname )
+{
+    $CONFIG{'verbose'} && print "Reading /etc/hosts\n";
+
+    #
+    #  Open it.
+    #
+    open( HOSTS,"<", "/etc/hosts" )
+      or die "Failed to open /etc/hosts : $!";
+
+    #
+    #  Read the lines
+    #
+    foreach my $line ( <HOSTS> )
+    {
+        #
+        #  If the line has the full hostname & doesn't
+        # begin 127.x.x.x then we have a match.
+        #
+        if ( ( $line =~ /\Q$hostname\E/i ) &&
+             ( $line !~ /^127/ ) )
+        {
+            $CONFIG{'verbose'} && print "Match found: $line\n";
+            my @data = split( /[ \t]/, $line );
+            print $data[0] . "\n";
+            exit;
+        }
+    }
+}
+
+
+$CONFIG{'verbose'} && print "Falling back to NIC devices\n";
+
+#
+#  OK fall back to devices
+#
+foreach my $dev ( qw! bond0 eth0 ! )
+{
+    if ( $IPS{$dev} )
+    {
+        print $IPS{$dev} . "\n";
+        exit;
+    }
+}
+
+
+#
+#  All done.
+#
+exit;
+
+
+
+
+=begin doc
+
+  Parse any command line arguments which might be present.
+
+=end doc
+
+=cut
+
+
+
+sub parseCommandLineArguments
+{
+    if (
+         !GetOptions( "verbose",  \$CONFIG{ 'verbose' },
+                      "prefix=s", \$CONFIG{ 'prefix' }, ) )
+    {
+        exit;
+    }
+
+}
+
+
+
+=begin doc
+
+  Find the IP addresses on the system.
+
+=end doc
+
+=cut
+
+sub findIPs
+{
+    my $out = `/sbin/ifconfig`;
+
+    my %results;
+
+    my $dev = undef;
+
+    foreach my $line ( split( /[\r\n]/, $out ) )
+    {
+        if ( $line =~ /^([^ \t]+)[ \t]/ )
+        {
+            $dev = $1;
+        }
+        elsif ( $line =~ /inet addr:([0-9\.]+)/ )
+        {
+            $results{ $dev } = $1;
+            $dev = undef;
+        }
+    }
+
+    return (%results);
+}
+
+sub readFile
+{
+    my( $file ) = ( @_ );
+
+    if ( -e $file )
+    {
+        if ( open( FILE, "<", $file ) )
+        {
+            my $line = <FILE> || "";
+            close( FILE );
+            chomp( $line ) if ( length($line));
+            return( $line );
+        }
+    }
+    return undef;
+}

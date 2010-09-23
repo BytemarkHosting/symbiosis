@@ -37,9 +37,9 @@ for i in mass-hosting mass-hosting.ssl zz-mass-hosting zz-mass-hosting.ssl defau
 done
 
 #
-#  Find IP address of the first interfaces
+#  Find IP address of the primary interfaces
 #
-ip=$(ifconfig  eth0 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}' )
+ip=$(/usr/bin/symbiosis-httpd-ip)
 
 
 #

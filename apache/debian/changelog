@@ -1,3 +1,11 @@
+symbiosis-httpd (2010:0923) stable; urgency=low
+
+  [ Steve Kemp ]
+  * Correctly install ourself when the system doesn't use eth0 as
+    the primary NIC
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 23 Sep 2010 09:57:00 +0000
+
 symbiosis-httpd (2010:0917) stable; urgency=low
 
   [ Steve Kemp ]
