@@ -3,9 +3,9 @@
 # changes or not.
 #
 
-0 0 * * * root  [ -x /sbin/symbiosis-dns-generate ] && /sbin/symbiosis-dns-generate --force
+0 0 * * * root  [ -x /usr/sbin/symbiosis-dns-generate ] && /usr/sbin/symbiosis-dns-generate --force
 
 #
-#  Run once per-hour and upload if changed
+#  Run four times per-hour and upload if changed
 #
-17 * * * * root [ -x /sbin/symbiosis-dns-generate ] && /sbin/symbiosis-dns-generate
+07,24,37,54 * * * * root [ -x /usr/sbin/symbiosis-dns-generate ] && /usr/sbin/symbiosis-dns-generate

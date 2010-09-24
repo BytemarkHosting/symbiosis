@@ -1,8 +1,13 @@
 symbiosis-tinydns (2010:0923) stable; urgency=low
 
+  [ Steve Kemp ]
   * Pre-Depend upon symbiosis-range - no longer assume eth0.
 
- -- Steve Kemp <steve@bytemark.co.uk>  Thu, 23 Sep 2010 10:12:14 +0000
+  [ Patrick J Cherry ]
+  * Fixed crontab to point at correct binary.
+  * Added preinst for moving config files around
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 24 Sep 2010 13:43:56 +0100
 
 symbiosis-tinydns (2010:0913) stable; urgency=low
 
