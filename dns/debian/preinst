@@ -20,7 +20,7 @@ prep_mv_conffile() {
 case "$1" in
 install|upgrade)
   if dpkg --compare-versions "$2" le "$LASTVERSION"; then
-    for pkg in bytemark-vhost-dns symbiosis-dns ; do   
+    for pkg in bytemark-vhost-tinydns symbiosis-tinydns ; do   
       for fn in `dpkg-query -W -f='${Conffiles}' $pkg | grep '/etc/exim4/bytemark-vhost.d' |  cut -f 2 -d ' '` ; do
         prep_mv_conffile $pkg $fn
       done
