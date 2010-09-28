@@ -2,9 +2,10 @@
 
 set -e
 
-sed -i -e 's#http://\(vhost\|symbiosis\).bytemark.co.uk/lenny#http://symbiosis-builder.sh.bytemark.co.uk/current#g' /etc/apt/sources.list{,.security}
 
-
+#
+# Make sure we're up to date
+#
 if [ -x /usr/bin/bytemark-vhost-updater ] ; then
 
 	echo -e "SUDO_USER=\"root\"\nEMAIL=\"\"\nQUIET=\"\$OPTIONS\"" >> /etc/update-packages.conf
@@ -17,4 +18,21 @@ elif [ -x /usr/bin/symbiosis-updater ] ; then
 
 fi 
 
+#
+# Now change the package lists
+#
+sed -i -e 's#http://\(vhost\|symbiosis\).bytemark.co.uk/lenny#http://symbiosis-builder.sh.bytemark.co.uk/current#g' /etc/apt/sources.list{,.security}
+
+#
+# And update again.
+#
+if [ -x /usr/bin/bytemark-vhost-updater ] ; then
+
+	/usr/bin/bytemark-vhost-updater
+
+elif [ -x /usr/bin/symbiosis-updater ] ; then
+
+	/usr/bin/symbiosis-updater
+
+fi 
 

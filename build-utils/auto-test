@@ -6,41 +6,44 @@
 
 SSHOPT='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q '
 
-for original_distro in lvhost symbiosis ; do
-        #
-        #  If the guest exists.
-        #
-        if [ -d /shared/guests/symtester/ ]; then
-          sudo km delete symtester
-        fi
+for arch in i386 amd64 ; do
+        for original_distro in lvhost symbiosis ; do
+                #
+                # Make sure an image exists.
+                #
+                if [ ! -d /shared/images/symtester/$original_distro/$arch ] ; then
+                  echo "Image for symtester/$original_distro/$arch doesn't exist" > /dev/stderr
+                  continue
+                fi
 
-        passwd=`pwgen -n 10`
+                #
+                #  If the guest exists.
+                #
+                if [ -d /shared/guests/symtester/ ]; then
+                  sudo km delete symtester
+                fi
 
-        echo "Root password is $passwd" 
-        #
-        #  Recreate
-        #
-        sudo km-provision --pass=$passwd  --ip=89.16.160.206 \
-                     --name=symtester --arch=i386 \
-                     --key=$HOME/.ssh/id_rsa.pub \
-                     --imager=http://imager3.bytemark.co.uk:5000 \
-                     --dist=$original_distro 2>&1
+                #
+                # Copy the image over
+                #
+                cp -Rv /shared/images/symtester/$original_distro/$arch /shared/guests/symtester
 
-        echo -n "Waiting for machine to start.."
+                echo -n "Waiting for machine to start.."
+                km start symtester
 
-        for i in `seq 1 24` ; do
-                # Wait for SSH to start
-                $(echo "foo" | nc 89.16.160.206 22 > /dev/null 2>&1 ) && break
-                echo -n "."
-                sleep 5
+                for i in `seq 1 24` ; do
+                        # Wait for SSH to start
+                        $(echo "foo" | nc 89.16.160.206 22 > /dev/null 2>&1 ) && break
+                        echo -n "."
+                        sleep 5
+                done
+
+                scp $SSHOPT do_upgrade root@89.16.160.206:
+                scp $SSHOPT do_tests root@89.16.160.206:
+                ssh $SSHOPT root@89.16.160.206 ./do_upgrade
+                ssh $SSHOPT root@89.16.160.206 ./do_tests
+
+                sudo km stop symtester
+                sudo km delete symtester
         done
-
-        scp $SSHOPT ~/bin/do_upgrade root@89.16.160.206:
-        scp $SSHOPT ~/bin/do_tests root@89.16.160.206:
-        ssh $SSHOPT root@89.16.160.206 ./do_upgrade
-        ssh $SSHOPT root@89.16.160.206 ./do_tests
-
-        sudo km stop symtester
-        sudo km delete symtester
 done
-

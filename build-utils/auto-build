@@ -46,9 +46,6 @@ cleanup() {
   else
     rm -f "${ERRFILE}"
   fi
-  #
-  # Symlink the logfile.
-  ln -sf $LOGFILE $DST/$REPO-builder.current.log
 
   rm -f "${LOCK}"
 }
@@ -85,6 +82,10 @@ fi
 # OK create the logfile
 #
 touch $LOGFILE 
+#
+#
+# Symlink the logfile.
+ln -sf $LOGFILE $DST/$REPO-builder.current.log
 
 #
 # Get on with the real work
