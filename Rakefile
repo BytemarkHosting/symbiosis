@@ -341,6 +341,6 @@ task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/#{re
 
 desc "Upload packages to mirror. !DANGER!" 
 task "upload-live" => ["#{ENV['HOME']}/htdocs/lenny"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/lenny/#{arch}"} do |t|
-  sh "rsync -Pr --delete #{t.prerequisites.first} repo@mirroir.sh:htdocs/symbiosis/lenny/"
+  sh "rsync -Pr --delete #{t.prerequisites.first}/ repo@mirroir.sh:htdocs/symbiosis/lenny/"
 end
 

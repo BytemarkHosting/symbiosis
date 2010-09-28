@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -e
+
+sed -i -e 's#http://\(vhost\|symbiosis\).bytemark.co.uk/lenny#http://symbiosis-builder.sh.bytemark.co.uk/current#g' /etc/apt/sources.list{,.security}
+
+
+if [ -x /usr/bin/bytemark-vhost-updater ] ; then
+
+	echo -e "SUDO_USER=\"root\"\nEMAIL=\"\"\nQUIET=\"\$OPTIONS\"" >> /etc/update-packages.conf
+	/usr/bin/bytemark-vhost-updater
+
+elif [ -x /usr/bin/symbiosis-updater ] ; then
+
+	echo -e "SSH_TTY=\"\"\nEMAIL=\"\"\nQUIET=\"\$OPTIONS\"" >> /etc/symbiosis/updater
+	/usr/bin/symbiosis-updater
+
+fi 
+
+

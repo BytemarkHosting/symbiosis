@@ -1,0 +1,58 @@
+#!/bin/bash
+
+set -e
+
+mkdir -p /srv/symtester/config/
+touch    /srv/symtester/config/antivirus
+touch    /srv/symtester/config/antispam
+
+#
+# Start spam & anti-virus bits
+#
+/etc/init.d/spamassassin start
+/etc/init.d/clamav-daemon start
+/etc/init.d/clamav-freshclam start
+
+#
+# Snooze for a bit to make sure things start
+#
+sleep 20
+
+#
+# Run the monitor, to make sure everything is behaving
+#
+/usr/sbin/symbiosis-monit --verbose
+
+#
+# And the test suite.
+#
+/usr/bin/symbiosis-test
+
+# This takes each package in the Packages file, and returns a list in the form 
+#
+# package1,version1
+# package2,version2
+#
+pkgvers=`curl -q symbiosis-builder.sh/current/Packages 2>/dev/null | grep '^\(Package\|Version\)' | sed -n 'N;s/\(Package\|Version\): //g;s/\n/,/;p' | uniq`
+
+for pkgver in $pkgvers ; do
+  pkg=${pkgver%,*} 
+  ver=${pkgver#*,}
+
+  #
+  # We don't want to test these two packages (yet)
+  #
+  [ "$pkg" == "bytemark-vhost" ] && continue
+  [ "$pkg" == "libapache2-mod-ruid" ] && continue
+
+  #
+  # Make sure the version is exactly equal.
+  #
+  installed_ver=`dpkg-query -W -f='${Version}' $pkg`
+  dpkg --compare-versions $ver eq ${installed_ver:-0.0.0}
+
+  # For each package installed, make sure that every file that is packaged,
+  # exists in the new install, and its md5 sum matches.
+  sed -e 's#  #  /#' /var/lib/dpkg/info/$pkg.md5sums | md5sum -c
+done
+
