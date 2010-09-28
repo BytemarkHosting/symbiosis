@@ -107,7 +107,8 @@ rake clobber      >> $LOGFILE 2>> $LOGFILE
 rake upload       >> $LOGFILE 2>> $LOGFILE 
 
 cd $DST/$ID/build-utils
-./auto-test   >> $LOGFILE 2>> $ERRFILE
+./auto-provision >> $LOGFILE 2>> $ERRFILE
+./auto-test      >> $LOGFILE 2>> $ERRFILE
 
 #
 # Copy the LOGFILE in place.
