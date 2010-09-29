@@ -14,7 +14,7 @@ for arch in i386 amd64 ; do
                 #
                 # If we already have an image, carry on.
                 #
-                if [ -d /shared/images/symtester/$distro/$arch ] ; then
+                if [ -d /shared/images/symtester/$distro/$arch/run ] ; then
                   echo Image for symtester/$distro/$arch already exists
                   continue
                 fi
@@ -36,7 +36,6 @@ for arch in i386 amd64 ; do
                              --dist=$distro \
                              --nostart
 
-                mkdir -p /shared/images/symtester/$distro/$arch
-                cp -R /shared/guests/symtester /shared/images/symtester/$distro/$arch
+                sudo cp -R /shared/guests/symtester/* /shared/images/symtester/$distro/$arch
         done
 done

@@ -19,31 +19,42 @@ for arch in i386 amd64 ; do
                 #
                 #  If the guest exists.
                 #
-                if [ -d /shared/guests/symtester/ ]; then
-                  sudo km delete symtester
+                if [ -e /shared/guests/symtester/run ]; then
+		  sudo km deactivate symtester
+                  rm -rf /shared/guests/symtester/*
                 fi
 
                 #
                 # Copy the image over
                 #
-                cp -Rv /shared/images/symtester/$original_distro/$arch /shared/guests/symtester
+                cp -Rv /shared/images/symtester/$original_distro/$arch/* /shared/guests/symtester/
 
                 echo -n "Waiting for machine to start.."
-                km start symtester
+                sudo km activate symtester
+                sudo km start symtester
 
                 for i in `seq 1 24` ; do
                         # Wait for SSH to start
+                        sleep 5
                         $(echo "foo" | nc 89.16.160.206 22 > /dev/null 2>&1 ) && break
                         echo -n "."
-                        sleep 5
                 done
+		#
+		# Double check we've started.
+		#
+                if [ $(echo "foo" | nc 89.16.160.206 22 > /dev/null 2>&1 ) ] ; then
+			echo "OK."
+		else
+			echo "Failed."
+			echo "Test machine didn't start for symtester/$original_distro/$arch" > /dev/stderr
+			continue
+		fi
 
-                scp $SSHOPT do_upgrade root@89.16.160.206:
-                scp $SSHOPT do_tests root@89.16.160.206:
+		echo "Copying tests in place"
+                scp $SSHOPT ./do_upgrade root@89.16.160.206:
+                scp $SSHOPT ./do_tests root@89.16.160.206:
                 ssh $SSHOPT root@89.16.160.206 ./do_upgrade
                 ssh $SSHOPT root@89.16.160.206 ./do_tests
-
                 sudo km stop symtester
-                sudo km delete symtester
         done
 done
