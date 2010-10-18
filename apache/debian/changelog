@@ -1,3 +1,11 @@
+symbiosis-httpd (2010:1018) stable; urgency=low
+
+  [ Steve Kemp ]
+  * Use the mtime of the config/ip + ssl.key files to control the regeneration
+    of Apache scripts.  Reference RT:# 278451
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 18 Oct 2010 15:16:17 +0000
+
 symbiosis-httpd (2010:0923) stable; urgency=low
 
   [ Steve Kemp ]

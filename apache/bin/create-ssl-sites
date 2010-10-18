@@ -228,7 +228,7 @@ class SSLConfiguration
     #
     # creation time of the (previously generated) SSL-site.
     #
-    site = File.ctime( "/etc/apache2/sites-available/#{@domain}.ssl" )
+    site = File.mtime( "/etc/apache2/sites-available/#{@domain}.ssl" )
 
 
     #
@@ -238,8 +238,8 @@ class SSLConfiguration
 
     files.each do |file|
       if ( File.exists?( "/srv/#{@domain}/config/#{file}" ) )
-        ctime = File.ctime("/srv/#{@domain}/config/#{file}" )
-        if ( ctime > site )
+        mtime = File.mtime("/srv/#{@domain}/config/#{file}" )
+        if ( mtime > site )
           return true
         end
       end
