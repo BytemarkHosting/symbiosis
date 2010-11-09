@@ -334,26 +334,17 @@ foreach my $entry (@outgoing)
 
 
 #
-#  Is the firewall disabled?
-#
-if ( -e "/etc/symbiosis/firewall/disabled" )
-{
-    unlink($tempfile);
-    unlink( $CONFIG{ 'lock' } );
-    exit;
-}
-
-
-#
-#  Flush the existing rules.
+#  Flush the existing rules - unless we shouldn't.
 #
 flushAllRules() unless ( $CONFIG{ 'no-flush' } );
 
 
 #
-#  Did the user just want to flush the rules?  If so exit now
+#  Now if the firewall is disabled, or the user requested a flush
+# then we'll do that and exit.
 #
-if ( $CONFIG{ 'flush' } )
+if ( ( $CONFIG{ 'flush' } ) ||
+     ( -e "/etc/symbiosis/firewall/disabled" ) )
 {
     unlink($tempfile);
     unlink( $CONFIG{ 'lock' } );
