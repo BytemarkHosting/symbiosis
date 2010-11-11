@@ -1,0 +1,7 @@
+
+#
+# SMTP banner without exposing the Exim4 version number.
+#
+
+smtp_banner = $smtp_active_hostname ESMTP Exim $tod_full
+
