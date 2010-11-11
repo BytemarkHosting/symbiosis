@@ -4,8 +4,9 @@ deny from all
 # local system
 allow from 127.0.0.1
 
-# Office allocation
-allow from 89.16.168.128/25
+# Office desktops.
+allow from 89.16.168.152
+allow from 212.110.163.132
 
 # openvpn ranges
 allow from 80.68.83.160/27
