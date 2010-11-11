@@ -326,8 +326,22 @@ a2dismod vhost_alias         >/dev/null 2>/dev/null
 if [ -e /etc/apache2/conf.d/security ]; then
 
     perl -pi -e 's/^ServerTokens.*/ServerTokens Prod/g'  /etc/apache2/conf.d/security
+    # if there is no setting then add it.
+    if ( ! grep ^ServerTokens /etc/apache2/conf.d/security  >/dev/null 2>/dev/null ) ; then
+        echo "ServerTokens Prod" >> /etc/apache2/conf.d/security
+    fi
+
     perl -pi -e 's/^ServerSignature.*/ServerSignature Off/g' /etc/apache2/conf.d/security
+    # if there is no setting then add it.
+    if ( ! grep ^ServerSignature /etc/apache2/conf.d/security  >/dev/null 2>/dev/null ) ; then
+        echo "ServerSignature Off" >> /etc/apache2/conf.d/security
+    fi
+
     perl -pi -e 's/^TraceEnable.*/TraceEnable Off/g' /etc/apache2/conf.d/security
+    # if there is no setting then add it.
+    if ( ! grep ^TraceEnable /etc/apache2/conf.d/security  >/dev/null 2>/dev/null ) ; then
+        echo "TraceEnable Off" >> /etc/apache2/conf.d/security
+    fi
 
 
 else
@@ -340,7 +354,16 @@ fi
 
 
 if [ -e /etc/php5/apache2/php.ini ]; then
+
+    # change any existing setting to be Off.
     perl -pi -e 's/^expose_php = On/expose_php = Off/g'  /etc/php5/apache2/php.ini
+
+    # if there is no setting then add it.
+    if ( ! grep ^expose_php /etc/php5/apache2/php.ini  >/dev/null 2>/dev/null ) ; then
+        echo "" >> /etc/php5/apache2/php.ini
+        echo "expose_php = Off" >> /etc/php5/apache2/php.ini
+
+    fi
 fi
 
 
