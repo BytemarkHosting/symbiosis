@@ -321,6 +321,30 @@ a2dismod vhost_alias         >/dev/null 2>/dev/null
 
 
 #
+#  Change the server tokens
+#
+if [ -e /etc/apache2/conf.d/security ]; then
+
+    perl -pi -e 's/^ServerTokens.*/ServerTokens Prod/g'  /etc/apache2/conf.d/security
+    perl -pi -e 's/^ServerSignature.*/ServerSignature Off/g' /etc/apache2/conf.d/security
+    perl -pi -e 's/^TraceEnable.*/TraceEnable Off/g' /etc/apache2/conf.d/security
+
+
+else
+    cat > /etc/apache2/conf.d/security<<EOF
+ServerTokens Prod
+ServerSignature Off
+TraceEnable Off
+EOF
+fi
+
+
+if [ -e /etc/php5/apache2/php.ini ]; then
+    perl -pi -e 's/^expose_php = On/expose_php = Off/g'  /etc/php5/apache2/php.ini
+fi
+
+
+#
 #  If we have additional sites add them
 #
 if [ -x /etc/cron.hourly/configure-additional ]; then
