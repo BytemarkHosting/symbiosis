@@ -1,3 +1,10 @@
+symbiosis-updater (2010:1012) stable; urgency=low
+
+  * Updated the cron-job such that systems only fetch & apply updates
+    Monday to Friday.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 12 Nov 2010 09:22:09 +0100
+
 symbiosis-updater (2010:0915) stable; urgency=low
 
   * Added cron-apt conflict
