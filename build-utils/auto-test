@@ -63,19 +63,19 @@ for arch in i386 amd64 ; do
                 #
                 # Double check we've started.
                 #
-                if [ $(echo "foo" | nc 89.16.160.206 22 > /dev/null 2>&1 ) ] ; then
-                        echo "OK."
-                else
-                        echo "Failed."
-                        echo "Test machine didn't start for $GUESTNAME/$original_distro/$arch" >&2 
-                        continue
-                fi
+                #if [ $(echo "foo" | nc 89.16.160.206 22 > /dev/null 2>&1 ) ] ; then
+                #        echo "OK."
+                #else
+                #        echo "Failed."
+                #        echo "Test machine didn't start for $GUESTNAME/$original_distro/$arch" >&2 
+                #        continue
+                #fi
 
                 echo "Copying tests in place"
                 scp $SSHOPT ./do_upgrade root@89.16.160.206:
                 scp $SSHOPT ./do_tests root@89.16.160.206:
                 ssh $SSHOPT root@89.16.160.206 ./do_upgrade
                 ssh $SSHOPT root@89.16.160.206 ./do_tests
-                sudo km stop $GUESTNAME
+                sudo km destroy $GUESTNAME
         done
 done
