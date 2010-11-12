@@ -22,12 +22,15 @@ for arch in i386 amd64 ; do
                 #  If the guest exists.
                 #
                 if [ -e /shared/guests/$GUESTNAME/run ]; then
-                  sudo km deactivate $GUESTNAME
+                  #
+                  # kill any running guest and remove its directory.
+                  #
+                  sudo km destroy $GUESTNAME
                   rm -rf /shared/guests/$GUESTNAME/*
                 fi
 
                 #
-                # Make sure the guest directory exists.
+                # Make sure the guest directory still exists.
                 #
                 if [ ! -d /shared/guests/$GUESTNAME ] ; then
                   echo "Cannot run integration test, since /shared/guests/$GUESTNAME/ is missing." >&2
