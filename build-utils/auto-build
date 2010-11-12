@@ -23,6 +23,7 @@ LOGFILE=$DST/$REPO-builder.$$.log
 ERRFILE=$DST/$REPO-builder.$$.err
 MAILTO="patrick@bytemark.co.uk"
 
+GUESTNAME=symtester
 
 #
 # Exit on errors

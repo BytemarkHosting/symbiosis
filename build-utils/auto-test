@@ -6,32 +6,50 @@
 
 SSHOPT='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q '
 
+echo "Using guest ${GUESTNAME:=symtester}"
+
 for arch in i386 amd64 ; do
         for original_distro in lvhost symbiosis ; do
                 #
                 # Make sure an image exists.
                 #
-                if [ ! -d /shared/images/symtester/$original_distro/$arch ] ; then
-                  echo "Image for symtester/$original_distro/$arch doesn't exist" > /dev/stderr
+                if [ ! -d /shared/images/$GUESTNAME/$original_distro/$arch ] ; then
+                  echo "Image for $GUESTNAME/$original_distro/$arch doesn't exist" >&2 
                   continue
                 fi
 
                 #
                 #  If the guest exists.
                 #
-                if [ -e /shared/guests/symtester/run ]; then
-		  sudo km deactivate symtester
-                  rm -rf /shared/guests/symtester/*
+                if [ -e /shared/guests/$GUESTNAME/run ]; then
+                  sudo km deactivate $GUESTNAME
+                  rm -rf /shared/guests/$GUESTNAME/*
+                fi
+
+                #
+                # Make sure the guest directory exists.
+                #
+                if [ ! -d /shared/guests/$GUESTNAME ] ; then
+                  echo "Cannot run integration test, since /shared/guests/$GUESTNAME/ is missing." >&2
+                  continue
+                fi
+
+                #
+                # Make sure we own the guest directory.
+                #
+                if [ ! -O /shared/guests/$GUESTNAME ] ; then
+                  echo "Cannot run integration test, since /shared/guests/$GUESTNAME/ is not owned by $USER." >&2
+                  continue
                 fi
 
                 #
                 # Copy the image over
                 #
-                cp -Rv /shared/images/symtester/$original_distro/$arch/* /shared/guests/symtester/
+                cp -Rv /shared/images/$GUESTNAME/$original_distro/$arch/* /shared/guests/$GUESTNAME/
 
                 echo -n "Waiting for machine to start.."
-                sudo km activate symtester
-                sudo km start symtester
+                sudo km activate $GUESTNAME
+                sudo km start $GUESTNAME
 
                 for i in `seq 1 24` ; do
                         # Wait for SSH to start
@@ -39,22 +57,22 @@ for arch in i386 amd64 ; do
                         $(echo "foo" | nc 89.16.160.206 22 > /dev/null 2>&1 ) && break
                         echo -n "."
                 done
-		#
-		# Double check we've started.
-		#
+                #
+                # Double check we've started.
+                #
                 if [ $(echo "foo" | nc 89.16.160.206 22 > /dev/null 2>&1 ) ] ; then
-			echo "OK."
-		else
-			echo "Failed."
-			echo "Test machine didn't start for symtester/$original_distro/$arch" > /dev/stderr
-			continue
-		fi
+                        echo "OK."
+                else
+                        echo "Failed."
+                        echo "Test machine didn't start for $GUESTNAME/$original_distro/$arch" >&2 
+                        continue
+                fi
 
-		echo "Copying tests in place"
+                echo "Copying tests in place"
                 scp $SSHOPT ./do_upgrade root@89.16.160.206:
                 scp $SSHOPT ./do_tests root@89.16.160.206:
                 ssh $SSHOPT root@89.16.160.206 ./do_upgrade
                 ssh $SSHOPT root@89.16.160.206 ./do_tests
-                sudo km stop symtester
+                sudo km stop $GUESTNAME
         done
 done

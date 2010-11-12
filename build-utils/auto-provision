@@ -6,6 +6,8 @@
 
 passwd=`pwgen -n 10`
 
+echo "Using guest ${GUESTNAME:=symtester}"
+
 echo "Root password is $passwd" 
 
 for arch in i386 amd64 ; do
