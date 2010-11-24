@@ -53,6 +53,12 @@ if ( ! grep ^admin: /etc/group 2>/dev/null >/dev/null ); then
     addgroup admin
 fi
 
+#
+#  If we have an adm group - which we shold - add the admin user to it.
+#
+if ( grep ^adm: /etc/group 2>/dev/null >/dev/null ); then
+    adduser admin adm  >/dev/null 2>/dev/null || true
+fi
 
 #
 #  If we don't have the sudoers file setup then configure it

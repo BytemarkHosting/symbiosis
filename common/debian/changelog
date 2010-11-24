@@ -1,3 +1,10 @@
+symbiosis-common (2010:1124) stable; urgency=low
+
+  * Add the "admin" user to the "adm" group - such that it may read
+    apache logfiles, etc.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 24 Nov 2010 14:33:41 +0000
+
 symbiosis-common (2010:0914) stable; urgency=low
 
   * Added test suite
