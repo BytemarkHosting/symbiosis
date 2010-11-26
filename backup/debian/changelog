@@ -1,6 +1,12 @@
+symbiosis-backup (2010:1126) stable; urgency=low
+
+  * Throttle the upload of the backups.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 26 Nov 2010 10:20:30 +0000
+
 symbiosis-backup (2010:0914) stable; urgency=low
 
-  * Updated backup scripts to use ruby. 
+  * Updated backup scripts to use ruby.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:40:54 +0100
 
