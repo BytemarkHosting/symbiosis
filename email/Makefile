@@ -13,3 +13,9 @@ clean:
 	$(RM) dovecot/dovecot.conf
 	$(RM) dovecot/dovecot.conf.tmp
 	$(RM) -r man
+
+test:
+	make -C exim4/
+
+.PHONY: clean docs all test
+

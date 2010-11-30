@@ -1,9 +1,17 @@
+symbiosis-email (2010:1130) stable; urgency=low
+
+  * Updated exim4 config to route via DNS for local domains only when those
+    domains have MX or SRV records pointing elsewhere (i.e. not A records).
+    Closes #1306.
+
+ -- Patrick Cherry <patick@bytemark.co.uk>  Tue, 30 Nov 2010 10:45:14 +0000
+
 symbiosis-email (2010:1111) stable; urgency=low
 
   * Tightened up SSL cipher versions in Dovecot
   * Removed Exim4 version number from SMTP banner
 
- -- Patrick Cherry <patch@desk1.tur.bytemark.co.uk>  Thu, 11 Nov 2010 14:40:47 +0000
+ -- Patrick Cherry <patick@bytemark.co.uk>  Thu, 11 Nov 2010 14:40:47 +0000
 
 symbiosis-email (2010:0914) stable; urgency=low
 

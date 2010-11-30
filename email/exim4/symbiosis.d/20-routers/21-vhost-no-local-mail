@@ -10,6 +10,10 @@ vhost_no_local_mail:
                  {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/default_forward}} \
                  {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/aliases}} \
                 }}
+
+  # Make sure that we only route domains that have MX records pointing
+  # elsewhere, as we normally expect A records to point at this box.
+  mx_domains = +vhost_domains
   transport = remote_smtp
   same_domain_copy_routing = yes
   # ignore private rfc1918 and APIPA addresses
