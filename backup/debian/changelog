@@ -1,8 +1,13 @@
-symbiosis-backup (2010:1126) stable; urgency=low
+symbiosis-backup (2010:1223) stable; urgency=low
 
+  [ Steve Kemp ]
   * Throttle the upload of the backups.
 
- -- Steve Kemp <steve@bytemark.co.uk>  Fri, 26 Nov 2010 10:20:30 +0000
+  [ Patrick Cherry ]
+  * Added rsync flags to make sure downloaded backups have sane
+    permissions/users.
+
+ -- Patrick Cherry <patch@desk1.tur.bytemark.co.uk>  Thu, 23 Dec 2010 11:36:44 +0000
 
 symbiosis-backup (2010:0914) stable; urgency=low
 
