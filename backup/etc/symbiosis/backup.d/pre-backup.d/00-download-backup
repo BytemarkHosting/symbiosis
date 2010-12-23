@@ -77,7 +77,7 @@ puts "Ensuring directory structure is present..."
 puts `rsync --verbose --human-readable --dirs #{src}/localhost #{dest}/`
 
 puts "\nSynchronising backups from #{dest}/localhost..."
-puts `rsync --verbose --archive --recursive --human-readable #{dest}/localhost/ #{src}/localhost/`
+puts `rsync --verbose --archive --recursive --no-perms --no-owner --no-group --human-readable #{dest}/localhost/ #{src}/localhost/`
 
 #
 # Exit with the exit status of the rsync command
