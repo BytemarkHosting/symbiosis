@@ -289,6 +289,11 @@ my $tempfile = createTemporaryFile();
 #
 processWhitelist($tempfile);
 
+#
+#  Also whitelist from /etc/hosts.allow
+#
+processHostsAllow($tempfile);
+
 
 #
 #  Blacklist any blacklisted sources immediately.
@@ -772,6 +777,69 @@ sub processWhitelist
     close(FILE);
 }
 
+
+
+=begin doc
+
+Whitelist IP addresses which are mentioned in /etc/hosts.allow
+
+=end doc
+
+=cut
+
+sub processHostsAllow
+{
+    my ($file) = (@_);
+
+
+    return unless ( -e "/etc/hosts.allow" );
+
+    #
+    #  Open our temporary firewall script to append the new
+    # entries to it.
+    #
+    open( FILE, ">>", $file ) or
+      die "ERROR: failed to append to temporary file $file - $!";
+
+
+    #
+    # Open /etc/hosts.allow
+    #
+    open( HOSTS, "<", "/etc/hosts.allow" ) or
+      die "ERROR: Failed to read /etc/hosts.allow: $!";
+
+    foreach my $line (<HOSTS>)
+    {
+        chomp($line);
+        next if ( !$line );
+        next if ( $line =~ /^#/ );
+
+        if ( $line =~ /([a-z]+):[ \t]*([0-9\.]+)/i )
+        {
+            my $srv = $1;
+            my $ip  = $2;
+            $CONFIG{ 'verbose' } &&
+              print "/etc/hosts.allow: IP $ip for service $srv\n";
+
+            #
+            #  Whitelist
+            #
+            if ( $srv =~ /^(all|ssh)$/i )
+            {
+                print FILE "\n";
+                print FILE "# whitelisted IP: $ip due to /etc/hosts.allow\n";
+                print FILE "# $srv : $ip\n";
+                print FILE
+                  "/sbin/iptables -A INPUT -p all --src $ip -j ACCEPT\n";
+
+            }
+        }
+
+    }
+    close(HOSTS);
+
+    close(FILE);
+}
 
 
 
