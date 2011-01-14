@@ -30,3 +30,8 @@ tls_privatekey = /etc/ssl/ssl.key
 
 tls_on_connect_ports = 465
 
+#
+# Don't allow duff SSL ciphers
+#
+tls_verify_ciphers = ALL:!LOW:!SSLv2:!EXP:!aNULL
+
