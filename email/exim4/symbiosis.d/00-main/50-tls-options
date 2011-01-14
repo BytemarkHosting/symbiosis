@@ -33,5 +33,5 @@ tls_on_connect_ports = 465
 #
 # Don't allow duff SSL ciphers
 #
-tls_verify_ciphers = ALL:!LOW:!SSLv2:!EXP:!aNULL
+tls_require_ciphers = ALL:!LOW:!SSLv2:!EXP:!aNULL
 
