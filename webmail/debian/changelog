@@ -1,3 +1,9 @@
+symbiosis-webmail (2011:0127) testing; urgency=low
+
+  * Bumped to squeeze
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:55 +0000
+
 symbiosis-webmail (2010:0908) stable; urgency=low
 
   * Changed restart to reload in postinst and prerm scripts

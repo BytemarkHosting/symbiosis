@@ -1,3 +1,9 @@
+symbiosis-pam (2011:0127) testing; urgency=low
+
+  * Bumped to squeeze
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:53 +0000
+
 symbiosis-pam (2010:0914) stable; urgency=low
 
   * Tidied packaging
