@@ -1,3 +1,9 @@
+symbiosis-cron (2011:0127) testing; urgency=low
+
+  * Bumped to squeeze
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:47 +0000
+
 symbiosis-cron (2010:0914) stable; urgency=low
 
   * Added makefile to build packages

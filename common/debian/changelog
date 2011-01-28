@@ -1,3 +1,9 @@
+symbiosis-common (2011:0127) testing; urgency=low
+
+  * Bumped to squeeze
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:45 +0000
+
 symbiosis-common (2010:1124) stable; urgency=low
 
   * Add the "admin" user to the "adm" group - such that it may read

@@ -1,3 +1,9 @@
+symbiosis-httpd (2011:0127) testing; urgency=low
+
+  * Bumped to squeeze
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:42 +0000
+
 symbiosis-httpd (2010:1018) stable; urgency=low
 
   [ Steve Kemp ]

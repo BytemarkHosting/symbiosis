@@ -1,3 +1,9 @@
+symbiosis-updater (2011:0127) testing; urgency=low
+
+  * Bumped to squeeze
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:54 +0000
+
 symbiosis-updater (2010:1012) stable; urgency=low
 
   * Updated the cron-job such that systems only fetch & apply updates
