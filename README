@@ -16,12 +16,28 @@ Building The Packages
 
   You should be able to build all packages via :
 
-                make all
+                rake all
 
   Once you're done you'll see a bunch of .deb files in the current
  directory.  Failures are going to be hard to spot, so do look over
  the output to ensure that you see as many packages as you expect.
 
   (Mostly failures will be due to lack of build-dependencies.)
+
+Changing branches
+-----------------
+
+ This repo contains branches.
+
+  * lenny
+  * lenny-backports
+  * default
+
+ The default branch is currently tracking Debian squeeze.  To changes branches run
+
+  hg update -C lenny
+
+ and substitute lenny for the branch you want.
+  
 
 
