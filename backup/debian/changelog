@@ -1,3 +1,9 @@
+symbiosis-backup (2011:0127) testing; urgency=low
+
+  * Bumped to squeeze
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:44 +0000
+
 symbiosis-backup (2010:1223) stable; urgency=low
 
   [ Steve Kemp ]

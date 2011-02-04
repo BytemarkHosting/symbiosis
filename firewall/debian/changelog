@@ -1,3 +1,9 @@
+symbiosis-firewall (2011:0127) testing; urgency=low
+
+  * Bumped to squeeze
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:49 +0000
+
 symbiosis-firewall (2010:1224) stable; urgency=low
 
   * Whitelist hosts mentioned in /etc/hosts.allow.
