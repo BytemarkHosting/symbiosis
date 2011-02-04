@@ -1,9 +1,3 @@
-symbiosis-email (2011:0127) testing; urgency=low
-
-  * Bumped to squeeze
-
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:48 +0000
-
 symbiosis-email (2010:1130) stable; urgency=low
 
   * Updated exim4 config to route via DNS for local domains only when those

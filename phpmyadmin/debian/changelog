@@ -1,9 +1,3 @@
-symbiosis-phpmyadmin (2011:0127) testing; urgency=low
-
-  * Bumped to squeeze
-
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:53 +0000
-
 symbiosis-phpmyadmin (2010:0908) stable; urgency=low
 
   * Changed prerm to clean up after itself, and also changed restart to

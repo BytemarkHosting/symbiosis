@@ -1,9 +1,3 @@
-symbiosis-key (2011:0127) testing; urgency=low
-
-  * Bumped to squeeze
-
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:50 +0000
-
 symbiosis-key (2010:0923) stable; urgency=low
 
   * New release.

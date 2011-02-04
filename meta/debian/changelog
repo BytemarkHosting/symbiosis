@@ -1,9 +1,3 @@
-bytemark-symbiosis (2011:0127) testing; urgency=low
-
-  * Bumped to squeeze
-
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 27 Jan 2011 16:51:51 +0000
-
 bytemark-symbiosis (2010:0817) stable; urgency=low
 
   * Remove the old bytemark-vhost init script.

@@ -3,14 +3,14 @@ Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), libcrack2-dev, cdbs
+Build-Depends: debhelper (>= 7.0.0), cracklib2-dev, cdbs
 Standards-Version: 3.8.0
 
 Package: symbiosis-crack
 Replaces: bytemark-vhost-crack
 Conflicts: bytemark-vhost-crack
 Architecture: any
-Depends: cracklib-runtime, ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}
+Depends: cracklib2, ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}
 Description: Test the strength of virtual hosting passwords
  This package contains a simple script to test each virtual host
  password to ensure they are secure.
