@@ -45,7 +45,7 @@ module Symbiosis
             puts "Not enough permissions to check process #{@name}: "+err.to_s
             raise
          rescue => err
-            puts "#{@name} doesn't appear to be runing: "+err.to_s
+            puts "#{@name} doesn't appear to be running: "+err.to_s
             false
           end
         end
