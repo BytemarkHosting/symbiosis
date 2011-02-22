@@ -1,3 +1,10 @@
+symbiosis-backup (2011:0222) stable; urgency=low
+
+  [ Steve Kemp ]
+  * Use 'bash' explicitly for the post-installation script.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 22 Feb 2011 14:44:41 +0000
+
 symbiosis-backup (2010:1223) stable; urgency=low
 
   [ Steve Kemp ]
