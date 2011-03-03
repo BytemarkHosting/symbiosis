@@ -28,8 +28,13 @@ NameVirtualHost <%= ip() %>:443
 <VirtualHost <%= ip() %>:443>
 
         SSLEngine On
-        <%= certificate %>
-        <%= bundle() %>
+        SSLCertificateFile <%= certificate %>
+        <% if key_file != certificate_file  %>
+        SSLKeyFile <%= certificate %>
+        <% end %>
+        <% if certificate_chain_file %>
+        SSLCertificateChainFile <%= bundle() %>
+        <% end %>
         SSLOptions +StrictRequire
 
 
