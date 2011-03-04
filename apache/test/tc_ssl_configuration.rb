@@ -419,18 +419,34 @@ class SSLConfigTest < Test::Unit::TestCase
     assert_nothing_raised{ @ssl.key_file         = @domain.directory+"/config/ssl.combined" }
 
     #
-    # This should not verify yet
+    # This should verify.
     #
     assert_nothing_raised{ @ssl.verify }
 
     #
-    # TODO: test expired certificate
+    # Generate another key
     #
+    new_key = do_generate_key
 
     #
-    # Now write a combined cert with a duff key.  This should not verify.
+    # Now write a combined cert with this new key.  This should not verify.
     #
-    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+do_generate_key.to_pem}
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+new_key.to_pem}
+    assert_raise(OpenSSL::X509::CertificateError){ @ssl.verify }
+    
+    #
+    # Now sign the certificate with this new key.  This should cause the verification to fail.
+    #
+    crt.sign( new_key, OpenSSL::Digest::SHA1.new )
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+    assert_raise(OpenSSL::X509::CertificateError){ @ssl.verify }
+
+    #
+    # Now write a combined cert with the new key.  This should still not
+    # verify, as the public key on the certificate will not match the private
+    # key, even though we've signed the cert with this new private key.
+    #
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+new_key.to_pem}
     assert_raise(OpenSSL::X509::CertificateError){ @ssl.verify }
   end
 
@@ -458,7 +474,7 @@ class SSLConfigTest < Test::Unit::TestCase
     File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
 
     #
-    # This should verify now 
+    # This should verify just fine.
     #
     assert_nothing_raised{ @ssl.certificate_file = @domain.directory+"/config/ssl.combined" }
     assert_nothing_raised{ @ssl.key_file         = @domain.directory+"/config/ssl.combined" }

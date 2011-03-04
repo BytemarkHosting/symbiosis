@@ -289,28 +289,33 @@ module Symbiosis
     #
     #
     unless self.certificate.check_private_key(self.key)
-      raise OpenSSL::X509::CertificateError, "Private key does not match certificate )a."
+      raise OpenSSL::X509::CertificateError, "Private key does not match certificate."
     end
-    
-    # Now check the certificate can be verified by the key.  Well I *think*
-    # that is what the Certificate#verify method is for.
+   
+    # 
+    # Now check the signature
     #
-    #unless self.certificate.verify(self.key)
-    #  raise OpenSSL::X509::CertificateError, "Private key does not match certificate (b)."
-    #end
+    if self.certificate.issuer.to_s == self.certificate.subject.to_s
+      #
+      # Firstly for a self-signed certificate check the signature on the
+      # certificate was made by our key.
+      #
+      # This should never fail!
+      unless self.certificate.verify(self.key)
+        raise OpenSSL::X509::CertificateError, "Private key does not match that on the certificate's signature."
+      end
+    else
+      # 
+      # Otherwise for a CA-signed certificate, make sure the signature can be
+      # verified using the usual store of certificates on the machine,
+      # including any bundle that has been left lying around.
+      #
+      unless self.certificate_chain.verify(self.certificate)
+        raise OpenSSL::X509::CertificateError, "Certificate does not verify -- maybe a bundle is missing?" 
+      end
+    end
 
-    # At this point, return if certificate is self-signed
-    #
-    #
-    return true if self.certificate.issuer.to_s == self.certificate.subject.to_s
-
-    # Now validate the certificate, using a bundle if needed.
-    #
-    #
-    raise OpenSSL::X509::CertificateError, "Certificate does not verify -- maybe a bundle is missing?" unless self.certificate_chain.verify(self.certificate)
-    #
-    #
-    return true
+    true
   end
 
   #
