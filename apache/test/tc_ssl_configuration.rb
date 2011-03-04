@@ -30,6 +30,8 @@ end
 
 class SSLConfigTest < Test::Unit::TestCase
 
+  @@serial=0
+
   def setup
     @domain = Symbiosis::Test::Http.new
     @domain.user  = Etc.getpwuid.name
@@ -43,9 +45,6 @@ class SSLConfigTest < Test::Unit::TestCase
     # Copy some SSL certs over
     #
     FileUtils.mkdir_p(@domain.directory+"/config")
-    @key = do_generate_key
-    @csr = do_generate_csr
-    @crt = do_generate_cert
     
   end
 
@@ -54,72 +53,238 @@ class SSLConfigTest < Test::Unit::TestCase
     FileUtils.rmdir "/tmp/srv"
   end
 
+  #####
+  #
+  # Helper methods
+  #
+  #####
+
   #
   # Returns a private key
   #
   def do_generate_key
+    # This is a very short key!
     OpenSSL::PKey::RSA.new(512)
   end
 
-  def do_generate_csr(key = @key, domain = @domain.name)
+  #
+  # Returns a new certificate given a key
+  #
+  def do_generate_crt(domain, key=nil, ca=nil)
+    #
+    # Generate a key if none has been specified
+    #
+    key = do_generate_key if key.nil?
+
+    # Generate the request 
     csr            = OpenSSL::X509::Request.new
     csr.version    = 0
     csr.subject    = OpenSSL::X509::Name.new( [ ["C","GB"], ["CN", domain]] )
     csr.public_key = key.public_key
     csr.sign( key, OpenSSL::Digest::SHA1.new )
-    csr
-  end
 
-  def do_generate_cert(csr = @csr, key = @key, ca=nil)
-    cert            = OpenSSL::X509::Certificate.new
-    cert.subject    = csr.subject
-    cert.issuer     = csr.subject
-    cert.public_key = csr.public_key
-    cert.not_before = Time.now
-    cert.not_after  = Time.now + 60
-    cert.serial     = 0x0
-    cert.version    = 1 
-    cert.sign( key, OpenSSL::Digest::SHA1.new )
-    cert
+    # And then the certificate
+    crt            = OpenSSL::X509::Certificate.new
+    crt.subject    = csr.subject
+
+    #
+    # Theoretically we could use a CA to sign the cert.
+    #
+    if ca.nil?
+      crt.issuer    = csr.subject
+    else
+      # FIXME
+      raise "Cannot sign cert with a CA yet.  FIXME!"
+    end
+    crt.public_key = csr.public_key
+    crt.not_before = Time.now
+    crt.not_after  = Time.now + 60
+    #
+    # Make sure we increment the serial for each regeneration, to make sure
+    # there are differences when regenerating a certificate for a new domain.
+    #
+    crt.serial     = @@serial
+    @@serial += 1
+    crt.version    = 1 
+    crt.sign( key, OpenSSL::Digest::SHA1.new )
+    crt
   end
   
+  #
+  # Returns a key and certificate
+  #
+  def do_generate_key_and_crt(domain, ca=nil)
+    key = do_generate_key
+    return [key, do_generate_crt(domain, key, ca)]
+  end
   
+  ####
+  #
+  # Tests start here.
+  #
+  #####
+
   def test_ssl_enabled?
+    #
+    # This should return true if an IP has been set, and we can find a matching key and cert.
+    #
+    # Initially no IP or key / cert have been configured.
+    #
+    assert( !@ssl.ssl_enabled? )
+
+    #
+    # Now set an IP.  This should still return false.
+    #
+    ip = "1.2.3.4"
+    File.open(@domain.directory+"/config/ip","w+"){|fh| fh.puts ip}
+    assert( !@ssl.ssl_enabled? )
+
+    #
+    # Generate a key + cert.  It should now return true.
+    #
+    key, crt = do_generate_key_and_crt(@domain.name)
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+    assert( @ssl.ssl_enabled? )
   end
 
   def test_site_enabled?
+
   end
 
   def test_mandatory_ssl?
+    #
+    # First make sure this responds "false" 
+    #
+    assert( !@ssl.mandatory_ssl? )
+
+    #
+    # Now it should return true
+    #
+    FileUtils.touch(@domain.directory+"/config/ssl-only")
+    assert( @ssl.mandatory_ssl? )
   end
 
   def test_remove_site
+
   end
 
   def test_ip
+    #
+    # If no IP has been set, it should return nil
+    #
+    assert_nil( @ssl.ip )
+
+    #
+    # Now we set an IP
+    #
+    ip = "1.2.3.4"
+    File.open(@domain.directory+"/config/ip","w+"){|fh| fh.puts ip}
+    assert_equal(@ssl.ip, ip)
+
   end
+
 
   def test_certificate
-  end
+    #
+    # Generate a key 
+    #
+    key, crt = do_generate_key_and_crt(@domain.name)
 
+    #
+    # Return nil if no certificate filename has been set
+    #
+    assert_nil(@ssl.certificate)
+
+    #
+    # Now write the file
+    #
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+    @ssl.certificate_file = @domain.directory+"/config/ssl.combined"
+
+    #
+    # Now it should read back the combined file correctly
+    #
+    assert_kind_of(crt.class, @ssl.certificate)
+    assert_equal(crt.to_der, @ssl.certificate.to_der)
+
+    #
+    # Generate a new certificate
+    #
+    key, crt = do_generate_key_and_crt(@domain.name)
+    #
+    # Make sure it doesn't match the last one
+    #
+    assert_not_equal(crt.to_der, @ssl.certificate.to_der)
+
+    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
+    @ssl.certificate_file = @domain.directory+"/config/ssl.crt"
+    #
+    # Now it should read back the individual file correctly
+    #
+    assert_equal(crt.to_der, @ssl.certificate.to_der)
+  end
+  
+  #
+  # Sh
+  #
   def test_key
+    #
+    # Generate a key and cert
+    #
+    key, crt = do_generate_key_and_crt(@domain.name)
+    
+    #
+    # Return nil if no certificate filename has been set
+    #
+    assert_nil(@ssl.key)
+
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+    @ssl.key_file = @domain.directory+"/config/ssl.combined"
+
+    #
+    # Now it should read back the combined file correctly
+    #
+    assert_kind_of(key.class, @ssl.key)
+    assert_equal(key.to_der, @ssl.key.to_der)
+
+    #
+    # Generate a new key
+    #
+    key = do_generate_key
+
+    #
+    # Make sure it doesn't match the last one
+    #
+    assert_not_equal(key.to_der, @ssl.key.to_der)
+
+    File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write key.to_pem}
+    @ssl.key_file = @domain.directory+"/config/ssl.key"
+    
+    assert_equal(key.to_der, @ssl.key.to_der)
   end
 
   def test_certificate_chain_file
+    # TODO: Requires setting up a dummy CA + intermediate bundle.
   end
 
   def test_certificate_chain
+    # TODO: Requires setting up a dummy CA + intermediate bundle.
   end
 
   def test_avilable_certificate_files
     #
+    # Generate a key and cert
+    #
+    key, crt = do_generate_key_and_crt(@domain.name)
+
+    #
     # Write the certificate in various forms
     #
-    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write @crt.to_pem+@key.to_pem}
-    File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write @crt.to_pem+@key.to_pem}
-    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write @crt.to_pem}
-    File.open(@domain.directory+"/config/ssl.cert","w+"){|fh| fh.write @crt.to_pem}
-    File.open(@domain.directory+"/config/ssl.pem","w+"){|fh| fh.write @crt.to_pem}
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+    File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
+    File.open(@domain.directory+"/config/ssl.cert","w+"){|fh| fh.write crt.to_pem}
+    File.open(@domain.directory+"/config/ssl.pem","w+"){|fh| fh.write crt.to_pem}
     
     #
     # Combined is preferred
@@ -131,7 +296,7 @@ class SSLConfigTest < Test::Unit::TestCase
     # If a combined file contains a non-matching cert+key, don't return it
     #
     new_key = do_generate_key
-    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write @crt.to_pem + new_key.to_pem}
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem + new_key.to_pem}
 
     assert_equal( %w(key crt cert pem).collect{|ext| @domain.directory+"/config/ssl."+ext},
                   @ssl.available_certificate_files )
@@ -139,11 +304,16 @@ class SSLConfigTest < Test::Unit::TestCase
 
   def test_available_keys
     #
+    # Generate a key and cert
+    #
+    key, crt = do_generate_key_and_crt(@domain.name)
+
+    #
     # Write the key to a number of files
     #
-    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write @crt.to_pem+@key.to_pem}
-    File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write @key.to_pem}
-    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write @crt.to_pem}
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+    File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write key.to_pem}
+    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
     
     #
     # Combined is preferred
@@ -155,17 +325,27 @@ class SSLConfigTest < Test::Unit::TestCase
     # If a combined file contains a non-matching cert+key, don't return it
     #
     new_key = do_generate_key
-    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write @crt.to_pem + new_key.to_pem}
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem + new_key.to_pem}
     assert_equal( [@domain.directory+"/config/ssl.key"], 
                   @ssl.available_key_files )
   end
 
   def test_find_matching_certificate_and_key
     #
+    # Generate a key and cert
+    #
+    key, crt = do_generate_key_and_crt(@domain.name)
+
+    #
+    # If no key and cert are found, nil is returned.
+    #
+    assert_nil( @ssl.find_matching_certificate_and_key )
+
+    #
     # Initially, the combined cert should contain both the certificate and the key
     #
-    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write @crt.to_pem+@key.to_pem}
-    File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write @crt.to_pem+@key.to_pem}
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+    File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write crt.to_pem+key.to_pem}
     assert_equal( [@domain.directory+"/config/ssl.combined"]*2, 
                   @ssl.find_matching_certificate_and_key )
 
@@ -179,26 +359,42 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     # Now recreate a key which is only a key, and see if we get the correct cert returned.
     #
-    File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write @key.to_pem}
-    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write @crt.to_pem}
+    File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write key.to_pem}
+    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
     assert_equal( [@domain.directory+"/config/ssl.crt", @domain.directory+"/config/ssl.key"], 
                   @ssl.find_matching_certificate_and_key )
     
     #
-    # Now generate a new key.  Watch it fail
+    # Now generate a new key, and corrupt the combined certificate.
+    # find_matching_certificate_and_key should now return the separate,
+    # matching key and cert.
     #
     new_key = do_generate_key
-    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write @crt.to_pem + new_key.to_pem}
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem + new_key.to_pem}
     assert_equal( [@domain.directory+"/config/ssl.crt", @domain.directory+"/config/ssl.key"],
                   @ssl.find_matching_certificate_and_key )
+
+    #
+    # Now remove the crt file, leaving the duff combined cert, and the other
+    # key.  This should return nil, since the combined file contains the
+    # certificate that matches the *separate* key, and a non-matching key,
+    # rendering it useless.
+    #
+    FileUtils.rm_f(@domain.directory+"/config/ssl.crt")
+    assert_nil(@ssl.find_matching_certificate_and_key)
+
   end
 
   def test_verify
     #
+    # Generate a key and cert
+    #
+    key, crt = do_generate_key_and_crt(@domain.name)
+
+    #
     # Write a combined cert
     #
-    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write @crt.to_pem+@key.to_pem}
-
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
 
     #
     # Now make sure it verifies OK
@@ -214,7 +410,7 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     # Now write a combined cert with a duff key.  This should not verify.
     #
-    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write @crt.to_pem+do_generate_key.to_pem}
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+do_generate_key.to_pem}
     assert_raise(OpenSSL::X509::CertificateError){ @ssl.verify }
    
     #
@@ -223,9 +419,12 @@ class SSLConfigTest < Test::Unit::TestCase
   end
 
   def test_create_ssl_site
+    
+    
   end
 
   def test_outdated?
+
   end
 
 end

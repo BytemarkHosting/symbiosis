@@ -42,19 +42,10 @@ module Symbiosis
     #
     # Is SSL enabled for the domain?
     #
-    # SSL is enabled if we have:
-    #
-    #  /srv/$domain/config/ip
-    #
-    # And one of:
-    #
-    #  /srv/$domain/config/ssl.key
-    #  /srv/$doamin/config/ssl.combined
+    # SSL is enabled if an IP has been set, as well as matching key and certificate.
     #
     def ssl_enabled?
-      File.exists?( "#{self.config_dir}/ip" ) and 
-       ( File.exists?( "#{self.config_dir}/ssl.key" ) or 
-         File.exists?( "#{self.config_dir}/ssl.combined" ) )
+      self.ip and not self.find_matching_certificate_and_key.nil? 
     end
 
     #
@@ -76,34 +67,46 @@ module Symbiosis
     #
     def remove_site
 
-      if ( File.exists?( "/etc/apache2/sites-enabled/#{@domain}.ssl" ) )
-        File.unlink( "/etc/apache2/sites-enabled/#{@domain}.ssl" )
+      if ( File.exists?( "#{self.apache_dir}/sites-enabled/#{@domain}.ssl" ) )
+        File.unlink( "#{self.apache_dir}/sites-enabled/#{@domain}.ssl" )
       end
 
-      if ( File.exists?( "/etc/apache2/sites-available/#{@domain}.ssl" ) )
-        File.unlink( "/etc/apache2/sites-available/#{@domain}.ssl" )
+      if ( File.exists?( "#{self.apache_dir}/sites-available/#{@domain}.ssl" ) )
+        File.unlink( "#{self.apache_dir}/sites-available/#{@domain}.ssl" )
       end
     end
 
     #
-    # Return the IP for this domain.
+    # Return the IP for this domain, or nil if no IP has been set.
     #
     def ip
-      File.open( File.join( self.config_dir, "ip" ) ){|fh| fh.readlines}.first.chomp
+      if File.exists?( File.join( self.config_dir, "ip" ) )
+        File.open( File.join( self.config_dir, "ip" ) ){|fh| fh.readlines}.first.chomp
+      else
+        nil
+      end
     end
 
     #
     # Returns the X509 certificate object
     #
     def certificate
-      OpenSSL::X509::Certificate.new(File.read(self.certificate_file))
+      if self.certificate_file.nil?
+        nil
+      else
+        OpenSSL::X509::Certificate.new(File.read(self.certificate_file))
+      end
     end
 
     #
     # Returns the RSA key object
     #
     def key
-      OpenSSL::PKey::RSA.new(File.read(self.key_file))
+      if self.key_file.nil?
+        nil
+      else
+        OpenSSL::PKey::RSA.new(File.read(self.key_file))
+      end
     end
 
     #
@@ -124,7 +127,7 @@ module Symbiosis
     def certificate_chain
       certificate_chain = OpenSSL::X509::Store.new
       certificate_chain.set_default_paths
-      certificate_chain.add_file(self.certificate_chain_file) if self.certificate_chain_file
+      certificate_chain.add_file(self.certificate_chain_file) unless self.certificate_chain_file.nil?
       certificate_chain
     end
                 
@@ -340,7 +343,7 @@ module Symbiosis
     #
     # creation time of the (previously generated) SSL-site.
     #
-    site = File.mtime( "/etc/apache2/sites-available/#{@domain}.ssl" )
+    site = File.mtime( "#{self.apache_dir}/sites-available/#{@domain}.ssl" )
 
 
     #
