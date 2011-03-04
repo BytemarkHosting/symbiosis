@@ -1,4 +1,5 @@
 require 'openssl'
+require 'erb'
 
 #
 # A helper class which copes with SSL-domains.
@@ -35,10 +36,17 @@ module Symbiosis
     end
 
     #
+    # Returns the DocumentRoot for the domain.
+    #
+    def domain_directory
+      File.join(@root_path, "srv", @domain)
+    end
+
+    #
     # Returns the configuration directory for this domain
     #
     def config_dir
-      File.join(@root_path, "srv", @domain, "config")
+      File.join(self.domain_directory, "config")
     end
 
     #
@@ -61,7 +69,7 @@ module Symbiosis
     # Is there an Apache site enabled for this domain?
     #
     def site_enabled?
-      File.exists?( File.join( self.apache_dir, "sites-enabled", "#{@domain}.ssl" )  )
+      File.exists?( File.join( self.apache_dir, "sites-enabled", "#{@domain}.conf" )  )
     end
 
     #
@@ -72,16 +80,25 @@ module Symbiosis
     end
 
     #
-    # Remove the apache file.
+    # Returns the bundle filename + the apache directive
     #
-    def remove_site
+    def bundle
+      return "" unless bundle_file
+      
+      "SSLCertificateChainFile #{config_dir}/ssl.bundle"
+    end
 
-      if ( File.exists?( "#{self.apache_dir}/sites-enabled/#{@domain}.ssl" ) )
-        File.unlink( "#{self.apache_dir}/sites-enabled/#{@domain}.ssl" )
-      end
+    #
+    # Returns the certificate (+key) snippet 
+    #
+    def certificate
+      return nil unless certificate_file and key_file
 
-      if ( File.exists?( "#{self.apache_dir}/sites-available/#{@domain}.ssl" ) )
-        File.unlink( "#{self.apache_dir}/sites-available/#{@domain}.ssl" )
+      if certificate_file == key_file
+        "SSLCertificateFile #{certificate_file}"
+      else
+        "SSLCertificateFile #{certificate_file}"
+        "SSLCertificateKeyFile #{key_file}"
       end
     end
 
@@ -99,7 +116,7 @@ module Symbiosis
     #
     # Returns the X509 certificate object
     #
-    def certificate
+    def x509_certificate
       if self.certificate_file.nil?
         nil
       else
@@ -271,25 +288,25 @@ module Symbiosis
       # Firstly check that the certificate is valid for the domain.
       #
       #
-      unless OpenSSL::SSL.verify_certificate_identity(self.certificate, @domain) or OpenSSL::SSL.verify_certificate_identity(self.certificate, "www.#{@domain}")
+      unless OpenSSL::SSL.verify_certificate_identity(self.x509_certificate, @domain) or OpenSSL::SSL.verify_certificate_identity(self.x509_certificate, "www.#{@domain}")
         raise OpenSSL::X509::CertificateError, "The certificate subject is not valid for this domain."
       end
 
       # Check that the certificate is current
       # 
       #
-      if self.certificate.not_before > Time.now 
+      if self.x509_certificate.not_before > Time.now 
         raise OpenSSL::X509::CertificateError, "The certificate is not valid yet."
       end
 
-      if self.certificate.not_after < Time.now 
+      if self.x509_certificate.not_after < Time.now 
         raise OpenSSL::X509::CertificateError, "The certificate has expired."
       end
 
       # Next check that the key matches the certificate.
       #
       #
-      unless self.certificate.check_private_key(self.key)
+      unless self.x509_certificate.check_private_key(self.key)
         raise OpenSSL::X509::CertificateError, "The certificate's public key does not match the supplied private key."
       end
      
@@ -299,15 +316,15 @@ module Symbiosis
       # First see if we can verify it using our own private key, i.e. the
       # certificate is self-signed.
       #
-      if self.certificate.verify(self.key)
+      if self.x509_certificate.verify(self.key)
         puts "\tUsing a self-signed certificate." if $VERBOSE
 
       #
       # Otherwise see if we can verify it using the certificate store,
       # including any bundle that has been uploaded.
       #
-      elsif self.certificate_store.verify(self.certificate)
-        puts "\tUsing certificate signed by #{self.certificate.issuer.to_s}" if $VERBOSE
+      elsif self.certificate_store.verify(self.x509_certificate)
+        puts "\tUsing certificate signed by #{self.x509_certificate.issuer.to_s}" if $VERBOSE
 
       #
       # If we can't verify -- raise an error.
@@ -322,7 +339,7 @@ module Symbiosis
     #
     # Update Apache to create a site for this domain.
     #
-    def create_ssl_site( tf = File.join(self.root_path, "etc/symbiosis/apache.d/ssl.template.erb") )
+    def config_snippet( tf = File.join(self.root_path, "etc/symbiosis/apache.d/ssl.template.erb") )
 
       #
       #  Read the template file.
@@ -332,22 +349,45 @@ module Symbiosis
       #
       #  Create a template object.
       #
-      template = ERB.new( content )
+      ERB.new( content ).result( binding )
+    end
 
+    def write_configuration(config = self.config_snippet)
       #
       # Write out to sites-enabled
       #
-      File.open( File.join( self.apache_dir, "sites-available/#{@domain}.ssl", "w" ) ) do |file|
-        file.write template.result(binding)
+      File.open( File.join( self.apache_dir, "sites-available/#{@domain}.conf"), "w+" ) do |file|
+        file.write config
       end
-
-      #
-      #  Now link in the file
-      #
-      File.symlink( File.join( self.apache_dir, "sites-available/#{@domain}.ssl" ),
-                    File.join( self.apache_dir, "sites-enabled/#{@domain}.ssl"   ) )
-
     end
+
+    def configuration_ok?
+      return false unless File.executable?("/usr/sbin/apache2")
+
+      output = []
+      IO.popen( "/usr/sbin/apache2 -C 'Include /etc/apache2/mods-enabled/*.load' -C 'Include /etc/apache2/mods-enabled/*.conf' -f #{File.join( self.apache_dir, "sites-available/#{@domain}.conf")} -t 2>&1 ") {|io| output = io.readlines }
+
+      "Syntax OK" == output.last.chomp
+    end
+
+    def enable_site
+      if configuration_ok?
+        #  Now link in the file
+        #
+        File.symlink( File.join( self.apache_dir, "sites-available/#{@domain}.conf" ),
+                      File.join( self.apache_dir, "sites-enabled/#{@domain}.conf"   ) )
+      end
+    end
+    
+    #
+    # Remove the apache file.
+    #
+    def disable_site
+      if ( File.exists?( "#{self.apache_dir}/sites-enabled/#{@domain}.conf" ) )
+        File.unlink( "#{self.apache_dir}/sites-enabled/#{@domain}.conf" )
+      end
+    end
+
 
     #
     # Does the SSL site need updating because a file is more
@@ -358,7 +398,7 @@ module Symbiosis
       #
       # creation time of the (previously generated) SSL-site.
       #
-      site = File.mtime( "#{self.apache_dir}/sites-available/#{@domain}.ssl" )
+      site = File.mtime( "#{self.apache_dir}/sites-available/#{@domain}.conf" )
 
 
       #

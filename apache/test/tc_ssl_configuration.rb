@@ -209,7 +209,7 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     # Return nil if no certificate filename has been set
     #
-    assert_nil(@ssl.certificate)
+    assert_nil(@ssl.x509_certificate)
 
     #
     # Now write the file
@@ -220,8 +220,8 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     # Now it should read back the combined file correctly
     #
-    assert_kind_of(crt.class, @ssl.certificate)
-    assert_equal(crt.to_der, @ssl.certificate.to_der)
+    assert_kind_of(crt.class, @ssl.x509_certificate)
+    assert_equal(crt.to_der, @ssl.x509_certificate.to_der)
 
     #
     # Generate a new certificate
@@ -230,14 +230,14 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     # Make sure it doesn't match the last one
     #
-    assert_not_equal(crt.to_der, @ssl.certificate.to_der)
+    assert_not_equal(crt.to_der, @ssl.x509_certificate.to_der)
 
     File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
     @ssl.certificate_file = @domain.directory+"/config/ssl.crt"
     #
     # Now it should read back the individual file correctly
     #
-    assert_equal(crt.to_der, @ssl.certificate.to_der)
+    assert_equal(crt.to_der, @ssl.x509_certificate.to_der)
   end
   
   #
@@ -523,8 +523,109 @@ class SSLConfigTest < Test::Unit::TestCase
     assert_nothing_raised{ @ssl.verify }
   end
 
-  def test_create_ssl_site
+  def test_configuration
+    #
+    # Set the IP address
+    #
+    ip = "1.2.3.4"
+    File.open(@domain.directory+"/config/ip","w+"){|fh| fh.puts ip}
 
+    #
+    # Generate a key and certificate
+    #
+    key, crt = do_generate_key_and_crt(@domain.name, key)
+
+    ######
+    #
+    # Write them into a combined file
+    #
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+
+    #
+    # Find a matching key and certificate
+    #
+    @ssl.certificate_file, @ssl.key_file = @ssl.find_matching_certificate_and_key
+    assert_nothing_raised{ @ssl.verify }
+
+    #
+    # Form the configuration snippet
+    #
+    if File.exists?("../etc/symbiosis/apache.d/ssl.template.erb")
+      snippet = @ssl.config_snippet("../etc/symbiosis/apache.d/ssl.template.erb")
+    else
+      snippet = @ssl.config_snippet
+    end 
+
+    %w(sites-enabled sites-available).each do |d|
+      FileUtils.mkdir_p(@ssl.apache_dir+"/"+d)
+    end
+
+    assert_nothing_raised{ @ssl.write_configuration(snippet) }
+
+    assert(@ssl.configuration_ok?)
+
+    ####
+    # 
+    # Now we do separate key+cert
+    #
+    File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write key.to_pem}
+    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
+
+    #
+    # Find a matching key and certificate
+    #
+    @ssl.certificate_file, @ssl.key_file = @ssl.find_matching_certificate_and_key
+    assert_nothing_raised{ @ssl.verify }
+
+    #
+    # Form the configuration snippet
+    #
+    if File.exists?("../etc/symbiosis/apache.d/ssl.template.erb")
+      snippet = @ssl.config_snippet("../etc/symbiosis/apache.d/ssl.template.erb")
+    else
+      snippet = @ssl.config_snippet
+    end
+
+    %w(sites-enabled sites-available).each do |d|
+      FileUtils.mkdir_p(@ssl.apache_dir+"/"+d)
+    end
+
+    assert_nothing_raised{ @ssl.write_configuration(snippet) }
+
+    assert(@ssl.configuration_ok?)
+
+    ###
+    #
+    # Now we add a bundle
+    #
+    ca_cert = OpenSSL::X509::Certificate.new(File.read("RootCA/RootCA.crt"))
+    ca_key  = OpenSSL::PKey::RSA.new(File.read("RootCA/RootCA.key"))
+    #
+    # Regenerate our crt 
+    #
+    crt = do_generate_crt(@domain.name, key, ca_cert, ca_key)
+    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
+    FileUtils.cp("RootCA/RootCA.crt",@domain.directory+"/config/ssl.bundle")
+    assert_nothing_raised{ @ssl.verify }
+
+    #
+    # Form the configuration snippet
+    #
+    if File.exists?("../etc/symbiosis/apache.d/ssl.template.erb")
+      snippet = @ssl.config_snippet("../etc/symbiosis/apache.d/ssl.template.erb")
+    else
+      snippet = @ssl.config_snippet
+    end
+
+    %w(sites-enabled sites-available).each do |d|
+      FileUtils.mkdir_p(@ssl.apache_dir+"/"+d)
+    end
+
+    assert_nothing_raised{ @ssl.write_configuration(snippet) }
+
+    assert(@ssl.configuration_ok?)
+
+ 
   end
 
   def test_outdated?

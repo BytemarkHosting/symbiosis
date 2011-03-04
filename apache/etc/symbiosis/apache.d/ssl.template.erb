@@ -23,18 +23,29 @@
 ##
 ###
 
-NameVirtualHost <%= ip() %>:443
+NameVirtualHost <%= ip %>:443
 
-<VirtualHost <%= ip() %>:443>
+<VirtualHost <%= ip %>:443>
+
+        ServerName  <%= domain %>
+        ServerAlias www.<%= domain %>
 
         SSLEngine On
-        SSLCertificateFile <%= certificate %>
-        <% if key_file != certificate_file  %>
-        SSLKeyFile <%= certificate %>
-        <% end %>
-        <% if certificate_chain_file %>
-        SSLCertificateChainFile <%= bundle() %>
-        <% end %>
+
+        #
+        # The certificate, key, and intermediate bundle (if needed)
+        #
+        <%= certificate %>
+        <%= bundle %>
+
+        #
+        # Sane SSL ciphers.
+        #
+        SSLCipherSuite ALL:!LOW:!SSLv2:!EXP:!aNULL
+
+        #
+        # And some options
+        #
         SSLOptions +StrictRequire
 
 
@@ -51,7 +62,7 @@ NameVirtualHost <%= ip() %>:443
         #
         #  Allow users to override settings via .htaccess
         #
-        <Directory "/srv">
+        <Directory <%=domain_directory%> >
                 AllowOverride all
         </Directory>
 
@@ -66,12 +77,12 @@ NameVirtualHost <%= ip() %>:443
         #
         #  The document root
         #
-        DocumentRoot     /srv/<%= @domain %>/public/htdocs/
+        DocumentRoot <%= domain_directory %>/public/htdocs
 
         #
         # General CGI Handling
         #
-        ScriptAlias /cgi-bin/ /srv/<%= @domain %>/public/cgi-bin/
+        ScriptAlias /cgi-bin/ <%= domain_directory %>/public/cgi-bin/
         <Location /cgi-bin>
                 Options +ExecCGI
         </Location>
@@ -83,25 +94,24 @@ NameVirtualHost <%= ip() %>:443
         # made against, so that the cron-job in /etc/cron.daily may generate
         # statistics for each domain.
         #
-        ErrorLog   /var/log/apache2/<%= @domain %>.ssl.error.log
-        CustomLog  /var/log/apache2/<%= @domain %>.ssl.access.log combined
+        ErrorLog   /var/log/apache2/<%= domain %>.ssl.error.log
+        CustomLog  /var/log/apache2/<%= domain %>.ssl.access.log combined
 </VirtualHost>
 
 
 
-NameVirtualHost <%= ip() %>:80
+NameVirtualHost <%= ip %>:80
 
-<VirtualHost <%= ip() %>:80>
+<VirtualHost <%= ip %>:80>
 
 <% if mandatory_ssl? %>
         #
         #  All accesses redirect to the HTTPS version of
         # the site.
         #
-        Redirect / https://<%= @domain %>/
+        Redirect / https://<%= domain %>/
 
 <% else %>
-
         #
         #  This is the directory people are redirected to
         # if their site is empty.
@@ -115,7 +125,7 @@ NameVirtualHost <%= ip() %>:80
         #
         #  Allow users to override settings via .htaccess
         #
-        <Directory "/srv">
+        <Directory <%=domain_directory%> >
                 AllowOverride all
         </Directory>
 
@@ -130,25 +140,23 @@ NameVirtualHost <%= ip() %>:80
         #
         #  The document root
         #
-        DocumentRoot     /srv/<%= @domain %>/public/htdocs/
+        DocumentRoot     <%= domain_directory %>/public/htdocs/
 
         #
         # General CGI Handling
         #
-        ScriptAlias /cgi-bin/ /srv/<%= @domain %>/public/cgi-bin/
+        ScriptAlias /cgi-bin/ <%= domain_directory %>/public/cgi-bin/
         <Location /cgi-bin>
                 Options +ExecCGI
         </Location>
-
-
 
         #
         #  We need to log the virtual hostname the incoming request was
         # made against, so that the cron-job in /etc/cron.daily may generate
         # statistics for each domain.
         #
-        ErrorLog   /var/log/apache2/<%= @domain %>.error.log
-        CustomLog  /var/log/apache2/<%= @domain %>.access.log combined
+        ErrorLog   /var/log/apache2/<%= domain %>.error.log
+        CustomLog  /var/log/apache2/<%= domain %>.access.log combined
 <% end %>
 </VirtualHost>
 
