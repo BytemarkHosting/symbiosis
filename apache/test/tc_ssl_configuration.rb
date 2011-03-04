@@ -17,12 +17,13 @@ require 'pp'
 require 'symbiosis/ssl_configuration'
 require 'symbiosis/test/http'
 
+TMP_PATH = File.join("/tmp", "#{__FILE__}.#{$$}")
 
 module Symbiosis 
   module Test
     class Http
       def directory
-        File.join("/tmp", "srv", @name)
+        File.join(TMP_PATH, "srv", @name)
       end
     end
   end
@@ -39,7 +40,7 @@ class SSLConfigTest < Test::Unit::TestCase
     @domain.create
 
     @ssl = Symbiosis::SSLConfiguration.new(@domain.name)
-    @ssl.root_path = "/tmp"
+    @ssl.root_path = TMP_PATH
 
     #
     # Copy some SSL certs over
@@ -50,7 +51,7 @@ class SSLConfigTest < Test::Unit::TestCase
 
   def teardown
     @domain.destroy unless $DEBUG
-    FileUtils.rmdir "/tmp/srv"
+    FileUtils.rm_rf TMP_PATH unless $DEBUG
   end
 
   #####
@@ -283,7 +284,7 @@ class SSLConfigTest < Test::Unit::TestCase
     #
   end
 
-  def test_certificate_chain
+  def test_certificate_store
     # TODO: Requires setting up a dummy CA + intermediate bundle.
   end
 
@@ -523,8 +524,7 @@ class SSLConfigTest < Test::Unit::TestCase
   end
 
   def test_create_ssl_site
-    
-    
+
   end
 
   def test_outdated?

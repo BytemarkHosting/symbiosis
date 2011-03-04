@@ -24,6 +24,7 @@ module Symbiosis
       @bundle = nil
       @root_path = "/"
       @ca_paths = []
+      @certificate_chain_file = nil
     end
 
     #
@@ -132,12 +133,12 @@ module Symbiosis
     #
     # Returns the X509 certificate store, including any specified chain file
     #
-    def certificate_chain
-      certificate_chain = OpenSSL::X509::Store.new
-      certificate_chain.set_default_paths
-      @ca_paths.each{|path| certificate_chain.add_path(path)}
-      certificate_chain.add_file(self.certificate_chain_file) unless self.certificate_chain_file.nil?
-      certificate_chain
+    def certificate_store
+      certificate_store = OpenSSL::X509::Store.new
+      certificate_store.set_default_paths
+      @ca_paths.each{|path| certificate_store.add_path(path)}
+      certificate_store.add_file(self.certificate_chain_file) unless self.certificate_chain_file.nil?
+      certificate_store
     end
                 
     #
@@ -267,115 +268,115 @@ module Symbiosis
     end
 
     def verify
-    # Firstly check that the certificate is valid for the domain.
-    #
-    #
-    unless OpenSSL::SSL.verify_certificate_identity(self.certificate, @domain) or OpenSSL::SSL.verify_certificate_identity(self.certificate, "www.#{@domain}")
-      raise OpenSSL::X509::CertificateError, "Certificate subject is not valid for this domain."
-    end
-
-    # Check that the certificate is current
-    # 
-    #
-    if self.certificate.not_before > Time.now 
-      raise OpenSSL::X509::CertificateError, "Certificate is not valid yet."
-    end
-
-    if self.certificate.not_after < Time.now 
-      raise OpenSSL::X509::CertificateError, "Certificate has expired."
-    end
-
-    # Next check that the key matches the certificate.
-    #
-    #
-    unless self.certificate.check_private_key(self.key)
-      raise OpenSSL::X509::CertificateError, "Private key does not match certificate."
-    end
-   
-    # 
-    # Now check the signature
-    #
-    if self.certificate.issuer.to_s == self.certificate.subject.to_s
+      # Firstly check that the certificate is valid for the domain.
       #
-      # Firstly for a self-signed certificate check the signature on the
-      # certificate was made by our key.
       #
-      # This should never fail!
-      unless self.certificate.verify(self.key)
-        raise OpenSSL::X509::CertificateError, "Private key does not match that on the certificate's signature."
+      unless OpenSSL::SSL.verify_certificate_identity(self.certificate, @domain) or OpenSSL::SSL.verify_certificate_identity(self.certificate, "www.#{@domain}")
+        raise OpenSSL::X509::CertificateError, "The certificate subject is not valid for this domain."
       end
-    else
+
+      # Check that the certificate is current
       # 
-      # Otherwise for a CA-signed certificate, make sure the signature can be
-      # verified using the usual store of certificates on the machine,
-      # including any bundle that has been left lying around.
       #
-      unless self.certificate_chain.verify(self.certificate)
-        raise OpenSSL::X509::CertificateError, "Certificate does not verify -- maybe a bundle is missing?" 
+      if self.certificate.not_before > Time.now 
+        raise OpenSSL::X509::CertificateError, "The certificate is not valid yet."
       end
+
+      if self.certificate.not_after < Time.now 
+        raise OpenSSL::X509::CertificateError, "The certificate has expired."
+      end
+
+      # Next check that the key matches the certificate.
+      #
+      #
+      unless self.certificate.check_private_key(self.key)
+        raise OpenSSL::X509::CertificateError, "The certificate's public key does not match the supplied private key."
+      end
+     
+      # 
+      # Now check the signature.
+      #
+      # First see if we can verify it using our own private key, i.e. the
+      # certificate is self-signed.
+      #
+      if self.certificate.verify(self.key)
+        puts "\tUsing a self-signed certificate." if $VERBOSE
+
+      #
+      # Otherwise see if we can verify it using the certificate store,
+      # including any bundle that has been uploaded.
+      #
+      elsif self.certificate_store.verify(self.certificate)
+        puts "\tUsing certificate signed by #{self.certificate.issuer.to_s}" if $VERBOSE
+
+      #
+      # If we can't verify -- raise an error.
+      #
+      else
+        raise OpenSSL::X509::CertificateError, "Certificate signature does not verify -- maybe a bundle is missing?" 
+      end
+
+      true
     end
 
-    true
-  end
+    #
+    # Update Apache to create a site for this domain.
+    #
+    def create_ssl_site( tf = File.join(self.root_path, "etc/symbiosis/apache.d/ssl.template.erb") )
 
-  #
-  # Update Apache to create a site for this domain.
-  #
-  def create_ssl_site( tf = File.join(self.root_path, "etc/symbiosis/apache.d/ssl.template.erb") )
+      #
+      #  Read the template file.
+      #
+      content = File.open( tf, "r" ).read()
 
-    #
-    #  Read the template file.
-    #
-    content = File.open( tf, "r" ).read()
+      #
+      #  Create a template object.
+      #
+      template = ERB.new( content )
 
-    #
-    #  Create a template object.
-    #
-    template = ERB.new( content )
+      #
+      # Write out to sites-enabled
+      #
+      File.open( File.join( self.apache_dir, "sites-available/#{@domain}.ssl", "w" ) ) do |file|
+        file.write template.result(binding)
+      end
 
-    #
-    # Write out to sites-enabled
-    #
-    File.open( File.join( self.apache_dir, "sites-available/#{@domain}.ssl", "w" ) ) do |file|
-      file.write template.result(binding)
+      #
+      #  Now link in the file
+      #
+      File.symlink( File.join( self.apache_dir, "sites-available/#{@domain}.ssl" ),
+                    File.join( self.apache_dir, "sites-enabled/#{@domain}.ssl"   ) )
+
     end
 
     #
-    #  Now link in the file
+    # Does the SSL site need updating because a file is more
+    # recent than the generated Apache site?
     #
-    File.symlink( File.join( self.apache_dir, "sites-available/#{@domain}.ssl" ),
-                  File.join( self.apache_dir, "sites-enabled/#{@domain}.ssl"   ) )
+    def outdated?
 
-  end
-
-  #
-  # Does the SSL site need updating because a file is more
-  # recent than the generated Apache site?
-  #
-  def outdated?
-
-    #
-    # creation time of the (previously generated) SSL-site.
-    #
-    site = File.mtime( "#{self.apache_dir}/sites-available/#{@domain}.ssl" )
+      #
+      # creation time of the (previously generated) SSL-site.
+      #
+      site = File.mtime( "#{self.apache_dir}/sites-available/#{@domain}.ssl" )
 
 
-    #
-    #  For each configuration file see if it is more recent
-    #
-    files = %w( ssl.combined ssl.key ssl.bundle ip )
+      #
+      #  For each configuration file see if it is more recent
+      #
+      files = %w( ssl.combined ssl.key ssl.bundle ip )
 
-    files.each do |file|
-      if ( File.exists?( File.join( self.config_dir, file ) ) )
-        mtime = File.mtime(  File.join( self.config_dir, file ) )
-        if ( mtime > site )
-          return true
+      files.each do |file|
+        if ( File.exists?( File.join( self.config_dir, file ) ) )
+          mtime = File.mtime(  File.join( self.config_dir, file ) )
+          if ( mtime > site )
+            return true
+          end
         end
       end
+
+      false
     end
 
-    false
   end
-
-end
 end
