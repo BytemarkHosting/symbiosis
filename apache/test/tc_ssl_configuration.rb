@@ -70,12 +70,20 @@ class SSLConfigTest < Test::Unit::TestCase
   #
   # Returns a new certificate given a key
   #
-  def do_generate_crt(domain, key=nil, ca=nil)
+  def do_generate_crt(domain, key=nil, ca_cert=nil, ca_key=nil)
     #
     # Generate a key if none has been specified
     #
     key = do_generate_key if key.nil?
 
+    #
+    # Check CA key and cert
+    #
+    if !ca_cert.nil? and !ca_key.nil? and !ca_cert.check_private_key(ca_key)
+      warn "CA certificate and key do not match -- not using." 
+      ca_cert = ca_key = nil
+    end
+  
     # Generate the request 
     csr            = OpenSSL::X509::Request.new
     csr.version    = 0
@@ -90,11 +98,11 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     # Theoretically we could use a CA to sign the cert.
     #
-    if ca.nil?
+    if ca_cert.nil? or ca_key.nil?
+      warn "Not setting the issuer as the CA because the CA key is not set" if !ca_cert.nil? and ca_key.nil?
       crt.issuer    = csr.subject
     else
-      # FIXME
-      raise "Cannot sign cert with a CA yet.  FIXME!"
+      crt.issuer   = ca_cert.subject
     end
     crt.public_key = csr.public_key
     crt.not_before = Time.now
@@ -106,16 +114,23 @@ class SSLConfigTest < Test::Unit::TestCase
     crt.serial     = @@serial
     @@serial += 1
     crt.version    = 1 
-    crt.sign( key, OpenSSL::Digest::SHA1.new )
+
+    if ca_cert.nil? or ca_key.nil?
+      warn "Not signing certificate with CA key because the CA certificate is not set" if ca_cert.nil? and !ca_key.nil?
+      crt.sign( key, OpenSSL::Digest::SHA1.new )  
+    else
+      crt.sign( ca_key, OpenSSL::Digest::SHA1.new )
+    end
+
     crt
   end
   
   #
   # Returns a key and certificate
   #
-  def do_generate_key_and_crt(domain, ca=nil)
+  def do_generate_key_and_crt(domain, ca_cert=nil, ca_key=nil)
     key = do_generate_key
-    return [key, do_generate_crt(domain, key, ca)]
+    return [key, do_generate_crt(domain, key, ca_cert, ca_key)]
   end
   
   ####
@@ -265,6 +280,7 @@ class SSLConfigTest < Test::Unit::TestCase
 
   def test_certificate_chain_file
     # TODO: Requires setting up a dummy CA + intermediate bundle.
+    #
   end
 
   def test_certificate_chain
@@ -385,7 +401,7 @@ class SSLConfigTest < Test::Unit::TestCase
 
   end
 
-  def test_verify
+  def test_verify_self_signed
     #
     # Generate a key and cert
     #
@@ -401,6 +417,10 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     assert_nothing_raised{ @ssl.certificate_file = @domain.directory+"/config/ssl.combined" }
     assert_nothing_raised{ @ssl.key_file         = @domain.directory+"/config/ssl.combined" }
+
+    #
+    # This should not verify yet
+    #
     assert_nothing_raised{ @ssl.verify }
 
     #
@@ -412,10 +432,78 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+do_generate_key.to_pem}
     assert_raise(OpenSSL::X509::CertificateError){ @ssl.verify }
-   
+  end
+
+  def test_verify_with_root_ca
     #
-    # TODO: Work out how to do bundled verifications. Ugh.
+    # Use our intermediate CA.
     #
+    ca_cert = OpenSSL::X509::Certificate.new(File.read("RootCA/RootCA.crt"))
+    ca_key  = OpenSSL::PKey::RSA.new(File.read("RootCA/RootCA.key"))
+
+    #
+    # Add the Root CA path
+    # 
+    @ssl.add_ca_path("./RootCA/")
+
+    #
+    # Generate a key and cert
+    #
+    key = do_generate_key
+    crt = do_generate_crt(@domain.name, key, ca_cert, ca_key)
+
+    #
+    # Write a combined cert
+    #
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+
+    #
+    # This should verify now 
+    #
+    assert_nothing_raised{ @ssl.certificate_file = @domain.directory+"/config/ssl.combined" }
+    assert_nothing_raised{ @ssl.key_file         = @domain.directory+"/config/ssl.combined" }
+    assert_nothing_raised{ @ssl.verify }
+  end
+
+  def test_verify_with_intermediate_ca
+    #
+    # Use our intermediate CA.
+    #
+    ca_cert = OpenSSL::X509::Certificate.new(File.read("IntermediateCA/IntermediateCA.crt"))
+    ca_key  = OpenSSL::PKey::RSA.new(File.read("IntermediateCA/IntermediateCA.key"))
+
+    #
+    # Add the Root CA path
+    # 
+    @ssl.add_ca_path("./RootCA/")
+
+    #
+    # Generate a key and cert
+    #
+    key = do_generate_key
+    crt = do_generate_crt(@domain.name, key, ca_cert, ca_key)
+
+    #
+    # Write a combined cert
+    #
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+
+    #
+    # This should not verify yet, as the bundle hasn't been copied in place.
+    #
+    assert_nothing_raised{ @ssl.certificate_file = @domain.directory+"/config/ssl.combined" }
+    assert_nothing_raised{ @ssl.key_file         = @domain.directory+"/config/ssl.combined" }
+    assert_raise(OpenSSL::X509::CertificateError){ @ssl.verify }
+
+    #
+    # Now copy the bundle in place
+    #
+    FileUtils.cp("IntermediateCA/IntermediateCA.crt",@domain.directory+"/config/ssl.bundle")
+
+    #
+    # Now it should verify just fine.
+    #
+    assert_nothing_raised{ @ssl.verify }
   end
 
   def test_create_ssl_site

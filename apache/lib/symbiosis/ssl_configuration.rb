@@ -23,6 +23,7 @@ module Symbiosis
       @key = nil
       @bundle = nil
       @root_path = "/"
+      @ca_paths = []
     end
 
     #
@@ -37,6 +38,13 @@ module Symbiosis
     #
     def config_dir
       File.join(@root_path, "srv", @domain, "config")
+    end
+
+    #
+    # Add a path with extra SSL certs for testing
+    #
+    def add_ca_path(path)
+      @ca_paths << path if File.directory?(path)
     end
 
     #
@@ -127,6 +135,7 @@ module Symbiosis
     def certificate_chain
       certificate_chain = OpenSSL::X509::Store.new
       certificate_chain.set_default_paths
+      @ca_paths.each{|path| certificate_chain.add_path(path)}
       certificate_chain.add_file(self.certificate_chain_file) unless self.certificate_chain_file.nil?
       certificate_chain
     end
@@ -280,15 +289,15 @@ module Symbiosis
     #
     #
     unless self.certificate.check_private_key(self.key)
-      raise OpenSSL::X509::CertificateError, "Private key does not match certificate."
+      raise OpenSSL::X509::CertificateError, "Private key does not match certificate )a."
     end
     
     # Now check the certificate can be verified by the key.  Well I *think*
     # that is what the Certificate#verify method is for.
     #
-    unless self.certificate.verify(self.key)
-      raise OpenSSL::X509::CertificateError, "Private key does not match certificate."
-    end
+    #unless self.certificate.verify(self.key)
+    #  raise OpenSSL::X509::CertificateError, "Private key does not match certificate (b)."
+    #end
 
     # At this point, return if certificate is self-signed
     #
