@@ -3,7 +3,7 @@
 set -e
 
 BUILDER=${BUILDER:-symbiosis-builder.sh.bytemark.co.uk}
-PACKAGE_DIR=${PACKAGE_DIR:-current}
+PACKAGE_DIR=${PACKAGE_DIR:-lenny}
 
 #
 # Make sure we're up to date
