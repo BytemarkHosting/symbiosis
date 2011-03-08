@@ -4,7 +4,7 @@ set -e
 
 GUESTNAME=${GUESTNAME:-symtester}
 BUILDER=${BUILDER:-symbiosis-builder.sh.bytemark.co.uk}
-PACKAGE_DIR=${PACKAGE_DIR:-current}
+PACKAGE_DIR=${PACKAGE_DIR:-squeeze}
 
 mkdir -p "/srv/$GUESTNAME.test/config/"
 touch    "/srv/$GUESTNAME.test/config/antivirus"
