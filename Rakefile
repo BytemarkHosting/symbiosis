@@ -12,7 +12,7 @@ AVAILABLE_BUILD_ARCH=["amd64", "i386"]
 CLEAN.add   %w(Release.asc Packages.new Sources.new Release.new *-stamp)
 CLOBBER.add %w(Packages Sources Packages.gz Sources.gz Release Release.gpg *.deb *.tar.gz *.build *.diff.gz *.dsc *.changes)
   
-DISTRO = File.basename(FileUtils.pwd)
+DISTRO = "squeeze"
 
 #
 # Monkey patch rake to output on stdout like normal people
@@ -314,32 +314,33 @@ rsync_args = %w(
 
 rsync_excludes = %w(*/ Makefile Rakefile TODO README .hgignore AUTOBUILD .hgtags)
 
-hg_number  = `hg id -n -r tip`.chomp
+hg_number  = `hg id -i -r tip`.chomp
+htdocs_home = File.join(ENV['HOME'],"htdocs",DISTRO)
 
-file "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
+file "#{htdocs_home}/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
   cmd = %w(rsync) + rsync_args
   rsync_excludes.each do |ex|
     cmd << "--exclude '#{ex}'"
   end
-  sh "#{cmd.join(" ")} --times $PWD/ #{ENV['HOME']}/htdocs/#{hg_number}"
-  rm "#{ENV['HOME']}/htdocs/#{DISTRO}"
+  sh "#{cmd.join(" ")} --times $PWD/ #{htdocs_home}/#{hg_number}"
+  rm "#{htdocs_home}/current"
 end
 
-file "#{ENV["HOME"]}/htdocs/#{DISTRO}" => "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" do |t|
-  sh "cd #{ENV["HOME"]}/htdocs && ln -sf #{hg_number} #{DISTRO}"
+file "#{htdocs_home}/current" => "#{htdocs_home}/#{hg_number}/Release.gpg" do |t|
+  sh "cd #{htdocs_home} && ln -sf #{hg_number} current"
 end
 
 AVAILABLE_BUILD_ARCH.each do |arch|
-  file "#{ENV["HOME"]}/htdocs/#{DISTRO}/#{arch}" => "#{ENV["HOME"]}/htdocs/#{DISTRO}" do |t|
+  file "#{htdocs_home}/current/#{arch}" => "#{htdocs_home}/current" do |t|
     sh "cd #{t.prerequisites.first} && ln -sf . #{arch}"
   end
 end 
 
 desc "Upload packages to the local tree" 
-task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/#{DISTRO}/#{arch}"}
+task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/current/#{arch}"}
 
 desc "Upload packages to mirror. !DANGER!" 
-task "upload-live" => ["#{ENV['HOME']}/htdocs/lenny"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/lenny/#{arch}"} do |t|
+task "upload-live" => ["#{htdocs_home}/lenny"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/lenny/#{arch}"} do |t|
   sh "rsync -Pr --delete #{t.prerequisites.first}/ repo@mirroir.sh:htdocs/symbiosis/lenny/"
 end
 
