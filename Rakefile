@@ -315,7 +315,6 @@ rsync_args = %w(
 rsync_excludes = %w(*/ Makefile Rakefile TODO README .hgignore AUTOBUILD .hgtags)
 
 hg_number  = `hg id -n -r tip`.chomp
-release = "current"
 
 file "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
   cmd = %w(rsync) + rsync_args
@@ -323,21 +322,21 @@ file "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
     cmd << "--exclude '#{ex}'"
   end
   sh "#{cmd.join(" ")} --times $PWD/ #{ENV['HOME']}/htdocs/#{hg_number}"
-  rm "#{ENV['HOME']}/htdocs/#{release}"
+  rm "#{ENV['HOME']}/htdocs/#{DISTRO}"
 end
 
-file "#{ENV["HOME"]}/htdocs/#{release}" => "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" do |t|
-  sh "cd #{ENV["HOME"]}/htdocs && ln -sf #{hg_number} #{release}"
+file "#{ENV["HOME"]}/htdocs/#{DISTRO}" => "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" do |t|
+  sh "cd #{ENV["HOME"]}/htdocs && ln -sf #{hg_number} #{DISTRO}"
 end
 
 AVAILABLE_BUILD_ARCH.each do |arch|
-  file "#{ENV["HOME"]}/htdocs/#{release}/#{arch}" => "#{ENV["HOME"]}/htdocs/#{release}" do |t|
+  file "#{ENV["HOME"]}/htdocs/#{DISTRO}/#{arch}" => "#{ENV["HOME"]}/htdocs/#{DISTRO}" do |t|
     sh "cd #{t.prerequisites.first} && ln -sf . #{arch}"
   end
 end 
 
 desc "Upload packages to the local tree" 
-task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/#{release}/#{arch}"}
+task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/#{DISTRO}/#{arch}"}
 
 desc "Upload packages to mirror. !DANGER!" 
 task "upload-live" => ["#{ENV['HOME']}/htdocs/lenny"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/lenny/#{arch}"} do |t|
