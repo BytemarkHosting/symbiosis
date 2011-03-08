@@ -3,7 +3,6 @@
 set -e
 
 BUILDER=${BUILDER:-symbiosis-builder.sh.bytemark.co.uk}
-PACKAGE_DIR=${PACKAGE_DIR:-lenny}
 
 #
 # Make sure we're up to date
@@ -25,7 +24,7 @@ echo "Changing package lists..."
 #
 # Now change the package lists
 #
-sed -i -e "s#http://\(vhost\|symbiosis\).bytemark.co.uk/[^ ]\+#http://$BUILDER/$PACKAGE_DIR#g" /etc/apt/sources.list{,.security}
+sed -i -e "s#http://\(vhost\|symbiosis\).bytemark.co.uk/[^ ]\+#http://$BUILDER/lenny/current#g" /etc/apt/sources.list{,.security}
 
 echo "Doing second upgrade..."
 #
