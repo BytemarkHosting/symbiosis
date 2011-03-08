@@ -1,0 +1,178 @@
+#!/usr/bin/ruby
+#
+# NAME
+#
+#   create-ssl-sites -- Auto-configure SSL sites
+#
+# SYNOPSIS
+#
+#  General Options:
+#
+#   --force       Force the re-creation of all SSL sites.
+#   --template    Specify an alternative template file to read.
+#
+#  Help Options:
+#
+#   --help        Show the help information for this script.
+#   --verbose     Show debugging information.
+#
+# DETAILS
+#
+#   This script is designed to iterate over the domains hosted
+#  upon a Symbiosis system, and configure Apache to listen appropriate
+#  when a domain is configured for SSL hosting and not yet configured.
+#
+# AUTHOR
+#
+#   Steve Kemp <steve@bytemark.co.uk>
+#
+
+
+require 'erb'
+require 'getoptlong'
+require 'symbiosis/domains'
+require 'symbiosis/ssl_configuration'
+
+
+#
+#  Entry point to the code
+#
+$FORCE    = false
+$HELP     = false
+$TEMPLATE = nil
+$VERBOSE  = false
+#
+#  Do we need to restart apache?
+#
+$RESTART=false
+
+opts = GetoptLong.new(
+         [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+         [ '--template', '-t', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--force', '-f', GetoptLong::NO_ARGUMENT ]
+       )
+
+opts.each do |opt, arg|
+  case opt
+  when '--help'
+    $HELP = true
+  when '--verbose'
+    $VERBOSE = true
+  when '--template'
+    $TEMPLATE = arg
+  when '--force'
+    $FORCE = true
+  end
+end
+
+#
+# CAUTION! Here be quality kode.
+#
+if $HELP
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
+
+  lines.each do |line|
+    line.chomp!
+    break if line.empty?
+    puts line[2..-1].to_s
+  end
+
+  exit 0
+end
+
+def verbose(s)
+  puts s if $VERBOSE
+end
+
+#
+#  For each domain.
+#
+Symbiosis::Domains.new.domains.each do |domain|
+
+  verbose "Domain: #{domain} "
+
+  #
+  #  Create a helper for the domain.
+  #
+  helper = SSLConfiguration.new( domain )
+
+  #
+  #  If SSL is not enabled then we can skip
+  #
+  if ( helper.ssl_enabled? )
+
+    verbose "\tSSL is enabled"
+
+    #
+    #  If there is already a site enabled we only
+    # need to touch it if one of the SSL-files is more
+    # recent than the generated file.
+    #
+    #  e.g. User adds /config/ssl.combined and a site
+    # is generated but broken because a mandatory bundle is missing.
+    #
+
+
+    if ( $FORCE )
+      verbose "\tForcing re-creation of configuration due to --force"
+
+    elsif helper.site_enabled?
+
+      if helper.changed?
+        verbose "\tNot updating configuration, as it has been edited by hand"
+        next
+
+      elsif helper.outdated? 
+        verbose "\tRe-creating configuration as it is older than the input file(s)"
+
+      else
+        verbose "\tSite already present and up-to date."
+        next
+
+      end
+
+    else
+      verbose "\tConfiguring site for the first time"
+
+    end
+
+    if helper.site_enabled?
+      verbose "\tDisabling site"
+      helper.disable_site
+      # Definitely restart if the site has been disabled
+      $RESTART = true
+    end
+
+    verbose "\tGenerating configuration snippet"
+    snippet = helper.config_snippet( $TEMPLATE )
+
+    verbose "\tWriting configuration"
+    helper.write_configuration( snippet )
+
+    #
+    # This gets apache2 to check the configuration.
+    #
+    if helper.configuration_ok?
+      verbose "\tEnabling site"
+      helper.enable_site
+      # Definitely restart if the site has been disabled
+      $RESTART = true
+    else
+      verbose "\tNot enabling site as Apache has rejected the configuration"
+    end
+  else
+
+    verbose "\tSSL is not enabled"
+  end
+end
+
+#
+#  All done.
+#
+if ( $RESTART )
+  verbose "Restarting Apache"
+
+  system( "/etc/init.d/apache2 restart" )
+end

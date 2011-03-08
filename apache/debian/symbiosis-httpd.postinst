@@ -269,6 +269,12 @@ else
     makessl=1
 fi
 
+#
+# Rename ssl.pem to ssl.crt.
+#
+if [ -e /etc/ssl/ssl.pem ] ; then
+  mv /etc/ssl/ssl.pem /etc/ssl/ssl.crt
+fi
 
 if [ "$makessl" == "1" ]; then
 
@@ -277,12 +283,12 @@ if [ "$makessl" == "1" ]; then
     #
     #  Make the key
     #
-    openssl req  -subj "/C=GB/ST=England/L=York/CN=$(cat /etc/hostname)" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.pem -keyout /etc/ssl/ssl.key
+    openssl req -subj "/C=GB/ST=England/L=York/CN=$(cat /etc/hostname)" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
 
     #
-    #  Combine PEM + Key
+    #  Combine Cert + Key
     #
-    cat /etc/ssl/ssl.key /etc/ssl/ssl.pem > /etc/ssl/ssl.combined
+    cat /etc/ssl/ssl.key /etc/ssl/ssl.crt > /etc/ssl/ssl.combined
 fi
 
 
@@ -291,8 +297,6 @@ fi
 #
 a2ensite zz-mass-hosting           >/dev/null 2>/dev/null
 a2ensite zz-mass-hosting.ssl       >/dev/null 2>/dev/null
-
-
 
 #
 #  Enable common modules
@@ -366,14 +370,27 @@ if [ -e /etc/php5/apache2/php.ini ]; then
     fi
 fi
 
-
 #
 #  If we have additional sites add them
 #
-if [ -x /etc/cron.hourly/configure-additional ]; then
-    /etc/cron.hourly/configure-additional
+if [ -x /usr/sbin/symbiosis-configure-additional ]; then
+    /usr/sbin/symbiosis-configure-additional
+    #
+    # And install the cron job
+    #
+    ln -s /usr/sbin/symbiosis-configure-additional /etc/cron.hourly
 fi
 
+#
+# Install cron jobs
+#
+if [ -x /usr/sbin/symbiosis-configure-ssl ] ; then
+  ln -s /usr/sbin/symbiosis-configure-ssl /etc/cron.hourly
+fi
+
+if [ -x /usr/sbin/symbiosis-make-logs ] ; then
+  ln -s /usr/sbin/symbiosis-make-logs /etc/cron.daily
+fi
 
 #
 #  Restart Apache2.

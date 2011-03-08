@@ -36,6 +36,17 @@ module Symbiosis
     end
 
     #
+    # Returns the site-enabled filename
+    #
+    def sites_enabled_file
+      File.join(self.apache_dir,"sites-enabled","#{@domain}.conf")
+    end
+
+    def sites_available_file
+      File.join(self.apache_dir,"sites-available","#{@domain}.conf")
+    end
+
+    #
     # Returns the DocumentRoot for the domain.
     #
     def domain_directory
@@ -69,7 +80,7 @@ module Symbiosis
     # Is there an Apache site enabled for this domain?
     #
     def site_enabled?
-      File.exists?( File.join( self.apache_dir, "sites-enabled", "#{@domain}.conf" )  )
+      File.exists?( self.sites_enabled_file )
     end
 
     #
@@ -97,8 +108,7 @@ module Symbiosis
       if certificate_file == key_file
         "SSLCertificateFile #{certificate_file}"
       else
-        "SSLCertificateFile #{certificate_file}"
-        "SSLCertificateKeyFile #{key_file}"
+        "SSLCertificateFile #{certificate_file}\nSSLCertificateKeyFile #{key_file}"
       end
     end
 
@@ -142,7 +152,12 @@ module Symbiosis
       if @certificate_chain_file.nil? and File.exists?( File.join( self.config_dir,"ssl.bundle" ) )
         @certificate_chain_file = File.join( self.config_dir,"ssl.bundle" )
       end
-      @certificate_chain_file
+
+      if @certificate_chain_file and File.exists?(@certificate_chain_file)
+        @certificate_chain_file 
+      else
+        nil
+      end
     end
 
     alias bundle_file certificate_chain_file
@@ -356,8 +371,9 @@ module Symbiosis
       #
       # Write out to sites-enabled
       #
-      File.open( File.join( self.apache_dir, "sites-available/#{@domain}.conf"), "w+" ) do |file|
+      File.open( self.sites_available_file, "w+" ) do |file|
         file.write config
+        file.puts "# Checksum MD5 "+OpenSSL::Digest::MD5.new(config).hexdigest
       end
     end
 
@@ -365,7 +381,9 @@ module Symbiosis
       return false unless File.executable?("/usr/sbin/apache2")
 
       output = []
-      IO.popen( "/usr/sbin/apache2 -C 'Include /etc/apache2/mods-enabled/*.load' -C 'Include /etc/apache2/mods-enabled/*.conf' -f #{File.join( self.apache_dir, "sites-available/#{@domain}.conf")} -t 2>&1 ") {|io| output = io.readlines }
+      IO.popen( "/usr/sbin/apache2 -C 'UseCanonicalName off' -C 'Include /etc/apache2/mods-enabled/*.load' -C 'Include /etc/apache2/mods-enabled/*.conf' -f #{self.sites_available_file} -t 2>&1 ") {|io| output = io.readlines }
+
+      warn output.collect{|o| "\t"+o}.join unless "Syntax OK" == output.last.chomp or $VERBOSE
 
       "Syntax OK" == output.last.chomp
     end
@@ -374,8 +392,7 @@ module Symbiosis
       if configuration_ok?
         #  Now link in the file
         #
-        File.symlink( File.join( self.apache_dir, "sites-available/#{@domain}.conf" ),
-                      File.join( self.apache_dir, "sites-enabled/#{@domain}.conf"   ) )
+        File.symlink( self.sites_available_file, self.sites_enabled_file )
       end
     end
     
@@ -383,11 +400,8 @@ module Symbiosis
     # Remove the apache file.
     #
     def disable_site
-      if ( File.exists?( "#{self.apache_dir}/sites-enabled/#{@domain}.conf" ) )
-        File.unlink( "#{self.apache_dir}/sites-enabled/#{@domain}.conf" )
-      end
+      File.unlink( self.sites_enabled_file ) if File.exists?( self.sites_enabled_file )
     end
-
 
     #
     # Does the SSL site need updating because a file is more
@@ -398,24 +412,66 @@ module Symbiosis
       #
       # creation time of the (previously generated) SSL-site.
       #
-      site = File.mtime( "#{self.apache_dir}/sites-available/#{@domain}.conf" )
-
+      site = File.mtime( self.sites_available_file )
 
       #
       #  For each configuration file see if it is more recent
       #
-      files = %w( ssl.combined ssl.key ssl.bundle ip )
-
-      files.each do |file|
-        if ( File.exists?( File.join( self.config_dir, file ) ) )
-          mtime = File.mtime(  File.join( self.config_dir, file ) )
-          if ( mtime > site )
-            return true
-          end
-        end
+      %w( ssl.combined ssl.key ssl.bundle ip ).each do |file|
+        file = File.join( self.config_dir, file )
+        return true if File.exists?( file ) and File.mtime( file ) > site 
       end
 
       false
+    end
+
+
+    #
+    # This opens the config sni
+    #
+    def changed?
+      #
+      # Read the snippet
+      #
+      snippet = File.readlines(self.sites_available_file)
+      
+      #
+      # We expect the checksum to be the last line of the file
+      #
+      if snippet.last.chomp =~ /^# Checksum MD5 ([a-f0-9]{32,32})$/
+        #
+        # OK we've found the checksum
+        #
+
+        supposed_checksum = $1
+
+        #
+        # Pop off the last line, as this isn't part of the checksum
+        #
+        snippet.pop
+        
+        #
+        # And compare to the calculated checksum of the rest of the snippet
+        #
+        return OpenSSL::Digest::MD5.new(snippet.join).hexdigest != supposed_checksum
+      
+      #
+      # We're OK if the file has a big warning in it.
+      #
+      elsif snippet.any?{|l| "# DO NOT EDIT THIS FILE - CHANGES WILL BE OVERWRITTEN" == l.chomp}
+        #
+        # So return true
+        #
+        return false
+
+      end
+
+      #
+      # Assume the file has been edited.  
+      #
+      puts "\tCould not find checksum or big warning." if $VERBOSE
+
+      true
     end
 
   end

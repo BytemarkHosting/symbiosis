@@ -1,3 +1,4 @@
+#!/usr/bin/ruby 
 
 # OK we're running this test locally
 unless File.dirname( File.expand_path( __FILE__ ) ) == "/etc/symbiosis/test.d"
@@ -46,7 +47,7 @@ class SSLConfigTest < Test::Unit::TestCase
     # Copy some SSL certs over
     #
     FileUtils.mkdir_p(@domain.directory+"/config")
-    
+
   end
 
   def teardown
@@ -84,7 +85,7 @@ class SSLConfigTest < Test::Unit::TestCase
       warn "CA certificate and key do not match -- not using." 
       ca_cert = ca_key = nil
     end
-  
+
     # Generate the request 
     csr            = OpenSSL::X509::Request.new
     csr.version    = 0
@@ -125,7 +126,7 @@ class SSLConfigTest < Test::Unit::TestCase
 
     crt
   end
-  
+
   #
   # Returns a key and certificate
   #
@@ -133,7 +134,7 @@ class SSLConfigTest < Test::Unit::TestCase
     key = do_generate_key
     return [key, do_generate_crt(domain, key, ca_cert, ca_key)]
   end
-  
+
   ####
   #
   # Tests start here.
@@ -151,7 +152,7 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     # Now set an IP.  This should still return false.
     #
-    ip = "1.2.3.4"
+    ip = "80.68.88.52"
     File.open(@domain.directory+"/config/ip","w+"){|fh| fh.puts ip}
     assert( !@ssl.ssl_enabled? )
 
@@ -164,6 +165,9 @@ class SSLConfigTest < Test::Unit::TestCase
   end
 
   def test_site_enabled?
+    #
+    # The site is enabled if the etc/apache2/sites-enabled/domain.ssl exists
+    #
 
   end
 
@@ -193,7 +197,7 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     # Now we set an IP
     #
-    ip = "1.2.3.4"
+    ip = "80.68.88.52"
     File.open(@domain.directory+"/config/ip","w+"){|fh| fh.puts ip}
     assert_equal(@ssl.ip, ip)
 
@@ -239,7 +243,7 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     assert_equal(crt.to_der, @ssl.x509_certificate.to_der)
   end
-  
+
   #
   # Sh
   #
@@ -248,7 +252,7 @@ class SSLConfigTest < Test::Unit::TestCase
     # Generate a key and cert
     #
     key, crt = do_generate_key_and_crt(@domain.name)
-    
+
     #
     # Return nil if no certificate filename has been set
     #
@@ -275,7 +279,7 @@ class SSLConfigTest < Test::Unit::TestCase
 
     File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write key.to_pem}
     @ssl.key_file = @domain.directory+"/config/ssl.key"
-    
+
     assert_equal(key.to_der, @ssl.key.to_der)
   end
 
@@ -302,7 +306,7 @@ class SSLConfigTest < Test::Unit::TestCase
     File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
     File.open(@domain.directory+"/config/ssl.cert","w+"){|fh| fh.write crt.to_pem}
     File.open(@domain.directory+"/config/ssl.pem","w+"){|fh| fh.write crt.to_pem}
-    
+
     #
     # Combined is preferred
     #
@@ -331,7 +335,7 @@ class SSLConfigTest < Test::Unit::TestCase
     File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
     File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write key.to_pem}
     File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
-    
+
     #
     # Combined is preferred
     #
@@ -372,7 +376,7 @@ class SSLConfigTest < Test::Unit::TestCase
     FileUtils.rm_f(@domain.directory+"/config/ssl.combined")
     assert_equal( [@domain.directory+"/config/ssl.key"]*2,
                   @ssl.find_matching_certificate_and_key )
-   
+
     #
     # Now recreate a key which is only a key, and see if we get the correct cert returned.
     #
@@ -380,7 +384,7 @@ class SSLConfigTest < Test::Unit::TestCase
     File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
     assert_equal( [@domain.directory+"/config/ssl.crt", @domain.directory+"/config/ssl.key"], 
                   @ssl.find_matching_certificate_and_key )
-    
+
     #
     # Now generate a new key, and corrupt the combined certificate.
     # find_matching_certificate_and_key should now return the separate,
@@ -434,7 +438,7 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+new_key.to_pem}
     assert_raise(OpenSSL::X509::CertificateError){ @ssl.verify }
-    
+
     #
     # Now sign the certificate with this new key.  This should cause the verification to fail.
     #
@@ -527,109 +531,204 @@ class SSLConfigTest < Test::Unit::TestCase
     #
     # Set the IP address
     #
-    ip = "1.2.3.4"
+    ip = "80.68.88.52"
     File.open(@domain.directory+"/config/ip","w+"){|fh| fh.puts ip}
 
-    #
-    # Generate a key and certificate
-    #
-    key, crt = do_generate_key_and_crt(@domain.name, key)
-
-    ######
-    #
-    # Write them into a combined file
-    #
-    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
-
-    #
-    # Find a matching key and certificate
-    #
-    @ssl.certificate_file, @ssl.key_file = @ssl.find_matching_certificate_and_key
-    assert_nothing_raised{ @ssl.verify }
-
-    #
-    # Form the configuration snippet
-    #
-    if File.exists?("../etc/symbiosis/apache.d/ssl.template.erb")
-      snippet = @ssl.config_snippet("../etc/symbiosis/apache.d/ssl.template.erb")
-    else
-      snippet = @ssl.config_snippet
-    end 
-
     %w(sites-enabled sites-available).each do |d|
       FileUtils.mkdir_p(@ssl.apache_dir+"/"+d)
     end
 
-    assert_nothing_raised{ @ssl.write_configuration(snippet) }
-
-    assert(@ssl.configuration_ok?)
-
-    ####
-    # 
-    # Now we do separate key+cert
     #
-    File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write key.to_pem}
-    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
-
+    # Generate a key
     #
-    # Find a matching key and certificate
+    key = do_generate_key
     #
-    @ssl.certificate_file, @ssl.key_file = @ssl.find_matching_certificate_and_key
-    assert_nothing_raised{ @ssl.verify }
-
+    # Generate a certificate
     #
-    # Form the configuration snippet
-    #
-    if File.exists?("../etc/symbiosis/apache.d/ssl.template.erb")
-      snippet = @ssl.config_snippet("../etc/symbiosis/apache.d/ssl.template.erb")
-    else
-      snippet = @ssl.config_snippet
-    end
+    crt = do_generate_crt(@domain.name, key)
 
-    %w(sites-enabled sites-available).each do |d|
-      FileUtils.mkdir_p(@ssl.apache_dir+"/"+d)
-    end
-
-    assert_nothing_raised{ @ssl.write_configuration(snippet) }
-
-    assert(@ssl.configuration_ok?)
-
-    ###
     #
     # Now we add a bundle
     #
     ca_cert = OpenSSL::X509::Certificate.new(File.read("RootCA/RootCA.crt"))
     ca_key  = OpenSSL::PKey::RSA.new(File.read("RootCA/RootCA.key"))
-    #
-    # Regenerate our crt 
-    #
-    crt = do_generate_crt(@domain.name, key, ca_cert, ca_key)
-    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
-    FileUtils.cp("RootCA/RootCA.crt",@domain.directory+"/config/ssl.bundle")
-    assert_nothing_raised{ @ssl.verify }
+    bundle_crt = do_generate_crt(@domain.name, key, ca_cert, ca_key)
+
+    test_cases = {
+     "combined" => {"combined" => crt.to_pem+key.to_pem},
+     "separate" => {"key" => key.to_pem, "crt" => crt.to_pem},
+     "separate with bundle" => {"key" => key.to_pem, "crt" => bundle_crt.to_pem, "bundle" => ca_cert.to_pem},
+     "combined with bundle" => {"combined" => key.to_pem + bundle_crt.to_pem, "bundle" => ca_cert.to_pem}
+    }
 
     #
-    # Form the configuration snippet
     #
-    if File.exists?("../etc/symbiosis/apache.d/ssl.template.erb")
-      snippet = @ssl.config_snippet("../etc/symbiosis/apache.d/ssl.template.erb")
-    else
-      snippet = @ssl.config_snippet
+    # For each of the templates, run the test.
+    #
+    configs = ["../apache.d/ssl.template.erb"] +  Dir.glob("apache.d/*.erb")
+    raise "cannot test templates because none exist" unless configs.length > 0
+
+    configs.each do |template|
+      #
+      # Run each of the test cases
+      #
+
+      test_cases.each do |test_case, files|
+        [true, false].each do |mandatory_ssl|
+          #
+          # Write each of the test files
+          #
+          files.each do |ext, contents|
+            File.open(@domain.directory+"/config/ssl.#{ext}", "w+"){|fh| fh.write contents}
+          end
+
+          #
+          # Make sure we can handle mandatory SSL
+          #
+          FileUtils.touch(@domain.directory+"/config/ssl-only") if mandatory_ssl
+
+          #
+          # Find a matching key and certificate
+          #
+          @ssl.certificate_file, @ssl.key_file = @ssl.find_matching_certificate_and_key
+
+          assert_nothing_raised{ @ssl.verify }
+
+          snippet = nil
+
+          #
+          # Form the configuration snippet
+          #
+          assert_nothing_raised("Could not interpolate for #{template} nad #{test_case}"){ snippet = @ssl.config_snippet(template)} 
+
+          #
+          # Test snippet for essential lines
+          #
+          assert_match(/NameVirtualHost\s+#{ip}:80/,  snippet)
+          assert_match(/NameVirtualHost\s+#{ip}:443/, snippet)
+          assert_match(/<VirtualHost\s+#{ip}:80>/,    snippet)
+          assert_match(/<VirtualHost\s+#{ip}:443>/,   snippet)
+          
+          #
+          # Make sure both a cert and key are used when needed
+          #
+          if files.has_key?("crt") or files.has_key?("key") 
+            assert_match(/^\s*SSLCertificateFile\s+#{@domain.directory}\/config\/ssl\.crt/,    snippet)
+            assert_match(/^\s*SSLCertificateKeyFile\s+#{@domain.directory}\/config\/ssl\.key/, snippet)
+          end
+
+          #
+          # Make sure there is just a certificate file when a combined key/cert is used
+          #
+          if files.has_key?("combined")
+            assert_match(/^\s*SSLCertificateFile\s+#{@domain.directory}\/config\/ssl\.combined/, snippet) 
+            assert_no_match(/^\s*SSLCertificateKeyFile\s+/, snippet)
+          end
+
+          #
+          # Make sure the bundle lines are there if a bundle is configured.
+          #
+          if files.has_key?("bundle")
+            assert_match(/^\s*SSLCertificateChainFile\s+#{@domain.directory}\/config\/ssl\.bundle/, snippet)
+          else
+            assert_no_match(/^\s*SSLCertificateChainFile\s+/, snippet)
+          end
+
+          #
+          # If mandatory SSL is switched on, then make sure there is a redirect in place.
+          #
+          if mandatory_ssl
+            assert_match(/^\s*Redirect \/ https:\/\/#{@domain.name}/, snippet)
+          end
+  
+          #
+          # Write the snippet
+          #
+          assert_nothing_raised("Could not write configuration for #{template} and #{test_case}"){ @ssl.write_configuration(snippet) }
+
+          #
+          # Make sure Apache is happy with it.
+          #
+          assert(@ssl.configuration_ok?, "Apache2 rejected configuration for #{template} and #{test_case}")
+
+          #
+          # Clean up
+          #
+          files.keys.each do |ext|
+            FileUtils.rm(@domain.directory+"/config/ssl.#{ext}")
+          end
+          FileUtils.rm(@domain.directory+"/config/ssl-only") if mandatory_ssl
+
+        end
+      end
     end
-
-    %w(sites-enabled sites-available).each do |d|
-      FileUtils.mkdir_p(@ssl.apache_dir+"/"+d)
-    end
-
-    assert_nothing_raised{ @ssl.write_configuration(snippet) }
-
-    assert(@ssl.configuration_ok?)
-
- 
   end
 
   def test_outdated?
+    #
+    # The config snippet is out of date if
+    #
+    #  (a) the IP file has changed
+    #  (b) any of the SSL files have changed.
+    #
+    #
+    # TODO
+  end
 
+  def test_changed?
+    #
+    # A file is deemed changed if one of 
+    #
+    # (a) The automatically generated checksum is different from the checksum of the file
+    # (b) There is now big warning saying that changes will be overwritten
+    #
+    # are true.
+
+    test_apache_config =<<EOF
+#
+# This is a pretend configuration file, that is complete bunkum.
+#
+#
+<Location /:412>
+  SomeApacheNonsense on
+  OtherApacheNonsesn off
+  SiteName testything.com
+  Blah yes
+  Nonsense certainly
+</Location>
+EOF
+    checksum_line = "# Checksum MD5 "+OpenSSL::Digest::MD5.new(test_apache_config).hexdigest
+
+    FileUtils.mkdir_p(File.dirname(@ssl.sites_available_file))
+    File.open(@ssl.sites_available_file, "w+"){ |fh| fh.puts test_apache_config  }
+
+    # This initial config does not contain the big warning, or an MD5 sum, so it should be seen as "changed".
+    #
+    assert(@ssl.changed?)
+
+    #
+    # OK, now add the MD5 sum, and magically the file should appear as unedited..
+    #
+    File.open(@ssl.sites_available_file, "a"){ |fh| fh.puts checksum_line  }
+    assert(!@ssl.changed?)
+
+    #
+    # OK now we'll edit the file, keeping the checksum the same.
+    #
+    edited_apache_config = test_apache_config.gsub("on","off")
+    assert_not_equal(test_apache_config, edited_apache_config)
+
+    #
+    # Write the config file, and see if we've changed it.
+    #
+    File.open(@ssl.sites_available_file, "w+"){ |fh| fh.puts edited_apache_config; fh.puts checksum_line  }
+    assert(@ssl.changed?)
+
+    #
+    # Now instead add the big warning to the file
+    #
+    File.open(@ssl.sites_available_file, "w+"){ |fh| fh.puts "# DO NOT EDIT THIS FILE - CHANGES WILL BE OVERWRITTEN"; fh.puts edited_apache_config }
+    assert(!@ssl.changed?)
   end
 
 end
