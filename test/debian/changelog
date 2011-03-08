@@ -1,42 +1,42 @@
-symbiosis-test (2010:0914) stable; urgency=low
+symbiosis-test (2010:0914) oldstable; urgency=low
 
   * Removed dovecot test -- now in email package.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 22:00:54 +0100
 
-symbiosis-test (2010:0908) stable; urgency=low
+symbiosis-test (2010:0908) oldstable; urgency=low
 
   * Fixed spelling mistake in module name
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Sep 2010 14:31:14 +0100
 
-symbiosis-test (2010:0817) stable; urgency=low
+symbiosis-test (2010:0817) oldstable; urgency=low
 
   * Renamed testing modules from Bytemark::Vhost to Symbiosis
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 19 Aug 2010 14:31:13 +0100
 
-symbiosis-test (2010:0623) stable; urgency=low
+symbiosis-test (2010:0623) oldstable; urgency=low
 
   * Updated to load tests from /etc/symbiosis/test.d/ not
     /etc/bytemark-vhost.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 23 Jun 2010 12:14:16 +0000
 
-symbiosis-test (2010:0610) stable; urgency=low
+symbiosis-test (2010:0610) oldstable; urgency=low
 
   * Updated standards versions.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 10 Jun 2010 14:44:41 +0000
 
-symbiosis-test (2010:0603) stable; urgency=low
+symbiosis-test (2010:0603) oldstable; urgency=low
 
   * Renamed package
   * Switched to dpkg-source 3.0 (native) format
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:34 +0100
 
-bytemark-vhost-test (20090707183253) stable; urgency=low
+bytemark-vhost-test (20090707183253) oldstable; urgency=low
 
   * Updated bytemark-vhost-test script to call each script locally.
 
@@ -50,25 +50,25 @@ bytemark-vhost-test (20090707175721) jaunty; urgency=low
 
  -- Patrick J. Cherry <patrick@bytemark.co.uk>  Tue, 07 Jul 2009 17:57:21 +0100
 
-bytemark-vhost-test (20090707153244) stable; urgency=low
+bytemark-vhost-test (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
 
-bytemark-vhost-test (20090522105210) stable; urgency=low
+bytemark-vhost-test (20090522105210) oldstable; urgency=low
 
   * New release for Lenny.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
 
-bytemark-vhost-test (20081110153344) stable; urgency=low
+bytemark-vhost-test (20081110153344) oldstable; urgency=low
 
   * Added tests for missing files, to ensure 404s are returned as expected.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 12 Nov 2008 10:00:01 +0000
 
-bytemark-vhost-test (20081110153344) stable; urgency=low
+bytemark-vhost-test (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package bytemark-vhost-test
     - Support may be found at http://vhost.bytemark.co.uk/

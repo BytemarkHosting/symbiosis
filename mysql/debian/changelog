@@ -1,10 +1,10 @@
-symbiosis-mysql (2010:0914) stable; urgency=low
+symbiosis-mysql (2010:0914) oldstable; urgency=low
 
   * Tidied packaging 
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:57:59 +0100
 
-symbiosis-mysql (2010:0604) stable; urgency=low
+symbiosis-mysql (2010:0604) oldstable; urgency=low
 
   * Renamed package
   * Switched to dpkg-source 3.0 (native) format
@@ -13,25 +13,25 @@ symbiosis-mysql (2010:0604) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 04 Jun 2010 11:05:11 +0000
 
-bytemark-vhost-mysql (20090707153244) stable; urgency=low
+bytemark-vhost-mysql (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
 
-bytemark-vhost-mysql (20090522105210) stable; urgency=low
+bytemark-vhost-mysql (20090522105210) oldstable; urgency=low
 
   * New release for Lenny.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
 
-bytemark-vhost-mysql (20081118175820) stable; urgency=low
+bytemark-vhost-mysql (20081118175820) oldstable; urgency=low
 
   * Disable debugging.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 18 Nov 2008 17:58:15 +0000
 
-bytemark-vhost-mysql (20081110153344) stable; urgency=low
+bytemark-vhost-mysql (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package bytemark-vhost-mysql
     - Support may be found at http://vhost.bytemark.co.uk/

@@ -1,11 +1,11 @@
-symbiosis-backup (2011:0222) stable; urgency=low
+symbiosis-backup (2011:0222) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Use 'bash' explicitly for the post-installation script.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 22 Feb 2011 14:44:41 +0000
 
-symbiosis-backup (2010:1223) stable; urgency=low
+symbiosis-backup (2010:1223) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Throttle the upload of the backups.
@@ -16,27 +16,27 @@ symbiosis-backup (2010:1223) stable; urgency=low
 
  -- Patrick Cherry <patch@desk1.tur.bytemark.co.uk>  Thu, 23 Dec 2010 11:36:44 +0000
 
-symbiosis-backup (2010:0914) stable; urgency=low
+symbiosis-backup (2010:0914) oldstable; urgency=low
 
   * Updated backup scripts to use ruby.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:40:54 +0100
 
-symbiosis-backup (2010:0817) stable; urgency=low
+symbiosis-backup (2010:0817) oldstable; urgency=low
 
   * Only sync down the contents of /localhost/, if present,
     to avoid overwritting uncommited changes.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 17 Aug 2010 10:00:01 +0000
 
-symbiosis-backup (2010:0803) stable; urgency=low
+symbiosis-backup (2010:0803) oldstable; urgency=low
 
   * Updated to preserve any custome source list upon upgrade.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 03 Aug 2010 09:33:09 +0100
 
 
-symbiosis-backup (2010:0706) stable; urgency=low
+symbiosis-backup (2010:0706) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Renamed to symbiosis-backup
@@ -53,7 +53,7 @@ symbiosis-backup (2010:0706) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:28 +0100
 
-bytemark-vhost-simple-backup (20081110153344) stable; urgency=low
+bytemark-vhost-simple-backup (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package bytemark-vhost-simple-backup
     - Support may be found at http://vhost.bytemark.co.uk/

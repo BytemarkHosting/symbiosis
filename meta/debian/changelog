@@ -1,11 +1,11 @@
-bytemark-symbiosis (2010:0817) stable; urgency=low
+bytemark-symbiosis (2010:0817) oldstable; urgency=low
 
   * Remove the old bytemark-vhost init script.
   * Changed "metapackage" & "meta package" to "meta-package" in our description.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 17 Aug 2010 10:11:12 +0000
 
-bytemark-symbiosis (2010:0519) stable; urgency=low
+bytemark-symbiosis (2010:0519) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Renamed the package.
@@ -15,44 +15,44 @@ bytemark-symbiosis (2010:0519) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:31 +0100
 
-bytemark-vhost (2009:1029-1) stable; urgency=low
+bytemark-vhost (2009:1029-1) oldstable; urgency=low
 
   * Updated /etc/motd to have mention of the Bytemark Vhost system.
   * Added an init-script to report the use of vhost.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 29 Oct 2009 10:00:01 +0000
 
-bytemark-vhost (20090707153244) stable; urgency=low
+bytemark-vhost (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
 
-bytemark-vhost (20090522105210) stable; urgency=low
+bytemark-vhost (20090522105210) oldstable; urgency=low
 
   * New release for Lenny.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
 
-bytemark-vhost (20081117163642) stable; urgency=low
+bytemark-vhost (20081117163642) oldstable; urgency=low
 
   * Updated the short description of this package.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 16:36:16 +0000
 
-bytemark-vhost (20081110153347) stable; urgency=low
+bytemark-vhost (20081110153347) oldstable; urgency=low
 
   * No longer rely upon the bytemark-vhost-ssh-protection package.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 11 Nov 2008 16:47:32 +0000
 
-bytemark-vhost (20081110153346) stable; urgency=low
+bytemark-vhost (20081110153346) oldstable; urgency=low
 
   * Updated all dependencies to be in order.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 11 Nov 2008 13:44:31 +0000
 
-bytemark-vhost (20081110153344) stable; urgency=low
+bytemark-vhost (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package bytemark-vhost
     - Support may be found at http://vhost.bytemark.co.uk/

@@ -1,54 +1,54 @@
-symbiosis-monit (2010:0909) stable; urgency=low
+symbiosis-monit (2010:0909) oldstable; urgency=low
 
   * Removed the obsolete bytemark-vhost-monit cronjob.
   * Update the current cronjob to exit if the script isn't installed.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 09 Sep 2010 12:00:21 +0000
 
-symbiosis-monit (2010:0908) stable; urgency=low
+symbiosis-monit (2010:0908) oldstable; urgency=low
 
   * Fixed spelling mistake that caused all the tests to fail all the time.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Sep 2010 14:33:15 +0100
 
-symbiosis-monit (2010:0603) stable; urgency=low
+symbiosis-monit (2010:0603) oldstable; urgency=low
 
   * Renamed package
   * Switched to dpkg-source 3.0 (native) format
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:32 +0100
 
-bytemark-vhost-monit (2009:1028-1) stable; urgency=low
+bytemark-vhost-monit (2009:1028-1) oldstable; urgency=low
 
   * Avoid running if the bytemark-vhost-updater lockfile is present.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Oct 2009 10:22:01 +0000
 
-bytemark-vhost-monit (2009:1027-1) stable; urgency=low
+bytemark-vhost-monit (2009:1027-1) oldstable; urgency=low
 
   * Add bytemark-vhost-updater to our list of exclusions.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 27 Oct 2009 10:13:01 +0000
 
-bytemark-vhost-monit (20090708114218) stable; urgency=low
+bytemark-vhost-monit (20090708114218) oldstable; urgency=low
 
   * Don't run any stop|start|restart actions if apt-get is running.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 8 Jul 2009 11:42:18 +0000
 
-bytemark-vhost-monit (20090707153244) stable; urgency=low
+bytemark-vhost-monit (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
 
-bytemark-vhost-monit (20090522105210) stable; urgency=low
+bytemark-vhost-monit (20090522105210) oldstable; urgency=low
 
   * New release for Lenny.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
 
-bytemark-vhost-monit (20081110153344) stable; urgency=low
+bytemark-vhost-monit (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package bytemark-vhost-monit
     - Support may be found at http://vhost.bytemark.co.uk/

@@ -1,17 +1,17 @@
-symbiosis-range (2010:0923) stable; urgency=low
+symbiosis-range (2010:0923) oldstable; urgency=low
 
   * Added new helper script "symbiosis-ip" to determine the primary
     IP Address of this system.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 23 Sep 2010 10:00:01 +0100
 
-symbiosis-range (2010:0819) stable; urgency=low
+symbiosis-range (2010:0819) oldstable; urgency=low
 
   * Added new Bytemark range of 46.43.0.0/18
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 19 Aug 2010 14:16:37 +0100
 
-symbiosis-range (2010:0528) stable; urgency=low
+symbiosis-range (2010:0528) oldstable; urgency=low
 
   * Moved onto shared ruby library
   * Added backup-space determination
@@ -20,7 +20,7 @@ symbiosis-range (2010:0528) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:33 +0100
 
-bytemark-vhost-range (20090707153244) stable; urgency=low
+bytemark-vhost-range (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 

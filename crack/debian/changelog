@@ -1,17 +1,17 @@
-symbiosis-crack (2010:0914) stable; urgency=low
+symbiosis-crack (2010:0914) oldstable; urgency=low
 
   * Updated URL in test-symbiosis-passwords 
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:46:57 +0100
 
-symbiosis-crack (2010:0809) stable; urgency=low
+symbiosis-crack (2010:0809) oldstable; urgency=low
 
   * Updated the cronjob to run in either an hourly or weekly mode.
   * The alerted email contains useful information.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 9 Aug 2010 09:07:51 +0000
 
-symbiosis-crack (2010:0627) stable; urgency=low
+symbiosis-crack (2010:0627) oldstable; urgency=low
 
   * Install both our binaries to /usr/bin rather than /usr/sbin.
   * Added manpage for the 'passwd-test' binary which was missing one.
@@ -19,7 +19,7 @@ symbiosis-crack (2010:0627) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 27 Jul 2010 15:22:51 +0000
 
-symbiosis-crack (2010:0603) stable; urgency=low
+symbiosis-crack (2010:0603) oldstable; urgency=low
 
   * Renamed package
   * Switched to dpkg-source 3.0 (native) format
@@ -27,19 +27,19 @@ symbiosis-crack (2010:0603) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:29 +0100
 
-bytemark-vhost-crack (20090707153244) stable; urgency=low
+bytemark-vhost-crack (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
 
-bytemark-vhost-crack (20090522105210) stable; urgency=low
+bytemark-vhost-crack (20090522105210) oldstable; urgency=low
 
   * New release for Lenny.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
 
-bytemark-vhost-crack (20081110153344) stable; urgency=low
+bytemark-vhost-crack (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package bytemark-vhost-crack
     - Support may be found at http://vhost.bytemark.co.uk/

@@ -1,4 +1,4 @@
-symbiosis-email (2010:1130) stable; urgency=low
+symbiosis-email (2010:1130) oldstable; urgency=low
 
   * Updated exim4 config to route via DNS for local domains only when those
     domains have MX or SRV records pointing elsewhere (i.e. not A records).
@@ -6,14 +6,14 @@ symbiosis-email (2010:1130) stable; urgency=low
 
  -- Patrick Cherry <patick@bytemark.co.uk>  Tue, 30 Nov 2010 10:45:14 +0000
 
-symbiosis-email (2010:1111) stable; urgency=low
+symbiosis-email (2010:1111) oldstable; urgency=low
 
   * Tightened up SSL cipher versions in Dovecot
   * Removed Exim4 version number from SMTP banner
 
  -- Patrick Cherry <patick@bytemark.co.uk>  Thu, 11 Nov 2010 14:40:47 +0000
 
-symbiosis-email (2010:0914) stable; urgency=low
+symbiosis-email (2010:0914) oldstable; urgency=low
 
   * Moved config from bytemark-vhost.d to symbiosis.d
   * Moved checkpassword script to dovecot_checkpassword
@@ -25,7 +25,7 @@ symbiosis-email (2010:0914) stable; urgency=low
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:53:23 +0100
 
-symbiosis-email (2010:0909) stable; urgency=low
+symbiosis-email (2010:0909) oldstable; urgency=low
 
   * Added in localhost rewriting
   * Fixed tests
@@ -34,7 +34,7 @@ symbiosis-email (2010:0909) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 09 Sep 2010 12:05:12 +0100
 
-symbiosis-email (2010:0603) stable; urgency=low
+symbiosis-email (2010:0603) oldstable; urgency=low
 
   * Split dovecot config into a multiple file layout (like exim4)
   * Unified exim4 and dovecot makefiles
@@ -47,62 +47,62 @@ symbiosis-email (2010:0603) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:30 +0100
 
-bytemark-vhost-email (20090707183051) stable; urgency=low
+bytemark-vhost-email (20090707183051) oldstable; urgency=low
 
   * Fixed exim4 config to defer mail from non-bytemark antispam hosts if
     bytemark-antispam is present.
 
  -- Patrick J. Cherry <patrick@bytemark.co.uk>  Tue, 07 Jul 2009 18:30:52 +0100
 
-bytemark-vhost-email (20090707175243) stable; urgency=low
+bytemark-vhost-email (20090707175243) oldstable; urgency=low
 
   * Updated checkpassword to have a better regex
 
  -- Patrick J. Cherry <patrick@bytemark.co.uk>  Tue, 07 Jul 2009 17:52:44 +0100
 
-bytemark-vhost-email (20090707161820) stable; urgency=low
+bytemark-vhost-email (20090707161820) oldstable; urgency=low
 
   * Removed mention of the Bytemark antispam servers
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 16:18:20 +0000
 
-bytemark-vhost-email (20090707153244) stable; urgency=low
+bytemark-vhost-email (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
 
-bytemark-vhost-email (20090707125946) stable; urgency=low
+bytemark-vhost-email (20090707125946) oldstable; urgency=low
 
   * Fix login
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 12:59:42 +0000
 
-bytemark-vhost-email (20090522105210) stable; urgency=low
+bytemark-vhost-email (20090522105210) oldstable; urgency=low
 
   * New release for Lenny.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
 
-bytemark-vhost-email (20081117170844) stable; urgency=low
+bytemark-vhost-email (20081117170844) oldstable; urgency=low
 
   * Install firewall blacklist patterns.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 17:09:08 +0000
 
-bytemark-vhost-email (20081110153347) stable; urgency=low
+bytemark-vhost-email (20081110153347) oldstable; urgency=low
 
   * Install a dependency upon rdoc
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 12 Nov 2008 15:22:51 +0000
 
-bytemark-vhost-email (20081110153346) stable; urgency=low
+bytemark-vhost-email (20081110153346) oldstable; urgency=low
 
   * Install a non-corrupt cron-job
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 11 Nov 2008 13:13:13 +0000
 
-bytemark-vhost-email (20081110153344) stable; urgency=low
+bytemark-vhost-email (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package bytemark-vhost-email
     - Support may be found at http://vhost.bytemark.co.uk/

@@ -1,4 +1,4 @@
-symbiosis-tinydns (2010:09240) stable; urgency=low
+symbiosis-tinydns (2010:09240) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Pre-Depend upon symbiosis-range - no longer assume eth0.
@@ -9,7 +9,7 @@ symbiosis-tinydns (2010:09240) stable; urgency=low
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 24 Sep 2010 13:43:56 +0100
 
-symbiosis-tinydns (2010:0913) stable; urgency=low
+symbiosis-tinydns (2010:0913) oldstable; urgency=low
 
   * Moved the script out of /etc/cron.hourly/create-dns and to
     /usr/sbin/symbiosis-dns-generate.
@@ -18,14 +18,14 @@ symbiosis-tinydns (2010:0913) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 19 Aug 2010 14:15:16 +0000
 
-symbiosis-tinydns (2010:0810) stable; urgency=low
+symbiosis-tinydns (2010:0810) oldstable; urgency=low
 
   * Avoid displaying obsolete debugging information when first
     running.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 10 Aug 2010 10:33:01 +0000
 
-symbiosis-tinydns (2010:0519) stable; urgency=low
+symbiosis-tinydns (2010:0519) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Don't re-upload the generated DNS contents, unless they are
@@ -36,38 +36,38 @@ symbiosis-tinydns (2010:0519) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:29 +0100
 
-bytemark-vhost-tinydns (20090901094658) stable; urgency=low
+bytemark-vhost-tinydns (20090901094658) oldstable; urgency=low
 
   * Skip /srv/lost+found if present.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 1 Sep 2009 09:46:58 +0000
 
-bytemark-vhost-tinydns (20090707174805) stable; urgency=low
+bytemark-vhost-tinydns (20090707174805) oldstable; urgency=low
 
   * Removed the is-bytemark-ip script, that now lives in the package
     bytemark-vhost-range.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 17:48:05 +0000
 
-bytemark-vhost-tinydns (20090707153244) stable; urgency=low
+bytemark-vhost-tinydns (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
 
-bytemark-vhost-tinydns (20090522105210) stable; urgency=low
+bytemark-vhost-tinydns (20090522105210) oldstable; urgency=low
 
   * New release for Lenny.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
 
-bytemark-vhost-tinydns (20081117163642) stable; urgency=low
+bytemark-vhost-tinydns (20081117163642) oldstable; urgency=low
 
   * Updated the short description of this package.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 16:36:16 +0000
 
-bytemark-vhost-tinydns (20081110153344) stable; urgency=low
+bytemark-vhost-tinydns (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package bytemark-vhost-tinydns
     - Support may be found at http://vhost.bytemark.co.uk/

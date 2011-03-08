@@ -1,4 +1,4 @@
-symbiosis-cron (2010:0914) stable; urgency=low
+symbiosis-cron (2010:0914) oldstable; urgency=low
 
   * Added makefile to build packages
   * Added ruby script to process crontabs
@@ -10,7 +10,7 @@ symbiosis-cron (2010:0914) stable; urgency=low
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:48:37 +0100
 
-symbiosis-cron (2010:0617) stable; urgency=low
+symbiosis-cron (2010:0617) oldstable; urgency=low
 
   * Initial release.
 

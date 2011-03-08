@@ -1,30 +1,30 @@
-symbiosis-updater (2010:1012) stable; urgency=low
+symbiosis-updater (2010:1012) oldstable; urgency=low
 
   * Updated the cron-job such that systems only fetch & apply updates
     Monday to Friday.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 12 Nov 2010 09:22:09 +0100
 
-symbiosis-updater (2010:0915) stable; urgency=low
+symbiosis-updater (2010:0915) oldstable; urgency=low
 
   * Added cron-apt conflict
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 15 Sep 2010 10:09:57 +0100
 
-symbiosis-updater (2010:0914) stable; urgency=low
+symbiosis-updater (2010:0914) oldstable; urgency=low
 
   * Renamed symbiosis-update to symbiosis-updater
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 22:02:28 +0100
 
-symbiosis-updater (2010:0628) stable; urgency=low
+symbiosis-updater (2010:0628) oldstable; urgency=low
 
   * Renamed our binaries to be "symbiosis-update", rather
     than any other name referring to vhost.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 28 Jun 2010 09:44:09 +0000
 
-symbiosis-updater (2010:0528) stable; urgency=low
+symbiosis-updater (2010:0528) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Updated package name.
@@ -35,105 +35,105 @@ symbiosis-updater (2010:0528) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:34 +0100
 
-bytemark-vhost-updater (2009:1126-1) stable; urgency=low
+bytemark-vhost-updater (2009:1126-1) oldstable; urgency=low
 
   * Correctly setup the updater environment such that dpkg is non-interactive.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 26 Nov 2009 14:13:12 +0000
 
-bytemark-vhost-updater (2009:1028-1) stable; urgency=low
+bytemark-vhost-updater (2009:1028-1) oldstable; urgency=low
 
   * Create a lockfile when we're running.
     (/var/tmp/update.packages)
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Oct 2009 10:22:01 +0000
 
-bytemark-vhost-updater (2009:0929-1) stable; urgency=low
+bytemark-vhost-updater (2009:0929-1) oldstable; urgency=low
 
   * Explicitly disable the use of /etc/apt/sources.list.d/
   * Configure debconf to be non-interactive.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 29 Sep 2009 10:57:01 +0000
 
-bytemark-vhost-updater (2009:0916-1) stable; urgency=low
+bytemark-vhost-updater (2009:0916-1) oldstable; urgency=low
 
   * Updated to use epoch-based revision date.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 16 Sep 2009 10:16:01 +0000
 
-bytemark-vhost-updater (20090714103603) stable; urgency=low
+bytemark-vhost-updater (20090714103603) oldstable; urgency=low
 
   * Include our cronjob
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 14 Jul 2009 10:36:03 +0000
 
-bytemark-vhost-updater (20090707153244) stable; urgency=low
+bytemark-vhost-updater (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
 
-bytemark-vhost-updater (200906011113728) stable; urgency=low
+bytemark-vhost-updater (200906011113728) oldstable; urgency=low
 
   * Updated standards version
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 1 Jun 2009 11:37:28 +0000
 
-bytemark-vhost-updater (20090522105210) stable; urgency=low
+bytemark-vhost-updater (20090522105210) oldstable; urgency=low
 
   * New release for Lenny.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
 
-bytemark-vhost-updater (20081119105025) stable; urgency=low
+bytemark-vhost-updater (20081119105025) oldstable; urgency=low
 
   * Don't call home
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 19 Nov 2008 10:50:25 +0000
 
-bytemark-vhost-updater (20081119103805) stable; urgency=low
+bytemark-vhost-updater (20081119103805) oldstable; urgency=low
 
   * Ensure we have a PATH defined.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 19 Nov 2008 10:38:05 +0000
 
-bytemark-vhost-updater (20081119101226) stable; urgency=low
+bytemark-vhost-updater (20081119101226) oldstable; urgency=low
 
   * Definely use the dpkg-confold option correctly.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 19 Nov 2008 10:12:25 +0000
 
-bytemark-vhost-updater (20081118122760) stable; urgency=low
+bytemark-vhost-updater (20081118122760) oldstable; urgency=low
 
   * Use the dpkg-confold option correctly
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 18 Nov 2008 12:27:58 +0000
 
-bytemark-vhost-updater (20081118122325) stable; urgency=low
+bytemark-vhost-updater (20081118122325) oldstable; urgency=low
 
   * Be quiet when running "apt-get update".
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 18 Nov 2008 12:23:19 +0000
 
-bytemark-vhost-updater (20081110153347) stable; urgency=low
+bytemark-vhost-updater (20081110153347) oldstable; urgency=low
 
   * Move updater out of cron.daily and into /usr/bin
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 14 Nov 2008 10:33:01 +0000
 
-bytemark-vhost-updater (20081110153347) stable; urgency=low
+bytemark-vhost-updater (20081110153347) oldstable; urgency=low
 
   * Persist logfiles in /var/log/update-packages
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 12 Nov 2008 16:44:59 +0000
 
-bytemark-vhost-updater (20081110153346) stable; urgency=low
+bytemark-vhost-updater (20081110153346) oldstable; urgency=low
 
   * Updated to avoid sending blank messages.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 12 Nov 2008 12:33:21 +0000
 
-bytemark-vhost-updater (20081110153344) stable; urgency=low
+bytemark-vhost-updater (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package bytemark-vhost
     - Support may be found at http://vhost.bytemark.co.uk/
