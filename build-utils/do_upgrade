@@ -3,7 +3,6 @@
 set -e
 
 BUILDER=${BUILDER:-symbiosis-builder.sh.bytemark.co.uk}
-PACKAGE_DIR=${PACKAGE_DIR:-squeeze}
 
 #
 # First we need to update to squeeze
@@ -27,10 +26,11 @@ elif [ -x /usr/bin/symbiosis-updater ] ; then
 fi 
 
 echo "Changing package lists..."
+
 #
 # Now change the package lists
 #
-sed -i -e "s#http://\(vhost\|symbiosis\).bytemark.co.uk/[^ ]\+#http://$BUILDER/$PACKAGE_DIR#g" /etc/apt/sources.list{,.security}
+sed -i -e "s#http://\(vhost\|symbiosis\).bytemark.co.uk/[^ ]\+#http://$BUILDER/squeeze/current#g" /etc/apt/sources.list{,.security}
 
 echo "Doing second upgrade..."
 #
