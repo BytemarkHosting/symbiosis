@@ -323,11 +323,11 @@ file "#{htdocs_home}/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
     cmd << "--exclude '#{ex}'"
   end
   sh "#{cmd.join(" ")} --times $PWD/ #{htdocs_home}/#{hg_number}"
-  rm "#{htdocs_home}/current"
+  rm "#{htdocs_home}/current" if File.exists?("#{htdocs_home}/current")
 end
 
 file "#{htdocs_home}/current" => "#{htdocs_home}/#{hg_number}/Release.gpg" do |t|
-  sh "cd #{htdocs_home} && ln -sf #{hg_number} current"
+  sh "cd #{htdocs_home} && ln -sf #{hg_number} current" unless File.exists?("#{htdocs_home}/current")
 end
 
 AVAILABLE_BUILD_ARCH.each do |arch|
