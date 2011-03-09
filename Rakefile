@@ -345,5 +345,5 @@ task "upload-live" => ["#{htdocs_home}/lenny"] + AVAILABLE_BUILD_ARCH.collect{|a
 end
 
 desc "Complete build cycle"
-task "clean_build_and_upload" => %w(clean build upload)
+task "clean_build_and_upload" => %w(clobber build upload)
 
