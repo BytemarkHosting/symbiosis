@@ -323,21 +323,21 @@ file "#{htdocs_home}/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
     cmd << "--exclude '#{ex}'"
   end
   sh "#{cmd.join(" ")} --times $PWD/ #{htdocs_home}/#{hg_number}"
-  rm "#{htdocs_home}/current" if File.exists?("#{htdocs_home}/current")
+  rm "#{htdocs_home}/latest" if File.exists?("#{htdocs_home}/latest")
 end
 
-file "#{htdocs_home}/current" => "#{htdocs_home}/#{hg_number}/Release.gpg" do |t|
-  sh "cd #{htdocs_home} && ln -sf #{hg_number} current"
+file "#{htdocs_home}/latest" => "#{htdocs_home}/#{hg_number}/Release.gpg" do |t|
+  sh "cd #{htdocs_home} && ln -sf #{hg_number} latest"
 end
 
 AVAILABLE_BUILD_ARCH.each do |arch|
-  file "#{htdocs_home}/current/#{arch}" => "#{htdocs_home}/current" do |t|
+  file "#{htdocs_home}/latest/#{arch}" => "#{htdocs_home}/latest" do |t|
     sh "cd #{t.prerequisites.first} && ln -sf . #{arch}"
   end
 end 
 
 desc "Upload packages to the local tree" 
-task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/current/#{arch}"}
+task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/latest/#{arch}"}
 
 desc "Upload packages to mirror. !DANGER!" 
 task "upload-live" => ["#{htdocs_home}/lenny"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/lenny/#{arch}"} do |t|
