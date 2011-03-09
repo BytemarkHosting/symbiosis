@@ -15,5 +15,7 @@
 #     listen = *:10100
 #     ..
 #   }
-listen = [::]
+#
+# Listen on both IPv4 and IPv6 interfaces
+listen = *,[::]
 
