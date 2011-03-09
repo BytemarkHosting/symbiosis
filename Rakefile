@@ -323,7 +323,7 @@ file "#{htdocs_home}/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
     cmd << "--exclude '#{ex}'"
   end
   sh "#{cmd.join(" ")} --times $PWD/ #{htdocs_home}/#{hg_number}"
-  rm "#{htdocs_home}/current"
+  rm "#{htdocs_home}/current" if File.exists?("#{htdocs_home}/current")
 end
 
 file "#{htdocs_home}/current" => "#{htdocs_home}/#{hg_number}/Release.gpg" do |t|
