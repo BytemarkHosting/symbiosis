@@ -95,7 +95,7 @@ def upstream_version(debian_version)
   $2
 end
 
-task :default => [:all]
+task :default => [:build]
 
 desc "Verify integrity of packages using lintian"
 task :lintian => ["lintian-stamp"]
@@ -145,7 +145,7 @@ rule '.gz' => [ proc {|t| t.sub(/.gz$/,"") } ] do |t|
 end
 
 desc "Generate Release.gpg"
-task :all => [ "Release.gpg" ] 
+task :build => [ "Release.gpg" ] 
 
 desc "Generate Packages file"
 file "Packages" => package_changess do |t|
@@ -343,4 +343,7 @@ desc "Upload packages to mirror. !DANGER!"
 task "upload-live" => ["#{htdocs_home}/lenny"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/lenny/#{arch}"} do |t|
   sh "rsync -Pr --delete #{t.prerequisites.first}/ repo@mirroir.sh:htdocs/symbiosis/lenny/"
 end
+
+desc "Complete build cycle"
+task "clean_build_and_upload" => %w(clean build upload)
 
