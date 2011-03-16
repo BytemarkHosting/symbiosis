@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #  This script has to do a lot of things, mostly relating to the Apache
 # setup.

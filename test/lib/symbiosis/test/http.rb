@@ -37,7 +37,7 @@ require 'symbiosis/test/symbiosisdomain'
         #
         def create_cgi()
           file = File.open( "/srv/#{self.name}/public/cgi-bin/test.cgi", "w" )
-          file.write( "#!/bin/sh\n" )
+          file.write( "#!/bin/bash\n" )
           file.write( "echo -e \"Content-type: text/plain\\n\\n\"\n" )
           file.write( "/usr/bin/uptime\n" )
           file.close()
