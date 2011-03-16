@@ -3,15 +3,15 @@
 #
 
 nop:
-	@echo "Makefile - available targets"
+	@echo "Available targets are:"
 	@echo " "
-	@echo " all       - generate manpage"
-	@echo " clean     - clean up"
+	@echo " manpage - generate manpage"
+	@echo " clean   - clean up"
 	@echo " "
 
 clean:
 	rm -f *.1 || true
 
-all:
-	pod2man symbiosis-updater > symbiosis-updater.1
+manpage:
+	pod2man usr/bin/symbiosis-updater > symbiosis-updater.1
 

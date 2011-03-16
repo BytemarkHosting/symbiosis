@@ -1,3 +1,10 @@
+symbiosis-updater (2011:0316) stable; urgency=low
+
+  * Updated the package to install two arch-specific files, with a suitable
+    suffix - and use the correct one at run-time.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 16 Mar 2011 10:44:01 +0000
+
 symbiosis-updater (2010:1012) stable; urgency=low
 
   * Updated the cron-job such that systems only fetch & apply updates

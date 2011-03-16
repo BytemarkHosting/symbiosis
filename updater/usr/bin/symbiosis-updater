@@ -20,9 +20,16 @@ export PATH
 
 
 #
+#  We need to find the architecture of this host, to know which
+# source list entry to use.
+#
+arch=$(/usr/bin/dpkg --print-architecture)
+
+
+#
 #  The sources list we update from.
 #
-SOURCES="/etc/apt/sources.list.security"
+SOURCES="/etc/apt/sources.list.security.$arch"
 
 
 #
@@ -250,8 +257,11 @@ This will ensure the updater exits.
 =head1 FILES
 
 The system will invoke B<apt-get> against the file
-B</etc/apt/sources.list.security> and archive the results of any updates
+B</etc/apt/sources.list.security.$arch> and archive the results of any updates
 applied to the directory B</var/log/symbiosis-updater/>
+
+The architecture of the host is determined via dpkg, and
+will be one of i386 or amd64.
 
 =cut
 

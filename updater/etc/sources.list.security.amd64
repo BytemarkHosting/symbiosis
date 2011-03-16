@@ -1,0 +1,15 @@
+#
+# Lenny distribution of Debian GNU/Linux
+#
+deb     http://mirror.bytemark.co.uk/debian/     lenny main contrib non-free
+
+#
+#  Bytemark Symbiosis Packages
+#
+deb     http://symbiosis.bytemark.co.uk/lenny/amd64 ./
+
+#
+# Security updates
+#
+deb     http://security.debian.org/ lenny/updates  main contrib non-free
+

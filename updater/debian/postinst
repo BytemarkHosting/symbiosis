@@ -11,11 +11,12 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
-#  If we don't have a list then create one
+#  If we have an old file then remove it.
 #
-if [ ! -e /etc/apt/sources.list.security ]; then
-    cp /etc/apt/sources.list /etc/apt/sources.list.security
+if [ -e /etc/apt/sources.list.security ]; then
+    rm -f  /etc/apt/sources.list.security
 fi
+
 
 #
 #  Make sure we notify the local sysadmin
