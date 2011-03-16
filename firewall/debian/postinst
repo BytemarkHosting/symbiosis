@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -186,7 +186,7 @@ if [ -z "$CHROOT" ]; then
     #
     if [ -d /usr/share/denyhosts/ ]; then
         cat > /etc/cron.hourly/purgy <<EOF
-#!/bin/sh
+#!/bin/bash
 dpkg --purge bytemark-vhost-ssh-protection denyhosts 2>/dev/null >/dev/null
 rm -f /etc/denyhosts.conf*
 rm /etc/cron.hourly/purgy
@@ -216,13 +216,13 @@ fi
 #  Setup new rules
 #
 cat >/etc/network/if-up.d/bytemark-firewall <<EOF
-#!/bin/sh
+#!/bin/bash
 echo "Loading firewall"
 /usr/bin/firewall
 echo "Done"
 EOF
 cat >/etc/network/if-down.d/bytemark-firewall <<EOF
-#!/bin/sh
+#!/bin/bash
 echo "Cleaning firewall"
 /usr/bin/firewall --flush
 echo "Done"
