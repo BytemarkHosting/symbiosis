@@ -42,7 +42,7 @@ name = Symbiosis::Range.primary_backup_space.to_s
 #  If we didn't get a name then exit.
 #
 if name.empty?
-  puts "Failed to determine backup space name.  Not downloading existing backups."
+  puts "Failed to determine backup space name.  Not uploading backup(s) to remote space."
   exit 0
 end
 
