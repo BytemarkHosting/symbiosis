@@ -162,6 +162,19 @@ void process_domains( const char *dirname )
                printf("\tstat( /srv/%s ) - failed\n", entry );
            continue;
        }
+       else
+       {
+           if ( ! S_ISDIR(domain.st_mode) )
+           {
+               if ( g_verbose )
+                   printf("\tIgnoring as %s is not a directory\n",
+                          entry);
+
+               continue;
+           }
+
+       }
+
 
 
        /**
