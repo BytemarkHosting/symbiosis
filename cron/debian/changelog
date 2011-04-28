@@ -1,3 +1,9 @@
+symbiosis-cron (2011:0428) oldstable; urgency=low
+
+  * Fixed forking in symbiosis-crontab-wrapper.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 28 Apr 2011 10:15:41 +0100
+
 symbiosis-cron (2010:0914) oldstable; urgency=low
 
   * Added makefile to build packages
