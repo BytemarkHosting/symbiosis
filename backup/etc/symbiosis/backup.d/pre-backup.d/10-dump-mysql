@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #  This script is designed to dump all the MySQL databases upon
 # the local system.
