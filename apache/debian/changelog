@@ -1,3 +1,11 @@
+symbiosis-httpd (2010:2804) stable; urgency=low
+
+  [ Steve Kemp ]
+  * Updated our log-processing to honour the /srv/$name/config/no-stats
+    flage.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thur, 28 Apr 2011 10:33:01 +0000
+
 symbiosis-httpd (2010:1018) stable; urgency=low
 
   [ Steve Kemp ]
