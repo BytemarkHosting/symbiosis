@@ -50,6 +50,10 @@ void fork_program( char *program )
     if ( pid == 0 )
     {
         system( program );
+        /*
+         * Goodbye!
+         */
+        exit( 0 );
     }
     else if (pid < 0)
     {
