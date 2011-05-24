@@ -340,8 +340,8 @@ desc "Upload packages to the local tree"
 task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/latest/#{arch}"}
 
 desc "Upload packages to mirror. !DANGER!" 
-task "upload-live" => ["#{htdocs_home}/lenny"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/lenny/#{arch}"} do |t|
-  sh "rsync -Pr --delete #{t.prerequisites.first}/ repo@mirroir.sh:htdocs/symbiosis/lenny/"
+task "upload-live" => ["#{htdocs_home}/#{DISTRO}"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/#{DISTRO}/#{arch}"} do |t|
+  sh "rsync -Pr --delete #{t.prerequisites.first}/ repo@mirroir.sh:htdocs/symbiosis/squeeze/"
 end
 
 desc "Complete build cycle"
