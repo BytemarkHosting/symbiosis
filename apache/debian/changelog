@@ -1,3 +1,11 @@
+symbiosis-httpd (2011:0720) stable; urgency=low
+
+  [ Steve Kemp ]
+  * Moved the logo into the symbiosis-static package, rather than
+    fetching it externally.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 20 Jul 2011 15:14:13 +0000
+
 symbiosis-httpd (2010:2804) stable; urgency=low
 
   [ Steve Kemp ]
