@@ -1,3 +1,9 @@
+symbiosis-crack (2011:1004) stable; urgency=low
+
+  * Updated to avoid alerts on files that don't exist.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 04 Oct 2011 14:19:20 +0100
+
 symbiosis-crack (2010:0914) stable; urgency=low
 
   * Updated URL in test-symbiosis-passwords 
