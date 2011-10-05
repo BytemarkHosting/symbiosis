@@ -1,0 +1,3 @@
+  # Support for dynamically loadable plugins. mail_plugins is a space separated
+  # list of plugins to load.
+  mail_plugins = sieve quota

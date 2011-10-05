@@ -1,0 +1,6 @@
+  #
+  # Used by both the Sieve plugin and the ManageSieve protocol
+  #
+  sieve      = ~/forward.sieve
+  sieve_dir  = ~/sieve
+

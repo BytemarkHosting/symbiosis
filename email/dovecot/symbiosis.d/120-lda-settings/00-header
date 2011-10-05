@@ -1,0 +1,6 @@
+##
+## LDA specific settings
+##
+
+protocol lda {
+
