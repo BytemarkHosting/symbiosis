@@ -11,4 +11,3 @@ vhost_mailbox:
   group = ${extract{gid}{${stat:VHOST_DIR/$domain}}}
   directory_transport = address_directory
 
-

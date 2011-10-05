@@ -12,5 +12,20 @@ address_directory:
   check_string = ""
   escape_string = ""
   maildir_format
+  maildir_use_size_file
+  # 
+  # Work out if this is a symbiosis domain
+  # and See if a per-domain quota has been set.
+  #  a) Use the per-user quota if set
+  #  b) Use the per-domain quota if set
+  #  b) Use a zero quota
+  quota = ${if exists{VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/mailbox_quota} \
+            {${readfile{VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/mailbox_quota}}} \
+ 	    { \
+              ${if exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/mailbox_quota} \
+                {${readfile{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/mailbox_quota}}} \
+	        {0}} \
+            } \
+          }
   allow_symlink
 

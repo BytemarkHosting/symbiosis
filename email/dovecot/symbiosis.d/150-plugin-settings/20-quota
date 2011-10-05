@@ -1,3 +1,6 @@
-
-  quota = maildir
+  #
+  # Set the default quota rule as "unlimited".
+  #
+  quota      = maildir
+  quota_rule = ?:storage=0
 
