@@ -8,7 +8,7 @@ module Symbiosis
 
   class Range
 
-    BYTEMARK_RANGES = %w(80.68.80.0/20 89.16.160.0/19 212.110.160.0/19 46.43.0.0/18 2001:41c8::/32).collect{|i| IPAddr.new(i)}
+    BYTEMARK_RANGES = %w(80.68.80.0/20 89.16.160.0/19 212.110.160.0/19 46.43.0.0/18 91.223.58.0/24 213.138.96.0/19 2001:41c8::/32).collect{|i| IPAddr.new(i)}
 
     BACKUP_SPACE_FILENAME = "/etc/symbiosis/dns.d/backup.name"
 
@@ -29,8 +29,11 @@ module Symbiosis
       # Call ip with a set of arguments that returns an easy-to-parse list of
       # IPs, for both IPv4 and 6.
       #
-      (IO.popen("/bin/ip -o -f inet  addr show scope global"){|pipe| pipe.readlines} +
-       IO.popen("/bin/ip -o -f inet6 addr show scope global"){|pipe| pipe.readlines}).each do |l|
+      (do_system("/bin/ip -o -f inet  addr show scope global") +
+       do_system("/bin/ip -o -f inet6 addr show scope global")).split("\n").each do |l|
+        # 
+        # This only matches the IP address, not the range.
+        #
         next unless l =~ /inet6? ((\d{1,3}\.){3,3}\d{1,3}|[0-9a-f:]+)/
         ip_addresses << IPAddr.new($1)
       end
@@ -54,6 +57,17 @@ module Symbiosis
     end
 
     #
+    # Returns all IPv6 ranges
+    #
+    def self.ipv6_ranges
+      ipv6_ranges = []
+      do_system("/bin/ip -o -f inet6 addr show scope global").split("\n").each do |l|
+        next unless l =~ /inet6 ([0-9a-f:]+\/\d{1,3})/
+        ipv6_ranges << IPAddr.new($1)
+      end
+      ipv6_ranges
+    end
+
     #
     # Returns the "primary" IP of the machine.  This is assumed to be the first
     # globally routable IPv4 address of the first interface in the list
@@ -119,13 +133,21 @@ module Symbiosis
     # the list returned by backup_spaces OR whatever is contained in a file
     # called /etc/symbiosis/dns.d/backup.name
     #
-    def self.primary_backup_space
-      if File.exists?(BACKUP_SPACE_FILENAME)
-        File.open(BACKUP_SPACE_FILENAME){|fh| fh.readlines}.first.to_s.chomp
+    def self.primary_backup_space(backup_space_filename=BACKUP_SPACE_FILENAME)
+      if File.exists?(backup_space_filename)
+        File.open(backup_space_filename){|fh| fh.readlines}.first.to_s.chomp
       else
         self.backup_spaces.first
       end
     end
+
+    #
+    # This just calls the command, and returns the output.
+    #
+    def self.do_system(cmd)
+      IO.popen(cmd){|pipe| pipe.readlines}.join
+    end
+
   end
 
 end
