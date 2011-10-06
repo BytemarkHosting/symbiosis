@@ -134,6 +134,7 @@ if [ "$incoming" = "0" ]; then
     touch  $PREFIX/incoming.d/75-ntp
     touch  $PREFIX/incoming.d/80-smtps
     touch  $PREFIX/incoming.d/85-submission
+    touch  $PREFIX/incoming.d/90-sieve
     touch  $PREFIX/incoming.d/99-reject
     touch  $PREFIX/incoming.d/00-related
     touch  $PREFIX/incoming.d/00-established
