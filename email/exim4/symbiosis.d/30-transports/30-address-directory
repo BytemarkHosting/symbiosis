@@ -5,12 +5,13 @@
 address_directory:
   debug_print = "T: address_directory for $local_part@$domain"
   driver = appendfile
-  envelope_to_add = true
-  return_path_add = true
+  envelope_to_add
+  return_path_add
   # This is enabled by default, but just to be explicit..
   create_directory
   check_string = ""
   escape_string = ""
+  allow_symlink
   maildir_format
   maildir_use_size_file
   # 
@@ -18,14 +19,25 @@ address_directory:
   # and See if a per-domain quota has been set.
   #  a) Use the per-user quota if set
   #  b) Use the per-domain quota if set
-  #  b) Use a zero quota
-  quota = ${if exists{VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/mailbox_quota} \
-            {${readfile{VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/mailbox_quota}}} \
- 	    { \
-              ${if exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/mailbox_quota} \
-                {${readfile{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/mailbox_quota}}} \
-	        {0}} \
+  #  c) Use a zero quota
+  #
+  # We then sanity check it to make sure that we're using the specified format.
+  #
+  # NB The Exim manual says that the multiplier can only be K,M, or G.  Dovecot
+  # wants k, M, or G.  Having had a look at the exim4 source, the comparison is
+  # done after making the multiplier lowercase, so we can specify k, M, or G.
+  #
+  # See line 301 of src/transports/appendfile.c in v4.72.
+  #
+  quota = ${if match{ \
+            ${if exists{VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/quota} \ 
+              {${readfile{VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/quota}}} \
+              { \
+                ${if exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/default_mailbox_quota} \
+                  {${readfile{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/default_mailbox_quota}}} \
+                  {0} \
+                } \
+              } \
             } \
-          }
-  allow_symlink
+          }{\N\b(\d+[kMG]?)\b\N}{$1}{0}}
 
