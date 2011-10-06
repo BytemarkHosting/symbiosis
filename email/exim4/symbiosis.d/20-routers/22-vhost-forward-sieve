@@ -1,0 +1,17 @@
+# This router handles forwards for vhost users
+vhost_forward_sieve:
+  debug_print = "R: vhost_forward_sieve for $local_part@$domain"
+  driver = accept
+  domains = +vhost_domains
+  local_part_suffix = +*
+  local_part_suffix_optional
+  # Make sure the files exists to avoid awkward failures
+  condition  = ${if exists{VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part/sieve}}
+  user  = ${extract{uid}{${stat:VHOST_DIR/$domain}}}
+  group = ${extract{gid}{${stat:VHOST_DIR/$domain}}}
+  transport = dovecot_lda
+  # This stops this router from trying to change uid/gid whilst verifying the
+  # address by skipping this router.  The address will get validated by the
+  # next router.
+  no_verify
+

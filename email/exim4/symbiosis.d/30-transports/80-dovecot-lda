@@ -1,0 +1,16 @@
+dovecot_lda:
+  debug_print = "T: dovecot_lda for $local_part@$domain"
+  driver = pipe
+  command = /usr/lib/dovecot/deliver -e -k -n \
+            -f "$sender_address" -a "$original_local_part@$original_domain"
+  home_directory = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part/
+  environment = USER=$local_part@$domain
+  use_shell
+  log_output
+  log_defer_output
+  return_fail_output
+  freeze_exec_fail
+  envelope_to_add = true
+  return_path_add = true
+  temp_errors = 64 : 69 : 70 : 71 : 72 : 73 : 74 : 75 : 78
+
