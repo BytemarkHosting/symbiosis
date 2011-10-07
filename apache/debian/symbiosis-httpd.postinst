@@ -158,8 +158,16 @@ NameVirtualHost $ip:443
         #
         SSLEngine On
         SSLCertificateFile /etc/ssl/ssl.combined
-        SSLOptions +StrictRequire
 
+        #
+        # Sane SSL ciphers.
+        #
+        SSLCipherSuite ALL:!LOW:!SSLv2:!EXP:!aNULL
+
+        #
+        # And some options
+        #
+        SSLOptions +StrictRequire
 
         #
         #  This is the directory people are redirected to
