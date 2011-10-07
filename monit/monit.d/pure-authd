@@ -15,9 +15,8 @@ class PureAuthdCheck < Symbiosis::Monitor::Check
     return SystemExit::EX_CONFIG unless initscript_ok?
 
     r = do_process_check
-    if SystemExit::EX_TEMPFAIL == r 
-      should_be_running ?  self.start : self.stop
-    end
+    self.start if SystemExit::EX_TEMPFAIL == r 
+
     return r
   end
 

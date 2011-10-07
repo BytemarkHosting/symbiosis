@@ -11,27 +11,81 @@ class DovecotCheck < Symbiosis::Monitor::Check
     @name = "dovecot"
   end
 
-  def do_check
-    return SystemExit::EX_CONFIG unless initscript_ok?
+  def protocols
+    File.readlines("/etc/dovecot/dovecot.conf").each do |l|
+      if l =~ /^\s*protocols\s*=\s*((\w+\s+)+)/
+        return $1.split(/\s+/)
+      end
+    end
+  end
 
-    tcpconnection = Symbiosis::Monitor::TCPConnection.new(
-     "localhost",
-     "pop3",
-     [nil,"AUTH\r\n", nil, "QUIT\r\n",nil] )
-    r = do_tcpconnection_check(tcpconnection)
+  def do_check
+    return SystemExit::EX_CONFIG unless initscript_ok?    
+
+    r = do_process_check
     self.restart if SystemExit::EX_TEMPFAIL == r
     return r unless 0 == r
 
-    tcpconnection.port = "imap"
-    tcpconnection.script = [nil,"* CAPABILITY\r\n",nil,"* LOGOUT\r\n",nil]
-    do_tcpconnection_check(tcpconnection)
-    self.restart if SystemExit::EX_TEMPFAIL == r
-    return r 
+    self.protocols.each do |proto| 
+      puts proto
+      r = do_protocol_check(proto)
+      self.restart if SystemExit::EX_TEMPFAIL == r
+      return r unless 0 == r
+    end
+
+    return 0
   end
 
-  def do_response_check(responses)
-    bad = responses.find{|r| r =~ /^\S+\s+(-ERR|NO|BAD)/}
+  def do_tcpresponse_check(responses)
+    bad = responses.find{|r| r =~ /^(\S+\s+)?(-ERR|NO|BAD)/}
     raise "Unexpected response '#{bad}'" unless bad.nil? 
+  end
+
+  def do_protocol_check(proto)
+    case proto
+      when /^imaps?$/
+        do_imap_check(proto)
+      when /^pop3s?$/
+        do_pop3_check(proto)
+      when "managesieve"
+        do_sieve_check
+      else
+        warn "Uknown protocol #{proto}"
+        0
+    end
+  end
+
+  def do_imap_check(proto)
+    tcpconnection = Symbiosis::Monitor::TCPConnection.new(
+     "localhost",
+     proto,
+     [nil,"* CAPABILITY\r\n",nil,"* LOGOUT\r\n",nil],
+     "imaps" == proto)
+
+    do_tcpconnection_check(tcpconnection)
+  end
+
+  def do_pop3_check(proto)
+    tcpconnection = Symbiosis::Monitor::TCPConnection.new(
+     "localhost",
+     proto,
+     [nil,"AUTH\r\n", /^\.\s*$/, "QUIT\r\n",nil],
+     "pop3s" == proto )
+
+    do_tcpconnection_check(tcpconnection)
+  end
+
+  def do_sieve_check
+    # This is a regex that matches the response that signals the end of what
+    # the server says.
+    resp = /^(OK|NO|BYE)/
+
+    tcpconnection = Symbiosis::Monitor::TCPConnection.new(
+     "localhost",
+     "sieve",
+     [resp, "LOGOUT\r\n", resp] )
+
+    do_tcpconnection_check(tcpconnection)
   end
 
 end

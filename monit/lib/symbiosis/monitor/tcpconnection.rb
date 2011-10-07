@@ -1,4 +1,5 @@
 require 'socket'
+require 'openssl'
 require 'timeout'
 
 module Symbiosis
@@ -8,16 +9,16 @@ module Symbiosis
         attr_accessor :script, :host, :port, :timeout
         attr_reader   :transactions
 
-        def initialize(host, port, script)
+        def initialize(host, port, script, ssl = false)
           @host = host
           @port = port
           @script = script
           @timeout = 5
           @transactions = []
-          @newlines = [0, 10]
+          @ssl = ssl
         end
 
-        def preces
+        def versicles
           return [] if @transactions.empty?
           @transactions.find_all{|t| "> " == t[0..1]}.collect{|t| t[2..-1]}
         end
@@ -27,29 +28,44 @@ module Symbiosis
           @transactions.find_all{|t| "< " == t[0..1]}.collect{|t| t[2..-1]}
         end
 
+        def connect
+          sock = TCPSocket.new(@host, @port)
+          if @ssl
+            ssl_sock = OpenSSL::SSL::SSLSocket.new(
+              sock,
+              OpenSSL::SSL::SSLContext.new("SSLv3_client")
+            )
+            ssl_sock.sync_close = true
+            ssl_sock.connect
+            return ssl_sock
+          else
+            return sock
+          end
+        end
+
         def do_check
           sock = nil
           @transactions = []
           begin
-            Timeout.timeout(@timeout, Errno::ETIMEDOUT) { sock = TCPSocket.new(@host, @port) }
-            @script.each do |line|
-              unless line.nil?
-                @transactions << "> "+line.inspect[1..-2]
-                puts @transactions.last
-                Timeout.timeout(@timeout, Errno::ETIMEDOUT) { sock.print line }
-              else
-                loop do
-                  trans = ""
-                  # read until we catch a null or newline char...
-                  Timeout.timeout(@timeout, Errno::ETIMEDOUT) {trans << sock.read(1) } while !@newlines.include?(trans[-1])
-                  # transform duff characters
-                  @transactions << "< "+trans.inspect[1..-2] unless trans.empty?
+            Timeout.timeout(@timeout, Errno::ETIMEDOUT) do
+              sock = self.connect
+              @script.each do |line|
+                if line.is_a?(String)
+                  @transactions << "> "+line..chomp.inspect[1..-2]
                   puts @transactions.last
-                  break if sock.eof?
+                  sock.print line
+                else
+                  loop do
+                    trans = sock.gets.chomp
+                    # transform duff characters
+                    @transactions << "< "+trans.inspect[1..-2]
+                    puts @transactions.last
+                    break if line.nil? or (line.is_a?(Regexp) and trans =~ line)
+                  end
                 end
               end
+              sock.close
             end
-            Timeout.timeout(@timeout, Errno::ETIMEDOUT) { sock.close }
           rescue => err
             raise err
           ensure
