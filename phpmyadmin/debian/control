@@ -5,7 +5,7 @@ Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), cdbs
 Standards-Version: 3.9.1
-Bugs: https://projects.bytemark.co.uk/projects/bytemarkvhost/issues
+Bugs: https://projects.bytemark.co.uk/projects/symbiosis/issues
 
 Package: symbiosis-phpmyadmin
 Replaces: bytemark-vhost-phpmyadmin
