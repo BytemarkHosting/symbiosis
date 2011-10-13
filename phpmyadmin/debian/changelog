@@ -1,3 +1,10 @@
+symbiosis-phpmyadmin (2011:1013) stable; urgency=low
+
+  * Updated standards version.
+  * Updated to install test script into /etc/symbiosis/test.d/
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 13 Oct 2011 10:57:01 +0000
+
 symbiosis-phpmyadmin (2010:0908) stable; urgency=low
 
   * Changed prerm to clean up after itself, and also changed restart to
