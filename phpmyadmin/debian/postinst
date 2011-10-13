@@ -29,6 +29,51 @@ if [ -e /etc/phpmyadmin/apache.conf ]; then
 fi
 
 #
+#  Append HTTP basic auth
+#
+if [ -e /etc/phpmyadmin/config.inc.php ]; then
+
+    if ( ! grep Symbiosis-Auth /etc/phpmyadmin/config.inc.php >/dev/null 2>/dev/null ); then
+        cat >>/etc/phpmyadmin/config.inc.php <<EOF
+
+//
+//  This setting uses HTTP BasicAuth rather than cookies for
+// authentication, this is more sane in the presence of remote
+// attackers probing your server.
+//
+//  Symbiosis made this change.
+//
+//  Symbiosis-Auth
+//
+\$cfg['Servers'][\$i]['auth_type'] = 'http';
+EOF
+    fi
+fi
+
+
+#
+#  Force SSL
+#
+
+if [ -e /etc/phpmyadmin/config.inc.php ]; then
+    if ( ! grep Symbiosis-SSL /etc/phpmyadmin/config.inc.php >/dev/null 2>/dev/null ); then
+        cat >>/etc/phpmyadmin/config.inc.php <<EOF
+
+//
+// This flag mandates the use of SSL for phpmyadmin
+//
+// Symbiosis made this change.
+//
+// Symbiosis-SSL
+//
+$cfg['ForceSSL'] = true;
+EOF
+    fi
+fi
+
+
+
+#
 #  Restart Apache2 to ensure this change is picked up.
 #
 if which invoke-rc.d >/dev/null 2>&1; then
