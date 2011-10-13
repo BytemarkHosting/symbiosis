@@ -1,3 +1,9 @@
+symbiosis-webmail (2011:1013) stable; urgency=low
+
+  * Updated standards version.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 13 Oct 2011 14:31:51 +0100
+
 symbiosis-webmail (2010:0908) stable; urgency=low
 
   * Changed restart to reload in postinst and prerm scripts
