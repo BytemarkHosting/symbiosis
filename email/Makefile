@@ -5,7 +5,7 @@ man/%.man: ./sbin/%
 	[ -d man ] || mkdir man
 	RUBYLIB=./lib $<  --manual | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
 
-docs: man/exim_rewrite_scan.man man/dovecot_checkpassword.man
+docs: man/exim_rewrite_scan.man man/symbiosis_checkpassword.man
 
 clean:
 	$(RM) exim4/exim4.conf
