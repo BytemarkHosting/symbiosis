@@ -1,3 +1,10 @@
+symbiosis-cron (2011:1026) stable; urgency=low
+
+  * Fixed --test to finish in a finite amount of time
+  * Added more tests.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 26 Oct 2011 10:48:20 +0100
+
 symbiosis-cron (2010:0914) stable; urgency=low
 
   * Added makefile to build packages

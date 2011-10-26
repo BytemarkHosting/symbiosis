@@ -15,4 +15,7 @@ wrapper/symbiosis-all-crontabs:	wrapper/symbiosis-all-crontabs.c
 %.man: %.txt
 	txt2man -s 1 -t $(basename $(notdir $<)) $< | sed -e 's/\\\\fB/\\fB/' > $@
 
-.PHONY: binary clean man all
+test:
+	cd test && ruby -I ../lib tc_crontab.rb
+
+.PHONY: binary clean man all test

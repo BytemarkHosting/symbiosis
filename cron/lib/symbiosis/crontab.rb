@@ -28,7 +28,19 @@
 
 require 'stringio'
 require 'net/smtp'
+require 'date'
 require 'time'
+
+class DateTime
+
+  def iso8601
+    "%04i-%02i-%02i %02i:%02i" % [ year, month, day, hour, min ]
+  end
+
+  def to_time
+    Time.local(year, month, day, hour, min, sec)
+  end
+end
 
 class Symbiosis
 
@@ -89,18 +101,19 @@ class Symbiosis
     # This prints the cron environment, and the date/time when each job will
     # next run.
     #
-    def test
+    def test(t = DateTime.now)
       cron_env = @environment.merge(ENV){|k,o,n| o}
       puts "Environment\n"+"-"*72
       %w(HOME LOGNAME PATH MAILTO).each do |k|
         puts "#{k} = #{cron_env[k]}"
       end
       puts "="*72+"\n\n"
-      puts "Jobs next due -- Local time #{Time.now.iso8601}\n"+"-"*72
-      puts "Date                       Command"
+      puts "Jobs next due -- Local time #{t.iso8601}\n"+"-"*72
+      puts ("%-20s" % "Date" ) + "Command"
       puts "-"*72
       @records.each do |record|
-        puts record.next_due.iso8601+"  "+record.command
+        n = record.next_due(t)
+        puts ("%-20s" % (n.nil? ? "** NEVER **" : n.iso8601))+record.command
       end
       puts "="*72
     end
@@ -145,7 +158,7 @@ class Symbiosis
         %w(SHELL PATH HOME LOGNAME).each do |k|
           mail << "X-Cron-Env: <#{k}=#{cron_env[k]}>" if ENV.has_key?(k)
         end
-        mail << "Date: #{Time.now.rfc2822}"
+        mail << "Date: #{DateTime.now.to_time.rfc2822}"
         mail << ""
         mail << output.join
         if @mail_output
@@ -161,7 +174,7 @@ class Symbiosis
       end
     end
 
-    def grep(time = Time.now)
+    def grep(time = DateTime.now)
       @records.select{|record| record.ready?(time)}
     end
 
@@ -248,7 +261,7 @@ class Symbiosis
       @command = c
     end
 
-    def ready?(time = Time.now)  
+    def ready?(time = DateTime.now)  
       min.include?  time.min  and
       hour.include? time.hour and
       mday.include? time.mday and
@@ -256,11 +269,74 @@ class Symbiosis
       wday.include? time.wday
     end
 
-    def next_due(time = Time.now)
-      time -= time.sec 
+    def next_due(time = DateTime.now)
+      orig_time = time
 
-      # Yes this is icky.
-      time += 60 while !ready?(time)
+      while !ready?(time)
+        # find the next minute that matches
+        unless min.include?(time.min)
+          ind = (min + [time.min]).sort.index(time.min)
+
+          if min.length == ind
+            # Roll on time to the beginning of the next hour
+            time += (60 - time.min + min.first)/ (60*24.0)
+          else
+            time += (min[ind] - time.min) / (60 * 24.0)
+          end
+        end
+
+        # find the next hour that matches
+        unless hour.include?(time.hour)
+          ind = (hour + [time.hour]).sort.index(time.hour)
+
+          if hour.length == ind
+            # Roll on time to the beginning of the next our
+            time += (24 - time.hour + hour.first)/ 24.0
+          else
+            time += (hour[ind] - time.hour) / 24.0
+          end
+        end  
+
+        # find the next hour that matches
+        unless mday.include?(time.mday)
+          ind = (mday + [time.mday]).sort.index(time.mday)
+
+          if mday.length == ind
+            # Roll on time to the beginning of the next our
+            time = (time >> 1) - time.mday + mday.first
+          else
+            time += mday[ind] - time.mday
+          end
+        end  
+
+        # The next month that matches
+        unless mon.include?(time.mon)
+          ind = (mon + [time.mon]).sort.index(time.mon)
+
+          if mon.length == ind
+            # Roll on time to the beginning of the next our
+            time = time >> (12 - time.mon + mon.first)
+          else
+            time = time >> (mon.first - time.mon)
+          end
+        end
+
+        unless wday.include?(time.wday)
+          ind = (wday + [time.wday]).sort.index(time.wday)
+          if wday.length == ind
+            # Roll on time to the beginning of the next week, and add the first day.
+            time = time + (7 - time.wday + wday.first)
+          else
+            time = time >> (wday.first - time.wday)
+          end
+        end
+
+        # Break if we get 30 years into the future!
+        if time > (orig_time >> 360)
+          time = nil
+          break
+        end
+      end
 
       time
     end

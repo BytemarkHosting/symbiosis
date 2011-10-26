@@ -26,7 +26,9 @@ opts.each do |opt, arg|
 end
 
 if help
-  puts "Write some help!"
+
+  puts "symbiosis-crontab [--help] [--test] [--no-mail-output] /path/to/crontab"
+
   exit 0
 end
 
@@ -36,6 +38,8 @@ if ARGV.length != 1
 end
 
 filename = ARGV.shift
+
+raise Errno::ENOENT, filename unless File.file?(filename)
 
 crontab = Symbiosis::Crontab.new(filename)
 
