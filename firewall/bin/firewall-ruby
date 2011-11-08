@@ -31,8 +31,70 @@ end
 
 
 
-
+#
+#  This class encapsulates a single firewall (iptables) rule.
+#
 class FirewallRule
+  attr_reader :port
+  attr_reader :jump
+  attr_reader :direction
+
+  def initialize( name )
+    @port = "unknown"
+    @direction = "incoming";
+  end
+
+  def incoming
+    @direction = "INPUT"
+  end
+
+  def incoming?
+    return( @direction == "INPUT" )
+  end
+
+  def outgoing
+    @direction = "OUTPUT"
+  end
+
+  def outgoing?
+    ( @direction == "OUTPUT" )
+  end
+
+  def permit( acl = nil )
+    @jump = "ACCEPT"
+    @acl = acl
+  end
+
+  def deny( acl = nil)
+    @jump = "REJECT"
+    @acl = acl
+  end
+
+  def to_s()
+    #
+    #  If there is a template - use that.
+    #
+    if ( template? )
+      return( "template expansion" )
+    end
+
+    #
+    #  Otherwise we build up ..
+    #
+    return "iptables -A #{direction} -J #{@jump}"
+  end
+
+
+  #
+  #  Is there a template for this rule?
+  #
+  def template?
+    if ( incoming? )
+      File.exists?( "/usr/share/symbiosis/firewall/#{@name}.incoming" )
+    else
+      File.exists?( "/usr/share/symbiosis/firewall/#{@name}.outgoing" )
+    end
+  end
 end
 
 
@@ -196,3 +258,9 @@ if __FILE__ == $0 then
   end
 
 end
+
+
+
+firewall = FirewallRule.new( "test" )
+firewall.deny
+puts firewall
