@@ -39,37 +39,63 @@ class FirewallRule
   attr_reader :jump
   attr_reader :direction
 
+
+  #
+  #  Constructor
+  #
   def initialize( name )
-    @port = "unknown"
-    @direction = "incoming";
+    @port      = "unknown"
+    @direction = "incoming"
+    @jump      = "unknown"
   end
 
+
+  #
+  #  Set this rule to work against incoming connections.
+  #
   def incoming
     @direction = "INPUT"
   end
 
+
+  #
+  #  Is this incoming?
+  #
   def incoming?
     return( @direction == "INPUT" )
   end
 
+
+  #
+  # Set this rule to work against outgoing connections.
+  #
   def outgoing
     @direction = "OUTPUT"
   end
 
+
+  #
+  #  Is this an outgoing rule?
+  #
   def outgoing?
     ( @direction == "OUTPUT" )
   end
 
+
+  #
+  #  Setup any ACL for permission.
+  #
   def permit( acl = nil )
     @jump = "ACCEPT"
     @acl = acl
   end
 
-  def deny( acl = nil)
-    @jump = "REJECT"
-    @acl = acl
-  end
 
+  #
+  #  The meat of the code.  This is designed to return the
+  # actual "iptable" command which this rule can be used
+  # to generate.
+  #
   def to_s()
     #
     #  If there is a template - use that.
@@ -98,15 +124,24 @@ class FirewallRule
 end
 
 
+
+
+
+
 #
-#  Singleton.
+# A meta-class which represents this firewall
 #
 class SymbiosisFirewall
 
   attr_reader :incoming, :outgoing, :blacklist, :whitelist
+  attr_reader :ipv6
 
 
+  #
+  #  Constructor
+  #
   def initialize()
+    @ipv6 = false
   end
 
 
@@ -116,6 +151,24 @@ class SymbiosisFirewall
   def disabled?
     return( File.exists?( "/etc/symbiosis/firewall/disabled" ) )
   end
+
+
+  #
+  # Control whether IPv6 is enabled.
+  #
+  def ipv6( enabled = false )
+    @ipv6 = enabled
+  end
+
+
+  #
+  # Is IPv6 enabled?
+  #
+  def ipv6?
+    return(@ipv6)
+  end
+
+
 
   #
   #  Read the permitted incoming rules on the filesystem.
@@ -162,6 +215,9 @@ private
 
   #
   #  Read from an incoming/outgoing directory and collate the results.
+  #
+  # TODO:  Rethink this - as here we only read the names, and we should
+  #        also take account of the ACL which might be inside the file.
   #
   def readRules( directory )
 
