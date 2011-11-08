@@ -1,0 +1,198 @@
+#!/usr/bin/ruby
+
+require 'getoptlong'
+require 'singleton'
+
+
+#
+# This is a helper-class designed to lookup the appropriate port
+# number for a given service.  It is a singleton.
+#
+class PortLookup
+ include Singleton
+
+  #
+  #  Return the port number for the given service
+  #
+  def lookup( name )
+
+    #
+    #  It was already numeric?
+    #
+    if ( name =~ /^([0-9]+)$/ )
+      return name.to_i
+    end
+
+    #
+    #  Otherwise load the data from /etc/services
+    #
+  end
+end
+
+
+
+
+class FirewallRule
+end
+
+
+#
+#  Singleton.
+#
+class SymbiosisFirewall
+
+  attr_reader :incoming, :outgoing, :blacklist, :whitelist
+
+
+  def initialize()
+  end
+
+
+  #
+  #  Is the firewall disabled?
+  #
+  def disabled?
+    return( File.exists?( "/etc/symbiosis/firewall/disabled" ) )
+  end
+
+  #
+  #  Read the permitted incoming rules on the filesystem.
+  #
+  def readIncoming
+    @incoming = readRules( "/etc/symbiosis/firewall/incoming.d/" )
+  end
+
+  #
+  #  Read the permitted outgoing rules on the filesystem.
+  #
+  def readOutgoing
+    @outgoing = readRules( "/etc/symbiosis/firewall/outgoing.d/" )
+  end
+
+  #
+  #  Read the IPs that are blacklisted.
+  #
+  def readBlacklist
+    @blacklist = readIPS( "/etc/symbiosis/firewall/blacklist.d/" )
+  end
+
+  #
+  #  Read the IPs that are whitelisted
+  #
+  def readWhitelist
+    @whitelist = readIPS( "/etc/symbiosis/firewall/whitelist.d/" )
+  end
+
+
+  def createFirewall()
+    # 1.  create a temporary file.
+    # 2.  expand our simple template into it.
+    # 3.  Add the blacklist
+    # 4.  Add the whitelist
+    # 5.  Add the incoming rules.
+    # 6.  Add the outgoing rules.
+  end
+
+#
+# Here be dragons.
+#
+private
+
+  #
+  #  Read from an incoming/outgoing directory and collate the results.
+  #
+  def readRules( directory )
+
+    results = Array.new()
+
+    throw "Directory not found #{directory}" unless File.directory?( directory );
+
+    Dir.entries( directory ).each do |file|
+
+      #
+      #  Here we need to strip off the leading numerical prefix
+      # which is only present to show sort order.
+      #
+      if ( file =~ /([0-9]*)-(.*)/ )
+        results.push( $2.dup )
+      end
+
+    end
+
+    #
+    #  Return the names.
+    #
+    results
+  end
+
+
+  #
+  #  Read from a blacklist/whitelist directory
+  #
+  def readIPS( directory )
+    results = Array.new()
+
+    throw "Directory not found #{directory}" unless File.directory?( directory );
+
+    Dir.entries( directory ).each do |file|
+
+      #
+      #  Here we need to strip the optional ".auto" suffix.
+      #
+      if ( file =~ /(.*)\.auto$/i )
+        file = $1.dup
+      end
+      results.push( file )
+    end
+
+    #
+    #  Return the IPs.
+    #
+    results
+  end
+
+end
+
+
+
+
+def verbose(s)
+  puts s if $VERBOSE
+end
+
+
+if __FILE__ == $0 then
+
+  #
+  #  Parse the arguments
+  #
+  $HELP     = false
+  $TEMPLATE = nil
+  $VERBOSE  = false
+
+  opts = GetoptLong.new(
+                        [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+                        [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ]
+                        )
+
+
+  begin
+    #
+    #  If we're disabled exit.
+    #
+    myself = SymbiosisFirewall.new()
+    if ( myself.disabled? )
+      verbose( "Firewall disabled" )
+      System.exit(0)
+    end
+
+    #
+    #  Collate the rules.
+    #
+    myself.readIncoming()
+
+  rescue
+    puts "There was an exception", $!, "\n"
+  end
+
+end
