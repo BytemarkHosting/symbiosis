@@ -35,19 +35,45 @@ end
 #  This class encapsulates a single firewall (iptables) rule.
 #
 class FirewallRule
+
   attr_reader :port
   attr_reader :jump
   attr_reader :direction
   attr_reader :source
+  attr_reader :acl
+
 
   #
   #  Constructor
   #
   def initialize( name )
-    @direction = "incoming"
-    @jump      = "unknown"
+    @direction = nil
+    @jump      = nil
     @src       = nil
     @port      = nil
+    @acl       = nil
+  end
+
+  #
+  #  Helper
+  #
+  def FirewallRule.blacklist( ip )
+    f = FirewallRule.new( "blacklist-#{ip}" )
+    f.incoming()
+    f.src( ip)
+    f.deny()
+    return f
+  end
+
+  #
+  #  Helper
+  #
+  def FirewallRule.whitelist( ip )
+    f = FirewallRule.new( "whitelist-#{ip}" )
+    f.incoming()
+    f.src( ip )
+    f.permit()
+    return f
   end
 
 
@@ -91,6 +117,10 @@ class FirewallRule
     @acl = acl
   end
 
+  def deny( acl = nil )
+    @jump = "REJECT"
+    @acl = acl
+  end
 
   #
   #  The meat of the code.  This is designed to return the
@@ -107,7 +137,15 @@ class FirewallRule
 
 
     #
-    #  Otherwise we build up ..
+    #  If we have a port then we must include that.
+    #
+    port=""
+    if ( ! @port.nil? )
+      port="-p tcp --dport #{@port}"
+    end
+
+    #
+    #  If we have a source:
     #
     s=""
     if ( ! @src.nil? )
@@ -115,13 +153,20 @@ class FirewallRule
     end
 
     #
-    #  Port
+    #  If we have an ACL then we need to repeat for each one.
     #
-    port=""
-    if ( ! @port.nil? )
-      port="-p tcp --dport #{@port}"
+    if ( ! @acl.nil? )
+      ret = ""
+
+      @acl.each do |ip|
+        ret = ret + "iptables -A #{direction} --source #{ip} #{port} -J #{@jump}\n"
+      end
+      return ret;
     end
 
+    #
+    #  OK a straight-forward single-rule
+    #
     return "iptables -A #{direction} #{s} #{port} -J #{@jump}"
   end
 
@@ -352,8 +397,8 @@ end
 
 
 
-firewall = FirewallRule.new( "test" )
-firewall.src( "127.1.2.3" )
-firewall.port(22)
-firewall.permit( ( "1.2.3.4" ) )
+firewall = FirewallRule.blacklist( "1.2.3.4" )
+puts firewall
+
+firewall = FirewallRule.whitelist( "1.2.3.4" )
 puts firewall
