@@ -38,15 +38,16 @@ class FirewallRule
   attr_reader :port
   attr_reader :jump
   attr_reader :direction
-
+  attr_reader :source
 
   #
   #  Constructor
   #
   def initialize( name )
-    @port      = "unknown"
     @direction = "incoming"
     @jump      = "unknown"
+    @src       = nil
+    @port      = nil
   end
 
 
@@ -104,12 +105,46 @@ class FirewallRule
       return( "template expansion" )
     end
 
+
     #
     #  Otherwise we build up ..
     #
-    return "iptables -A #{direction} -J #{@jump}"
+    s=""
+    if ( ! @src.nil? )
+      s="--source #{@src}"
+    end
+
+    #
+    #  Port
+    #
+    port=""
+    if ( ! @port.nil? )
+      port="-p tcp --dport #{@port}"
+    end
+
+    return "iptables -A #{direction} #{s} #{port} -J #{@jump}"
   end
 
+
+  #
+  #  Set the source
+  #
+  def src( new_src )
+    @src = new_src
+  end
+
+  def src?
+    @src
+  end
+
+
+  def port( new_port )
+    @port = new_port
+  end
+
+  def port?
+    @port
+  end
 
   #
   #  Is there a template for this rule?
@@ -318,5 +353,7 @@ end
 
 
 firewall = FirewallRule.new( "test" )
-firewall.deny
+firewall.src( "127.1.2.3" )
+firewall.port(22)
+firewall.permit( ( "1.2.3.4" ) )
 puts firewall
