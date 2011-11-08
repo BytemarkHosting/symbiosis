@@ -1,3 +1,10 @@
+symbiosis-mysql (2011:0811) stable; urgency=low
+
+  * Updated Debian standards version; no change.
+  * Install global alias for Apache at http://$hostname/_db/
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 8 Nov 2011 16:11:16 +0100
+
 symbiosis-mysql (2010:0914) stable; urgency=low
 
   * Tidied packaging 

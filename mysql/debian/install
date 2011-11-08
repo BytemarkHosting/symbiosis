@@ -1,0 +1,2 @@
+apache/*.conf        etc/apache2/conf.d/
+php/*.php            usr/share/symbiosis-mysql/

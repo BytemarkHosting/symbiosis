@@ -98,5 +98,15 @@ if ( grep ^bind-address /etc/mysql/my.cnf >/dev/null 2>/dev/null ); then
     invoke-rc.d mysql restart
 fi
 
+
+#
+#  Restart apache 2.x
+#
+if which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d apache2 restart
+else
+    /etc/init.d/apache2 restart
+fi
+
 #DEBHELPER#
 exit 0
