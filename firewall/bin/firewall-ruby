@@ -513,12 +513,16 @@ if __FILE__ == $0 then
   $VERBOSE  = false
   $TEST     = false
   $FLUSH    = false
+  $EXECUTE  = true
+  $DELETE   = true
 
   opts = GetoptLong.new(
                         [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
                         [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
                         [ '--test', '-t', GetoptLong::NO_ARGUMENT ],
                         [ '--flush', '-f', GetoptLong::NO_ARGUMENT ]
+                        [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ]
+                        [ '--no-delete', '-d', GetoptLong::NO_ARGUMENT ]
                         )
 
 
@@ -532,6 +536,10 @@ if __FILE__ == $0 then
       $FLUSH = true
     when '--test'
       $TEST = true
+    when '--no-execute'
+      $EXECUTE = false
+    when '--no-delete'
+      $DELETE = false
     end
   end
 
@@ -563,10 +571,14 @@ if __FILE__ == $0 then
     #
     #  file = myself.createFirewall()
     #
-    #  chmod( 755 , file ) unless( no-execute )
-    #  system( file ) unless ( no-execute )
-    #  system( "run-parts .../local.d/" ) unless ( no-execute )
-    #  unlink( file ) unless ( no-delete )
+    # if ( $EXECUTE )
+    #  chmod( 755 , file )
+    #  system( file )
+    #  system( "run-parts .../local.d/" )
+    # end
+    # if ( $DELETE )
+    #  unlink( file )
+    # end
   rescue
     puts "There was an exception", $!, "\n"
   end
