@@ -520,8 +520,8 @@ if __FILE__ == $0 then
                         [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
                         [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
                         [ '--test', '-t', GetoptLong::NO_ARGUMENT ],
-                        [ '--flush', '-f', GetoptLong::NO_ARGUMENT ]
-                        [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ]
+                        [ '--flush', '-f', GetoptLong::NO_ARGUMENT ],
+                        [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ],
                         [ '--no-delete', '-d', GetoptLong::NO_ARGUMENT ]
                         )
 
