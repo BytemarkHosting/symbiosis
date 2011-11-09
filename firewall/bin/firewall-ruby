@@ -586,13 +586,3 @@ if __FILE__ == $0 then
 end
 
 
-
-firewall = FirewallRule.blacklist( "1.2.3.4" )
-puts firewall
-
-firewall = FirewallRule.whitelist( "1.2.3.4" )
-puts firewall
-
-
-f = DirectoryIPList.new( "./blacklist.d" )
-puts f.whitelist
