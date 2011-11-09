@@ -396,8 +396,18 @@ if [ -x /usr/sbin/symbiosis-configure-ssl ] ; then
   ln -s /usr/sbin/symbiosis-configure-ssl /etc/cron.hourly
 fi
 
+#
+#  Helper to make stats for standard sites.
+#
 if [ -x /usr/sbin/symbiosis-make-logs ] ; then
   ln -s /usr/sbin/symbiosis-make-logs /etc/cron.daily
+fi
+
+#
+#  Helper to make stats for SSL-based sites.
+#
+if [ -x /usr/sbin/symbiosis-make-ssl-logs ] ; then
+  ln -s /usr/sbin/symbiosis-make-ssl-logs /etc/cron.daily
 fi
 
 #

@@ -1,0 +1,114 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+
+my (%CONFIG);
+
+if (
+    !GetOptions( "verbose",
+                 \$CONFIG{ 'verbose' } ) )
+{
+    exit 0;
+}
+
+
+
+#
+#  Get each SSL site.
+#
+foreach my $file ( sort( glob( "/var/log/apache2/*ssl.access.log" ) ) )
+{
+    $CONFIG{'verbose'} && print "Handling logfile: $file\n";
+
+    my $domain = undef;
+    if ( $file =~ /apache2\/(.*)\.ssl/ )
+    {
+        $domain = $1;
+    }
+
+    if ( ! -d "/srv/$domain" )
+    {
+        $domain =~ s/^www\.//g;
+
+        $CONFIG{'verbose'} && print "\tTransformed www.$domain to $domain\n";
+    }
+
+
+    #
+    #  We have the domain
+    #
+    if ( -d "/srv/$domain" )
+    {
+        # 1. Resolve
+        $CONFIG{'verbose'} && print "\tResolving logfile\n";
+        system( "logresolve < $file > /srv/$domain/public/logs/access.log.resolved" );
+
+        # 2. Make directory
+        if ( ! -d "/srv/$domain/public/htdocs/stats" )
+        {
+            $CONFIG{'verbose'} && print "\tCreating public/htdocs/stats/\n";
+            system( "mkdir -p /srv/$domain/public/htdocs/stats" );
+        }
+
+
+        # 3.  Create webalizer configuration file.
+        if ( ! -e "/srv/$domain/public/htdocs/stats/webalizer.conf" )
+        {
+            $CONFIG{'verbose'} && print "\tCreating webalizer configuration file.\n";
+
+            open( FILE, ">/srv/$domain/public/htdocs/stats/webalizer.conf" );
+            print FILE<<EOF;
+OutputDir       /srv/$domain/public/htdocs/stats/
+Incremental     yes
+ReportTitle     Usage Statistics for
+HostName        $domain
+HideSite        $domain
+HideReferrer    $domain/
+HideReferrer    Direct Request
+HideURL         *.gif
+HideURL         *.GIF
+HideURL         *.jpg
+HideURL         *.JPG
+HideURL         *.ra
+GroupURL        /cgi-bin/*
+MangleAgents    4
+
+EOF
+            close( FILE );
+        }
+
+        $CONFIG{'verbose'} && print "\tRunning webalizer\n";
+
+        system( "cd /srv/$domain/public/htdocs/stats/ && webalizer -q </srv/$domain/public/logs/access.log.resolved >/dev/null 2>/dev/null" );
+
+        # Now move the logfile into place.
+        if ( ! -d "/srv/$domain/public/logs" )
+        {
+            system( "mkdir -p /srv/$domain/public/logs" );
+        }
+        
+        # Get the date
+        my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
+          localtime(time);
+        
+        # fixup
+        $year += 1900;
+        $mday = sprintf("%02d", $mday );
+        $mon = sprintf("%02d", $mon );
+        
+        # save
+        $CONFIG{'verbose'} && print "Moving logfile to /srv/$domain/public/logs/access.log.$year.$mon.$mday\n";
+        system( "mv /srv/$domain/public/logs/access.log.resolved /srv/$domain/public/logs/access.log.$year.$mon.$mday" );
+        
+        # now change ownership
+        system(" chown -R admin.admin /srv/$domain/public/logs" );
+        system(" chown -R admin.admin /srv/$domain/public/htdocs/stats/" );
+    }
+    else
+    {
+        print "Failed to find domain for $file\n";
+    }
+}
