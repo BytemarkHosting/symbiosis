@@ -349,9 +349,52 @@ class SymbiosisFirewall
   #  Flush/Remove all existing firewall rules.
   #
   def flush()
-    puts "'firewall --flush' invoked.  TODO - Write code."
-    0
+    flush_ipv4
+    flush_ipv6 if ( ipv6? )
   end
+
+
+  #
+  #  Flush all IPv4-specific firewall rules which might be present.
+  #
+  def flush_ipv4
+    commands = [
+               "/sbin/iptables -P INPUT ACCEPT",
+               "/sbin/iptables -P OUTPUT ACCEPT",
+               "/sbin/iptables -P FORWARD ACCEPT",
+               "/sbin/iptables -F",
+               "/sbin/iptables -t nat -F",
+               "/sbin/iptables -t raw -F",
+               "/sbin/iptables -t mangle -F",
+               "/sbin/iptables -X"
+    ];
+
+    commands.each do |cmd|
+      Kernel.system( cmd )
+    end
+  end
+
+
+  #
+  #  Flush all IPv6-specific firewall rules which might be present.
+  #
+  def flush_ipv6
+    commands = [
+               "/sbin/ip6tables -P INPUT ACCEPT",
+               "/sbin/ip6tables -P OUTPUT ACCEPT",
+               "/sbin/ip6tables -P FORWARD ACCEPT",
+               "/sbin/ip6tables -F",
+               "/sbin/ip6tables -t nat -F",
+               "/sbin/ip6tables -t raw -F",
+               "/sbin/ip6tables -t mangle -F",
+                "/sbin/ip6tables -X"
+    ];
+
+    commands.each do |cmd|
+      Kernel.system( cmd )
+    end
+  end
+
 
 
   #
@@ -488,7 +531,6 @@ if __FILE__ == $0 then
     when '--flush'
       $FLUSH = true
     when '--test'
-      puts "TET"
       $TEST = true
     end
   end
@@ -508,14 +550,14 @@ if __FILE__ == $0 then
     #
     if ( $TEST )
       exit( myself.test() )
-      puts "OK"
     end
 
     #
     #  Flushing / Removing the firewall?
     #
     if ( $FLUSH )
-      exit( myself.flush() )
+      myself.flush()
+      exit 0
     end
 
     #
