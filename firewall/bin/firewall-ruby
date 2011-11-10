@@ -37,6 +37,8 @@ require 'getoptlong'
 require 'singleton'
 
 
+
+
 #
 # This is a helper-class designed to lookup the appropriate port
 # number for a given service.  It is a singleton.
@@ -60,6 +62,7 @@ class PortLookup
     #  Otherwise load the data from /etc/services
     #
   end
+
 end
 
 
@@ -78,7 +81,6 @@ class FirewallRule
   attr_reader :jump
   attr_reader :direction
   attr_reader :source
-  attr_reader :acl
 
 
   #
@@ -89,7 +91,6 @@ class FirewallRule
     @jump      = nil
     @src       = nil
     @port      = nil
-    @acl       = nil
   end
 
   #
@@ -147,19 +148,6 @@ class FirewallRule
   end
 
 
-  #
-  #  Setup any ACL for permission.
-  #
-  def permit( acl = nil )
-    @jump = "ACCEPT"
-    @acl = acl
-  end
-
-  def deny( acl = nil )
-    @jump = "REJECT"
-    @acl = acl
-  end
-
 
   #
   #  The meat of the code.  This is designed to return the
@@ -186,17 +174,23 @@ class FirewallRule
     #
     #  If we have a source:
     #
-    s=""
+    acl=""
     if ( ! @src.nil? )
-      s="--source #{@src}"
+
+      if ( incoming? )
+        acl="--source #{@src}"
+      else
+        acl="--dest #{@src}"
+      end
     end
+
 
     #
     #  OK a single-rule should be sufficient.
     #
     #  TODO:  Duplicate for IPv6.
     #
-    return "iptables -A #{direction} #{s} #{port} -J #{@jump}"
+    return "iptables -A #{direction} #{port} #{acl} -J #{@jump}"
   end
 
 
@@ -266,6 +260,7 @@ class DirectoryIPList
   # our list.
   #
   def initialize( directory )
+
     @directory = directory
     @ips       = Array.new()
 
@@ -274,12 +269,12 @@ class DirectoryIPList
 
 
     #
-    #  Read teh contents of the directory
+    #  Read the contents of the directory
     #
     Dir.entries( directory ).each do |file|
 
       #
-      # Skip dotfiles.
+      #  Skip "dotfiles".
       #
       next if ( file =~ /^\./ )
 
@@ -289,6 +284,10 @@ class DirectoryIPList
       if ( file =~ /(.*)\.auto$/i )
         file = $1.dup
       end
+
+      #
+      #  Save it away.
+      #
       @ips.push( file )
     end
   end
@@ -591,6 +590,7 @@ if __FILE__ == $0 then
 
 
   begin
+
     #
     #  If we're disabled exit.
     #
@@ -600,12 +600,14 @@ if __FILE__ == $0 then
       System.exit(0)
     end
 
+
     #
     #  Just testing?
     #
     if ( $TEST )
       exit( myself.test() )
     end
+
 
     #
     #  Flushing / Removing the firewall?
@@ -614,6 +616,7 @@ if __FILE__ == $0 then
       myself.flush()
       exit 0
     end
+
 
     #
     #  file = myself.createFirewall()
@@ -625,6 +628,8 @@ if __FILE__ == $0 then
     # end
     # if ( $DELETE )
     #  unlink( file )
+    # else
+    #  puts "Left firewall in #{file}"
     # end
   rescue
     puts "There was an exception", $!, "\n"

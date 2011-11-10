@@ -46,6 +46,19 @@ foreach my $file ( sort( glob( "/var/log/apache2/*ssl.access.log" ) ) )
         $CONFIG{'verbose'} && print "\tResolving logfile\n";
         system( "logresolve < $file > /srv/$domain/public/logs/access.log.resolved" );
 
+
+        # Add in the non-ssl file too, if present.
+        my $additional = $file;
+        $additional =~ s/\.ssl//g;
+        if ( -e $additional )
+        {
+            $CONFIG{'verbose'} && print "\tResolving the additional NON-SSL log\n";
+
+            system( "logresolve < $additional >> /srv/$domain/public/logs/access.log.resolved" );
+        }
+
+
+
         # 2. Make directory
         if ( ! -d "/srv/$domain/public/htdocs/stats" )
         {
@@ -89,20 +102,20 @@ EOF
         {
             system( "mkdir -p /srv/$domain/public/logs" );
         }
-        
+
         # Get the date
         my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
           localtime(time);
-        
+
         # fixup
         $year += 1900;
         $mday = sprintf("%02d", $mday );
         $mon = sprintf("%02d", $mon );
-        
+
         # save
         $CONFIG{'verbose'} && print "Moving logfile to /srv/$domain/public/logs/access.log.$year.$mon.$mday\n";
         system( "mv /srv/$domain/public/logs/access.log.resolved /srv/$domain/public/logs/access.log.$year.$mon.$mday" );
-        
+
         # now change ownership
         system(" chown -R admin.admin /srv/$domain/public/logs" );
         system(" chown -R admin.admin /srv/$domain/public/htdocs/stats/" );
