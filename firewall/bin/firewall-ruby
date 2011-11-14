@@ -39,31 +39,88 @@ require 'singleton'
 
 
 
+
+
 #
-# This is a helper-class designed to lookup the appropriate port
-# number for a given service.  It is a singleton.
+#  A singleton class that converts the services file /etc/services
+# to a hash, and allows a port number to be looked up for any given
+# service name.
+#
+#  Note that there is no differentiation between TCP and UDP.
+#
 #
 class PortLookup
- include Singleton
+  include Singleton
 
   #
-  #  Return the port number for the given service
+  # A hash of the service and port combinations
+  #
+  attr_reader :services
+
+  #
+  # Constructor.  Because this is a singleton class it is only
+  # invoked once.
+  #
+  # We read the services-file and store the data from within it
+  # into a hash for later lookups.
+  #
+  def initialize( filename = "/etc/services" )
+    @services = Hash.new
+
+    #
+    #  Ensure the file exists
+    #
+    throw "The services file '#{filename}' is missing" unless
+      File.exists?(filename)
+
+    #
+    #  Read the file.
+    #
+    begin
+      File.open(filename).readlines().each do |line|
+
+        #
+        # service-names are alphanumeric - but also include "-" and "_".
+        #
+        if ( line =~ /^([-a-z_0-9]+)\s+([0-9]+)\// )
+          @services[$1.dup.downcase ] = $2
+        end
+
+      end
+    rescue
+      throw "There was an error reading the '#{filename}' file"
+    end
+
+  end
+
+
+  #
+  #  Find the TCP/UDP port of the named service.
   #
   def lookup( name )
 
-    #
-    #  It was already numeric?
-    #
+    # numeric name is a cheat - we just return that port.
     if ( name =~ /^([0-9]+)$/ )
-      return name.to_i
+      return $1.to_i
     end
 
-    #
-    #  Otherwise load the data from /etc/services
-    #
+    # Lookup the port, if present
+    port = @services[name.downcase]
+
+    # return numeric value - not a string value
+    port.nil? ? nil : port.to_i
   end
 
+
+  #
+  #  Is the name defined?
+  #
+  def defined?( name )
+    port = @services[name.downcase]
+    ( ! port.nil? )
+  end
 end
+
 
 
 
@@ -94,7 +151,7 @@ class FirewallRule
   end
 
   #
-  #  Helper
+  #  Helper:  Note no port is required for a blacklist.
   #
   def FirewallRule.blacklist( ip )
     f = FirewallRule.new( "blacklist-#{ip}" )
@@ -105,7 +162,7 @@ class FirewallRule
   end
 
   #
-  #  Helper
+  #  Helper:  Note no port is required for a whitelist.
   #
   def FirewallRule.whitelist( ip )
     f = FirewallRule.new( "whitelist-#{ip}" )
