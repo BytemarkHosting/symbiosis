@@ -615,7 +615,7 @@ EOF
       end
 
     end
-    system( "cat #{fname}" )
+
     return(fname)
   end
 
@@ -780,7 +780,13 @@ if __FILE__ == $0 then
     if ( $DELETE )
       File.unlink( file )
     else
-      puts "Left firewall in #{file}"
+
+      #
+      #  TODO: Fix this.  Because we used Tempfile we have to manually
+      # copy the firewall to a new name as it is unlinked at process exit.
+      #
+      Kernel.system("cp #{file} #{file}2")
+      puts "Left firewall in #{file}2"
     end
   rescue
     puts "There was an exception", $!, "\n"
