@@ -1,3 +1,11 @@
+symbiosis-backup (2011:1121) stable; urgency=low
+
+  [ Steve Kemp ]
+  * Updated to explicitly preserve permissions to avoid harmless warnings.
+  * Updated to most recent standards version - no changes.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 21 Nov 2011 12:10:08 +0000
+
 symbiosis-backup (2011:0222) stable; urgency=low
 
   [ Steve Kemp ]
