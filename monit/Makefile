@@ -10,9 +10,13 @@ man/symbiosis-monit.man: sbin/symbiosis-monit
 
 docs: man/symbiosis-monit.man doc/index.html
 
+test:
+	cd test && ruby ts_monit.rb
 
 clean:
 	$(RM) man/symbiosis-monit.man
 	$(RM) -r man/
 	$(RM) -r rdoc/
+
+.PHONY: docs test all clean
 

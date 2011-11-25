@@ -1,0 +1,36 @@
+#!/bin/bash
+
+self=`basename $0`
+dir=`dirname $0`
+
+if [ $self = 'flip-flop' ] ; then
+  result=`readlink $0`
+elif [ $self = 'temp-flip-flop' ] ; then
+  result=`readlink $0`
+else
+  result=$self
+fi
+
+if [ -z $result ] ; then
+  result="success"
+fi
+
+cd $dir
+
+if [ $result = "success" ] ; then
+  [ $self = 'flip-flop' ] && ln -sf fail flip-flop 
+  [ $self = 'temp-flip-flop' ] && ln -sf tempfail temp-flip-flop 
+  echo "Hello!"
+  exit 0
+elif [ $result = 'fail' ] ; then
+  [ $self = 'flip-flop' ] && ln -sf success flip-flop 
+  echo "Blurgh!"
+  exit 1
+elif [ $result = 'tempfail' ] ; then
+  [ $self = 'temp-flip-flop' ] && ln -sf success temp-flip-flop 
+  echo "Temporary failure"
+  exit 75
+else
+  echo "Usage failure."
+  exit 64
+fi

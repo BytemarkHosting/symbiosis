@@ -12,24 +12,28 @@ module Symbiosis
           @process = Symbiosis::Monitor::Process.new
         end
 
-
         #
-        #  Should we ignore failures because apt-get|aptitude|dpkg is running?
+        # Checks if dpkg/apt/aptitude is running.
         #
-        def should_ignore?
-          f = File.open('/var/lib/dpkg/lock','w+')
-  
+        def self.dpkg_running?
           begin 
             # Check the dpkg lock
-            x = f.fcntl(Fcntl::F_SETLK, [Fcntl::F_WRLCK, IO::SEEK_SET, 0].pack("III"))
-            f.close
-            return false
-          rescue Errno::EACCES, Errno::EAGAIN => err
-            f.close
+            File.open('/var/lib/dpkg/lock','r+') do |fd|
+              args = [Fcntl::F_WRLCK, IO::SEEK_SET, 0, 0, 0].pack("s2L2i")
+              fd.fcntl(Fcntl::F_GETLK, args)
+              Fcntl::F_WRLCK == args.unpack("s2L5i*").first
+            end
+          rescue Errno::EPERM, Errno::EACCES, Errno::EAGAIN => err
             return true
           end
         end
 
+        #
+        # Should we run the test?
+        #
+        def should_ignore?
+          self.class.dpkg_running?
+        end
 
         def should_be_running
           true

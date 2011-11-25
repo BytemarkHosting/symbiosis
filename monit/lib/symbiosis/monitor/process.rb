@@ -35,7 +35,7 @@ module Symbiosis
         
         def start
           @pid = nil
-          do_iniscript("start")
+          do_initscript("start")
           @sleep.times do
             begin
               sleep 1
@@ -56,7 +56,7 @@ module Symbiosis
             # able to do the PID test later. 
             pid_test = false
           ensure
-            do_iniscript("stop")
+            do_initscript("stop")
           end
 
           @sleep.times do
@@ -76,7 +76,8 @@ module Symbiosis
           raise Errno::EPERM,  initscript unless File.executable?(initscript)
         end
 
-        def do_iniscript(action)
+        def do_initscript(action)
+          return unless 0 == ::Process.uid
           check_initscript
           @pid = nil
           Kernel.system("#{initscript} #{action} 2>&1")

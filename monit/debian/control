@@ -10,7 +10,7 @@ Package: symbiosis-monit
 Replaces: bytemark-vhost-monit
 Conflicts: bytemark-vhost-monit, monit
 Architecture: all
-Depends: ruby, rdoc, cron, ${misc:Depends}
+Depends: ruby, rdoc, cron, libsqlite3-ruby1.8, ${misc:Depends}
 Description: Service monitoring and restarting
  This package configures your server to include monitoring, so that
  failed services are restarted automatically.

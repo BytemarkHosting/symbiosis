@@ -40,5 +40,10 @@ if [ -d /etc/bytemark-vhost/monit.d ]; then
 fi
 
 
+# 
+# Add var/lib directory for the state DB
+#
+mkdir -p /var/lib/symbiosis/
+
 #DEBHELPER#
 exit 0

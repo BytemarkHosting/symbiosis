@@ -102,8 +102,13 @@ class SystemExit
     return LOOKUP_TABLE[status]
   end
 
+  def to_i
+    status
+  end
+
+  def success?
+    0 == status
+  end
+
 end
-
-  
-
 
