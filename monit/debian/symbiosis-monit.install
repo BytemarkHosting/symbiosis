@@ -1,6 +1,8 @@
 sbin/symbiosis-monit          usr/sbin/
 monit.d/*                     etc/symbiosis/monit.d/
 cron.d/*                      etc/cron.d/
+templates/*                   usr/share/symbiosis/monit/
 bug.report                    usr/share/bug/symbiosis-monit/control
 lib/*                         usr/lib/ruby/1.8/
 etc/apt.conf.d/*              etc/apt.conf.d/
+

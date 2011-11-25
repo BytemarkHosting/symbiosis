@@ -5,7 +5,7 @@
 include /usr/share/cdbs/1/rules/debhelper.mk
 
 build/symbiosis-monit::
-	make docs
+	make all 
 
 cleanbuilddir/symbiosis-monit::
 	make clean

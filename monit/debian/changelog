@@ -1,3 +1,10 @@
+symbiosis-monit (2011:1125) stable; urgency=low
+
+  * Complete rewrite of system binary.
+  * Now with tests.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 25 Nov 2011 19:36:31 +0000
+
 symbiosis-monit (2010:0909) stable; urgency=low
 
   * Removed the obsolete bytemark-vhost-monit cronjob.

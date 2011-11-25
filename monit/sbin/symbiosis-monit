@@ -1,52 +1,48 @@
 #!/usr/bin/ruby
-# = NAME
+# NAME
 #
 # symbiosis-monit - Symbiosis Service Monitor
 #
-# = SYNOPSIS
+# SYNOPSIS
 #
 # symbiosis-monit [OPTIONS]
 #
-# = USAGE
+# USAGE
 #
-# -d, --directory <directory>:
-#   The directory which contains the scripts to be run.  The default is
-#   /etc/symbiosis/monit.d/
+# -d, --directory <directory>   The directory which contains the scripts to be
+#                               run. The default is /etc/symbiosis/monit.d/
 #
-# -m, --send-mail:
-#   If any of the tests fail, send an email containing a pass/fail summary.
-#   Use the verbose flag if more detail is required.
+# -m, --send-mail               If any of the tests fail, send an email
+#                               containing a pass/fail summary. Use the verbose
+#                               flag if more detail is required.
 #
-# -a, --always-mail:
-#   Always send the email summary.
+# -a, --always-mail             Always send the email summary.
 #
-# -t, --mailto <email>:
-#   Set the to address for the email notification.  The default address is
-#   root.
+# -m, --mailto <email>          Set the to address for the email notification.
+#                               The default address is root.
 #
-# -f, --mailfrom <email>:
-#   Set the from address for the email notification.  The default address is
-#   nobody.
+# -f, --mailfrom <email>        Set the from address for the email
+#                               notification. The default address is nobody.
 #
-# -v, --verbose:
-#   Enable verbose output.  This means show or email the entire output all the
-#   test scripts produce.  Normally only a pass/fail summary will be shown.
+# -v, --verbose                 Enable verbose output.  This means show or
+#                               email the entire output all the test scripts
+#                               produce. Normally only a pass/fail summary
+#                               will be shown.
 #
-# -l, --log-level:
-#   Set the log level for logging to syslog.  Available options are the EMERG,
-#   ALARM, CRIT, ERR, WARNING, NOTICE, INFO, and DEBUG.  Currently failures are
-#   logged with the WARNING level, and other output with the INFO level.
+# -l, --log-level               Set the log level for logging to syslog.
+#                               Available options are the EMERG, ALARM, CRIT,
+#                               ERR, WARNING, NOTICE, INFO, and DEBUG.
+#                               Currently failures are logged with the WARNING
+#                               level, and other output with the INFO level.
 #
-# -h, --help:
-#   Show help.
+# -h, --help                    Show help.
 #
-# -n, --manual:
-#   Show the full manual.
+# -n, --manual                  Show the full manual.
 #
-# = SCRIPTS
+# SCRIPTS
 #
 # Each of the scripts in the script directory are expected to be self
-# contained.  That is to say, each script is responsible for testing, and
+# contained. That is to say, each script is responsible for testing, and
 # starting/stopping/restarting a service as necessary.
 #
 # A script will be deemed successful if it exits with a status of EX_OK (0).
@@ -55,40 +51,35 @@
 # of EX_TEMPFAIL (75).
 #
 # If a script exits with a status equal to certain pre-defined values, it is
-# deemed to be a bad test.  Results of tests returning any of these bad
+# deemed to be a bad test. Results of tests returning any of these bad
 # statuses are not routinely reported.
 #
-# Currently the bad test statuses are
-#   * EX_USAGE (64) -- command line usage error
-#   * EX_CONFIG (78) -- configuration error
-#   * 126 / 127     -- 
+# Currently the bad test statuses are:
 #
-# = LOGGING
+#   EX_USAGE (64)   command line usage error
+#   EX_CONFIG (78)  configuration error
+#   126 / 127       errors returned by bash / shell
+#
+# LOGGING
 #
 # Any scripts that fail tests will be logged to the daemon syslog, along with
 # the last 10 lines of any output they produce.
 #
-# = EXIT STATUS
+# EXIT STATUS
 #
-# This program will return:
-#   0 if none of the tests fail;
-#   1 If any of the tests fail;
-#  -1 If dpkg is running.
+# This program will return
+# 
+#   0  if none of the tests fail;
+#   1  if any of the tests fail;
+#   2  if dpkg is running.
 #
-# = COPYRIGHT
-#
-# Copyright © 2008 Bytemark Computer Consulting Ltd.  License GPLv2+: GNU GPL
-# version 2 or later <http://gnu.org/licenses/gpl.html> This is free software:
-# you are free to change and redistribute it.  There is NO WARRANTY, to the
-# extent permitted by law.
-#
-# = AUTHOR
+# AUTHOR
 #
 # Patrick J Cherry <patrick@bytemark.co.uk>
 #
-# = DATE
+# DATE
 #
-# 2008-09-08
+# 2011-11-25
 
 
 require 'getoptlong'
@@ -96,7 +87,6 @@ require 'symbiosis/monitor/runner'
 require 'systemexit'
 require 'log4r'
 require 'log4r/outputter/syslogoutputter'
-require 'pp'
 
 #
 #  Ensure we have a sensible path.
@@ -128,7 +118,7 @@ level         = "INFO"
 state_db_fn   = "/var/lib/symbiosis/monit.db"
 template      = "default"
 template_dir  = "/usr/share/symbiosis/monit/"
-
+help = manual = false
 opts = nil
 
 #
@@ -160,9 +150,9 @@ begin
         send_mail   = true
         always_mail = true
       when "--help"
-        RDoc::usage('synopsis','usage')
+        help = true
       when "--manual"
-        RDoc::usage
+        manual = true
       when "--mailto"
         send_mail = true
         mailto_addr = arg
@@ -184,6 +174,33 @@ rescue GetoptLong::InvalidOption => e
  error e.to_s
 end
 
+# CAUTION! Kwality kode.
+#
+if manual or help
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
+
+  found_synopsis = false
+
+  lines.each do |line|
+
+    line.chomp!
+    break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
+    puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
+  end
+
+  exit 0
+end
+
 unless %w(EMERG ALARM CRIT ERR WARNING NOTICE INFO DEBUG).include?(level)
   error "Bad log level #{level}"
 end
@@ -201,7 +218,7 @@ logger.add Log4r::SyslogOutputter.new("symbiosis-monit")
 if 0 == Process.uid
   if Symbiois::Monitor::Check.dpkg_running?
     print "dpkg running -- not conducting tests." if $VERBOSE
-    exit 0
+    exit 2
   end
 end
 
