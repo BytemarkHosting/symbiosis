@@ -1,9 +1,16 @@
+symbiosis-monit (2011:1129) stable; urgency=low
+
+  * Fixed up monit reporting bugs
+  * Added new templates.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 29 Nov 2011 13:50:16 +0000
+
 symbiosis-monit (2011:1125) stable; urgency=low
 
   * Complete rewrite of system binary.
   * Now with tests.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 25 Nov 2011 19:36:31 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 29 Nov 2011 13:50:14 +0000
 
 symbiosis-monit (2010:0909) stable; urgency=low
 
