@@ -10,7 +10,7 @@ Package: symbiosis-mysql
 Replaces: bytemark-vhost-mysql
 Conflicts: bytemark-vhost-mysql
 Architecture: all
-Depends: mysql-server, debconf, ${misc:Depends}
+Depends: mysql-server-5.1, debconf, ${misc:Depends}
 Pre-Depends: symbiosis-common
 Description: A metapackage for MySQL
  This package ensures that the MySQL database will have a password setup.
