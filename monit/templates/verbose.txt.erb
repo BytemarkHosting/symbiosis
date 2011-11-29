@@ -1,0 +1,21 @@
+= Symbiosis service test report ========================================
+
+ Tests conducted on <%= hostname %>.
+ Tests started at <%= start_time.iso8601 %>.
+
+% tests.each do |t|
+<%= "-"*72 %> 
+ TEST:   <%= t.name %>
+
+<%= t.output %> 
+
+ RESULT: <%= t.success? ? "PASSED" : "FAILED" %>
+% if !t.success?
+ REASON: <%= t.exitstatus %>
+% end
+% end 
+<%= "-"*72 %> 
+
+ Tests finished at <%= finish_time.iso8601 %>.
+
+= End of service test report ===========================================

@@ -3,6 +3,7 @@ $:.unshift "../lib"
 require 'test/unit'
 require 'symbiosis/monitor/runner'
 require 'log4r'
+require 'log4r/outputter/syslogoutputter'
 require 'time'
 
 class TestRunner < Test::Unit::TestCase
@@ -13,6 +14,7 @@ class TestRunner < Test::Unit::TestCase
     @monit_d = File.join(File.dirname(__FILE__), "monit.d")
     @template_d = File.join(File.dirname(__FILE__), "../templates")
     @log = Log4r::Logger.new("Symbiosis::Monitor")
+    @log.level = Log4r::CRIT unless $debug or $verbose
     @log.add Log4r::Outputter.stdout()
     #
     # Set up the flip-flop test to fail initially
@@ -66,7 +68,6 @@ class TestRunner < Test::Unit::TestCase
     runner = nil
     assert_nothing_raised { runner = Symbiosis::Monitor::Runner.new(@monit_d, @statedb_fn, @template_d) }
     assert_kind_of(Log4r::Logger, runner.logger)
-    pp runner.logger
   end
 
   def test_dpkg_running?

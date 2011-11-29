@@ -1,0 +1,6 @@
+Symbiosis: <%= hostname+": "%>
+% if failed_tests.length > 0
+<%= failed_tests.length %> test<%= failed_tests.length > 1 ? "s" : "" %> failed: <%= failed_tests.collect{|t| t.name }.join(", ") %>
+% else
+All tests passed
+% end

@@ -73,11 +73,11 @@ module Symbiosis
         # Sanity checks...
         #
         status = $?
-        raise RuntimeError, "Somehow the command #{@script} didn't execute." unless status.is_a?(Process::Status)
+        raise RuntimeError, "Somehow the command #{@script} didn't execute." unless status.is_a?(::Process::Status)
         raise RuntimeError, "Process IDs didn't match when checking #{@script}." if pid != status.pid
 
         @exitstatus = SystemExit.new(status.exitstatus)
-        @exitstatus.set_backtrace @output.join("\n")
+        @exitstatus.set_backtrace @output
 
         #
         # Record the answer.

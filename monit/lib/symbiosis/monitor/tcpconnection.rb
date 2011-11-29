@@ -51,7 +51,7 @@ module Symbiosis
               sock = self.connect
               @script.each do |line|
                 if line.is_a?(String)
-                  @transactions << "> "+line..chomp.inspect[1..-2]
+                  @transactions << "> "+line.chomp.inspect[1..-2]
                   puts @transactions.last
                   sock.print line
                 else

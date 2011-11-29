@@ -4,6 +4,7 @@ require 'erb'
 require 'time'
 require 'symbiosis/monitor/state_db'
 require 'symbiosis/monitor/test'
+require 'symbiosis/monitor/check'
 
 module Symbiosis
 
@@ -16,8 +17,10 @@ module Symbiosis
 
       def initialize(dir = "/etc/symbiosis/monit.d", state_db_fn = "/var/lib/symbiosis/monit.db", template_dir = "/usr/share/symbiosis/monitor/" )
         @dir          = dir
+        raise "Test directory #{dir} not found" unless File.directory?(dir)
         @state_db_fn  = state_db_fn
         @template_dir = template_dir
+        raise "Template directory #{template_dir} not found" unless File.directory?(template_dir)
         self.reset
       end
 
@@ -43,7 +46,7 @@ module Symbiosis
       end
 
       def dpkg_running?
-       Symbiois::Monitor::Check.dpkg_running?
+       Symbiosis::Monitor::Check.dpkg_running?
       end
 
       def state_db
@@ -56,34 +59,44 @@ module Symbiosis
 
       def go
         @start_time = Time.now
+        logger.debug("STARTING")
 
         self.tests.each do |test|
           begin
             result = test.run
-            raise result unless test.success? 
-            logger.info("#{test.name}: OK")
-          rescue SystemExit => err
-            if logger.respond_to?(:warning)
-              logger.warning("#{test.name}: FAIL #{err.to_s}")
+            raise result unless test.success?
+            if test.retried
+              result.backtrace.each{ |l| logger.info("#{test.name}: #{l}") }
+              logger.warning("#{test.name}: PASSED")
             else
-              logger.warn("#{test.name}: FAIL #{err.to_s}")
+              result.backtrace.each{ |l| logger.debug("#{test.name}: #{l}") }
+              logger.debug("#{test.name}: PASSED")
             end
+          rescue SystemExit => err
+            #
+            # Log the backtrace if we've failed.
+            #
+            err.backtrace.each{ |l| logger.info("#{test.name}: #{l}") }
 
-            logger.debug(err.backtrace.join("\n"))
             #
             # If we get a temporary failure, retry!
             #
-            retry if ( SystemExit::EX_TEMPFAIL == err.to_i and not test.retried )
+            if ( SystemExit::EX_TEMPFAIL == err.to_i and not test.retried )
+              logger.warning("#{test.name}: RETRYING (following #{err.to_s})")
+              retry
+            end
 
             # 
             # Otherwise do nothing.
             #
+            logger.warning("#{test.name}: FAILED: #{err.to_s}")
           rescue RuntimeError => err
             error err.to_s
           end
 
         end
 
+        logger.info("RESULT: #{successful_tests.length}/#{tests.length} passed.")
         @finish_time = Time.now
 
         nil

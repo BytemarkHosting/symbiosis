@@ -17,6 +17,8 @@ fi
 
 cd $dir
 
+echo "I am $0"
+
 if [ $result = "success" ] ; then
   [ $self = 'flip-flop' ] && ln -sf fail flip-flop 
   [ $self = 'temp-flip-flop' ] && ln -sf tempfail temp-flip-flop 
@@ -28,9 +30,9 @@ elif [ $result = 'fail' ] ; then
   exit 1
 elif [ $result = 'tempfail' ] ; then
   [ $self = 'temp-flip-flop' ] && ln -sf success temp-flip-flop 
-  echo "Temporary failure"
+  echo "Whoops!  This is a temporary failure."
   exit 75
 else
-  echo "Usage failure."
+  echo "Oh dear.  You should read my manual."
   exit 64
 fi
