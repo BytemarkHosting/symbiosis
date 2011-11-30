@@ -1,0 +1,11 @@
+% iptables_cmds.each do |cmd|
+% %w(tcp udp).each do |proto|
+<%= cmd %> -A INPUT<% %>
+% unless port.nil?
+ -p <%= proto %> --dport <%= port %>
+%  end
+ <%= src %> -j <%= jump %>
+
+% break unless port
+% end
+% end

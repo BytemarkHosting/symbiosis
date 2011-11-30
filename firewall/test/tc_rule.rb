@@ -6,34 +6,18 @@ require 'fileutils'
 
 class TestFirewallRule < Test::Unit::TestCase
 
+  include Symbiosis
+
   def setup
-    @boilerplate = <<EOF
-% iptables_cmds.each do |cmd|
-% %w(tcp udp).each do |proto|
-<%= cmd %> -A <%= chain %>
-% unless port.nil?
- -p <%= proto %> --dport <%= port %>
-%  end
-% if incoming?
- <%= src %>
-% else
- <%= dst %>
-% end
- -j <%= jump %>
-
-% break unless port
-% end
-% end
-EOF
-
+    @template_dir = File.join(File.dirname(__FILE__),"rule.d")
   end
 
   def teardown
   end
 
   def test_built_in_named_rule
-    r = Symbiosis::Firewall::Rule.new("smtp")
-    r.template = @boilerplate
+    r = Firewall::Rule.new("smtp")
+    r.template_dir = @template_dir
     #
     # This will get boiled down to 2001:ba8:123::/56
     #
@@ -56,49 +40,50 @@ EOF
   end
 
   def test_built_in_numbered_rule
-    r = Symbiosis::Firewall::Rule.new("1919")
+    r = Firewall::Rule.new("1919")
+    r.template_dir = @template_dir
     r.address = "2001:ba8:123:0::12/56"
-    r.outgoing
+    r.incoming
     puts r.to_s
   end
   
   def test_legacy_rule_without_subst
-    r = Symbiosis::Firewall::Rule.new("allow-old")
-    r.template_dir = "./rule.d"
+    r = Firewall::Rule.new("allow-old")
+    r.template_dir = @template_dir
     puts r.to_s
   end
 
   def test_legacy_rule_ipv4
-    r = Symbiosis::Firewall::Rule.new("allow-old")
-    r.template_dir = "./rule.d"
+    r = Firewall::Rule.new("allow-old")
+    r.template_dir = @template_dir
     r.address = "1.2.3.4/30"
     puts r.to_s
   end
   
   def test_legacy_rule_ipv6
-    r = Symbiosis::Firewall::Rule.new("allow-old")
-    r.template_dir = "./rule.d"
+    r = Firewall::Rule.new("allow-old")
+    r.template_dir = @template_dir
     r.address = "2001:ba8:123:0::12/56"
     puts r.to_s
   end
 
   def test_new_rule_ipv4
-    r = Symbiosis::Firewall::Rule.new("allow")
-    r.template_dir = "./rule.d"
+    r = Firewall::Rule.new("allow")
+    r.template_dir = @template_dir
     r.address = "1.2.3.4/30"
     puts r.to_s
   end
 
   def test_new_rule_ipv6
-    r = Symbiosis::Firewall::Rule.new("allow")
-    r.template_dir = "./rule.d"
+    r = Firewall::Rule.new("allow")
+    r.template_dir = @template_dir
     r.address = "2001:ba8:123:0::12/56"
     puts r.to_s
   end
 
   def test_new_rule_all_ipv
-    r = Symbiosis::Firewall::Rule.new("allow")
-    r.template_dir = "./rule.d"
+    r = Firewall::Rule.new("allow")
+    r.template_dir = @template_dir
     puts r.to_s
   end
 

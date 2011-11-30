@@ -3,8 +3,7 @@ require 'symbiosis/firewall/ports'
 require 'test/unit'
 
 class TestPorts < Test::Unit::TestCase
-
-  include Symbiosis::Firewall
+  include Symbiosis
 
   def setup
   end
@@ -15,7 +14,7 @@ class TestPorts < Test::Unit::TestCase
   def test_parsing
     ports = nil
     assert_nothing_raised do
-      ports = Ports.new(File.dirname(__FILE__)+"/services")
+      ports = Firewall::Ports.new(File.dirname(__FILE__)+"/services")
     end
 
     assert_equal(4, ports.services.length)
