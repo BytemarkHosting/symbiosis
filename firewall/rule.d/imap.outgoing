@@ -1,5 +1,0 @@
-
-#
-#  Allow outgoing connections on port 143
-#
-/sbin/iptables -A OUTPUT -p tcp --dport 143 $DEST -j ACCEPT
