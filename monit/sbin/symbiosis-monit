@@ -209,8 +209,6 @@ begin
     end
   end
 
-  raise Errno::ENOENT, File.join(template_dir
-
   runner = Symbiosis::Monitor::Runner.new(dir, state_db_fn, template_dir)
   runner.go
   report = runner.report(template)
