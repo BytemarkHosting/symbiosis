@@ -18,7 +18,7 @@ module Symbiosis
       attr_reader :port
       attr_reader :jump
       attr_reader :jump_opts
-      attr_reader :chain
+      attr_reader :direction
       attr_reader :address
 
       #
@@ -28,7 +28,7 @@ module Symbiosis
         #
         # Some defaults..
         #
-        @chain = "INPUT"
+        @direction = "incoming"
         @jump      = "ACCEPT"
         @jump_opts = nil
         @address   = nil
@@ -73,40 +73,53 @@ module Symbiosis
       #  Set this rule to work against incoming connections.
       #
       def incoming
-        @chain = "INPUT"
+        @direction = "incoming"
       end
 
       #
       #  Is this incoming?
       #
       def incoming?
-        return( @chain == "INPUT" )
+        "incoming" == @direction
       end
 
       #
       # Set this rule to work against outgoing connections.
       #
       def outgoing
-        @chain = "OUTPUT"
+        @direction = "outgoing"
       end
 
       #
       #  Is this an outgoing rule?
       #
       def outgoing?
-        ( @chain == "OUTPUT" )
+        "outgoing" == @direction
       end
 
       #
-      # Return either "incoming" or "outgoing" depending on chain
+      # Two convenience methods to allow us to use chain/src_or_dst for templates.
       #
-      def direction
-        return "incoming" if incoming? 
-        return "outgoing" if outgoing?
-        #
-        # Hmm neither incoming or outgoing!
-        #
-        nil
+      def chain
+        case direction
+          when "incoming"
+            "INPUT"
+          when "outgoing"
+            "OUTPUT"
+          else
+            raise "Don't know which chain to choose for direction #{direction}."
+        end
+      end
+
+      def src_or_dst
+        case direction
+          when "incoming"
+            src
+          when "outgoing"
+            dst
+          else
+            raise "Don't know which src or dst to choose for direction #{direction}."
+        end
       end
 
       #
@@ -125,8 +138,8 @@ module Symbiosis
       #
       def iptables_cmds
         cmds = %w(iptables ip6tables)
-        cmds.delete("ip6tables") if self.ipv4?
-        cmds.delete("iptables")  if self.ipv6?
+        cmds.delete("iptables") unless self.ipv4?
+        cmds.delete("ip6tables") unless self.ipv6?
         cmds.collect{|c| "/sbin/#{c}"}
       end
 
@@ -141,14 +154,22 @@ module Symbiosis
         #
         if template =~ /\$(SRC|DEST)/
           lines = template.split("\n")
-          if ipv6? and lines.any?{|l| l =~ /^[^#]*iptables /}
-            warn "Disabling IPv4 rules for IPv6 addresses in #{@name}" if $VERBOSE
+
+          if !ipv4? and lines.any?{|l| l =~ /^[^#]*iptables /}
+            warn "Disabling IPv4 rules for non-IPv4 addresses in #{@name}" if $VERBOSE
             lines = lines.collect{|l| l =~ /^[^#]*iptables / ? "# "+l : l }
           end
+
           lines = lines.collect{|l| l.gsub("$SRC",src).gsub("$DEST",dst)}
+
           return lines.join("\n") 
         else
-          return ERB.new(template,0,'%>').result(binding)
+          begin
+            return ERB.new(template,0,'%>').result(binding)
+          rescue SyntaxError => err
+            warn "Caught syntax error in #{template}:"
+            raise err
+          end
         end
       end
 
@@ -185,28 +206,15 @@ module Symbiosis
         return @template unless @template.nil?
 
         fn = "#{@template_dir}/#{@name}.#{direction}"
-        if ( File.exists?( fn ) )
-          @template = File.read(fn)
-        else
-          @template =<<EOF
-% iptables_cmds.each do |cmd|
-% %w(tcp udp).each do |proto|
-<%= cmd %> -A <%= chain %>
-% unless port.nil?
- -p <%= proto %> --dport <%= port %>
-%  end
-% if incoming?
- <%= src %>
-% else
- <%= dst %>
-% end
- -j <%= jump %>
-
-% break unless port
-% end
-% end
-EOF
+        begin
+          @template = File.read(fn) 
+        rescue Errno::ENOENT => err
+          old_fn = fn
+          fn = "#{@template_dir}/accept.#{direction}"
+          retry unless old_fn == fn
+          raise err
         end
+
         @template
       end
 

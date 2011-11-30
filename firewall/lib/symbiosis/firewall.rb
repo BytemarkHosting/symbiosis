@@ -41,7 +41,6 @@ module Symbiosis
       return File.exists?( File.join(@base_dir, "disabled" ) )
     end
 
-
     #
     # Run a self-test upon the firewall rules.  This merely needs to
     # test that an outgoing DNS lookup succeeds, and that an external
@@ -192,8 +191,7 @@ EOF
         end
       end
 
-      read_rules( File.join(@base_dir, "outgoing.d" ) ).each do |name|
-
+      read_rules( File.join(@base_dir, "outgoing.d" ) ).each do |name, addresses|
         t = Rule.new( name )
         t.template_dir = @template_dir
         t.permit()
@@ -246,7 +244,6 @@ EOF
         #
         results << [template, File.readlines(File.join(directory,entry)).collect{|l| l.chomp}]
       end
-
 
       #
       #  Return the names.
