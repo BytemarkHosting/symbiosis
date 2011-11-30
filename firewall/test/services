@@ -1,0 +1,12 @@
+# Network services, Internet style
+#
+# Only one echo definition should be generated
+echo		7/tcp
+echo		7/udp
+#
+#  We should ignore the next line because echo has already been defined.
+echo		8/udp
+# This should generate three entries, one for mail, one for smtp, one for inboundmail
+smtp		25/tcp		mail inboundmail
+# This next line is ignored, because it is not a tcp or udp service.
+blah    123/udanbv ulanbatur

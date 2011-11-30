@@ -1,0 +1,6 @@
+#
+#  Allow all incoming connections.
+#
+% iptables_cmds.each do |cmd|
+<%= cmd %> -A INPUT -p all <%= source %> -j ACCEPT
+% end

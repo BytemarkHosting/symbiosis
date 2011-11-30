@@ -2,6 +2,15 @@
 #  Allow ICMP echo requests - not being able to ping a machine is annoying.
 #
 
-for i in echo-request echo-reply ttl-exceeded ; do
-    /sbin/iptables -A INPUT -p icmp --icmp-type $i $SRC -j ACCEPT
-done
+% if ipv4?
+% %w(echo-request echo-reply ttl-exceeded).each do |type|
+/sbin/iptables -A INPUT -p icmp --icmp-type <%= type %> <%= src %> -j ACCEPT
+% end
+% end
+% if ipv6?
+% %w(echo-request echo-reply ttl-exceeded).each do |type|
+/sbin/ip6tables -A INPUT -p icmpv6 --icmpv6-type <%= type %> <%= src %> -j ACCEPT
+% end
+% end
+
+

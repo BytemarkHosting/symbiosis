@@ -34,644 +34,12 @@
 
 
 require 'getoptlong'
-require 'singleton'
 require 'tempfile'
-
-
-
-
-
-
-
-
-#
-#  A singleton class that converts the services file /etc/services
-# to a hash, and allows a port number to be looked up for any given
-# service name.
-#
-#  Note that there is no differentiation between TCP and UDP.
-#
-#
-class PortLookup
-  include Singleton
-
-  #
-  # A hash of the service and port combinations
-  #
-  attr_reader :services
-
-  #
-  # Constructor.  Because this is a singleton class it is only
-  # invoked once.
-  #
-  # We read the services-file and store the data from within it
-  # into a hash for later lookups.
-  #
-  def initialize( filename = "/etc/services" )
-    @services = Hash.new
-
-    #
-    #  Ensure the file exists
-    #
-    throw "The services file '#{filename}' is missing" unless
-      File.exists?(filename)
-
-    #
-    #  Read the file.
-    #
-    begin
-      File.open(filename).readlines().each do |line|
-
-        #
-        # service-names are alphanumeric - but also include "-" and "_".
-        #
-        if ( line =~ /^([-a-z_0-9]+)\s+([0-9]+)\// )
-          @services[$1.dup.downcase ] = $2
-        end
-
-      end
-    rescue
-      throw "There was an error reading the '#{filename}' file"
-    end
-
-  end
-
-
-  #
-  #  Find the TCP/UDP port of the named service.
-  #
-  def lookup( name )
-
-    # numeric name is a cheat - we just return that port.
-    if ( name =~ /^([0-9]+)$/ )
-      return $1.to_i
-    end
-
-    # Lookup the port, if present
-    port = @services[name.downcase]
-
-    # return numeric value - not a string value
-    port.nil? ? nil : port.to_i
-  end
-
-
-  #
-  #  Is the name defined?
-  #
-  def defined?( name )
-    port = @services[name.downcase]
-    ( ! port.nil? )
-  end
-end
-
-
-
-
-
-
-
-
-
-#
-#  This class encapsulates a single firewall (iptables) rule.
-#
-class FirewallRule
-
-  attr_reader :port
-  attr_reader :jump
-  attr_reader :direction
-  attr_reader :source
-
-
-  #
-  #  Constructor
-  #
-  def initialize( name )
-    @direction = nil
-    @jump      = nil
-    @src       = nil
-    @port      = nil
-    @name      = name
-
-    if ( !@name.nil? )
-      @port = PortLookup.instance().lookup( @name )
-    end
-  end
-
-  #
-  #  Helper:  Note no port is required for a blacklist.
-  #
-  def FirewallRule.blacklist( ip )
-    f = FirewallRule.new( "blacklist-#{ip}" )
-    f.incoming()
-    f.src( ip)
-    f.deny()
-    return f
-  end
-
-  #
-  #  Helper:  Note no port is required for a whitelist.
-  #
-  def FirewallRule.whitelist( ip )
-    f = FirewallRule.new( "whitelist-#{ip}" )
-    f.incoming()
-    f.src( ip )
-    f.permit()
-    return f
-  end
-
-
-
-  def permit
-    @jump = "ACCEPT"
-  end
-
-  def deny
-    @jump = "DROP"
-  end
-
-  #
-  #  Set this rule to work against incoming connections.
-  #
-  def incoming
-    @direction = "INPUT"
-  end
-
-
-  #
-  #  Is this incoming?
-  #
-  def incoming?
-    return( @direction == "INPUT" )
-  end
-
-
-  #
-  # Set this rule to work against outgoing connections.
-  #
-  def outgoing
-    @direction = "OUTPUT"
-  end
-
-
-  #
-  #  Is this an outgoing rule?
-  #
-  def outgoing?
-    ( @direction == "OUTPUT" )
-  end
-
-
-
-  #
-  #  The meat of the code.  This is designed to return the
-  # actual "iptable" command which this rule can be used
-  # to generate.
-  #
-  def to_s()
-    #
-    #  If there is a template - use that.
-    #
-    if ( template? )
-      return( "template expansion" )
-    end
-
-
-    #
-    #  If we have a port then we must include that.
-    #
-    port=""
-    if ( ! @port.nil? )
-      port="-p tcp --dport #{@port}"
-    end
-
-    #
-    #  If we have a source:
-    #
-    acl=""
-    if ( ! @src.nil? )
-
-      if ( incoming? )
-        acl="--source #{@src}"
-      else
-        acl="--dest #{@src}"
-      end
-    end
-
-
-    #
-    #  OK a single-rule should be sufficient.
-    #
-    #  TODO:  Duplicate for IPv6.
-    #
-    return "iptables -A #{direction} #{port} #{acl} -J #{@jump}"
-  end
-
-
-  #
-  #  Set the source
-  #
-  def src( new_src )
-    @src = new_src
-  end
-
-  def src?
-    @src
-  end
-
-
-  def port( new_port )
-    @port = new_port
-  end
-
-  def port?
-    @port
-  end
-
-  #
-  #  Is there a template for this rule?
-  #
-  def template?
-    if ( incoming? )
-      File.exists?( "/usr/share/symbiosis/firewall/#{@name}.incoming" )
-    else
-      File.exists?( "/usr/share/symbiosis/firewall/#{@name}.outgoing" )
-    end
-  end
-end
-
-
-
-
-
-
-#
-# This class allows a directory containing IP addresses to be used
-# to construct either a whitelist or a blacklist of the IP addresses
-# which are in that directory.
-#
-# For example the following directory tree will blacklist all incoming
-# connections from the IP addresses 1.2.3.4, 1.4.4.4, and 10.20.30.40:
-#
-# .
-# |--- 10.20.30.40
-# |---  1.2.3.4
-# \--   1.4.4.4
-#
-# 0 directories, 3 files
-#
-#
-#
-class DirectoryIPList
-
-  attr_reader :directory
-  attr_reader :ips
-
-
-
-  #
-  #  Read all the IP files in a given directory and store them within
-  # our list.
-  #
-  def initialize( directory )
-
-    @directory = directory
-    @ips       = Array.new()
-
-    throw "Directory not found #{directory}" unless
-      File.directory?( directory );
-
-
-    #
-    #  Read the contents of the directory
-    #
-    Dir.entries( directory ).each do |file|
-
-      #
-      #  Skip "dotfiles".
-      #
-      next if ( file =~ /^\./ )
-
-      #
-      #  Here we need to strip the optional ".auto" suffix.
-      #
-      if ( file =~ /(.*)\.auto$/i )
-        file = $1.dup
-      end
-
-      #
-      #  Save it away.
-      #
-      @ips.push( file )
-    end
-  end
-
-
-  #
-  #  Generate appropriate IPtable rules for a whitelist
-  #
-  def whitelist
-    result = ""
-
-    @ips.each do |ip|
-      f = FirewallRule.whitelist( ip )
-
-      result = result + "\n# Whitelisted IP: #{ip} - #{directory}/#{ip}"
-      result = result + "\n" + f.to_s
-    end
-
-    result
-  end
-
-
-  #
-  #  Generate appropriate IPtable rules for a blacklist
-  #
-  def blacklist
-    result = ""
-
-    @ips.each do |ip|
-      f = FirewallRule.blacklist( ip )
-      result = result + "\n# Blacklisted IP: #{ip} - #{directory}/#{ip}"
-      result = result + "\n" + f.to_s
-    end
-
-    result
-  end
-
-end
-
-
-
-
-
-
-
-
-#
-# A meta-class which represents this firewall
-#
-class SymbiosisFirewall
-
-  attr_reader :incoming
-  attr_reader :outgoing
-  attr_reader :blacklist
-  attr_reader :whitelist
-  attr_reader :ipv6
-  attr_reader :template
-
-
-  #
-  #  Constructor
-  #
-  def initialize()
-    @ipv6 = false
-#    @template =  File.open( "./firewall.erb", "r" ).read()
-  end
-
-
-  #
-  #  Is the firewall disabled?
-  #
-  def disabled?
-    return( File.exists?( "/etc/symbiosis/firewall/disabled" ) )
-  end
-
-
-  #
-  #  Run a self-test upon the firewall rules.  This merely needs to
-  # test that an outgoing DNS lookup succeeds, and that an external
-  # ping succeeds.
-  #
-  #  If the test fails it will call flush().
-  #
-  def test()
-    puts "'firewall --test' invoked.  TODO - Write code."
-    0
-  end
-
-
-  #
-  #  Flush/Remove all existing firewall rules.
-  #
-  def flush()
-    flush_ipv4
-    flush_ipv6 if ( ipv6? )
-  end
-
-
-  #
-  #  Flush all IPv4-specific firewall rules which might be present.
-  #
-  def flush_ipv4
-    commands = [
-               "/sbin/iptables -P INPUT ACCEPT",
-               "/sbin/iptables -P OUTPUT ACCEPT",
-               "/sbin/iptables -P FORWARD ACCEPT",
-               "/sbin/iptables -F",
-               "/sbin/iptables -t nat -F",
-               "/sbin/iptables -t raw -F",
-               "/sbin/iptables -t mangle -F",
-               "/sbin/iptables -X"
-    ];
-
-    commands.each do |cmd|
-      Kernel.system( cmd )
-    end
-  end
-
-
-  #
-  #  Flush all IPv6-specific firewall rules which might be present.
-  #
-  def flush_ipv6
-    commands = [
-               "/sbin/ip6tables -P INPUT ACCEPT",
-               "/sbin/ip6tables -P OUTPUT ACCEPT",
-               "/sbin/ip6tables -P FORWARD ACCEPT",
-               "/sbin/ip6tables -F",
-               "/sbin/ip6tables -t nat -F",
-               "/sbin/ip6tables -t raw -F",
-               "/sbin/ip6tables -t mangle -F",
-                "/sbin/ip6tables -X"
-    ];
-
-    commands.each do |cmd|
-      Kernel.system( cmd )
-    end
-  end
-
-
-
-  #
-  # Is IPv6 enabled?
-  #
-  def ipv6?
-    return(@ipv6)
-  end
-
-
-
-  #
-  #  Read the permitted incoming rules on the filesystem.
-  #
-  def readIncoming
-    @incoming = readRules( "/etc/symbiosis/firewall/incoming.d/" )
-  end
-
-  #
-  #  Read the permitted outgoing rules on the filesystem.
-  #
-  def readOutgoing
-    @outgoing = readRules( "/etc/symbiosis/firewall/outgoing.d/" )
-  end
-
-
-  #
-  #  This method is the key which ties all the distinct steps together.
-  #
-  #  It is responsible for :
-  #
-  #   1.  Creating a temporary file, to write the firewall to.
-  #
-  #   2.  Writing out the static prefix to the firewall.
-  #
-  #   3.  Writing out the whitelist and blacklist parts.
-  #
-  #   4.  Writing out the individual rules.
-  #
-  #   5.  Closing and returning the name of that file.
-  #
-  def createFirewall()
-    fname = Tempfile.new( "fw" ).path
-
-    #
-    #  Open the file for writing.
-    #
-    File.open( fname, "w" ) do |fw|
-
-
-      #
-      #  Write our header there.
-      #
-      fw.puts <<EOF
-#!/bin/bash
-#
-#  This firewall script was automatically generated by the
-# Bytemark Symbiosis firewall package.
-#
-#
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/X11
-export PATH
-
-#
-# Enable free use of loopback interfaces
-#
-/sbin/iptables -A INPUT  -i lo -j ACCEPT
-/sbin/iptables -A OUTPUT -o lo -j ACCEPT
-
-
-#
-# Ditto for IPv6.
-#
-#
-ip6tables -A INPUT  -i lo -j ACCEPT 2>/dev/null >/dev/null
-ip6tables -A OUTPUT -o lo -j ACCEPT 2>/dev/null >/dev/null
-
-EOF
-
-      #
-      #  Now write out our whitelist - which comes first.
-      #
-      wlist = DirectoryIPList.new( "/etc/symbiosis/firewall/whitelist.d" )
-      fw.puts( wlist.whitelist )
-
-      #
-      #  Now we write out our blacklist.
-      #
-      blist = DirectoryIPList.new( "/etc/symbiosis/firewall/blacklist.d" )
-      fw.puts( blist.blacklist )
-
-      #
-      #  Finally we have to write out our rules.
-      #
-      readIncoming()
-      @incoming.each do |name|
-
-        t = FirewallRule.new( name )
-        t.permit()
-        t.incoming()
-        fw.puts( t )
-      end
-
-      readOutgoing()
-      @outgoing.each do |name|
-
-        t = FirewallRule.new( name )
-        t.permit()
-        t.outgoing()
-        fw.puts( t )
-
-      end
-
-    end
-
-    return(fname)
-  end
-
-
-#
-# Here be dragons.
-#
-private
-
-  #
-  #  Read from an incoming/outgoing directory and collate the results.
-  #
-  # TODO:  Rethink this - as here we only read the names, and we should
-  #        also take account of the ACL which might be inside the file.
-  #
-  def readRules( directory )
-
-    results = Array.new()
-
-    throw "Directory not found #{directory}" unless File.directory?( directory );
-
-    Dir.entries( directory ).each do |file|
-
-      #
-      #  Skip dotfiles
-      #
-      next if ( file =~ /^\./ )
-
-      #
-      #  Here we need to strip off the leading numerical prefix
-      # which is only present to show sort order.
-      #
-      if ( file =~ /([0-9]*)-(.*)/ )
-        results.push( $2.dup )
-      end
-
-    end
-
-    #
-    #  Return the names.
-    #
-    results
-  end
-
-end
-
-
-
-
-
+require 'symbiosis/firewall'
 
 def verbose(s)
   puts s if $VERBOSE
 end
-
-
 
 
 #
@@ -688,42 +56,56 @@ if __FILE__ == $0 then
   #
   #  Parse the arguments
   #
-  $HELP     = false
+  help     = false
   $TEMPLATE = nil
   $VERBOSE  = false
-  $TEST     = false
-  $FLUSH    = false
-  $EXECUTE  = true
-  $DELETE   = true
+  test     = false
+  flush    = false
+  execute  = true
+  delete   = true
+  base_dir = '/etc/symbiosis/firewall'
+  template_dir = '/usr/share/symbiosis/firewall/rules.d'
 
   opts = GetoptLong.new(
                         [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+                        [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
                         [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
                         [ '--test', '-t', GetoptLong::NO_ARGUMENT ],
                         [ '--flush', '-f', GetoptLong::NO_ARGUMENT ],
                         [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ],
-                        [ '--no-delete', '-d', GetoptLong::NO_ARGUMENT ]
-                        )
+                        [ '--no-delete', '-d', GetoptLong::NO_ARGUMENT ],
+                        [ '--no-root', '-R', GetoptLong::NO_ARGUMENT ],
+                        [ '--base-d', '-b', GetoptLong::REQUIRED_ARGUMENT ],
+                        [ '--template-d', '-T', GetoptLong::REQUIRED_ARGUMENT ],
+                        [ '--services', '-s', GetoptLong::REQUIRED_ARGUMENT ]
+                       )
+
 
 
   opts.each do |opt,arg|
     case opt
     when '--help'
-      $HELP = true
+      help = true
     when '--verbose'
       $VERBOSE = true
     when '--flush'
-      $FLUSH = true
+      flush = true
     when '--test'
-      $TEST = true
+      test = true
     when '--no-execute'
-      $EXECUTE = false
+      execute = false
     when '--no-delete'
-      $DELETE = false
+      delete = false
+    when '--base-d'
+      base_dir = arg
+    when '--template-d'
+      template_dir = arg
+    when '--services'
+      services = arg
     end
   end
 
-  if ( $HELP )
+  if ( help )
     # Open the file, stripping the shebang line
     lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
 
@@ -735,14 +117,14 @@ if __FILE__ == $0 then
     exit 0
   end
 
-
-
   begin
 
     #
     #  If we're disabled exit.
     #
-    myself = SymbiosisFirewall.new()
+    myself = Symbiosis::Firewall.new(base_dir)
+    myself.template_dir = template_dir unless template_dir.nil?
+
     if ( myself.disabled? )
       verbose( "Firewall disabled.  Exiting cleanly." )
       System.exit(0)
@@ -752,7 +134,7 @@ if __FILE__ == $0 then
     #
     #  Just testing?
     #
-    if ( $TEST )
+    if ( test )
       exit( myself.test() )
     end
 
@@ -760,7 +142,7 @@ if __FILE__ == $0 then
     #
     #  Flushing / Removing the firewall?
     #
-    if ( $FLUSH )
+    if ( flush )
       myself.flush()
       exit 0
     end
@@ -769,27 +151,27 @@ if __FILE__ == $0 then
     #
     #  Write the firewall to a local file
     #
-    file = myself.createFirewall()
+    tf = Tempfile.new("symbiois-firewall")
+    myself.create_firewall(tf)
+    tf.close
 
-    if ( $EXECUTE )
-      system( "chmod 755 #{file}" )
-      system( file )
+    if ( execute )
+      system( "chmod 755 #{tf}" )
+      system( tf.path )
       #      system( "run-parts .../local.d/" )
     end
 
-    if ( $DELETE )
-      File.unlink( file )
+    if ( delete )
+      File.unlink( tf.path )
     else
 
       #
       #  TODO: Fix this.  Because we used Tempfile we have to manually
       # copy the firewall to a new name as it is unlinked at process exit.
       #
-      Kernel.system("cp #{file} #{file}2")
-      puts "Left firewall in #{file}2"
+      Kernel.system("cp #{tf.path} #{tf.path}2")
+      puts "Left firewall in #{tf.path}2"
     end
-  rescue
-    puts "There was an exception", $!, "\n"
   end
 
 end
