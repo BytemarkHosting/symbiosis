@@ -1,4 +1,1 @@
-#
-#  Allow incoming connections when already established
-#
-/sbin/iptables -A OUTPUT -m state --state ESTABLISHED $DEST -j ACCEPT
+established.incoming

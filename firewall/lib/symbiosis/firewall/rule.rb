@@ -16,8 +16,6 @@ module Symbiosis
 
       attr_reader :name
       attr_reader :port
-      attr_reader :jump
-      attr_reader :jump_opts
       attr_reader :direction
       attr_reader :address
 
@@ -29,12 +27,10 @@ module Symbiosis
         # Some defaults..
         #
         @direction = "incoming"
-        @jump      = "ACCEPT"
-        @jump_opts = nil
         @address   = nil
         @port      = nil
         @template  = nil
-        @template_dir = '/usr/share/symbiosis/firewall'
+        @template_dirs = %w(/usr/local/share/firewall /usr/local/share/symbiosis/firewall /usr/share/firewall /usr/share/symbiosis/firewall)
         @name      = name
         @port      = @@ports.lookup( @name ) unless @name.nil? 
       end
@@ -43,10 +39,9 @@ module Symbiosis
       #  Helper:  Note no port is required for a blacklist.
       #
       def self.blacklist( ip )
-        f = self.new( "blacklist-#{ip}" )
+        f = self.new( "drop" )
         f.incoming()
         f.address( ip )
-        f.deny()
         return f
       end
 
@@ -54,19 +49,10 @@ module Symbiosis
       #  Helper:  Note no port is required for a whitelist.
       #
       def self.whitelist( ip )
-        f = self.new( "whitelist-#{ip}" )
+        f = self.new( "accept" )
         f.incoming()
         f.address( ip )
-        f.permit()
         return f
-      end
-
-      def permit
-        @jump = "ACCEPT"
-      end
-
-      def deny
-        @jump = "DROP"
       end
 
       #
@@ -205,14 +191,31 @@ module Symbiosis
       def template
         return @template unless @template.nil?
 
-        fn = "#{@template_dir}/#{@name}.#{direction}"
-        begin
+        fn = nil
+        
+        #
+        # Search all the template directories...
+        #
+        @template_dirs.each do |td|
+          fn = "#{td}/#{@name}.#{direction}"
+          next unless File.exists?(fn)
+
           @template = File.read(fn) 
-        rescue Errno::ENOENT => err
-          old_fn = fn
-          fn = "#{@template_dir}/accept.#{direction}"
-          retry unless old_fn == fn
-          raise err
+        end
+
+        #
+        # OK we've found the template!
+        #
+        return @template unless @template.nil?
+
+        #
+        # OK, we've not found it.  Try using "accept".
+        #
+        @template_dirs.each do |td|
+          fn = "#{td}/accept.#{direction}"
+          next unless File.exists?(fn)
+
+          @template = File.read(fn) 
         end
 
         @template
@@ -225,11 +228,20 @@ module Symbiosis
         @template = t
       end
 
+      #
+      # If we specify a template directory, ignore all the rest.
+      #
       def template_dir=(td)
-        @template_dir = td
+        @template_dirs = [ td ]
+      end
+
+      def direction=(d)
+        raise ArgumentError, "Bad direction #{d.inspect}" unless %w(incoming outgoing).include?(d)
+        @direction = d
       end
 
     end
 
   end
+
 end

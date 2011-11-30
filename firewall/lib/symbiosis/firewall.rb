@@ -173,36 +173,26 @@ EOF
         fw.puts( blist.blacklist )
       end
 
-      #
-      #  Finally we have to write out our rules.
-      #
-      read_rules( File.join(@base_dir, "incoming.d" ) ).each do |name,addresses|
-        t = Rule.new( name )
-        t.template_dir = @template_dir
-        t.permit()
-        t.incoming()
-        unless addresses.empty?
-          addresses.each do |a|
-            t.address = a
-            fw.puts( t.to_s )
+      %w(incoming outgoing).each do |direction|
+        #
+        #  Finally we have to write out our rules.
+        #
+        read_rules( File.join(@base_dir, "#{direction}.d" ) ).each do |name,addresses|
+          new_rules = []
+          begin
+            t = Rule.new( name )
+            t.template_dir = @template_dir
+            t.direction = direction
+            addresses.each do |a|
+              t.address = a
+              new_rules << t.to_s
+            end
+            new_rules << t.to_s if addresses.empty?
+          rescue ArgumentError => err
+            warn "Ignoring #{direction} rule #{name} because #{err.to_s}"
           end
-        else
-          fw.puts( t.to_s )
-        end
-      end
 
-      read_rules( File.join(@base_dir, "outgoing.d" ) ).each do |name, addresses|
-        t = Rule.new( name )
-        t.template_dir = @template_dir
-        t.permit()
-        t.outgoing()
-        unless addresses.empty?
-          addresses.each do |a|
-            t.address = a
-            fw.puts( t.to_s )
-          end
-        else
-          fw.puts( t.to_s )
+          fw.puts new_rules.join("\n") unless new_rules.empty?
         end
       end
 

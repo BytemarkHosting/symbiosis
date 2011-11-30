@@ -1,4 +1,1 @@
-#
-#  Allow incoming connections when already established
-#
-/sbin/iptables -A OUTPUT -m state --state RELATED $DEST -j ACCEPT
+related.incoming

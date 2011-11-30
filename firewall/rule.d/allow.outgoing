@@ -1,4 +1,1 @@
-#
-#  Allow all outgoing connections.
-#
-/sbin/iptables -A OUTPUT -p all $DEST -j ACCEPT
+accept.incoming

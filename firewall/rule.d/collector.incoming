@@ -1,6 +1,7 @@
 
 #
-#  Allow incoming connections on port 7711
+#  Allow <%= direction %> connections on port 1919
 #
-/sbin/iptables -A INPUT -p tcp --dport 7711 $SRC -j ACCEPT
-/sbin/iptables -A INPUT -p tcp --dport 1919 $SRC -j ACCEPT
+% iptables_cmds.each do |cmd|
+<%= cmd %> -A <%= chain %> -p tcp --dport 1919 <%= src_or_dst %> -j ACCEPT
+% end

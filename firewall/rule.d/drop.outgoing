@@ -1,4 +1,1 @@
-#
-#  Drop outgoing connections
-#
-/sbin/iptables -A OUTPUT -p tcp -m state --state NEW $DEST -j REJECT --reject-with icmp-admin-prohibited
+drop.incoming

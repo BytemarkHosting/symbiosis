@@ -1,0 +1,179 @@
+#!/usr/bin/ruby
+#
+# NAME
+# ----
+#
+#   firewall -- The symbiosis firewall package.
+#
+# SYNOPSIS
+# --------
+#
+#  General Options:
+#
+#  Help Options:
+#
+#   --help        Show the help information for this script.
+#   --verbose     Show debugging information.
+#
+#
+# DETAILS
+# -------
+#
+#   This script is designed to both generate and load a simple firewall
+#  based upon the contents of a hierarchy of flat files and directories.
+#
+#   This means that creating a firewall will be as simple as touching a file
+#  or removing and existing one.
+#
+#
+# AUTHOR
+# ------
+#
+#    Steve Kemp <steve@bytemark.co.uk>
+#
+
+
+require 'getoptlong'
+require 'tempfile'
+require 'symbiosis/firewall'
+
+def verbose(s)
+  puts s if $VERBOSE
+end
+
+
+#
+##
+##  Entry point.
+##
+#######
+##############
+
+
+
+
+#
+#  Parse the arguments
+#
+help     = false
+manual   = false
+$VERBOSE = false
+test     = false
+flush    = false
+execute  = true
+delete   = true
+base_dir = '/etc/symbiosis/firewall'
+template_dir = '/usr/share/symbiosis/firewall/rules.d'
+
+#
+# This allows us just to symlink straight to /etc/network/if-up.d and if-down.d
+#
+if ENV.has_key?('IFACE')
+  flush = true if "stop" == ENV['MODE']
+  $VERBOSE = true if ENV.has_key?('VERBOSE')
+end
+
+opts = GetoptLong.new(
+                      [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+                      [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
+                      [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+                      [ '--test', '-t', GetoptLong::NO_ARGUMENT ],
+                      [ '--flush', '-f', GetoptLong::NO_ARGUMENT ],
+                      [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ],
+                      [ '--no-delete', '-d', GetoptLong::NO_ARGUMENT ],
+                      [ '--no-root', '-R', GetoptLong::NO_ARGUMENT ],
+                      [ '--base-d', '-b', GetoptLong::REQUIRED_ARGUMENT ],
+                      [ '--template-d', '-T', GetoptLong::REQUIRED_ARGUMENT ],
+                      [ '--services', '-s', GetoptLong::REQUIRED_ARGUMENT ]
+                     )
+
+opts.each do |opt,arg|
+  case opt
+  when '--help'
+    help = true
+  when '--verbose'
+    $VERBOSE = true
+  when '--flush'
+    flush = true
+  when '--test'
+    test = true
+  when '--no-execute'
+    execute = false
+  when '--no-delete'
+    delete = false
+  when '--base-d'
+    base_dir = arg
+  when '--template-d'
+    template_dir = arg
+  when '--services'
+    services = arg
+  end
+end
+
+if ( help )
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
+
+  lines.each do |line|
+    line.chomp!
+    break if line.empty?
+    puts line[2..-1].to_s
+  end
+  exit 0
+end
+
+begin
+
+  #
+  #  If we're disabled exit.
+  #
+  myself = Symbiosis::Firewall.new(base_dir)
+  myself.template_dir = template_dir unless template_dir.nil?
+
+  if ( myself.disabled? )
+    verbose( "Firewall disabled.  Exiting cleanly." )
+    System.exit(0)
+  end
+
+
+  #
+  #  Just testing?
+  #
+  exit( myself.test() ) if ( test )
+
+  #
+  #  Flushing / Removing the firewall?
+  #
+  if ( flush )
+    myself.flush()
+    exit 0
+  end
+
+
+  #
+  #  Write the firewall to a local file
+  #
+  tf = Tempfile.new("symbiosis-firewall-")
+  myself.create_firewall(tf)
+  tf.close
+
+  if ( execute )
+    system( "chmod 755 #{tf}" )
+    system( tf.path )
+    #      system( "run-parts .../local.d/" )
+  end
+
+  if ( delete )
+    File.unlink( tf.path )
+  else
+
+    #
+    #  TODO: Fix this.  Because we used Tempfile we have to manually
+    # copy the firewall to a new name as it is unlinked at process exit.
+    #
+    Kernel.system("cp #{tf.path} #{tf.path}2")
+    puts "Left firewall in #{tf.path}2"
+  end
+end
+
+

@@ -1,6 +1,1 @@
-
-#
-#  Allow outgoing connections on port 7711
-#
-/sbin/iptables -A OUTPUT -p tcp --dport 7711 $DEST -j ACCEPT
-/sbin/iptables -A OUTPUT -p tcp --dport 1919 $DEST -j ACCEPT
+collector.incoming

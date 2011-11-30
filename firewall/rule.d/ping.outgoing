@@ -1,7 +1,1 @@
-#
-#  Allow ICMP echo requests - not being able to ping a machine is annoying.
-#
-
-for i in echo-request echo-reply ttl-exceeded ; do
-    /sbin/iptables -A OUTPUT -p icmp --icmp-type $i $DEST -j ACCEPT
-done
+ping.incoming

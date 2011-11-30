@@ -1,7 +1,11 @@
 #
 #  Allow established incoming connections for resolving DNS
 #
-/sbin/iptables -A INPUT -p udp --sport 53 --dport 1024:65535 -m state --state ESTABLISHED -j ACCEPT
+% iptables_cmds.each do |cmd|
+<%= cmd %> -A INPUT -p tcp --sport 53 --dport 1024:65535 <%= src %> -m state --state ESTABLISHED -j ACCEPT
+<%= cmd %> -A INPUT -p udp --sport 53 --dport 1024:65535 <%= src %> -m state --state ESTABLISHED -j ACCEPT
+% end
+
 
 
 

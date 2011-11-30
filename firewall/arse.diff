@@ -1,0 +1,1341 @@
+diff -r 38a4002655a6 firewall/Makefile
+--- a/firewall/Makefile	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/Makefile	Wed Nov 30 20:18:54 2011 +0000
+@@ -41,9 +41,32 @@
+ 	if [ ! -d ./i/incoming.d/ ]; then mkdir ./i/incoming.d/; fi
+ 	if [ ! -d ./i/outgoing.d/ ]; then mkdir ./i/outgoing.d/; fi
+ 	if [ ! -d ./i/blacklist.d/ ]; then mkdir ./i/blacklist.d/; fi
+-	touch ./i/incoming.d/00-ssh
+-	touch ./i/incoming.d/05-ping
++	touch  i/incoming.d/00-established
++	touch  i/incoming.d/00-related
++	touch  i/incoming.d/05-ping
++	touch  i/incoming.d/07-ssh
++	touch  i/incoming.d/10-http
++	touch  i/incoming.d/15-https
++	touch  i/incoming.d/20-ftp
++	touch  i/incoming.d/30-imap
++	touch  i/incoming.d/40-imaps
++	touch  i/incoming.d/50-pop3
++	touch  i/incoming.d/60-pop3s
++	touch  i/incoming.d/70-smtp
++	touch  i/incoming.d/75-ntp
++	touch  i/incoming.d/80-smtps
++	touch  i/incoming.d/85-submission
++	touch  i/incoming.d/90-sieve
++	touch  i/incoming.d/99-reject
++	touch  i/outgoing.d/00-established
++	touch  i/outgoing.d/00-related
++	touch  i/outgoing.d/10-new-not-www-data
++	touch  i/outgoing.d/15-domain
++	echo "212.110.161.177" > i/outgoing.d/20-new-www-data
++	echo "2001:41c8:20:862:ac1:1::" >> i/outgoing.d/20-new-www-data
++	touch  i/outgoing.d/99-reject
+ 	fakeroot ./bin/firewall --incoming-d=./i/incoming.d --outgoing-d=./i/outgoing.d/ --rule-d=./rule.d/ --no-exec --verbose --blacklist-d=./i/blacklist.d --whitelist-d=./i/whitelist.d  --no-delete --verbose
++	ruby -I lib ./sbin/symbiosis-firewall -b ./i -T rule.d -x -v -d
+ 
+ ext/symbiosis_utmp.so: ext/Makefile
+ 	make -C ext $(notdir $@)
+diff -r 38a4002655a6 firewall/bin/firewall-ruby
+--- a/firewall/bin/firewall-ruby	Wed Nov 30 16:59:16 2011 +0000
++++ /dev/null	Thu Jan 01 00:00:00 1970 +0000
+@@ -1,179 +0,0 @@
+-#!/usr/bin/ruby
+-#
+-# NAME
+-# ----
+-#
+-#   firewall -- The symbiosis firewall package.
+-#
+-# SYNOPSIS
+-# --------
+-#
+-#  General Options:
+-#
+-#  Help Options:
+-#
+-#   --help        Show the help information for this script.
+-#   --verbose     Show debugging information.
+-#
+-#
+-# DETAILS
+-# -------
+-#
+-#   This script is designed to both generate and load a simple firewall
+-#  based upon the contents of a hierarchy of flat files and directories.
+-#
+-#   This means that creating a firewall will be as simple as touching a file
+-#  or removing and existing one.
+-#
+-#
+-# AUTHOR
+-# ------
+-#
+-#    Steve Kemp <steve@bytemark.co.uk>
+-#
+-
+-
+-require 'getoptlong'
+-require 'tempfile'
+-require 'symbiosis/firewall'
+-
+-def verbose(s)
+-  puts s if $VERBOSE
+-end
+-
+-
+-#
+-##
+-##  Entry point.
+-##
+-#######
+-##############
+-
+-
+-
+-if __FILE__ == $0 then
+-
+-  #
+-  #  Parse the arguments
+-  #
+-  help     = false
+-  $TEMPLATE = nil
+-  $VERBOSE  = false
+-  test     = false
+-  flush    = false
+-  execute  = true
+-  delete   = true
+-  base_dir = '/etc/symbiosis/firewall'
+-  template_dir = '/usr/share/symbiosis/firewall/rules.d'
+-
+-  opts = GetoptLong.new(
+-                        [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+-                        [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
+-                        [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+-                        [ '--test', '-t', GetoptLong::NO_ARGUMENT ],
+-                        [ '--flush', '-f', GetoptLong::NO_ARGUMENT ],
+-                        [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ],
+-                        [ '--no-delete', '-d', GetoptLong::NO_ARGUMENT ],
+-                        [ '--no-root', '-R', GetoptLong::NO_ARGUMENT ],
+-                        [ '--base-d', '-b', GetoptLong::REQUIRED_ARGUMENT ],
+-                        [ '--template-d', '-T', GetoptLong::REQUIRED_ARGUMENT ],
+-                        [ '--services', '-s', GetoptLong::REQUIRED_ARGUMENT ]
+-                       )
+-
+-
+-
+-  opts.each do |opt,arg|
+-    case opt
+-    when '--help'
+-      help = true
+-    when '--verbose'
+-      $VERBOSE = true
+-    when '--flush'
+-      flush = true
+-    when '--test'
+-      test = true
+-    when '--no-execute'
+-      execute = false
+-    when '--no-delete'
+-      delete = false
+-    when '--base-d'
+-      base_dir = arg
+-    when '--template-d'
+-      template_dir = arg
+-    when '--services'
+-      services = arg
+-    end
+-  end
+-
+-  if ( help )
+-    # Open the file, stripping the shebang line
+-    lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
+-
+-    lines.each do |line|
+-      line.chomp!
+-      break if line.empty?
+-      puts line[2..-1].to_s
+-    end
+-    exit 0
+-  end
+-
+-  begin
+-
+-    #
+-    #  If we're disabled exit.
+-    #
+-    myself = Symbiosis::Firewall.new(base_dir)
+-    myself.template_dir = template_dir unless template_dir.nil?
+-
+-    if ( myself.disabled? )
+-      verbose( "Firewall disabled.  Exiting cleanly." )
+-      System.exit(0)
+-    end
+-
+-
+-    #
+-    #  Just testing?
+-    #
+-    if ( test )
+-      exit( myself.test() )
+-    end
+-
+-
+-    #
+-    #  Flushing / Removing the firewall?
+-    #
+-    if ( flush )
+-      myself.flush()
+-      exit 0
+-    end
+-
+-
+-    #
+-    #  Write the firewall to a local file
+-    #
+-    tf = Tempfile.new("symbiois-firewall")
+-    myself.create_firewall(tf)
+-    tf.close
+-
+-    if ( execute )
+-      system( "chmod 755 #{tf}" )
+-      system( tf.path )
+-      #      system( "run-parts .../local.d/" )
+-    end
+-
+-    if ( delete )
+-      File.unlink( tf.path )
+-    else
+-
+-      #
+-      #  TODO: Fix this.  Because we used Tempfile we have to manually
+-      # copy the firewall to a new name as it is unlinked at process exit.
+-      #
+-      Kernel.system("cp #{tf.path} #{tf.path}2")
+-      puts "Left firewall in #{tf.path}2"
+-    end
+-  end
+-
+-end
+-
+-
+diff -r 38a4002655a6 firewall/bin/firewall-whitelist
+--- a/firewall/bin/firewall-whitelist	Wed Nov 30 16:59:16 2011 +0000
++++ /dev/null	Thu Jan 01 00:00:00 1970 +0000
+@@ -1,159 +0,0 @@
+-#! /usr/bin/ruby1.8
+-#
+-# NAME
+-#
+-#   firewall-whitelist -- Automatically whitelist IP addresses.
+-#
+-# SYNOPSIS
+-#
+-#  Options:
+-#
+-#   --prefix      The directory to operate upon.
+-#
+-#  Help Options:
+-#
+-#   --help        Show the help information for this script.
+-#   --verbose     Show debugging information.
+-#
+-# This script is designed to automatically whitelist IP addresses which
+-# have been used to successfully login via SSH.
+-#
+-# It does this by parsing the output of the "last" command, and creating
+-# entries in /etc/symbiosis/firewall/whitelist.d/
+-#
+-# AUTHOR
+-#
+-#   Steve Kemp <steve@bytemark.co.uk>
+-#
+-
+-#
+-#  Modules we require
+-#
+-
+-require 'getoptlong'
+-require 'ipaddr'
+-require 'symbiosis/utmp'
+-
+-opts = GetoptLong.new(
+-    [ '--help',    '-h', GetoptLong::NO_ARGUMENT ],
+-    [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+-    [ '--prefix',  '-p', GetoptLong::REQUIRED_ARGUMENT ]
+-)
+-
+-
+-#
+-#  The options set by the command line.
+-#
+-$HELP    = false
+-$VERBOSE = false
+-$PREFIX  = "/etc/symbiosis/firewall/whitelist.d"
+-
+-opts.each do |opt,arg|
+-  case opt
+-    when '--help'
+-      $HELP = true
+-    when '--verbose'
+-      $VERBOSE = true
+-    when '--prefix'
+-      $PREFIX = arg
+-  end
+-end
+-
+-
+-#
+-# CAUTION! Here be quality kode.
+-#
+-if $HELP
+-  # Open the file, stripping the shebang line
+-  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
+-
+-  lines.each do |line|
+-    line.chomp!
+-    break if line.empty?
+-    puts line[2..-1].to_s
+-  end
+-
+-  exit 0
+-end
+-
+-
+-#
+-#  Expire old entries first of all, then add new ones.
+-#
+-puts "Expiring old whitelist entries" if ( $VERBOSE )
+-
+-expired = 0
+-
+-if ( File.directory?( $PREFIX ) )
+-  Dir.foreach( $PREFIX ) do |entry|
+-    if ( ( entry =~ /\.auto$/i ) &&
+-         (File.mtime( "#{$PREFIX}/#{entry}" ) <  ( Time.now - 8 * 24 * 60 * 60 ) ) )
+-    then
+-      puts "Removing #{$PREFIX}/#{entry}" if ( $VERBOSE )
+-      File.unlink("#{$PREFIX}/#{entry}")
+-      expired += 1
+-    end
+-  end
+-end
+-puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
+-
+-
+-#
+-# Fetch the IP addresses
+-#
+-ip_addresses = Symbiosis::Utmp.read.collect{|entry| entry["ip"]}
+-
+-#
+-#  Did we update?
+-#
+-updated=false
+-
+-#
+-#  Iterate over each IP
+-#
+-ip_addresses.each do |ip|
+-  #
+-  # We only want IP addresses.
+-  #
+-  next unless ip.is_a?(IPAddr)
+-
+-  #
+-  # FIXME: Need better IPv6 conditions.
+-  #
+-  if ( ( ip.ipv4? and 
+-         !( IPAddr.new("127.0.0.1/8").include?(ip) or IPAddr.new("0.0.0.0") == ip )
+-       ) or (
+-         ip.ipv6? and IPAddr.new("2000::/3").include?(ip)
+-       ) 
+-     )
+-
+-    puts "Found IP address: #{ip}" if ( $VERBOSE )
+-
+-    if ( File.exists?( "/etc/symbiosis/firewall/whitelist.d/#{ip}.auto" ) )
+-      puts "\tAlready whitelisted" if ( $VERBOSE )
+-    else
+-      # ensure the directory exists.
+-      if ( ! File.directory?( "/etc/symbiosis/firewall/whitelist.d" ) )
+-        system( "mkdir -p /etc/symbiosis/firewall/whitelist.d" )
+-      end
+-
+-      # create the file
+-      system( "touch /etc/symbiosis/firewall/whitelist.d/#{ip}.auto" )
+-
+-      updated=true
+-      puts "\tAdding to whitelist" if ( $VERBOSE )
+-    end
+-  end
+-end
+-
+-
+-
+-#
+-# Re-run the firewall if we updated, or if we expired an existing entry.
+-#
+-if ( ( updated ) || ( expired > 0 ) )
+-
+-  puts "Something changed: Re-running firewall" if ( $VERBOSE )
+-
+-  system( "/usr/bin/firewall >>/var/log/firewall.log 2>>/var/log/firewall.err" )
+-end
+diff -r 38a4002655a6 firewall/debian/install
+--- a/firewall/debian/install	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/debian/install	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,3 +1,4 @@
+-rule.d                usr/share/firewall
++rule.d                usr/share/symbiosis/irewall
+ bin                   usr/
++sbin                  usr/
+ patterns.d/           etc/symbiosis/firewall
+diff -r 38a4002655a6 firewall/debian/postinst
+--- a/firewall/debian/postinst	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/debian/postinst	Wed Nov 30 20:18:54 2011 +0000
+@@ -183,7 +183,7 @@
+     firewall
+ 
+     #
+-    #  Remove denyhosts.
++    #  Remove denyhosts.  Yummy!
+     #
+     if [ -d /usr/share/denyhosts/ ]; then
+         cat > /etc/cron.hourly/purgy <<EOF
+@@ -196,40 +196,29 @@
+     fi
+ 
+ else
+-
+     echo " - In a chroot()"
+     echo " - Not flushing / running firewall"
+-    echo " - In a chroot()"
+ fi
+ 
+ 
+ #
+-#  Cleanup
++#  Cleanup old ifup/down scripts
+ #
+-if [ -e /etc/network/if-up.d/www-data ]; then
+-    rm -f /etc/network/if-up.d/www-data
+-fi
+-if [ -e /etc/network/if-down.d/www-data ]; then
+-    rm -f /etc/network/if-down.d/www-data
+-fi
++for i in www-data bytemark-firewall ; do
++  if [ -e /etc/network/if-up.d/$i ]; then
++      rm -f /etc/network/if-up.d/$i
++  fi
++  if [ -e /etc/network/if-down.d/$i ]; then
++      rm -f /etc/network/if-down.d/$i
++  fi
++done
+ 
+ #
+-#  Setup new rules
++# Directly link new firewall scripts into if-up/down.d
+ #
+-cat >/etc/network/if-up.d/bytemark-firewall <<EOF
+-#!/bin/bash
+-echo "Loading firewall"
+-/usr/bin/firewall
+-echo "Done"
+-EOF
+-cat >/etc/network/if-down.d/bytemark-firewall <<EOF
+-#!/bin/bash
+-echo "Cleaning firewall"
+-/usr/bin/firewall --flush
+-echo "Done"
+-EOF
+-chmod 755 /etc/network/if-up.d/bytemark-firewall
+-chmod 755 /etc/network/if-down.d/bytemark-firewall
++ln -s /usr/sbin/symbiosis-firewall /etc/network/if-up.d/
++ln -s /usr/sbin/symbiosis-firewall /etc/network/if-down.d/
++
+ 
+ #DEBHELPER#
+ exit 0
+diff -r 38a4002655a6 firewall/lib/symbiosis/firewall.rb
+--- a/firewall/lib/symbiosis/firewall.rb	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/lib/symbiosis/firewall.rb	Wed Nov 30 20:18:54 2011 +0000
+@@ -173,36 +173,26 @@
+         fw.puts( blist.blacklist )
+       end
+ 
+-      #
+-      #  Finally we have to write out our rules.
+-      #
+-      read_rules( File.join(@base_dir, "incoming.d" ) ).each do |name,addresses|
+-        t = Rule.new( name )
+-        t.template_dir = @template_dir
+-        t.permit()
+-        t.incoming()
+-        unless addresses.empty?
+-          addresses.each do |a|
+-            t.address = a
+-            fw.puts( t.to_s )
++      %w(incoming outgoing).each do |direction|
++        #
++        #  Finally we have to write out our rules.
++        #
++        read_rules( File.join(@base_dir, "#{direction}.d" ) ).each do |name,addresses|
++          new_rules = []
++          begin
++            t = Rule.new( name )
++            t.template_dir = @template_dir
++            t.direction = direction
++            addresses.each do |a|
++              t.address = a
++              new_rules << t.to_s
++            end
++            new_rules << t.to_s if addresses.empty?
++          rescue ArgumentError => err
++            warn "Ignoring #{direction} rule #{name} because #{err.to_s}"
+           end
+-        else
+-          fw.puts( t.to_s )
+-        end
+-      end
+ 
+-      read_rules( File.join(@base_dir, "outgoing.d" ) ).each do |name, addresses|
+-        t = Rule.new( name )
+-        t.template_dir = @template_dir
+-        t.permit()
+-        t.outgoing()
+-        unless addresses.empty?
+-          addresses.each do |a|
+-            t.address = a
+-            fw.puts( t.to_s )
+-          end
+-        else
+-          fw.puts( t.to_s )
++          fw.puts new_rules.join("\n") unless new_rules.empty?
+         end
+       end
+ 
+diff -r 38a4002655a6 firewall/lib/symbiosis/firewall/rule.rb
+--- a/firewall/lib/symbiosis/firewall/rule.rb	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/lib/symbiosis/firewall/rule.rb	Wed Nov 30 20:18:54 2011 +0000
+@@ -16,8 +16,6 @@
+ 
+       attr_reader :name
+       attr_reader :port
+-      attr_reader :jump
+-      attr_reader :jump_opts
+       attr_reader :direction
+       attr_reader :address
+ 
+@@ -29,12 +27,10 @@
+         # Some defaults..
+         #
+         @direction = "incoming"
+-        @jump      = "ACCEPT"
+-        @jump_opts = nil
+         @address   = nil
+         @port      = nil
+         @template  = nil
+-        @template_dir = '/usr/share/symbiosis/firewall'
++        @template_dirs = %w(/usr/local/share/firewall /usr/local/share/symbiosis/firewall /usr/share/firewall /usr/share/symbiosis/firewall)
+         @name      = name
+         @port      = @@ports.lookup( @name ) unless @name.nil? 
+       end
+@@ -43,10 +39,9 @@
+       #  Helper:  Note no port is required for a blacklist.
+       #
+       def self.blacklist( ip )
+-        f = self.new( "blacklist-#{ip}" )
++        f = self.new( "drop" )
+         f.incoming()
+         f.address( ip )
+-        f.deny()
+         return f
+       end
+ 
+@@ -54,21 +49,12 @@
+       #  Helper:  Note no port is required for a whitelist.
+       #
+       def self.whitelist( ip )
+-        f = self.new( "whitelist-#{ip}" )
++        f = self.new( "accept" )
+         f.incoming()
+         f.address( ip )
+-        f.permit()
+         return f
+       end
+ 
+-      def permit
+-        @jump = "ACCEPT"
+-      end
+-
+-      def deny
+-        @jump = "DROP"
+-      end
+-
+       #
+       #  Set this rule to work against incoming connections.
+       #
+@@ -205,14 +191,31 @@
+       def template
+         return @template unless @template.nil?
+ 
+-        fn = "#{@template_dir}/#{@name}.#{direction}"
+-        begin
++        fn = nil
++        
++        #
++        # Search all the template directories...
++        #
++        @template_dirs.each do |td|
++          fn = "#{td}/#{@name}.#{direction}"
++          next unless File.exists?(fn)
++
+           @template = File.read(fn) 
+-        rescue Errno::ENOENT => err
+-          old_fn = fn
+-          fn = "#{@template_dir}/accept.#{direction}"
+-          retry unless old_fn == fn
+-          raise err
++        end
++
++        #
++        # OK we've found the template!
++        #
++        return @template unless @template.nil?
++
++        #
++        # OK, we've not found it.  Try using "accept".
++        #
++        @template_dirs.each do |td|
++          fn = "#{td}/accept.#{direction}"
++          next unless File.exists?(fn)
++
++          @template = File.read(fn) 
+         end
+ 
+         @template
+@@ -225,11 +228,20 @@
+         @template = t
+       end
+ 
++      #
++      # If we specify a template directory, ignore all the rest.
++      #
+       def template_dir=(td)
+-        @template_dir = td
++        @template_dirs = [ td ]
++      end
++
++      def direction=(d)
++        raise ArgumentError, "Bad direction #{d.inspect}" unless %w(incoming outgoing).include?(d)
++        @direction = d
+       end
+ 
+     end
+ 
+   end
++
+ end
+diff -r 38a4002655a6 firewall/rule.d/accept.incoming
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ b/firewall/rule.d/accept.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -0,0 +1,12 @@
++#
++# Accept all <%= direction %> connections<%= port.nil? ? "" : " to port #{port} (#{name})" %><%= address.nil? ? "" : " from address #{address}" %>.
++#
++% iptables_cmds.each do |cmd|
++% unless port.nil?
++<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -j ACCEPT
++<%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -j ACCEPT
++% else
++<%= cmd %> -A <%= chain%> <%= src_or_dst %> -j ACCEPT
++% end
++% end
++
+diff -r 38a4002655a6 firewall/rule.d/accept.outgoing
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ b/firewall/rule.d/accept.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -0,0 +1,1 @@
++accept.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/rule.d/allow.incoming
+--- a/firewall/rule.d/allow.incoming	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/allow.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,4 +1,1 @@
+-#
+-#  Allow all incoming connections.
+-#
+-/sbin/iptables -A INPUT -p all $SRC -j ACCEPT
++accept.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/rule.d/allow.outgoing
+--- a/firewall/rule.d/allow.outgoing	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/allow.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,4 +1,1 @@
+-#
+-#  Allow all outgoing connections.
+-#
+-/sbin/iptables -A OUTPUT -p all $DEST -j ACCEPT
++accept.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/rule.d/collector.incoming
+--- a/firewall/rule.d/collector.incoming	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/collector.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,6 +1,7 @@
+ 
+ #
+-#  Allow incoming connections on port 7711
++#  Allow <%= direction %> connections on port 1919
+ #
+-/sbin/iptables -A INPUT -p tcp --dport 7711 $SRC -j ACCEPT
+-/sbin/iptables -A INPUT -p tcp --dport 1919 $SRC -j ACCEPT
++% iptables_cmds.each do |cmd|
++<%= cmd %> -A <%= chain %> -p tcp --dport 1919 <%= src_or_dst %> -j ACCEPT
++% end
+diff -r 38a4002655a6 firewall/rule.d/collector.outgoing
+--- a/firewall/rule.d/collector.outgoing	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/collector.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,6 +1,1 @@
+-
+-#
+-#  Allow outgoing connections on port 7711
+-#
+-/sbin/iptables -A OUTPUT -p tcp --dport 7711 $DEST -j ACCEPT
+-/sbin/iptables -A OUTPUT -p tcp --dport 1919 $DEST -j ACCEPT
++collector.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/rule.d/dns.incoming
+--- a/firewall/rule.d/dns.incoming	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/dns.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,7 +1,11 @@
+ #
+ #  Allow established incoming connections for resolving DNS
+ #
+-/sbin/iptables -A INPUT -p udp --sport 53 --dport 1024:65535 -m state --state ESTABLISHED -j ACCEPT
++% iptables_cmds.each do |cmd|
++<%= cmd %> -A INPUT -p tcp --sport 53 --dport 1024:65535 <%= src %> -m state --state ESTABLISHED -j ACCEPT
++<%= cmd %> -A INPUT -p udp --sport 53 --dport 1024:65535 <%= src %> -m state --state ESTABLISHED -j ACCEPT
++% end
+ 
+ 
+ 
++
+diff -r 38a4002655a6 firewall/rule.d/dns.outgoing
+--- a/firewall/rule.d/dns.outgoing	Wed Nov 30 16:59:16 2011 +0000
++++ /dev/null	Thu Jan 01 00:00:00 1970 +0000
+@@ -1,8 +0,0 @@
+-
+-#
+-#  Allow outgoing connections on port 53
+-#
+-/sbin/iptables -A OUTPUT -p tcp --sport 53 $DEST -j ACCEPT
+-/sbin/iptables -A OUTPUT -p tcp --dport 53 $DEST -j ACCEPT
+-/sbin/iptables -A OUTPUT -p udp --sport 53 $DEST -j ACCEPT
+-/sbin/iptables -A OUTPUT -p udp --dport 53 $DEST -j ACCEPT
+diff -r 38a4002655a6 firewall/rule.d/drop.incoming
+--- a/firewall/rule.d/drop.incoming	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/drop.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,4 +1,13 @@
+ #
+-#  Drop all incoming connections.
+ #
+-/sbin/iptables -A INPUT -p tcp -m state --state NEW $SRC -j REJECT --reject-with icmp-admin-prohibited
++# Drop all <%= direction %> connections<%= port.nil? ? "" : " to port #{port}" %><%= address.nil? ? "" : " from address #{address}" %>.
++#
++% iptables_cmds.each do |cmd|
++% unless port.nil?
++<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -j DROP --reject-with tcp-reset
++<%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -j DROP
++% else
++<%= cmd %> -A <%= chain%> <%= src_or_dst %> -j DROP
++% end
++% end
++
+diff -r 38a4002655a6 firewall/rule.d/drop.outgoing
+--- a/firewall/rule.d/drop.outgoing	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/drop.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,4 +1,1 @@
+-#
+-#  Drop outgoing connections
+-#
+-/sbin/iptables -A OUTPUT -p tcp -m state --state NEW $DEST -j REJECT --reject-with icmp-admin-prohibited
+\ No newline at end of file
++drop.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/rule.d/established.incoming
+--- a/firewall/rule.d/established.incoming	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/established.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,4 +1,13 @@
+ #
+-#  Allow outgoing connections when already established
+ #
+-/sbin/iptables -A INPUT -m state --state ESTABLISHED $SRC -j ACCEPT
++#  Allow all ESTABLISHED <%= direction %> connections<%= port.nil? ? "" : " to port #{port}" %><%= address.nil? ? "" : " from address #{address}" %>.
++#
++% iptables_cmds.each do |cmd|
++% unless port.nil?
++<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -m state --state ESTABLISHED -j ACCEPT
++<%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -m state --state ESTABLISHED -j ACCEPT
++% else
++<%= cmd %> -A <%= chain%> <%= src_or_dst %> -m state --state ESTABLISHED -j ACCEPT
++% end
++% end
++
+diff -r 38a4002655a6 firewall/rule.d/established.outgoing
+--- a/firewall/rule.d/established.outgoing	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/established.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,4 +1,1 @@
+-#
+-#  Allow incoming connections when already established
+-#
+-/sbin/iptables -A OUTPUT -m state --state ESTABLISHED $DEST -j ACCEPT
++established.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/rule.d/ftp.incoming
+--- a/firewall/rule.d/ftp.incoming	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/ftp.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -2,5 +2,8 @@
+ #
+ #  Allow incoming connections on port 20 + 21
+ #
+-/sbin/iptables -A INPUT -p tcp --dport  20 $SRC -j ACCEPT
+-/sbin/iptables -A INPUT -p tcp --dport  21 $SRC -j ACCEPT
++% iptables_cmds.each do |cmd|
++<%= cmd %> -A <%= chain%> -p tcp --dport 20 <%= src_or_dst %> -j ACCEPT
++<%= cmd %> -A <%= chain%> -p tcp --dport 21 <%= src_or_dst %> -j ACCEPT
++% end
++
+diff -r 38a4002655a6 firewall/rule.d/ftp.outgoing
+--- a/firewall/rule.d/ftp.outgoing	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/ftp.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,6 +1,1 @@
+-
+-#
+-#  Allow incoming connections on port 20 + 21
+-#
+-/sbin/iptables -A OUTPUT -p tcp --dport 20 $DEST -j ACCEPT
+-/sbin/iptables -A OUTPUT -p tcp --dport 21 $DEST -j ACCEPT
++ftp.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/rule.d/imager.outgoing
+--- a/firewall/rule.d/imager.outgoing	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/imager.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,5 +1,1 @@
+-
+-#
+-#  Allow outgoing imager connections
+-#
+-/sbin/iptables -A OUTPUT  -p  tcp --dport 5000 $DEST -j ACCEPT
++imager.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/rule.d/new-not-www-data.outgoing
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ b/firewall/rule.d/new-not-www-data.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -0,0 +1,8 @@
++#
++#
++#  Allow all NEW outgoing connections <%= address.nil? ? "" : " to address #{address}" %>, but not for www-data.
++#
++% iptables_cmds.each do |cmd|
++<%= cmd %> -A OUTPUT <%= dst %> --match owner \! --uid-owner www-data -m state --state NEW -j ACCEPT
++% end
++
+diff -r 38a4002655a6 firewall/rule.d/new-www-data.outgoing
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ b/firewall/rule.d/new-www-data.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -0,0 +1,8 @@
++#
++#
++# Allow all NEW outgoing connections <%= address.nil? ? "" : " to address #{address}" %>, but only for www-data.
++#
++% iptables_cmds.each do |cmd|
++<%= cmd %> -A OUTPUT <%= dst %> --match owner --uid-owner www-data -m state --state NEW -j ACCEPT
++% end
++
+diff -r 38a4002655a6 firewall/rule.d/new.incoming
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ b/firewall/rule.d/new.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -0,0 +1,13 @@
++#
++#
++#  Allow all NEW <%= direction %> connections<%= port.nil? ? "" : " to port #{port}" %><%= address.nil? ? "" : " from address #{address}" %>.
++#
++% iptables_cmds.each do |cmd|
++% unless port.nil?
++<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -m state --state NEW -j ACCEPT
++<%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -m state --state NEW -j ACCEPT
++% else
++<%= cmd %> -A <%= chain%> <%= src_or_dst %> -m state --state NEW -j ACCEPT
++% end
++% end
++
+diff -r 38a4002655a6 firewall/rule.d/new.outgoing
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ b/firewall/rule.d/new.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -0,0 +1,1 @@
++new.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/rule.d/ping.incoming
+--- a/firewall/rule.d/ping.incoming	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/ping.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,15 +1,14 @@
+ #
+ #  Allow ICMP echo requests - not being able to ping a machine is annoying.
+ #
+-
+ % if ipv4?
+ % %w(echo-request echo-reply ttl-exceeded).each do |type|
+-/sbin/iptables -A INPUT -p icmp --icmp-type <%= type %> <%= src %> -j ACCEPT
++/sbin/iptables -A <%= chain %> -p icmp --icmp-type <%= type %> <%= src_or_dst %> -j ACCEPT
+ % end
+ % end
+ % if ipv6?
+ % %w(echo-request echo-reply ttl-exceeded).each do |type|
+-/sbin/ip6tables -A INPUT -p icmpv6 --icmpv6-type <%= type %> <%= src %> -j ACCEPT
++/sbin/ip6tables -A <%= chain %> -p icmpv6 --icmpv6-type <%= type %> <%= src_or_dst %> -j ACCEPT
+ % end
+ % end
+ 
+diff -r 38a4002655a6 firewall/rule.d/ping.outgoing
+--- a/firewall/rule.d/ping.outgoing	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/ping.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,7 +1,1 @@
+-#
+-#  Allow ICMP echo requests - not being able to ping a machine is annoying.
+-#
+-
+-for i in echo-request echo-reply ttl-exceeded ; do
+-    /sbin/iptables -A OUTPUT -p icmp --icmp-type $i $DEST -j ACCEPT
+-done
++ping.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/rule.d/reject.incoming
+--- a/firewall/rule.d/reject.incoming	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/reject.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,6 +1,13 @@
+ #
+-#  Reject all new incoming connections.
+ #
+-/sbin/iptables -A INPUT -p tcp   $SRC -j REJECT --reject-with tcp-reset  -m state --state NEW
+-/sbin/iptables -A INPUT -p udp   $SRC -j REJECT -m state --state NEW
+-/sbin/iptables -A INPUT -p icmp  $SRC -j REJECT -m state --state NEW
++#  Reject all <%= direction %> connections<%= port.nil? ? "" : " to port #{port}" %><%= address.nil? ? "" : " from address #{address}" %>.
++#
++% iptables_cmds.each do |cmd|
++% unless port.nil?
++<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -j REJECT --reject-with tcp-reset
++<%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -j REJECT
++% else
++<%= cmd %> -A <%= chain%> <%= src_or_dst %> -j REJECT
++% end
++% end
++
+diff -r 38a4002655a6 firewall/rule.d/reject.outgoing
+--- a/firewall/rule.d/reject.outgoing	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/reject.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,6 +1,1 @@
+-#
+-#  Reject all new outgoing connections.
+-#
+-/sbin/iptables -A OUTPUT -p tcp   $DEST -j REJECT --reject-with tcp-reset  -m state --state NEW
+-/sbin/iptables -A OUTPUT -p udp   $DEST -j REJECT -m state --state NEW
+-/sbin/iptables -A OUTPUT -p icmp  $DEST -j REJECT -m state --state NEW
++reject.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/rule.d/related.incoming
+--- a/firewall/rule.d/related.incoming	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/related.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,4 +1,13 @@
+ #
+-#  Allow outgoing connections when already established
+ #
+-/sbin/iptables -A INPUT -m state --state RELATED $SRC -j ACCEPT
++#  Allow all RELATED <%= direction %> connections<%= port.nil? ? "" : " to port #{port}" %><%= address.nil? ? "" : " from address #{address}" %>.
++#
++% iptables_cmds.each do |cmd|
++% unless port.nil?
++<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -m state --state RELATED -j ACCEPT
++<%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -m state --state RELATED -j ACCEPT
++% else
++<%= cmd %> -A <%= chain%> <%= src_or_dst %> -m state --state RELATED -j ACCEPT
++% end
++% end
++
+diff -r 38a4002655a6 firewall/rule.d/related.outgoing
+--- a/firewall/rule.d/related.outgoing	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/rule.d/related.outgoing	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,4 +1,1 @@
+-#
+-#  Allow incoming connections when already established
+-#
+-/sbin/iptables -A OUTPUT -m state --state RELATED $DEST -j ACCEPT
++related.incoming
+\ No newline at end of file
+diff -r 38a4002655a6 firewall/sbin/symbiosis-firewall
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ b/firewall/sbin/symbiosis-firewall	Wed Nov 30 20:18:54 2011 +0000
+@@ -0,0 +1,179 @@
++#!/usr/bin/ruby
++#
++# NAME
++# ----
++#
++#   firewall -- The symbiosis firewall package.
++#
++# SYNOPSIS
++# --------
++#
++#  General Options:
++#
++#  Help Options:
++#
++#   --help        Show the help information for this script.
++#   --verbose     Show debugging information.
++#
++#
++# DETAILS
++# -------
++#
++#   This script is designed to both generate and load a simple firewall
++#  based upon the contents of a hierarchy of flat files and directories.
++#
++#   This means that creating a firewall will be as simple as touching a file
++#  or removing and existing one.
++#
++#
++# AUTHOR
++# ------
++#
++#    Steve Kemp <steve@bytemark.co.uk>
++#
++
++
++require 'getoptlong'
++require 'tempfile'
++require 'symbiosis/firewall'
++
++def verbose(s)
++  puts s if $VERBOSE
++end
++
++
++#
++##
++##  Entry point.
++##
++#######
++##############
++
++
++
++
++#
++#  Parse the arguments
++#
++help     = false
++manual   = false
++$VERBOSE = false
++test     = false
++flush    = false
++execute  = true
++delete   = true
++base_dir = '/etc/symbiosis/firewall'
++template_dir = '/usr/share/symbiosis/firewall/rules.d'
++
++#
++# This allows us just to symlink straight to /etc/network/if-up.d and if-down.d
++#
++if ENV.has_key?('IFACE')
++  flush = true if "stop" == ENV['MODE']
++  $VERBOSE = true if ENV.has_key?('VERBOSE')
++end
++
++opts = GetoptLong.new(
++                      [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
++                      [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
++                      [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
++                      [ '--test', '-t', GetoptLong::NO_ARGUMENT ],
++                      [ '--flush', '-f', GetoptLong::NO_ARGUMENT ],
++                      [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ],
++                      [ '--no-delete', '-d', GetoptLong::NO_ARGUMENT ],
++                      [ '--no-root', '-R', GetoptLong::NO_ARGUMENT ],
++                      [ '--base-d', '-b', GetoptLong::REQUIRED_ARGUMENT ],
++                      [ '--template-d', '-T', GetoptLong::REQUIRED_ARGUMENT ],
++                      [ '--services', '-s', GetoptLong::REQUIRED_ARGUMENT ]
++                     )
++
++opts.each do |opt,arg|
++  case opt
++  when '--help'
++    help = true
++  when '--verbose'
++    $VERBOSE = true
++  when '--flush'
++    flush = true
++  when '--test'
++    test = true
++  when '--no-execute'
++    execute = false
++  when '--no-delete'
++    delete = false
++  when '--base-d'
++    base_dir = arg
++  when '--template-d'
++    template_dir = arg
++  when '--services'
++    services = arg
++  end
++end
++
++if ( help )
++  # Open the file, stripping the shebang line
++  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
++
++  lines.each do |line|
++    line.chomp!
++    break if line.empty?
++    puts line[2..-1].to_s
++  end
++  exit 0
++end
++
++begin
++
++  #
++  #  If we're disabled exit.
++  #
++  myself = Symbiosis::Firewall.new(base_dir)
++  myself.template_dir = template_dir unless template_dir.nil?
++
++  if ( myself.disabled? )
++    verbose( "Firewall disabled.  Exiting cleanly." )
++    System.exit(0)
++  end
++
++
++  #
++  #  Just testing?
++  #
++  exit( myself.test() ) if ( test )
++
++  #
++  #  Flushing / Removing the firewall?
++  #
++  if ( flush )
++    myself.flush()
++    exit 0
++  end
++
++
++  #
++  #  Write the firewall to a local file
++  #
++  tf = Tempfile.new("symbiosis-firewall-")
++  myself.create_firewall(tf)
++  tf.close
++
++  if ( execute )
++    system( "chmod 755 #{tf}" )
++    system( tf.path )
++    #      system( "run-parts .../local.d/" )
++  end
++
++  if ( delete )
++    File.unlink( tf.path )
++  else
++
++    #
++    #  TODO: Fix this.  Because we used Tempfile we have to manually
++    # copy the firewall to a new name as it is unlinked at process exit.
++    #
++    Kernel.system("cp #{tf.path} #{tf.path}2")
++    puts "Left firewall in #{tf.path}2"
++  end
++end
++
++
+diff -r 38a4002655a6 firewall/sbin/symbiosis-firewall-whitelist
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ b/firewall/sbin/symbiosis-firewall-whitelist	Wed Nov 30 20:18:54 2011 +0000
+@@ -0,0 +1,159 @@
++#! /usr/bin/ruby1.8
++#
++# NAME
++#
++#   firewall-whitelist -- Automatically whitelist IP addresses.
++#
++# SYNOPSIS
++#
++#  Options:
++#
++#   --prefix      The directory to operate upon.
++#
++#  Help Options:
++#
++#   --help        Show the help information for this script.
++#   --verbose     Show debugging information.
++#
++# This script is designed to automatically whitelist IP addresses which
++# have been used to successfully login via SSH.
++#
++# It does this by parsing the output of the "last" command, and creating
++# entries in /etc/symbiosis/firewall/whitelist.d/
++#
++# AUTHOR
++#
++#   Steve Kemp <steve@bytemark.co.uk>
++#
++
++#
++#  Modules we require
++#
++
++require 'getoptlong'
++require 'ipaddr'
++require 'symbiosis/utmp'
++
++opts = GetoptLong.new(
++    [ '--help',    '-h', GetoptLong::NO_ARGUMENT ],
++    [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
++    [ '--prefix',  '-p', GetoptLong::REQUIRED_ARGUMENT ]
++)
++
++
++#
++#  The options set by the command line.
++#
++$HELP    = false
++$VERBOSE = false
++$PREFIX  = "/etc/symbiosis/firewall/whitelist.d"
++
++opts.each do |opt,arg|
++  case opt
++    when '--help'
++      $HELP = true
++    when '--verbose'
++      $VERBOSE = true
++    when '--prefix'
++      $PREFIX = arg
++  end
++end
++
++
++#
++# CAUTION! Here be quality kode.
++#
++if $HELP
++  # Open the file, stripping the shebang line
++  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
++
++  lines.each do |line|
++    line.chomp!
++    break if line.empty?
++    puts line[2..-1].to_s
++  end
++
++  exit 0
++end
++
++
++#
++#  Expire old entries first of all, then add new ones.
++#
++puts "Expiring old whitelist entries" if ( $VERBOSE )
++
++expired = 0
++
++if ( File.directory?( $PREFIX ) )
++  Dir.foreach( $PREFIX ) do |entry|
++    if ( ( entry =~ /\.auto$/i ) &&
++         (File.mtime( "#{$PREFIX}/#{entry}" ) <  ( Time.now - 8 * 24 * 60 * 60 ) ) )
++    then
++      puts "Removing #{$PREFIX}/#{entry}" if ( $VERBOSE )
++      File.unlink("#{$PREFIX}/#{entry}")
++      expired += 1
++    end
++  end
++end
++puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
++
++
++#
++# Fetch the IP addresses
++#
++ip_addresses = Symbiosis::Utmp.read.collect{|entry| entry["ip"]}
++
++#
++#  Did we update?
++#
++updated=false
++
++#
++#  Iterate over each IP
++#
++ip_addresses.each do |ip|
++  #
++  # We only want IP addresses.
++  #
++  next unless ip.is_a?(IPAddr)
++
++  #
++  # FIXME: Need better IPv6 conditions.
++  #
++  if ( ( ip.ipv4? and 
++         !( IPAddr.new("127.0.0.1/8").include?(ip) or IPAddr.new("0.0.0.0") == ip )
++       ) or (
++         ip.ipv6? and IPAddr.new("2000::/3").include?(ip)
++       ) 
++     )
++
++    puts "Found IP address: #{ip}" if ( $VERBOSE )
++
++    if ( File.exists?( "/etc/symbiosis/firewall/whitelist.d/#{ip}.auto" ) )
++      puts "\tAlready whitelisted" if ( $VERBOSE )
++    else
++      # ensure the directory exists.
++      if ( ! File.directory?( "/etc/symbiosis/firewall/whitelist.d" ) )
++        system( "mkdir -p /etc/symbiosis/firewall/whitelist.d" )
++      end
++
++      # create the file
++      system( "touch /etc/symbiosis/firewall/whitelist.d/#{ip}.auto" )
++
++      updated=true
++      puts "\tAdding to whitelist" if ( $VERBOSE )
++    end
++  end
++end
++
++
++
++#
++# Re-run the firewall if we updated, or if we expired an existing entry.
++#
++if ( ( updated ) || ( expired > 0 ) )
++
++  puts "Something changed: Re-running firewall" if ( $VERBOSE )
++
++  system( "/usr/bin/firewall >>/var/log/firewall.log 2>>/var/log/firewall.err" )
++end
+diff -r 38a4002655a6 firewall/test/rule.d/accept.incoming
+--- a/firewall/test/rule.d/accept.incoming	Wed Nov 30 16:59:16 2011 +0000
++++ b/firewall/test/rule.d/accept.incoming	Wed Nov 30 20:18:54 2011 +0000
+@@ -1,11 +1,9 @@
+ % iptables_cmds.each do |cmd|
+-% %w(tcp udp).each do |proto|
+-<%= cmd %> -A INPUT<% %>
+ % unless port.nil?
+- -p <%= proto %> --dport <%= port %>
+-%  end
+- <%= src %> -j <%= jump %>
++<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -j ACCEPT
++<%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -j ACCEPT
++% else
++<%= cmd %> -A <%= chain%> <%= src_or_dst %> -j ACCEPT
++% end
++% end
+ 
+-% break unless port
+-% end
+-% end

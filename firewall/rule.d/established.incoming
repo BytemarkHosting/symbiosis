@@ -1,4 +1,13 @@
 #
-#  Allow outgoing connections when already established
 #
-/sbin/iptables -A INPUT -m state --state ESTABLISHED $SRC -j ACCEPT
+#  Allow all ESTABLISHED <%= direction %> connections<%= port.nil? ? "" : " to port #{port}" %><%= address.nil? ? "" : " from address #{address}" %>.
+#
+% iptables_cmds.each do |cmd|
+% unless port.nil?
+<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -m state --state ESTABLISHED -j ACCEPT
+<%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -m state --state ESTABLISHED -j ACCEPT
+% else
+<%= cmd %> -A <%= chain%> <%= src_or_dst %> -m state --state ESTABLISHED -j ACCEPT
+% end
+% end
+

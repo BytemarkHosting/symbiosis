@@ -1,3 +1,6 @@
+#
+# Accept all <%= direction %> connections<%= port.nil? ? "" : " to port #{port} (#{name})" %><%= address.nil? ? "" : " from address #{address}" %>.
+#
 % iptables_cmds.each do |cmd|
 % unless port.nil?
 <%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -j ACCEPT

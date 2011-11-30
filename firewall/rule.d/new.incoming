@@ -1,0 +1,13 @@
+#
+#
+#  Allow all NEW <%= direction %> connections<%= port.nil? ? "" : " to port #{port}" %><%= address.nil? ? "" : " from address #{address}" %>.
+#
+% iptables_cmds.each do |cmd|
+% unless port.nil?
+<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -m state --state NEW -j ACCEPT
+<%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -m state --state NEW -j ACCEPT
+% else
+<%= cmd %> -A <%= chain%> <%= src_or_dst %> -m state --state NEW -j ACCEPT
+% end
+% end
+

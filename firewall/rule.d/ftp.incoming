@@ -2,5 +2,8 @@
 #
 #  Allow incoming connections on port 20 + 21
 #
-/sbin/iptables -A INPUT -p tcp --dport  20 $SRC -j ACCEPT
-/sbin/iptables -A INPUT -p tcp --dport  21 $SRC -j ACCEPT
+% iptables_cmds.each do |cmd|
+<%= cmd %> -A <%= chain%> -p tcp --dport 20 <%= src_or_dst %> -j ACCEPT
+<%= cmd %> -A <%= chain%> -p tcp --dport 21 <%= src_or_dst %> -j ACCEPT
+% end
+

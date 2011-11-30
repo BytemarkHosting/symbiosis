@@ -183,7 +183,7 @@ if [ -z "$CHROOT" ]; then
     firewall
 
     #
-    #  Remove denyhosts.
+    #  Remove denyhosts.  Yummy!
     #
     if [ -d /usr/share/denyhosts/ ]; then
         cat > /etc/cron.hourly/purgy <<EOF
@@ -196,40 +196,29 @@ EOF
     fi
 
 else
-
     echo " - In a chroot()"
     echo " - Not flushing / running firewall"
-    echo " - In a chroot()"
 fi
 
 
 #
-#  Cleanup
+#  Cleanup old ifup/down scripts
 #
-if [ -e /etc/network/if-up.d/www-data ]; then
-    rm -f /etc/network/if-up.d/www-data
-fi
-if [ -e /etc/network/if-down.d/www-data ]; then
-    rm -f /etc/network/if-down.d/www-data
-fi
+for i in www-data bytemark-firewall ; do
+  if [ -e /etc/network/if-up.d/$i ]; then
+      rm -f /etc/network/if-up.d/$i
+  fi
+  if [ -e /etc/network/if-down.d/$i ]; then
+      rm -f /etc/network/if-down.d/$i
+  fi
+done
 
 #
-#  Setup new rules
+# Directly link new firewall scripts into if-up/down.d
 #
-cat >/etc/network/if-up.d/bytemark-firewall <<EOF
-#!/bin/bash
-echo "Loading firewall"
-/usr/bin/firewall
-echo "Done"
-EOF
-cat >/etc/network/if-down.d/bytemark-firewall <<EOF
-#!/bin/bash
-echo "Cleaning firewall"
-/usr/bin/firewall --flush
-echo "Done"
-EOF
-chmod 755 /etc/network/if-up.d/bytemark-firewall
-chmod 755 /etc/network/if-down.d/bytemark-firewall
+ln -s /usr/sbin/symbiosis-firewall /etc/network/if-up.d/
+ln -s /usr/sbin/symbiosis-firewall /etc/network/if-down.d/
+
 
 #DEBHELPER#
 exit 0

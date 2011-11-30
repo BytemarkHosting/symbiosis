@@ -1,6 +1,13 @@
 #
-#  Reject all new incoming connections.
 #
-/sbin/iptables -A INPUT -p tcp   $SRC -j REJECT --reject-with tcp-reset  -m state --state NEW
-/sbin/iptables -A INPUT -p udp   $SRC -j REJECT -m state --state NEW
-/sbin/iptables -A INPUT -p icmp  $SRC -j REJECT -m state --state NEW
+#  Reject all <%= direction %> connections<%= port.nil? ? "" : " to port #{port}" %><%= address.nil? ? "" : " from address #{address}" %>.
+#
+% iptables_cmds.each do |cmd|
+% unless port.nil?
+<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -j REJECT --reject-with tcp-reset
+<%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -j REJECT
+% else
+<%= cmd %> -A <%= chain%> <%= src_or_dst %> -j REJECT
+% end
+% end
+

@@ -1,6 +1,1 @@
-#
-#  Reject all new outgoing connections.
-#
-/sbin/iptables -A OUTPUT -p tcp   $DEST -j REJECT --reject-with tcp-reset  -m state --state NEW
-/sbin/iptables -A OUTPUT -p udp   $DEST -j REJECT -m state --state NEW
-/sbin/iptables -A OUTPUT -p icmp  $DEST -j REJECT -m state --state NEW
+reject.incoming

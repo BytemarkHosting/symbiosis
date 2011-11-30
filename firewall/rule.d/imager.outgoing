@@ -1,5 +1,1 @@
-
-#
-#  Allow outgoing imager connections
-#
-/sbin/iptables -A OUTPUT  -p  tcp --dport 5000 $DEST -j ACCEPT
+imager.incoming
