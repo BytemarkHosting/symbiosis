@@ -20,16 +20,15 @@ clean:
 	$(RM) ext/Makefile
 
 
-man/%.man: ./bin/%
+man/%.man: ./sbin/%
 	[ -d man ] || mkdir man
 	RUBYLIB=./lib $<  --help | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
 
-
-manpage: ./bin/firewall man/firewall-whitelist.man
+man/%.1: ./bin/%
 	if ! [ -d ./man ] ; then mkdir ./man ; fi
-	pod2man ./bin/firewall > ./man/firewall.1
-	pod2man ./bin/firewall-logtail > ./man/firewall-logtail.1
-	pod2man ./bin/firewall-blacklist > ./man/firewall-blacklist.1
+	pod2man $< > $@ 
+
+manpage: ./man/symbiosis-firewall-whitelist.man ./man/symbiosis-firewall.man ./man/firewall.1 ./man/firewall-logtail.1 ./man/firewall-blacklist.1
 
 all: manpage ext/symbiosis_utmp.so
 
@@ -74,4 +73,4 @@ ext/symbiosis_utmp.so: ext/Makefile
 ext/Makefile: ext/extconf.rb
 	cd ext/ && ruby $(notdir $<)
 
-.PHONY: test
+.PHONY: test manpage all clean distclean
