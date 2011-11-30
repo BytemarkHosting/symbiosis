@@ -1,6 +1,0 @@
-
-#
-#  Allow outgoing connections on port 80 + 443
-#
-/sbin/iptables -A OUTPUT -p tcp --dport  80 $DEST -j ACCEPT
-/sbin/iptables -A OUTPUT -p udp --dport 443 $DEST -j ACCEPT
