@@ -103,7 +103,7 @@ if [ -d /opt/bytemark ]; then
 fi
 
 #
-#  See if there are any entries present.
+#  See if there are any incominng entries present.
 #
 incoming=0
 for i in $PREFIX/incoming.d/*-*; do
@@ -112,75 +112,59 @@ for i in $PREFIX/incoming.d/*-*; do
     fi
 done
 
+#
+# Create incoming/outgoing directories, and make sure that RELATED/ESTABLISED
+# are unconditionally allowed.
+#
+for dir in incoming outgoing ; do
+  if  [ ! -d $PREFIX/$dir.d/ ]; then
+      mkdir -p $PREFIX/$dir.d/
+      touch  $PREFIX/$dir.d/.empty
+  fi
+
+  for state in related established ; do
+    touch  $PREFIX/$dir.d/00-$state
+  done
+done
+
+
 if [ "$incoming" = "0" ]; then
 
     echo "Creating default rules for the incoming firewall"
 
-    if  [ ! -d $PREFIX/incoming.d/ ]; then
-        mkdir -p $PREFIX/incoming.d/
-        touch  $PREFIX/incoming.d/.empty
-    fi
-
-    touch  $PREFIX/incoming.d/00-ssh
+    #
+    #  Default incoming rules.
+    #
     touch  $PREFIX/incoming.d/05-ping
+    touch  $PREFIX/incoming.d/07-ssh
     touch  $PREFIX/incoming.d/10-http
+    touch  $PREFIX/incoming.d/10-https
     touch  $PREFIX/incoming.d/20-ftp
     touch  $PREFIX/incoming.d/30-imap
-    touch  $PREFIX/incoming.d/40-imaps
-    touch  $PREFIX/incoming.d/50-pop3
-    touch  $PREFIX/incoming.d/55-dns
-    touch  $PREFIX/incoming.d/60-pop3s
-    touch  $PREFIX/incoming.d/70-smtp
-    touch  $PREFIX/incoming.d/75-ntp
-    touch  $PREFIX/incoming.d/80-smtps
-    touch  $PREFIX/incoming.d/85-submission
-    touch  $PREFIX/incoming.d/90-sieve
+    touch  $PREFIX/incoming.d/30-imaps
+    touch  $PREFIX/incoming.d/40-pop3
+    touch  $PREFIX/incoming.d/40-pop3s
+    touch  $PREFIX/incoming.d/50-smtp
+    touch  $PREFIX/incoming.d/50-smtps
+    touch  $PREFIX/incoming.d/50-submission
+    touch  $PREFIX/incoming.d/60-sieve
     touch  $PREFIX/incoming.d/99-reject
-    touch  $PREFIX/incoming.d/00-related
-    touch  $PREFIX/incoming.d/00-established
-
-    #
-    #  Now create our outgoing directory, if it is missing.
-    #
-    if  [ ! -d $PREFIX/outgoing.d/ ]; then
-        mkdir -p $PREFIX/outgoing.d/
-        touch $PREFIX/outgoing.d/.empty
-    fi
 
     #
     #  Default outgoing rules.
     #
-    echo "Creating default rules for firewall"
-    touch $PREFIX/outgoing.d/50-www-data
+    touch $PREFIX/outgoing.d/10-new-not-www-data
+    touch $PREFIX/outgoing.d/99-reject
 fi
 
-
-#
-#  Make sure that DNS is unconditionally allowed.
-#
-touch  $PREFIX/incoming.d/55-dns
-
-
-
-#
-#  Cope with prior mistaken rules
-#
-if [ -e $PREFIX/outgoing.d/00-established ]; then
-
-    # create rule in correct directory.
-    touch $PREFIX/incoming.d/00-established
-
-    # remove the wrong file.
-    rm $PREFIX/outgoing.d/00-established
-fi
 
 #
 #  Flush and reload the firewall unless we're in a chroot
 #
 if [ -z "$CHROOT" ]; then
 
-    firewall --flush
-    firewall
+    symbiosis-firewall --flush
+    symbiosis-firewall
 
     #
     #  Remove denyhosts.  Yummy!
