@@ -62,6 +62,9 @@ echo '1' > /etc/pure-ftpd/conf/TLS
 if [ -x "/etc/init.d/pure-authd" ]; then
   update-rc.d pure-authd defaults >/dev/null
 fi
+if [ -x "/etc/init.d/pure-ftpd" ]; then
+  update-rc.d pure-ftpd defaults >/dev/null
+fi
 
 
 #
@@ -73,11 +76,8 @@ else
   action=restart
 fi
 
-if which invoke-rc.d >/dev/null 2>&1; then
-    invoke-rc.d pure-authd $action
-else
-    /etc/init.d/pure-authd $action
-fi
+invoke-rc.d pure-authd $action
+invoke-rc.d pure-ftpd  $action
 
 #DEBHELPER#
 exit 0
