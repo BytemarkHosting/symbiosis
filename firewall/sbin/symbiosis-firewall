@@ -63,7 +63,7 @@ flush    = false
 execute  = true
 delete   = true
 base_dir = '/etc/symbiosis/firewall'
-template_dir = '/usr/share/symbiosis/firewall/rules.d'
+template_dir = '/usr/share/symbiosis/firewall/rule.d'
 
 #
 # This allows us just to symlink straight to /etc/network/if-up.d and if-down.d
