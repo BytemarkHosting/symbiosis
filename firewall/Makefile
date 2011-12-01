@@ -7,30 +7,30 @@ nop:
 	@echo " "
 	@echo " all       - generate rules and manpages"
 	@echo " rules     - generate automatic rules"
-	@echo " manpage   - generate manpage for ./bin/firewall"
+	@echo " manpages  - generate manpages for ./bin/firewall"
 	@echo " test      - test firewall installation"
 	@echo " clean     - clean up"
 	@echo " "
 
 clean:
-	if [ -d ./man ] ; then rm -rf ./man ; fi
+	if [ -d ./manpages ] ; then rm -rf ./manpages ; fi
 	if [ -d ./i ] ; then rm -rf ./i ; fi
 	cd ext && ruby extconf.rb
 	make -C ext clean
 	$(RM) ext/Makefile
 
 
-man/%.man: ./sbin/%
-	[ -d man ] || mkdir man
+manpages/%.man: ./sbin/%
+	[ -d ./manpages ] || mkdir ./manpages
 	RUBYLIB=./lib $<  --help | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
 
-man/%.1: ./bin/%
-	if ! [ -d ./man ] ; then mkdir ./man ; fi
-	pod2man $< > $@ 
+manpages/%.1: ./bin/%
+	[ -d ./manpages ] || mkdir ./manpages
+	pod2man -s 1 $< > $@ 
 
-manpage: ./man/symbiosis-firewall-whitelist.man ./man/symbiosis-firewall.man ./man/firewall.1 ./man/firewall-logtail.1 ./man/firewall-blacklist.1
+manpages: ./manpages/symbiosis-firewall-whitelist.man ./manpages/symbiosis-firewall.man ./manpages/firewall.1 ./manpages/firewall-logtail.1 ./manpages/firewall-blacklist.1
 
-all: manpage ext/symbiosis_utmp.so
+all: manpages ext/symbiosis_utmp.so
 
 distclean: clean
 
@@ -73,4 +73,4 @@ ext/symbiosis_utmp.so: ext/Makefile
 ext/Makefile: ext/extconf.rb
 	cd ext/ && ruby $(notdir $<)
 
-.PHONY: test manpage all clean distclean
+.PHONY: test manpages all clean distclean

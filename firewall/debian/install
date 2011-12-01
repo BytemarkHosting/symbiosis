@@ -1,4 +1,4 @@
-rule.d                usr/share/symbiosis/irewall
+rule.d                usr/share/symbiosis/firewall
 bin                   usr/
 sbin                  usr/
 patterns.d/           etc/symbiosis/firewall
