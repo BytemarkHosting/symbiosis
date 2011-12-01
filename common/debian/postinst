@@ -140,7 +140,7 @@ makessl=0
 #
 # Rename ssl.pem to ssl.crt, and link back to the .pem, just in case.
 #
-if [ -e /etc/ssl/ssl.pem ]
+if [ -e /etc/ssl/ssl.pem ] ; then
   if [ -e /etc/ssl/ssl.crt ] ; then
     mv /etc/ssl/ssl.pem /etc/ssl/ssl.pem.old
   else
