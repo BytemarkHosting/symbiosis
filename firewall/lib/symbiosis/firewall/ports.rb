@@ -69,7 +69,9 @@ module Symbiosis
         unless @services.has_key?(srv)
           @services[srv] = prt
         else
-          warn "#{srv} defined twice.  Ignoring definition for port #{prt}" unless prt == @services[srv]
+          unless prt == @services[srv]
+            warn "#{srv} defined twice.  Ignoring definition for port #{prt}" if $VERBOSE
+          end
         end
       end
 

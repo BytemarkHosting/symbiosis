@@ -72,7 +72,7 @@ module Symbiosis
         result = []
 
         @ips.each do |ip|
-          f = FirewallRule.whitelist( ip )
+          f = Firewall::Rule.whitelist( ip )
 
           result << "# Whitelisted IP: #{ip} - #{directory}/#{ip}"
           result << f.to_s
@@ -89,7 +89,7 @@ module Symbiosis
         result = [] 
 
         @ips.each do |ip|
-          f = FirewallRule.blacklist( ip )
+          f = Firewall::Rule.blacklist( ip )
           result << "# Blacklisted IP: #{ip} - #{directory}/#{ip}"
           result << f.to_s
         end

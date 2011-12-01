@@ -48,41 +48,41 @@ class TestFirewallRule < Test::Unit::TestCase
   end
   
   def test_legacy_rule_without_subst
-    r = Firewall::Rule.new("allow-old")
+    r = Firewall::Rule.new("accept-old")
     r.template_dir = @template_dir
     puts r.to_s
   end
 
   def test_legacy_rule_ipv4
-    r = Firewall::Rule.new("allow-old")
+    r = Firewall::Rule.new("accept-old")
     r.template_dir = @template_dir
     r.address = "1.2.3.4/30"
     puts r.to_s
   end
   
   def test_legacy_rule_ipv6
-    r = Firewall::Rule.new("allow-old")
+    r = Firewall::Rule.new("accept-old")
     r.template_dir = @template_dir
     r.address = "2001:ba8:123:0::12/56"
     puts r.to_s
   end
 
   def test_new_rule_ipv4
-    r = Firewall::Rule.new("allow")
+    r = Firewall::Rule.new("accept")
     r.template_dir = @template_dir
     r.address = "1.2.3.4/30"
     puts r.to_s
   end
 
   def test_new_rule_ipv6
-    r = Firewall::Rule.new("allow")
+    r = Firewall::Rule.new("accept")
     r.template_dir = @template_dir
     r.address = "2001:ba8:123:0::12/56"
     puts r.to_s
   end
 
   def test_new_rule_all_ipv
-    r = Firewall::Rule.new("allow")
+    r = Firewall::Rule.new("accept")
     r.template_dir = @template_dir
     puts r.to_s
   end

@@ -39,9 +39,9 @@ module Symbiosis
       #  Helper:  Note no port is required for a blacklist.
       #
       def self.blacklist( ip )
-        f = self.new( "drop" )
+        f = self.new( "reject" )
         f.incoming()
-        f.address( ip )
+        f.address = ip
         return f
       end
 
@@ -51,7 +51,7 @@ module Symbiosis
       def self.whitelist( ip )
         f = self.new( "accept" )
         f.incoming()
-        f.address( ip )
+        f.address = ip 
         return f
       end
 
@@ -209,16 +209,22 @@ module Symbiosis
         return @template unless @template.nil?
 
         #
-        # OK, we've not found it.  Try using "accept".
+        # OK, we've not found it.  Try using "accept", but only if one of port
+        # or address is defined.  This prevents accidental ACCEPT ALL rules
+        # being put in.
         #
-        @template_dirs.each do |td|
-          fn = "#{td}/accept.#{direction}"
-          next unless File.exists?(fn)
-
-          @template = File.read(fn) 
+        unless @port.nil? and @address.nil?
+          @template_dirs.each do |td|
+            fn = "#{td}/accept.#{direction}"
+            next unless File.exists?(fn)
+  
+            @template = File.read(fn) 
+          end
         end
 
-        @template
+        return @template unless @template.nil?
+
+        raise ArgumentError, "Could not find #{@name}.#{direction} template"
       end
 
       #
