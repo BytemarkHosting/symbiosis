@@ -92,7 +92,6 @@ module Symbiosis
                  "/sbin/ip6tables -P OUTPUT ACCEPT",
                  "/sbin/ip6tables -P FORWARD ACCEPT",
                  "/sbin/ip6tables -F",
-                 "/sbin/ip6tables -t nat -F",
                  "/sbin/ip6tables -t raw -F",
                  "/sbin/ip6tables -t mangle -F",
                  "/sbin/ip6tables -X"
