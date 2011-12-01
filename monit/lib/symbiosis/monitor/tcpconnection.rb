@@ -56,9 +56,10 @@ module Symbiosis
                   sock.print line
                 else
                   loop do
-                    trans = sock.gets.chomp
+                    trans = sock.gets
+                    break if trans.nil?
                     # transform duff characters
-                    @transactions << "< "+trans.inspect[1..-2]
+                    @transactions << "< "+trans.chomp.inspect[1..-2]
                     puts @transactions.last
                     break if line.nil? or (line.is_a?(Regexp) and trans =~ line)
                   end
