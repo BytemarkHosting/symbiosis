@@ -6,9 +6,9 @@ class PureFtpdCheck < Symbiosis::Monitor::Check
 
   def initialize
     super
-    @process.pidfile = "/var/run/inetd.pid"
-    @process.initscript = "/etc/init.d/openbsd-inetd"
-    @name = "inetd"
+    @process.pidfile = "/var/run/pure-ftpd/pure-ftpd.pid"
+    @process.initscript = "/etc/init.d/pure-ftpd"
+    @name = "pure-ftpd"
   end
 
   def do_check

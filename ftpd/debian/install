@@ -2,3 +2,4 @@ check-ftp-password /usr/sbin/
 patterns.d/*       /etc/symbiosis/firewall/patterns.d/
 init.d/*           /etc/init.d/
 default/*          /etc/default/
+monit.d/*          /etc/symbiosis/monit.d/
