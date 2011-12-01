@@ -33,5 +33,28 @@ tls_on_connect_ports = 465
 #
 # Don't allow duff SSL ciphers
 #
-tls_require_ciphers = ALL:!LOW:!SSLv2:!EXP:!aNULL
+#
+# For OpenSSL
+# tls_require_ciphers = ALL:!LOW:!SSLv2:!EXP:!aNULL
+#
+# This corresponds to:
+# DHE-RSA-AES256-SHA      SSLv3 Kx=DH       Au=RSA  Enc=AES(256)  Mac=SHA1
+# DHE-DSS-AES256-SHA      SSLv3 Kx=DH       Au=DSS  Enc=AES(256)  Mac=SHA1
+# AES256-SHA              SSLv3 Kx=RSA      Au=RSA  Enc=AES(256)  Mac=SHA1
+# DHE-RSA-AES128-SHA      SSLv3 Kx=DH       Au=RSA  Enc=AES(128)  Mac=SHA1
+# DHE-DSS-AES128-SHA      SSLv3 Kx=DH       Au=DSS  Enc=AES(128)  Mac=SHA1
+# AES128-SHA              SSLv3 Kx=RSA      Au=RSA  Enc=AES(128)  Mac=SHA1
+# EDH-RSA-DES-CBC3-SHA    SSLv3 Kx=DH       Au=RSA  Enc=3DES(168) Mac=SHA1
+# EDH-DSS-DES-CBC3-SHA    SSLv3 Kx=DH       Au=DSS  Enc=3DES(168) Mac=SHA1
+# DES-CBC3-SHA            SSLv3 Kx=RSA      Au=RSA  Enc=3DES(168) Mac=SHA1
+# RC4-SHA                 SSLv3 Kx=RSA      Au=RSA  Enc=RC4(128)  Mac=SHA1
+# RC4-MD5                 SSLv3 Kx=RSA      Au=RSA  Enc=RC4(128)  Mac=MD5 
+#
+
+# For GnuTLS:
+tls_require_ciphers      = AES_256:AES_128:3DES:ARCFOUR_128
+gnutls_require_kx        = DHE_RSA:DHE_DSS:RSA
+gnutls_require_mac       = MD5:SHA1
+gnutls_require_protocols = SSL3
+
 
