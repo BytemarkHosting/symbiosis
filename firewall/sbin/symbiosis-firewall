@@ -160,13 +160,10 @@ begin
   if ( execute )
     system( "chmod 755 #{tf.path}" )
     system( tf.path )
-    #      system( "run-parts .../local.d/" )
+    system( "run-parts #{base_dir}/local.d/" ) if File.directory?("#{base_dir}/local.d/")
   end
 
-  if ( delete )
-    File.unlink( tf.path )
-  else
-
+  unless( delete )
     #
     #  TODO: Fix this.  Because we used Tempfile we have to manually
     # copy the firewall to a new name as it is unlinked at process exit.
