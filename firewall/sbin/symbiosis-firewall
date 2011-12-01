@@ -158,7 +158,7 @@ begin
   tf.close
 
   if ( execute )
-    system( "chmod 755 #{tf}" )
+    system( "chmod 755 #{tf.path}" )
     system( tf.path )
     #      system( "run-parts .../local.d/" )
   end
