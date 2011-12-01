@@ -36,9 +36,7 @@ module Symbiosis
         @directory = directory
         @ips       = Array.new()
 
-        throw "Directory not found #{directory}" unless
-          File.directory?( directory );
-
+        raise Errno::ENOENT, directory unless File.directory?( directory );
 
         #
         #  Read the contents of the directory
@@ -69,16 +67,7 @@ module Symbiosis
       #  Generate appropriate IPtable rules for a whitelist
       #
       def whitelist
-        result = []
-
-        @ips.each do |ip|
-          f = Firewall::Rule.whitelist( ip )
-
-          result << "# Whitelisted IP: #{ip} - #{directory}/#{ip}"
-          result << f.to_s
-        end
-
-        result
+        @ips.collect{|ip| Firewall::Rule.whitelist( ip ) }
       end
 
 
@@ -86,15 +75,7 @@ module Symbiosis
       #  Generate appropriate IPtable rules for a blacklist
       #
       def blacklist
-        result = [] 
-
-        @ips.each do |ip|
-          f = Firewall::Rule.blacklist( ip )
-          result << "# Blacklisted IP: #{ip} - #{directory}/#{ip}"
-          result << f.to_s
-        end
-
-        result.join("\n")
+        @ips.collect{|ip| Firewall::Rule.blacklist( ip ) }
       end
     end
   end

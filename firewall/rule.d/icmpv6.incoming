@@ -1,0 +1,10 @@
+% if ipv6?
+#
+#  Allow IPv6 ICMP<%= port.nil? ? "" : " type #{port}" %>.
+#
+/sbin/ip6tables -A <%= chain %> -p icmpv6 <%= port.nil? ? "" : "--icmpv6-type #{port}" %> <%= src_or_dst %> -j ACCEPT
+% end
+
+
+
+

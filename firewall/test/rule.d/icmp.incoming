@@ -1,0 +1,10 @@
+% if ipv4?
+#
+#  Allow IPv4 ICMP<%= port.nil? ? "" : " type #{port}" %>.
+#
+/sbin/iptables -A <%= chain %> -p icmp <%= port.nil? ? "" : "--icmp-type #{port}" %> <%= src_or_dst %> -j ACCEPT
+% end
+
+
+
+

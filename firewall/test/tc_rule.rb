@@ -81,13 +81,25 @@ class TestFirewallRule < Test::Unit::TestCase
     puts r.to_s
   end
 
-  def test_new_rule_all_ipv
+  def test_new_rule_all_ipv4
     r = Firewall::Rule.new("accept")
     r.template_dir = @template_dir
     puts r.to_s
   end
 
+  def test_new_rule_icmp_echo_reply
+    r = Firewall::Rule.new("icmp-echo-reply")
+    r.template_dir = @template_dir
+    puts r.to_s
+  end
+
+  def test_new_rule_icmp6_echo_reply
+    r = Firewall::Rule.new("icmpv6-echo-reply")
+    r.template_dir = @template_dir
+    puts r.to_s
+  end
 end
+
 
 
 

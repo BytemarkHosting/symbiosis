@@ -125,6 +125,15 @@ for dir in incoming outgoing ; do
   for state in related established ; do
     touch  $PREFIX/$dir.d/00-$state
   done
+
+  #
+  # Essential IPv6 ICMP protocols
+  # 
+  for itype in destination-unreachable packet-too-big parameter-problem \
+    router-solicitation router-advertisement \
+    neighbor-solicitation neighbor-advertisement ; do
+    touch $PREFIX/$dir.d/05-icmpv6-$itype
+  done
 done
 
 
@@ -153,10 +162,21 @@ if [ "$incoming" = "0" ]; then
     #
     #  Default outgoing rules.
     #
-    touch $PREFIX/outgoing.d/10-new-not-www-data
+    touch $PREFIX/outgoing.d/10-match-uid-not-www-data
     touch $PREFIX/outgoing.d/99-reject
 fi
 
+if [ -e $PREFIX/incoming.d/*-http -a ! -e $PREFIX/incoming.d/*-https ] ; then
+    touch $PREFIX/incoming.d/10-https
+fi
+
+#
+# This rule forbade outgoing connections by www-data.  It has been renamed.
+#
+if [ -e $PREFIX/outgoing.d/50-www-data ] ; then
+    mv $PREFIX/outgoing.d/50-www-data $PREFIX/outgoing.d/10-match-uid-not-www-data
+    touch $PREFIX/outgoing.d/20-match-uid-www-data
+fi
 
 #
 #  Flush and reload the firewall unless we're in a chroot

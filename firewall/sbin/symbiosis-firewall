@@ -132,35 +132,33 @@ begin
 
   if ( myself.disabled? )
     verbose( "Firewall disabled.  Exiting cleanly." )
-    System.exit(0)
+    exit 0
   end
-
 
   #
   #  Just testing?
   #
   exit( myself.test() ) if ( test )
-
-  #
-  #  Flushing / Removing the firewall?
-  #
-  if ( flush )
-    myself.flush()
-    exit 0
-  end
-
-
+  
   #
   #  Write the firewall to a local file
   #
   tf = Tempfile.new("symbiosis-firewall-")
-  myself.create_firewall(tf)
+
+  tf.puts myself.header
+
+  tf.puts myself.flush  
+
+  #
+  # Just flushing / removing the firewall?
+  #
+  tf.puts myself.create_firewall unless flush 
+
   tf.close
 
   if ( execute )
     system( "chmod 755 #{tf.path}" )
     system( tf.path )
-    system( "run-parts #{base_dir}/local.d/" ) if File.directory?("#{base_dir}/local.d/")
   end
 
   unless( delete )

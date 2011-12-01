@@ -31,8 +31,16 @@ module Symbiosis
         @port      = nil
         @template  = nil
         @template_dirs = %w(/usr/local/share/firewall /usr/local/share/symbiosis/firewall /usr/share/firewall /usr/share/symbiosis/firewall)
-        @name      = name
-        @port      = @@ports.lookup( @name ) unless @name.nil? 
+        #
+        # Special handling of ICMP stuff.
+        #
+        if name =~ /^(icmp(?:v6)?)(?:-(.+))?$/
+          @name = $1
+          @port = $2 unless $2.nil?
+        else
+          @name      = name
+          @port      = @@ports.lookup( @name ) unless @name.nil? 
+        end
       end
 
       #
@@ -112,11 +120,11 @@ module Symbiosis
       # Is this an IPv6 rule
       #
       def ipv6?
-        @address.nil? or (@address.is_a?(IPAddr) and @address.ipv6?)
+        @name == "icmpv6" or @address.nil? or (@address.is_a?(IPAddr) and @address.ipv6?)
       end
     
       def ipv4?
-        @address.nil? or (@address.is_a?(IPAddr) and @address.ipv4?)
+        @name == "icmp" or @address.nil? or (@address.is_a?(IPAddr) and @address.ipv4?)
       end
 
       #
@@ -201,6 +209,7 @@ module Symbiosis
           next unless File.exists?(fn)
 
           @template = File.read(fn) 
+          break 
         end
 
         #
@@ -218,7 +227,8 @@ module Symbiosis
             fn = "#{td}/accept.#{direction}"
             next unless File.exists?(fn)
   
-            @template = File.read(fn) 
+            @template = File.read(fn)
+            break 
           end
         end
 
