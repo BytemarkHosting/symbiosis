@@ -11,6 +11,7 @@ Replaces: bytemark-vhost-ftpd
 Conflicts: bytemark-vhost-ftpd
 Architecture: all
 Depends: pure-ftpd, ${misc:Depends}
+Pre-Depends: symbiosis-common
 Description: Tools to manage FTP virtual hosting
  This package contains tools to FTP access to any virtual hosts which
  have been setup with the bytemark packges.

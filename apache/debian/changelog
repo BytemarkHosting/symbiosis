@@ -1,3 +1,9 @@
+symbiosis-httpd (2011:1201) stable; urgency=low
+
+  * Removed certificate generation
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 01 Dec 2011 09:30:42 +0000
+
 symbiosis-httpd (2011:0720) stable; urgency=low
 
   [ Steve Kemp ]

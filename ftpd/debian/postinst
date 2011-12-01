@@ -38,29 +38,9 @@ echo "yes" > /etc/pure-ftpd/conf/DisplayDotFiles
 #
 echo "/var/run/pure-ftpd/pure-authd.sock" > /etc/pure-ftpd/conf/ExtAuth
 
-#
-#  Make sure we have a certificate directory.
-#
-if [ ! -d /etc/ssl/private ]; then
-    mkdir -p /etc/ssl/private
-fi
-
-
-#
-#  If we dont have an SSL certificate generate one.
-#
-if [ ! -e /etc/ssl/ssl.combined ]; then
-
-    #
-    #  Make it.
-    #
-    openssl req  -subj "/C=GB/ST=North Yorkshire/L=York/CN=$(cat /etc/hostname)" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.pem -keyout /etc/ssl/ssl.key
-
-    #
-    #  Combine PEM + Key
-    #
-    cat /etc/ssl/ssl.key /etc/ssl/ssl.pem > /etc/ssl/ssl.combined
-fi
+##
+# SSL cert generation now in symbiosis-common
+##
 
 #
 #  Link in the certificate if we have one.

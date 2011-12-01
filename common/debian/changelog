@@ -1,3 +1,9 @@
+symbiosis-common (2011:1201) stable; urgency=low
+
+  * Moved SSL certificate generation into this package.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 01 Dec 2011 09:30:14 +0000
+
 symbiosis-common (2010:1124) stable; urgency=low
 
   * Add the "admin" user to the "adm" group - such that it may read

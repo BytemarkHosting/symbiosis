@@ -247,58 +247,9 @@ if ( ! grep 443 /etc/apache2/ports.conf >/dev/null 2>/dev/null ); then
     echo "Listen 443" >> /etc/apache2/ports.conf
 fi
 
-
-#
-#  Flag to see if we need to make the key
-#
-makessl=0
-
-#
-#  Now test the current cert to see if it came from a
-# bytemark imager machine
-#
-if [ -e /etc/ssl/ssl.combined ]; then
-
-    #
-    # Get the issuer
-    #
-    issue=$(openssl x509 -noout -in /etc/ssl/ssl.combined  -subject | sed -e 's#.*CN=\([^/]\+\).*#\1#')
-
-    #
-    # If the is an imager then re-make it
-    #
-    if [ "$issue" = "imager.bytemark.co.uk" -o "$issue" = "imager1.bytemark.co.uk" -o "$issue" = "imager2.bytemark.co.uk" -o "$issue" = "imager3.bytemark.co.uk" ]; then
-        makessl=1
-    fi
-else
-    #
-    #  No cert.  We need to make it.
-    #
-    makessl=1
-fi
-
-#
-# Rename ssl.pem to ssl.crt.
-#
-if [ -e /etc/ssl/ssl.pem ] ; then
-  mv /etc/ssl/ssl.pem /etc/ssl/ssl.crt
-fi
-
-if [ "$makessl" == "1" ]; then
-
-    echo "Creating SSL key"
-
-    #
-    #  Make the key
-    #
-    openssl req -subj "/C=GB/ST=England/L=York/CN=$(cat /etc/hostname)" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
-
-    #
-    #  Combine Cert + Key
-    #
-    cat /etc/ssl/ssl.key /etc/ssl/ssl.crt > /etc/ssl/ssl.combined
-fi
-
+##
+# SSL cert generation now in symbiosis-common.
+##
 
 #
 #  Enable the new sites

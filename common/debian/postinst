@@ -132,6 +132,82 @@ if [ $(ls -l /srv/ | grep ^d | wc -l) -lt 1 ] ; then
     chown -R admin:admin /srv/
 fi
 
+#
+#  Flag to see if we need to make the key
+#
+makessl=0
+
+#
+# Rename ssl.pem to ssl.crt, and link back to the .pem, just in case.
+#
+if [ -e /etc/ssl/ssl.pem ]
+  if [ -e /etc/ssl/ssl.crt ] ; then
+    mv /etc/ssl/ssl.pem /etc/ssl/ssl.pem.old
+  else
+    mv /etc/ssl/ssl.pem /etc/ssl/ssl.crt
+  fi
+  ln -s /etc/ssl/ssl.crt /etc/ssl/ssl.pem
+fi
+
+#
+# If ssl.combined exists, and either the key or crt do not, then split it.
+#
+if [ -e /etc/ssl/ssl.combined ] ; then
+  if [ ! -e /etc/ssl/ssl.key ] ; then
+    openssl rsa -out /etc/ssl/ssl.key -in /etc/ssl/ssl.combined > /dev/null
+  fi
+  
+  if [ ! -e /etc/ssl/ssl.crt ] ; then
+    openssl x509 -out /etc/ssl/ssl.crt -in /etc/ssl/ssl.combined > /dev/null
+  fi
+fi
+
+
+#
+#  Now test the current cert to see if it came from a
+# bytemark imager machine
+#
+if [ -e /etc/ssl/ssl.crt -a -e /etc/ssl/ssl.key ]; then
+
+    #
+    # Get the issuer
+    #
+    issue=$(openssl x509 -noout -in /etc/ssl/ssl.crt  -subject | sed -e 's#.*CN=\([^/]\+\).*#\1#')
+
+    #
+    # If the issuer is a Bytemark imager then re-make it.  If the moduli of the crt and key do not match, remake it.
+    #
+    if [ "$issue" = "imager.bytemark.co.uk" -o "$issue" = "imager1.bytemark.co.uk" -o "$issue" = "imager2.bytemark.co.uk" -o "$issue" = "imager3.bytemark.co.uk" ]; then
+      makessl=1
+    elif [ "$(openssl rsa -noout -modulus -in /etc/ssl/ssl.key)" != "$(openssl x509 -noout -modulus -in /etc/ssl/ssl.crt)" ] ; then
+      makessl=1
+    fi
+else
+    #
+    #  No cert.  We need to make it.
+    #
+    makessl=1
+fi
+
+
+if [ "$makessl" == "1" ]; then
+
+    for i in key crt combined ; do
+      [ -e /etc/ssl/ssl.$i ] && mv /etc/ssl/ssl.$i /etc/ssl/ssl.$i.dpkg-old
+    done
+
+    echo "Creating new SSL key"
+
+    #
+    #  Make the key
+    #
+    openssl req -subj "/C=GB/ST=England/L=York/CN=$(cat /etc/hostname)" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
+
+    #
+    #  Combine Cert + Key
+    #
+    cat /etc/ssl/ssl.key /etc/ssl/ssl.crt > /etc/ssl/ssl.combined
+fi
 
 #
 #  Fix all perms

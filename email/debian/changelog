@@ -1,3 +1,9 @@
+symbiosis-email (2011:1201) stable; urgency=low
+
+  * Added dependency on symbiosis-common for SSL certificate generation 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 01 Dec 2011 09:31:11 +0000
+
 symbiosis-email (2010:1130) stable; urgency=low
 
   * Updated exim4 config to route via DNS for local domains only when those
