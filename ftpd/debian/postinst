@@ -77,6 +77,12 @@ else
 fi
 
 invoke-rc.d pure-authd $action
+#
+# Pure-ftpd seems not create its pidfile on a fresh install.
+# 
+if [ ! -f /var/run/pure-ftpd/pure-ftpd.pid ] ; then
+  killall pure-ftpd
+fi
 invoke-rc.d pure-ftpd  $action
 
 #DEBHELPER#
