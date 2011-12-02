@@ -216,12 +216,5 @@ for i in www-data bytemark-firewall ; do
   fi
 done
 
-#
-# Directly link new firewall scripts into if-up/down.d
-#
-ln -s /usr/sbin/symbiosis-firewall /etc/network/if-up.d/
-ln -s /usr/sbin/symbiosis-firewall /etc/network/if-down.d/
-
-
 #DEBHELPER#
 exit 0
