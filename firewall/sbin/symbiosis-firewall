@@ -1,13 +1,9 @@
 #!/usr/bin/ruby
 #
 # NAME
-# ----
-#
 #   firewall -- The symbiosis firewall package.
 #
 # SYNOPSIS
-# --------
-#
 #  General Options:
 #
 #  Help Options:
@@ -17,8 +13,6 @@
 #
 #
 # DETAILS
-# -------
-#
 #   This script is designed to both generate and load a simple firewall
 #  based upon the contents of a hierarchy of flat files and directories.
 #
@@ -35,7 +29,8 @@
 
 require 'getoptlong'
 require 'tempfile'
-require 'symbiosis/firewall'
+require 'symbiosis/firewall/directory'
+require 'symbiosis/firewall/template'
 
 def verbose(s)
   puts s if $VERBOSE
@@ -64,6 +59,7 @@ execute  = true
 delete   = true
 base_dir = '/etc/symbiosis/firewall'
 template_dir = '/usr/share/symbiosis/firewall/rule.d'
+services = '/etc/services'
 
 #
 # This allows us just to symlink straight to /etc/network/if-up.d and if-down.d
@@ -102,13 +98,18 @@ opts.each do |opt,arg|
   when '--no-delete'
     delete = false
   when '--base-d'
-    base_dir = arg
+    base_dir = File.expand_path(arg)
   when '--template-d'
-    template_dir = arg
+    template_dir = File.expand_path(arg)
   when '--services'
     services = arg
   end
 end
+
+#
+# Set the action
+#
+action = ARGV.first || "load"
 
 if ( help )
   # Open the file, stripping the shebang line
@@ -122,38 +123,58 @@ if ( help )
   exit 0
 end
 
+# DONE parseCommandLineArguments
+# TODO sanityCheck
+# DONE flushAllRules
+# DONE createTemporaryFile
+# DONE processWhitelist
+# TODO processHostsAllow -- and hosts.deny, I suppose..
+# DONE processBlacklist
+# DONE findRules
+# TODO findDevices -- is this needed?
+# DONE processRule
+# DONE processRuleTemplate
+# DONE addRule
+# TODO testFirewall
+# DONE loadKernelModules
+# TODO fixOwnership
+# DONE parseServices
+
+
 begin
+  include Symbiosis::Firewall
 
-  #
-  #  If we're disabled exit.
-  #
-  myself = Symbiosis::Firewall.new(base_dir)
-  myself.template_dir = template_dir unless template_dir.nil?
+  Ports.load(services)
 
-  if ( myself.disabled? )
-    verbose( "Firewall disabled.  Exiting cleanly." )
-    exit 0
-  end
-
-  #
-  #  Just testing?
-  #
-  exit( myself.test() ) if ( test )
-  
   #
   #  Write the firewall to a local file
   #
-  tf = Tempfile.new("symbiosis-firewall-")
-
-  tf.puts myself.header
-
-  tf.puts myself.flush  
+  Template.directories = %w(/usr/local/share/firewall/rule.d /usr/local/share/symbiosis/firewall/rule.d /usr/share/firewall/rule.d /usr/share/symbiosis/firewall/rule.d)
+  Template.directories = template_dir unless template_dir.nil?
 
   #
-  # Just flushing / removing the firewall?
+  # Handy file-finder.
   #
-  tf.puts myself.create_firewall unless flush 
+  script_path = Template.find("#{action}.sh.erb", Template.directories.collect{|d| d.sub("rule","action")} )
 
+  #
+  # Make sure we can find the script
+  #
+  unless ( File.exists?(script_path) )
+    warn "Could not find action script for #{action.inspect}"
+    exit 1
+  end
+
+  #
+  # Create temp file
+  #
+  tf = Tempfile.new(File.basename($0)+"-")
+
+  #
+  # OK ERB it up, baby!
+  #
+  script = File.read(script_path)
+  tf.puts ERB.new(script,0,'%').result(binding)
   tf.close
 
   if ( execute )
@@ -166,8 +187,8 @@ begin
     #  TODO: Fix this.  Because we used Tempfile we have to manually
     # copy the firewall to a new name as it is unlinked at process exit.
     #
-    Kernel.system("cp #{tf.path} #{tf.path}2")
-    puts "Left firewall in #{tf.path}2"
+    Kernel.system("cp #{tf.path} #{tf.path}-saved")
+    puts "Left firewall in #{tf.path}-saved"
   end
 end
 

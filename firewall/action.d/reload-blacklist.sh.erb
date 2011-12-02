@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+#
+########################################################################
+#
+# Firewall rules created by <%= $0 %> 
+#
+########################################################################
+
+#
+# exit nicely.
+#
+
+set -e
+
+#
+# Create black/whitelist rules
+# 
+% chain = "blacklist"
+for cmd in /sbin/iptables /sbin/ip6tables ; do
+  #
+  # See if the chain exists, create if not.
+  #
+  $cmd  -L <%= chain %> > /dev/null 2>&1 || $cmd -N <%= chain%> 
+
+  # 
+  # Flush the chain, just in case it already existed.
+  #
+  $cmd  -F <%= chain %> 
+done
+
+%   dir  = File.join(base_dir, "#{chain}.d")
+%   next unless File.directory?(dir)
+%   list = IPListDirectory.new(dir, "incoming", chain)
+%   list.default = chain
+<%=  list.to_s %>
+
+

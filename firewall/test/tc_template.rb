@@ -1,23 +1,22 @@
 $: << "../lib/"
-$: << "../ext/"
-require 'symbiosis/firewall/rule'
+require 'symbiosis/firewall/template'
 require 'test/unit'
 require 'fileutils'
 
-class TestFirewallRule < Test::Unit::TestCase
+class TestFirewallTemplate < Test::Unit::TestCase
 
-  include Symbiosis
+  include Symbiosis::Firewall
 
   def setup
-    @template_dir = File.join(File.dirname(__FILE__),"rule.d")
+    @template_dirs = [ File.join(File.dirname(__FILE__),"rule.d") ]
+    Ports.reset
   end
 
   def teardown
   end
 
   def test_built_in_named_rule
-    r = Firewall::Rule.new("smtp")
-    r.template_dir = @template_dir
+    r = Template.new("smtp", "incoming", "rule.d/accept.incoming")
     #
     # This will get boiled down to 2001:ba8:123::/56
     #
@@ -40,64 +39,65 @@ class TestFirewallRule < Test::Unit::TestCase
   end
 
   def test_built_in_numbered_rule
-    r = Firewall::Rule.new("1919")
-    r.template_dir = @template_dir
+    r = Template.new("1919", "incoming",  "rule.d/accept.incoming")
     r.address = "2001:ba8:123:0::12/56"
     r.incoming
     puts r.to_s
   end
   
   def test_legacy_rule_without_subst
-    r = Firewall::Rule.new("accept-old")
-    r.template_dir = @template_dir
+    r = Template.new("accept", "incoming",  "rule.d/accept-old.incoming")
     puts r.to_s
   end
 
   def test_legacy_rule_ipv4
-    r = Firewall::Rule.new("accept-old")
-    r.template_dir = @template_dir
+    r = Template.new("accept", "incoming",  "rule.d/accept-old.incoming")
     r.address = "1.2.3.4/30"
     puts r.to_s
   end
   
   def test_legacy_rule_ipv6
-    r = Firewall::Rule.new("accept-old")
-    r.template_dir = @template_dir
+    r = Template.new("accept", "incoming",  "rule.d/accept-old.incoming")
     r.address = "2001:ba8:123:0::12/56"
     puts r.to_s
   end
 
   def test_new_rule_ipv4
-    r = Firewall::Rule.new("accept")
-    r.template_dir = @template_dir
+    r = Template.new("accept", "incoming",  "rule.d/accept.incoming")
     r.address = "1.2.3.4/30"
     puts r.to_s
   end
 
   def test_new_rule_ipv6
-    r = Firewall::Rule.new("accept")
-    r.template_dir = @template_dir
+    r = Template.new("accept", "incoming",  "rule.d/accept.incoming")
     r.address = "2001:ba8:123:0::12/56"
     puts r.to_s
   end
 
   def test_new_rule_all_ipv4
-    r = Firewall::Rule.new("accept")
-    r.template_dir = @template_dir
+    r = Template.new("accept", "incoming",  "rule.d/accept.incoming")
     puts r.to_s
   end
 
-  def test_new_rule_icmp_echo_reply
-    r = Firewall::Rule.new("icmp-echo-reply")
-    r.template_dir = @template_dir
+#  def test_new_rule_icmp_echo_reply
+#    r = Template.new("icmp-echo-reply")
+#    r.template_dirs = @template_dirs
+#    puts r.to_s
+#  end
+#
+#  def test_new_rule_icmp6_echo_reply
+#    r = Template.new("icmpv6-echo-reply")
+#    r.template_dirs = @template_dirs
+#    puts r.to_s
+#  end
+#
+  def test_boilerplate
+    r = Template.new("flush", "incoming","../boilerplate.d/flush.txt.erb")
+    puts r.to_s
+    r = Template.new("flush", "outgoing","../boilerplate.d/flush.txt.erb")
     puts r.to_s
   end
 
-  def test_new_rule_icmp6_echo_reply
-    r = Firewall::Rule.new("icmpv6-echo-reply")
-    r.template_dir = @template_dir
-    puts r.to_s
-  end
 end
 
 

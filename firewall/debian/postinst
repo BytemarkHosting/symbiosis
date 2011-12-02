@@ -175,7 +175,6 @@ fi
 #
 if [ -e $PREFIX/outgoing.d/50-www-data ] ; then
     mv $PREFIX/outgoing.d/50-www-data $PREFIX/outgoing.d/10-match-uid-not-www-data
-    touch $PREFIX/outgoing.d/20-match-uid-www-data
 fi
 
 #

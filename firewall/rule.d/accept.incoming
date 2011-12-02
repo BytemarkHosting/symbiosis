@@ -1,5 +1,13 @@
 #
-# Accept all <%= direction %> connections<%= port.nil? ? "" : " to port #{port} (#{name})" %><%= address.nil? ? "" : " from address #{address}" %>.
+# Accept all <%= direction %> connections<% #no-op %>
+% unless port.nil?
+ to port <%= port %> (<%=name %>) <% # no-op %>
+% end
+% unless address.nil?
+ <%= ("incoming" == direction ? "from" : "to" ) %>
+ address <%=address %>
+% end
+.
 #
 % iptables_cmds.each do |cmd|
 % unless port.nil?

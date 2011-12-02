@@ -33,11 +33,15 @@
 require 'getoptlong'
 require 'ipaddr'
 require 'symbiosis/utmp'
+require 'symbiosis/firewall/directory'
+require 'symbiosis/firewall/template'
+require 'tempfile'
 
 opts = GetoptLong.new(
     [ '--help',    '-h', GetoptLong::NO_ARGUMENT ],
     [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
-    [ '--prefix',  '-p', GetoptLong::REQUIRED_ARGUMENT ]
+    [ '--prefix',  '-p', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--template-d', '-t', GetoptLong::REQUIRED_ARGUMENT ]
 )
 
 
@@ -46,7 +50,11 @@ opts = GetoptLong.new(
 #
 $HELP    = false
 $VERBOSE = false
-$PREFIX  = "/etc/symbiosis/firewall/whitelist.d"
+$PREFIX = "/etc/symbiosis/firewall/"
+delete   = false
+execute  = false
+template_dir = nil
+force = true
 
 opts.each do |opt,arg|
   case opt
@@ -56,6 +64,8 @@ opts.each do |opt,arg|
       $VERBOSE = true
     when '--prefix'
       $PREFIX = arg
+    when '--template-d'
+      template_dir = arg
   end
 end
 
@@ -83,14 +93,20 @@ end
 puts "Expiring old whitelist entries" if ( $VERBOSE )
 
 expired = 0
+whitelist_d = File.join($PREFIX, "whitelist.d")
 
-if ( File.directory?( $PREFIX ) )
-  Dir.foreach( $PREFIX ) do |entry|
+# ensure the directory exists.
+if ( ! File.directory?( "#{whitelist_d}" ) )
+  system( "mkdir -p #{whitelist_d}" )
+end
+
+if ( File.directory?( whitelist_d ) )
+  Dir.foreach( whitelist_d ) do |entry|
     if ( ( entry =~ /\.auto$/i ) &&
-         (File.mtime( "#{$PREFIX}/#{entry}" ) <  ( Time.now - 8 * 24 * 60 * 60 ) ) )
+         (File.mtime( "#{whitelist_d}/#{entry}" ) <  ( Time.now - 8 * 24 * 60 * 60 ) ) )
     then
-      puts "Removing #{$PREFIX}/#{entry}" if ( $VERBOSE )
-      File.unlink("#{$PREFIX}/#{entry}")
+      puts "Removing #{whitelist_d}/#{entry}" if ( $VERBOSE )
+      File.unlink("#{whitelist_d}/#{entry}")
       expired += 1
     end
   end
@@ -129,16 +145,12 @@ ip_addresses.each do |ip|
 
     puts "Found IP address: #{ip}" if ( $VERBOSE )
 
-    if ( File.exists?( "/etc/symbiosis/firewall/whitelist.d/#{ip}.auto" ) )
+    if ( File.exists?( "#{whitelist_d}/#{ip}.auto" ) )
       puts "\tAlready whitelisted" if ( $VERBOSE )
     else
-      # ensure the directory exists.
-      if ( ! File.directory?( "/etc/symbiosis/firewall/whitelist.d" ) )
-        system( "mkdir -p /etc/symbiosis/firewall/whitelist.d" )
-      end
 
       # create the file
-      system( "touch /etc/symbiosis/firewall/whitelist.d/#{ip}.auto" )
+      system( "touch #{whitelist_d}/#{ip}.auto" )
 
       updated=true
       puts "\tAdding to whitelist" if ( $VERBOSE )
@@ -149,11 +161,9 @@ end
 
 
 #
-# Re-run the firewall if we updated, or if we expired an existing entry.
+# Re-generate the whitelist chain
 #
-if ( ( updated ) || ( expired > 0 ) )
-
-  puts "Something changed: Re-running firewall" if ( $VERBOSE )
-
-  system( "/usr/bin/firewall >>/var/log/firewall.log 2>>/var/log/firewall.err" )
+if ( updated || expired > 0 || force )
+  system( "symbiosis-firewall reload-whitelist" )
 end
+

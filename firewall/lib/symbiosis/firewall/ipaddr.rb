@@ -2,7 +2,7 @@ require 'ipaddr'
 require 'pp'
 
 module Symbiosis
-class Firewall
+module Firewall
 class IPAddr < ::IPAddr
   include Enumerable
 

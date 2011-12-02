@@ -1,3 +1,9 @@
+symbiosis-firewall (2011:1202) stable; urgency=low
+
+  * Rewrite into ruby.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 02 Dec 2011 18:16:02 +0000
+
 symbiosis-firewall (2010:1224) stable; urgency=low
 
   * Whitelist hosts mentioned in /etc/hosts.allow.

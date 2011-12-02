@@ -1,0 +1,106 @@
+#!/bin/bash
+#
+#
+########################################################################
+#
+# Firewall rules created by <%= $0 %> 
+#
+########################################################################
+
+#
+# exit nicely.
+#
+
+set -e
+
+#
+# If we don't have a module-aware kernel we're out of luck.
+#
+if [ -x "/sbin/modprobe" -a -e "/proc/modules" ] ; then
+  for i in iptable_filter nf_conntrack nf_conntrack_ftp ; do
+    /sbin/modprobe $i
+  done
+fi
+
+#######################################################################
+#
+# Clean up existing tables
+#
+#######################################################################
+for cmd in /sbin/iptables /sbin/ip6tables ; do
+  for chain in INPUT FORWARD OUTPUT ; do
+    #
+    # Fix policy, flush chain, and allow everything on loopback.
+    #
+    $cmd  -P $chain ACCEPT
+    $cmd  -F $chain 
+  done
+  #
+  # Delete old chains
+  #
+  $cmd -X
+  #
+  # Allow everythink on loopback
+  #
+  $cmd  -I INPUT  -i lo -j ACCEPT
+  $cmd  -I OUTPUT -o lo -j ACCEPT
+done
+#######################################################################
+
+
+#######################################################################
+# 
+# Create black/whitelist rules
+#
+% %w(whitelist blacklist).each do |chain|
+#######################################################################
+for cmd in /sbin/iptables /sbin/ip6tables ; do
+  #
+  # See if the chain exists, create if not.
+  #
+  $cmd  -L <%= chain %> > /dev/null 2>&1 || $cmd -N <%= chain%> 
+
+  # 
+  # Flush the chain, just in case it already existed.
+  #
+  $cmd  -F <%= chain %> 
+done
+
+%   dir  = File.join(base_dir, "#{chain}.d")
+%   next unless File.directory?(dir)
+%   list = IPListDirectory.new(dir, "incoming", chain)
+%   list.default = chain
+<%=  list.to_s %>
+#
+# Add the jump in
+#
+for cmd in /sbin/iptables /sbin/ip6tables ; do
+  $cmd -A INPUT -j <%= chain %> 
+done
+
+% end
+
+
+#######################################################################
+#
+# Add incoming and outgoing rules
+#
+% %w(incoming outgoing).each do |direction|
+#######################################################################
+%  dir  = File.join(base_dir, "#{direction}.d")
+%  next unless File.directory?(dir) 
+%  list = TemplateDirectory.new(dir, direction )
+<%= list.to_s %>
+
+% end
+
+% dir = File.join(base_dir, "local.d")
+#######################################################################
+# Run scripts in local.d
+#
+if [ -d <%= dir %> ] ; then
+  /bin/run-parts <%= dir %>
+fi
+#######################################################################
+
+

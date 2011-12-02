@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+#
+########################################################################
+#
+# Firewall rules created by <%= $0 %> 
+#
+########################################################################
+
+#
+# exit nicely.
+#
+
+set -e
+
+#
+# If we don't have a module-aware kernel we're out of luck.
+#
+if [ -x "/sbin/modprobe" -a -e "/proc/modules" ] ; then
+  for i in iptable_filter nf_conntrack nf_conntrack_ftp ; do
+    /sbin/modprobe $i
+  done
+fi
+
+#
+# Clean up existing tables
+#
+for cmd in /sbin/iptables /sbin/ip6tables ; do
+  for chain in INPUT FORWARD OUTPUT ; do
+    #
+    # Fix policy, flush chain, and allow everything on loopback.
+    #
+    $cmd  -P $chain ACCEPT
+    $cmd  -F $chain 
+  done
+  #
+  # Delete any old chains
+  #
+  $cmd -X
+done
+

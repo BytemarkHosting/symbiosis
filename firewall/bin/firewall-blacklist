@@ -149,7 +149,7 @@ if ( -e "/etc/symbiosis/firewall/disabled.blacklist" )
     #  If we're disabled and we were disabled "recently" then
     # reload the firewall to make sure changes take effect.
     #
-    if ( ( -x "/usr/bin/firewall" ) &&
+    if ( ( -x "/usr/sbin/symbiosis-firewall" ) &&
          ( recentlyModified("/etc/symbiosis/firewall/disabled") ) )
     {
         $CONFIG{ 'verbose' } && print "Reloading firewall\n";
@@ -159,7 +159,7 @@ if ( -e "/etc/symbiosis/firewall/disabled.blacklist" )
         #
         my $log = " >>/var/log/firewall.log 2>>/var/log/firewall.err";
 
-        system("/usr/bin/firewall $log");
+        system("/usr/sbin/symbiosis-firewall reload-blacklist");
     }
     exit;
 }
