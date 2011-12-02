@@ -33,8 +33,11 @@ for cmd in /sbin/iptables /sbin/ip6tables ; do
     # Fix policy, flush chain, and allow everything on loopback.
     #
     $cmd  -P $chain ACCEPT
-    $cmd  -F $chain 
   done
+  #
+  # Flush everything
+  #
+  $cmd  -F
   #
   # Delete old chains
   #
