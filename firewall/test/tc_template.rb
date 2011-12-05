@@ -16,7 +16,10 @@ class TestFirewallTemplate < Test::Unit::TestCase
   end
 
   def test_built_in_named_rule
-    r = Template.new("smtp", "incoming", "rule.d/accept.incoming")
+    r = Template.new("rule.d/accept.incoming")
+    r.name = "smtp"
+    r.direction = "incoming"
+
     #
     # This will get boiled down to 2001:ba8:123::/56
     #
@@ -39,43 +42,56 @@ class TestFirewallTemplate < Test::Unit::TestCase
   end
 
   def test_built_in_numbered_rule
-    r = Template.new("1919", "incoming",  "rule.d/accept.incoming")
+    r = Template.new("rule.d/accept.incoming")
+    r.name = "1919"
+    r.direction = "incoming"
     r.address = "2001:ba8:123:0::12/56"
-    r.incoming
     puts r.to_s
   end
   
   def test_legacy_rule_without_subst
-    r = Template.new("accept", "incoming",  "rule.d/accept-old.incoming")
+    r = Template.new("rule.d/accept-old.incoming")
+    r.name = "accept"
+    r.direction = "incoming"
     puts r.to_s
   end
 
   def test_legacy_rule_ipv4
-    r = Template.new("accept", "incoming",  "rule.d/accept-old.incoming")
+    r = Template.new("rule.d/accept-old.incoming")
+    r.name = "accept"
+    r.direction = "incoming"
     r.address = "1.2.3.4/30"
     puts r.to_s
   end
   
   def test_legacy_rule_ipv6
-    r = Template.new("accept", "incoming",  "rule.d/accept-old.incoming")
+    r = Template.new("rule.d/accept-old.incoming")
+    r.name = "accept"
+    r.direction = "incoming"
     r.address = "2001:ba8:123:0::12/56"
     puts r.to_s
   end
 
   def test_new_rule_ipv4
-    r = Template.new("accept", "incoming",  "rule.d/accept.incoming")
+    r = Template.new("rule.d/accept.incoming")
+    r.name = "accept"
+    r.direction = "incoming"
     r.address = "1.2.3.4/30"
     puts r.to_s
   end
 
   def test_new_rule_ipv6
-    r = Template.new("accept", "incoming",  "rule.d/accept.incoming")
+    r = Template.new("rule.d/accept.incoming")
+    r.name = "accept"
+    r.direction = "incoming"
     r.address = "2001:ba8:123:0::12/56"
     puts r.to_s
   end
 
   def test_new_rule_all_ipv4
-    r = Template.new("accept", "incoming",  "rule.d/accept.incoming")
+    r = Template.new("rule.d/accept.incoming")
+    r.name = "accept"
+    r.direction = "incoming"
     puts r.to_s
   end
 
@@ -91,12 +107,6 @@ class TestFirewallTemplate < Test::Unit::TestCase
 #    puts r.to_s
 #  end
 #
-  def test_boilerplate
-    r = Template.new("flush", "incoming","../boilerplate.d/flush.txt.erb")
-    puts r.to_s
-    r = Template.new("flush", "outgoing","../boilerplate.d/flush.txt.erb")
-    puts r.to_s
-  end
 
 end
 

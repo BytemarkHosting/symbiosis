@@ -29,6 +29,10 @@ module Symbiosis
         @default = d
       end
 
+      def read
+        do_read
+      end
+
       #
       #
       def to_s
@@ -175,6 +179,10 @@ module Symbiosis
     #
     # 0 directories, 3 files
     #
+    # Each file can contain a list of ports/services/templates, or the word
+    # "all", or nothing at all.
+    #
+    #
     class IPListDirectory < Directory
 
       private
@@ -188,18 +196,17 @@ module Symbiosis
       #
       def do_read
 
-        template_path = do_find_template( self.default )
-        template = Template.new( template_path )
-        template.name = self.default
-        template.direction = self.direction
-        template.chain = self.chain unless self.chain.nil?
+        templates = []
 
-        addresses = []
+        #
+        # A hash of arrays
+        #
+        port_addresses = Hash.new{|i,j| i[j] = []}
+
         #
         #  Read the contents of the directory
         #
         Dir.entries( self.path ).each do |file|
-
           #
           #  Skip "dotfiles".
           #
@@ -208,15 +215,57 @@ module Symbiosis
           #
           #  Here we need to strip the optional ".auto" suffix.
           #
-          file = File.basename(file,".auto") 
+          ip = File.basename(file,".auto") 
 
           #
-          #  Save it away.
+          # Now see if the file contains any lines for ports
           #
-          addresses << file
+          ports = File.readlines(File.join(self.path, file))
+
+          #
+          # Tidy port list, removing empty lines, and stripping out white
+          # space.
+          #
+          ports = ports.collect do |port|
+            port = port.chomp.strip
+            if port.empty?
+              nil
+            else
+              port
+            end
+          end.compact
+         
+          #
+          # Now we have our sanitised list, if the list is empty, assume all
+          # ports.  If nothing is specified, or one of the lines is "all", then
+          # the array can just contain "nil", which means all ports.
+          #
+          if ports.empty? or ports.any?{|port| "all" == port}
+            ports = [nil] 
+          end
+
+          #
+          # Save each port/address combo.
+          #
+          ports.each do |port|
+            port_addresses[port] << ip
+          end
         end
 
-        return [[template, addresses]]
+        #
+        # Now translate our ports into templates.
+        #
+        port_addresses.each do |port, addresses|
+          template_path = do_find_template( self.default )
+          template = Template.new( template_path )
+          template.name = self.default
+          template.direction = self.direction
+          template.port = port unless port.nil? 
+          template.chain = self.chain unless self.chain.nil?
+          templates << [template, addresses]
+        end
+
+        return templates
       end
 
     end

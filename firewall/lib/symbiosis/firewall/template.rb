@@ -93,6 +93,13 @@ module Symbiosis
       #  Set the source/dest
       #
       def address=( new_address )
+        #
+        # Cope with ranges.
+        #
+        if new_address.downcase =~ /^([0-9a-f\.:]+)-([0-9]+)$/
+          new_address = [$1, $2].join("/")
+        end
+
         @address = IPAddr.new(new_address)
       end
 

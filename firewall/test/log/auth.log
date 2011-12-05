@@ -1,0 +1,209 @@
+Dec  3 18:40:01 example CRON[20273]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 18:40:01 example CRON[20274]: pam_unix(cron:session): session closed for user root
+Dec  3 18:40:01 example CRON[20275]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  3 18:40:02 example CRON[20273]: pam_unix(cron:session): session closed for user root
+Dec  3 18:40:56 example sshd[20335]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:40:59 example sshd[20335]: Failed password for root from 10.18.152.10 port 41416 ssh2
+Dec  3 18:41:01 example sshd[20337]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:41:01 example CRON[20340]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  3 18:41:01 example CRON[20339]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 18:41:01 example CRON[20339]: pam_unix(cron:session): session closed for user root
+Dec  3 18:41:01 example CRON[20340]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  3 18:41:03 example sshd[20337]: Failed password for root from 10.18.152.10 port 41752 ssh2
+Dec  3 18:41:05 example sshd[20347]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:41:07 example sshd[20347]: Failed password for root from 10.18.152.10 port 42050 ssh2
+Dec  3 18:41:10 example sshd[20349]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:41:11 example sshd[20349]: Failed password for root from 10.18.152.10 port 42369 ssh2
+Dec  3 18:41:14 example sshd[20351]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:41:15 example sshd[20351]: Failed password for root from 10.18.152.10 port 42622 ssh2
+Dec  3 18:41:18 example sshd[20353]: Invalid user oracle from 10.18.152.10
+Dec  3 18:41:18 example sshd[20353]: pam_unix(sshd:auth): check pass; user unknown
+Dec  3 18:41:18 example sshd[20353]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  3 18:41:20 example sshd[20353]: Failed password for invalid user oracle from 10.18.152.10 port 42939 ssh2
+Dec  3 18:41:22 example sshd[20355]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:41:24 example sshd[20355]: Failed password for root from 10.18.152.10 port 43246 ssh2
+Dec  3 18:41:27 example sshd[20357]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=bin
+Dec  3 18:41:30 example sshd[20357]: Failed password for bin from 10.18.152.10 port 43553 ssh2
+Dec  3 18:41:32 example sshd[20359]: Invalid user cron from 2001:1af:ba8:123:456:12:54:23
+Dec  3 18:41:32 example sshd[20359]: pam_unix(sshd:auth): check pass; user unknown
+Dec  3 18:41:32 example sshd[20359]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  3 18:41:34 example sshd[20359]: Failed password for invalid user cron from 10.18.152.10 port 43908 ssh2
+Dec  3 18:41:37 example sshd[20361]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:41:39 example sshd[20361]: Failed password for root from 10.18.152.10 port 44234 ssh2
+Dec  3 18:41:41 example sshd[20363]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:41:43 example sshd[20363]: Failed password for root from 10.18.152.10 port 44564 ssh2
+Dec  3 18:41:45 example sshd[20365]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:41:48 example sshd[20365]: Failed password for root from 10.18.152.10 port 44895 ssh2
+Dec  3 18:41:50 example sshd[20367]: Invalid user cyrus from 10.18.152.10
+Dec  3 18:41:50 example sshd[20367]: pam_unix(sshd:auth): check pass; user unknown
+Dec  3 18:41:50 example sshd[20367]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  3 18:41:52 example sshd[20367]: Failed password for invalid user cyrus from 10.18.152.10 port 45250 ssh2
+Dec  3 18:41:58 example sshd[20369]: Invalid user nagios from 10.18.152.10
+Dec  3 18:41:58 example sshd[20369]: pam_unix(sshd:auth): check pass; user unknown
+Dec  3 18:41:58 example sshd[20369]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  3 18:41:59 example sshd[20369]: Failed password for invalid user nagios from 10.18.152.10 port 45582 ssh2
+Dec  3 18:42:01 example CRON[20375]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  3 18:42:01 example CRON[20374]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 18:42:01 example CRON[20373]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 18:42:01 example CRON[20374]: pam_unix(cron:session): session closed for user root
+Dec  3 18:42:01 example CRON[20375]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  3 18:42:02 example sshd[20371]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:42:02 example CRON[20373]: pam_unix(cron:session): session closed for user root
+Dec  3 18:42:05 example sshd[20371]: Failed password for root from 10.18.152.10 port 46091 ssh2
+Dec  3 18:42:07 example sshd[20435]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=backup
+Dec  3 18:42:09 example sshd[20435]: Failed password for backup from 10.18.152.10 port 46477 ssh2
+Dec  3 18:42:11 example sshd[20437]: Invalid user conner from 10.18.152.10
+Dec  3 18:42:11 example sshd[20437]: pam_unix(sshd:auth): check pass; user unknown
+Dec  3 18:42:11 example sshd[20437]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  3 18:42:13 example sshd[20437]: Failed password for invalid user conner from 10.18.152.10 port 46809 ssh2
+Dec  3 18:42:15 example sshd[20439]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:42:18 example sshd[20439]: Failed password for root from 10.18.152.10 port 47123 ssh2
+Dec  3 18:42:20 example sshd[20441]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:42:22 example sshd[20441]: Failed password for root from 10.18.152.10 port 47499 ssh2
+Dec  3 18:42:25 example sshd[20443]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=nobody
+Dec  3 18:42:27 example sshd[20443]: Failed password for nobody from 10.18.152.10 port 47874 ssh2
+Dec  3 18:42:29 example sshd[20445]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:42:31 example sshd[20445]: Failed password for root from 10.18.152.10 port 48229 ssh2
+Dec  3 18:42:33 example sshd[20447]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:42:35 example sshd[20447]: Failed password for root from 10.18.152.10 port 48586 ssh2
+Dec  3 18:42:38 example sshd[20449]: Invalid user postgres from 10.18.152.10
+Dec  3 18:42:38 example sshd[20449]: pam_unix(sshd:auth): check pass; user unknown
+Dec  3 18:42:38 example sshd[20449]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  3 18:42:40 example sshd[20449]: Failed password for invalid user postgres from 10.18.152.10 port 48973 ssh2
+Dec  3 18:42:42 example sshd[20451]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:42:44 example sshd[20451]: Failed password for root from 10.18.152.10 port 49321 ssh2
+Dec  3 18:42:46 example sshd[20453]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  3 18:42:48 example sshd[20453]: Failed password for root from 10.18.152.10 port 49645 ssh2
+Dec  3 18:43:01 example CRON[20456]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  3 18:43:01 example CRON[20455]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 18:43:01 example CRON[20455]: pam_unix(cron:session): session closed for user root
+Dec  3 18:43:01 example CRON[20456]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  3 18:44:01 example CRON[20465]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  3 20:29:01 example CRON[24330]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 20:29:01 example CRON[24330]: pam_unix(cron:session): session closed for user root
+Dec  3 20:29:01 example CRON[24331]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  3 20:29:21 example sshd[24338]: reverse mapping checking getaddrinfo for host-78-1-111-24-static.midco.net [24.111.1.78] failed - POSSIBLE BREAK-IN ATTEMPT!
+Dec  3 20:29:21 example sshd[24338]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.111.1.78  user=root
+Dec  3 20:29:23 example sshd[24338]: Failed password for root from 24.111.1.78 port 48946 ssh2
+Dec  3 20:30:01 example CRON[24343]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 20:30:01 example CRON[24344]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  3 20:30:01 example CRON[24342]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 20:30:01 example CRON[24341]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 20:30:01 example CRON[24340]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 20:55:01 example CRON[25284]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  3 20:55:01 example CRON[25283]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 20:55:01 example CRON[25283]: pam_unix(cron:session): session closed for user root
+Dec  3 20:55:01 example CRON[25284]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  3 20:55:04 example sshd[25291]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=mx.cashcredito.com.br  user=root
+Dec  3 20:55:07 example sshd[25291]: Failed password for root from 200.175.53.196 port 43796 ssh2
+Dec  3 20:56:01 example CRON[25295]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  3 20:56:01 example CRON[25294]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 20:56:01 example CRON[25293]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 20:56:01 example CRON[25294]: pam_unix(cron:session): session closed for user root
+Dec  3 20:56:01 example CRON[25295]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  3 23:02:01 example CRON[29917]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 23:02:01 example CRON[29918]: pam_unix(cron:session): session closed for user root
+Dec  3 23:02:01 example CRON[29919]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  3 23:02:02 example CRON[29917]: pam_unix(cron:session): session closed for user root
+Dec  3 23:02:12 example sshd[29979]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.55.95.132  user=root
+Dec  3 23:02:14 example sshd[29979]: Failed password for root from 67.55.95.132 port 53293 ssh2
+Dec  3 23:03:01 example CRON[29982]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  3 23:03:01 example CRON[29981]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 23:03:01 example CRON[29981]: pam_unix(cron:session): session closed for user root
+Dec  3 23:03:01 example CRON[29982]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  3 23:04:01 example CRON[29991]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  3 23:44:01 example CRON[31459]: pam_unix(cron:session): session closed for user root
+Dec  3 23:44:01 example CRON[31460]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  3 23:44:02 example CRON[31458]: pam_unix(cron:session): session closed for user root
+Dec  3 23:44:20 example sshd[31520]: reverse mapping checking getaddrinfo for 162-119-162-69.reverse.lstn.net [69.162.10.162] failed - POSSIBLE BREAK-IN ATTEMPT!
+Dec  3 23:44:21 example sshd[31520]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.162.10.162  user=root
+Dec  3 23:44:23 example sshd[31520]: Failed password for root from 69.162.10.162 port 33600 ssh2
+Dec  3 23:45:01 example CRON[31524]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  3 23:45:01 example CRON[31523]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 23:45:01 example CRON[31522]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  3 23:45:01 example CRON[31523]: pam_unix(cron:session): session closed for user root
+Dec  3 23:45:01 example CRON[31524]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  4 02:15:01 example CRON[4595]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  4 02:15:01 example CRON[4596]: pam_unix(cron:session): session closed for user root
+Dec  4 02:15:01 example CRON[4597]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  4 02:15:01 example CRON[4595]: pam_unix(cron:session): session closed for user root
+Dec  4 02:15:59 example sshd[4609]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:16:01 example sshd[4609]: Failed password for root from 10.18.152.10 port 39779 ssh2
+Dec  4 02:16:01 example CRON[4613]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  4 02:16:01 example CRON[4612]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  4 02:16:01 example CRON[4611]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  4 02:16:01 example CRON[4612]: pam_unix(cron:session): session closed for user root
+Dec  4 02:16:01 example CRON[4613]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  4 02:16:02 example CRON[4611]: pam_unix(cron:session): session closed for user root
+Dec  4 02:16:04 example sshd[4643]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:16:06 example sshd[4643]: Failed password for root from 10.18.152.10 port 40457 ssh2
+Dec  4 02:16:09 example sshd[4675]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:16:11 example sshd[4675]: Failed password for root from 10.18.152.10 port 41149 ssh2
+Dec  4 02:16:13 example sshd[4677]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:16:15 example sshd[4677]: Failed password for root from 10.18.152.10 port 41851 ssh2
+Dec  4 02:16:18 example sshd[4679]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:16:20 example sshd[4679]: Failed password for root from 10.18.152.10 port 42478 ssh2
+Dec  4 02:16:22 example sshd[4681]: Invalid user oracle from 10.18.152.10
+Dec  4 02:16:22 example sshd[4681]: pam_unix(sshd:auth): check pass; user unknown
+Dec  4 02:16:22 example sshd[4681]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  4 02:16:25 example sshd[4681]: Failed password for invalid user oracle from 10.18.152.10 port 43069 ssh2
+Dec  4 02:16:28 example sshd[4683]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:16:30 example sshd[4683]: Failed password for root from 10.18.152.10 port 43738 ssh2
+Dec  4 02:16:32 example sshd[4685]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=bin
+Dec  4 02:16:34 example sshd[4685]: Failed password for bin from 10.18.152.10 port 44450 ssh2
+Dec  4 02:16:37 example sshd[4687]: Invalid user cron from 10.18.152.10
+Dec  4 02:16:37 example sshd[4687]: pam_unix(sshd:auth): check pass; user unknown
+Dec  4 02:16:37 example sshd[4687]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  4 02:16:39 example sshd[4687]: Failed password for invalid user cron from 10.18.152.10 port 45156 ssh2
+Dec  4 02:16:42 example sshd[4689]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:16:44 example sshd[4689]: Failed password for root from 10.18.152.10 port 45847 ssh2
+Dec  4 02:16:47 example sshd[4691]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:16:48 example sshd[4691]: Failed password for root from 10.18.152.10 port 46518 ssh2
+Dec  4 02:16:51 example sshd[4693]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:16:53 example sshd[4693]: Failed password for root from 10.18.152.10 port 47114 ssh2
+Dec  4 02:16:56 example sshd[4695]: Invalid user cyrus from 10.18.152.10
+Dec  4 02:16:56 example sshd[4695]: pam_unix(sshd:auth): check pass; user unknown
+Dec  4 02:16:56 example sshd[4695]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  4 02:16:58 example sshd[4695]: Failed password for invalid user cyrus from 10.18.152.10 port 47800 ssh2
+Dec  4 02:17:01 example sshd[4697]: Invalid user nagios from 10.18.152.10
+Dec  4 02:17:01 example sshd[4697]: pam_unix(sshd:auth): check pass; user unknown
+Dec  4 02:17:01 example sshd[4697]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  4 02:17:01 example CRON[4701]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  4 02:17:01 example CRON[4700]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  4 02:17:01 example CRON[4699]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  4 02:17:01 example CRON[4700]: pam_unix(cron:session): session closed for user root
+Dec  4 02:17:01 example CRON[4699]: pam_unix(cron:session): session closed for user root
+Dec  4 02:17:01 example CRON[4701]: pam_unix(cron:session): session closed for user Debian-exim
+Dec  4 02:17:03 example sshd[4697]: Failed password for invalid user nagios from 10.18.152.10 port 48478 ssh2
+Dec  4 02:17:06 example sshd[4713]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:17:07 example sshd[4713]: Failed password for root from 10.18.152.10 port 49170 ssh2
+Dec  4 02:17:10 example sshd[4715]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=backup
+Dec  4 02:17:12 example sshd[4715]: Failed password for backup from 10.18.152.10 port 49885 ssh2
+Dec  4 02:17:15 example sshd[4717]: Invalid user conner from 10.18.152.10
+Dec  4 02:17:15 example sshd[4717]: pam_unix(sshd:auth): check pass; user unknown
+Dec  4 02:17:15 example sshd[4717]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  4 02:17:18 example sshd[4717]: Failed password for invalid user conner from 10.18.152.10 port 50619 ssh2
+Dec  4 02:17:20 example sshd[4719]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:17:23 example sshd[4719]: Failed password for root from 10.18.152.10 port 51376 ssh2
+Dec  4 02:17:25 example sshd[4721]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:17:27 example sshd[4721]: Failed password for root from 10.18.152.10 port 52072 ssh2
+Dec  4 02:17:30 example sshd[4723]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=nobody
+Dec  4 02:17:32 example sshd[4723]: Failed password for nobody from 10.18.152.10 port 52756 ssh2
+Dec  4 02:17:34 example sshd[4725]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:17:36 example sshd[4725]: Failed password for root from 10.18.152.10 port 53381 ssh2
+Dec  4 02:17:39 example sshd[4727]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:17:41 example sshd[4727]: Failed password for root from 10.18.152.10 port 54095 ssh2
+Dec  4 02:17:44 example sshd[4729]: Invalid user postgres from 10.18.152.10
+Dec  4 02:17:44 example sshd[4729]: pam_unix(sshd:auth): check pass; user unknown
+Dec  4 02:17:44 example sshd[4729]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10 
+Dec  4 02:17:46 example sshd[4729]: Failed password for invalid user postgres from 10.18.152.10 port 54834 ssh2
+Dec  4 02:17:49 example sshd[4731]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:17:51 example sshd[4731]: Failed password for root from 10.18.152.10 port 55510 ssh2
+Dec  4 02:17:54 example sshd[4733]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.18.152.10  user=root
+Dec  4 02:17:56 example sshd[4733]: Failed password for root from 10.18.152.10 port 56284 ssh2
+Dec  4 02:18:01 example CRON[4737]: pam_unix(cron:session): session opened for user Debian-exim by (uid=0)
+Dec  4 02:18:01 example CRON[4736]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  4 02:18:01 example CRON[4735]: pam_unix(cron:session): session opened for user root by (uid=0)
+Dec  4 02:18:01 example CRON[4736]: pam_unix(cron:session): session closed for user root
+Dec  4 02:18:01 example CRON[4737]: pam_unix(cron:session): session closed for user Debian-exim
+

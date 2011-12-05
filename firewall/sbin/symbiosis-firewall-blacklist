@@ -2,7 +2,7 @@
 #
 # NAME
 #
-#   firewall-whitelist -- Automatically whitelist IP addresses.
+#   symbiosis-firewall-blacklist -- Automatically blacklist IP addresses.
 #
 # SYNOPSIS
 #
@@ -15,11 +15,11 @@
 #   --help        Show the help information for this script.
 #   --verbose     Show debugging information.
 #
-# This script is designed to automatically whitelist IP addresses which
+# This script is designed to automatically blacklist IP addresses which
 # have been used to successfully login via SSH.
 #
 # It does this by parsing the output of the "last" command, and creating
-# entries in /etc/symbiosis/firewall/whitelist.d/
+# entries in /etc/symbiosis/firewall/blacklist.d/
 #
 # AUTHOR
 #
@@ -36,6 +36,8 @@ require 'symbiosis/utmp'
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
 require 'symbiosis/firewall/ipaddr'
+require 'symbiosis/firewall/logtail'
+require 'symbiosis/firewall/pattern'
 
 opts = GetoptLong.new(
     [ '--help',    '-h', GetoptLong::NO_ARGUMENT ],
@@ -90,86 +92,83 @@ end
 #
 #  Expire old entries first of all, then add new ones.
 #
-puts "Expiring old whitelist entries" if ( $VERBOSE )
+puts "Expiring old blacklist entries" if ( $VERBOSE )
 
 expired = 0
-whitelist_d = File.join($PREFIX, "whitelist.d")
+blacklist_d = File.join($PREFIX, "blacklist.d")
 
 # ensure the directory exists.
-if ( ! File.directory?( "#{whitelist_d}" ) )
-  system( "mkdir -p #{whitelist_d}" )
+if ( ! File.directory?( "#{blacklist_d}" ) )
+  system( "mkdir -p #{blacklist_d}" )
 end
 
-if ( File.directory?( whitelist_d ) )
-  Dir.foreach( whitelist_d ) do |entry|
+if ( File.directory?( blacklist_d ) )
+
+  Dir.foreach( blacklist_d ) do |entry|
     if ( ( entry =~ /\.auto$/i ) &&
-         (File.mtime( "#{whitelist_d}/#{entry}" ) <  ( Time.now - 8 * 24 * 60 * 60 ) ) )
+         (File.mtime( "#{blacklist_d}/#{entry}" ) <  ( Time.now - 8 * 24 * 60 * 60 ) ) )
     then
-      puts "Removing #{whitelist_d}/#{entry}" if ( $VERBOSE )
-      File.unlink("#{whitelist_d}/#{entry}")
+      puts "Removing #{blacklist_d}/#{entry}" if ( $VERBOSE )
+      File.unlink("#{blacklist_d}/#{entry}")
       expired += 1
     end
   end
-end
-puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
 
+end
+
+puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
 
 #
 # Fetch the IP addresses
 #
-ip_addresses = Symbiosis::Utmp.read.collect{|entry| entry["ip"]}
+blacklist = Symbiosis::Blacklist.new
+blacklist.attempts = attempts
+blacklist.base_dir = $PREFIX
+
+whitelist = Symbiosis::IPListDirectory.new(File.join($PREFIX, "whitelist.d"))
+
 
 #
 #  Did we update?
 #
 updated=false
 
+
 #
 #  Iterate over each IP
 #
-ip_addresses.each do |ip|
-  #
-  # We only want IP addresses.
-  #
-  next unless ip.is_a?(IPAddr)
+blacklist.generate.each do |ip, ports|
 
-  #
-  # FIXME: Need better IPv6 conditions.
-  #
-  if ( ( ip.ipv4? and 
-         !( IPAddr.new("127.0.0.1/8").include?(ip) or IPAddr.new("0.0.0.0") == ip )
-       ) or (
-         ip.ipv6? and IPAddr.new("2000::/3").include?(ip)
-       ) 
-     )
+  puts "Found IP address: #{ip}" if ( $VERBOSE )
 
-    #
-    # Mask IPv6 to /64s.
-    #
-    ip = ip.mask(64) if ip.ipv6?
+  fn = File.join(blacklist_d,ip.to_s.gsub("/","-")+".auto" )
 
-    puts "Found IP address: #{ip}" if ( $VERBOSE )
+  if ( File.exists?(fn) )
+    puts "\tAlready blacklisted" if ( $VERBOSE )
+  else
+    # create the file
+    system( "touch #{fn}" )
 
-    fn = File.join(whitelist_d,ip.to_s.gsub("/","-")+".auto" )
-
-    if ( File.exists?(fn) )
-      puts "\tAlready whitelisted" if ( $VERBOSE )
-    else
-      # create the file
-      system( "touch #{fn}" )
-
-      updated=true
-      puts "\tAdding to whitelist" if ( $VERBOSE )
-    end
+    updated=true
+    puts "\tAdding to blacklist" if ( $VERBOSE )
   end
 end
 
 
 
 #
-# Re-generate the whitelist chain
+# Re-generate the blacklist chain
 #
 if ( updated || expired > 0 || force )
-  system( "symbiosis-firewall reload-whitelist" )
+  system( "symbiosis-firewall reload-blacklist" )
 end
+
+
+
+
+
+
+
+
+
 

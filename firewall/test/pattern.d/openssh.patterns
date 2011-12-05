@@ -1,0 +1,29 @@
+##
+#
+#  This file contains patterns for matching failed logins via OpenSSH
+#
+##
+###
+
+
+#
+#  The logfile we look for matches within.
+#
+file = ./log/auth.log
+
+#
+#  Any matches will be denied access to these ports.
+#
+#  Comma-separated values are expected.
+#
+ports = 22
+
+
+#
+#  Patterns we'll match upon.
+#
+Did not receive identification string from __IP__
+Failed password for invalid user [^ ]+ from __IP__ port
+Failed none for invalid user [^ ]+ from __IP__
+Invalid user [^ ]+ from __IP__
+
