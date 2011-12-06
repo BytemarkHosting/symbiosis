@@ -1,3 +1,9 @@
+symbiosis-monit (2011:1206) stable; urgency=low
+
+  * Moved monit templates into their respective packages.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 06 Dec 2011 09:33:01 +0000
+
 symbiosis-monit (2011:1129) stable; urgency=low
 
   * Fixed up monit reporting bugs
