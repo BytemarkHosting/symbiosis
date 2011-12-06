@@ -204,7 +204,7 @@ end
 #
 # Exit if we've been disabled
 #
-if File.exists(File.join(base_dir, "disabled"))
+if File.exists?(File.join(base_dir, "disabled"))
   puts "Firewall disabled.  Exiting." if $VERBOSE
   exit 0 
 end

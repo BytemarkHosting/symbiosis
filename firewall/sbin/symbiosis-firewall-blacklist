@@ -161,7 +161,7 @@ end
 #
 # Exit if we've been disabled
 #
-if File.exists(File.join(base_dir, "disabled.blacklist"))
+if File.exists?(File.join(base_dir, "disabled.blacklist"))
   puts "Firewall blacklist disabled.  Exiting." if $VERBOSE
   exit 0
 end

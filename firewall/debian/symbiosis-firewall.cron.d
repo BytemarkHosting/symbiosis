@@ -8,7 +8,7 @@
 # (Since we only process *new* logfile entries each time we start.)
 #
 
-*/15 * * * * root [ -x /usr/sbin/symbiosis-firewall-blacklist ] && /usr/sbin/symbiosis-firewall-blacklist
+5,20,35,50 * * * * root [ -x /usr/sbin/symbiosis-firewall-blacklist ] && /usr/sbin/symbiosis-firewall-blacklist
 
 #
 # Whitelist valid IP addresses every hour, but outside the scope of the
@@ -17,7 +17,7 @@
 30   * * * * root [ -x /usr/sbin/symbiosis-firewall-whitelist ] && /usr/sbin/symbiosis-firewall-whitelist
 
 #
-# Check the firewall works every hour.
+# TODO: Check the firewall works every hour.
 #
-# @hourly      root [ -x /usr/sbin/symbiosis-firewall ] && /usr/sbin/symbiosis-firewall test
-#
+# 55   * * * * root [ -x /usr/sbin/symbiosis-firewall ] && /usr/sbin/symbiosis-firewall test
+

@@ -152,7 +152,7 @@ end
 #
 # Exit if we've been disabled
 #
-if File.exists(File.join(base_dir, "disabled.whitelist"))
+if File.exists?(File.join(base_dir, "disabled.whitelist"))
   puts "Firewall whitelist disabled.  Exiting." if $VERBOSE
   exit 0
 end
