@@ -5,10 +5,10 @@ set -e
 #
 # Skip, if we are not in "configure" state
 #
-if [ "$1" != "configure" ]; then
-        echo "I: Skipping configuration"
-        exit 0
-fi
+#if [ "$1" != "configure" ]; then
+#        echo "I: Skipping configuration"
+#        exit 0
+#fi
 
 #
 #  The prefix of our tree.
@@ -129,11 +129,7 @@ for dir in incoming outgoing ; do
   #
   # Essential IPv6 ICMP protocols
   # 
-  for itype in destination-unreachable packet-too-big parameter-problem \
-    router-solicitation router-advertisement \
-    neighbor-solicitation neighbor-advertisement ; do
-    touch $PREFIX/$dir.d/05-icmpv6-$itype
-  done
+  touch $PREFIX/$dir.d/05-essential-icmpv6
 done
 
 
@@ -175,6 +171,7 @@ fi
 #
 if [ -e $PREFIX/outgoing.d/50-www-data ] ; then
     mv $PREFIX/outgoing.d/50-www-data $PREFIX/outgoing.d/10-match-uid-not-www-data
+    touch $PREFIX/outgoing.d/99-reject
 fi
 
 #
@@ -184,19 +181,6 @@ if [ -z "$CHROOT" ]; then
 
     symbiosis-firewall flush
     symbiosis-firewall load
-
-    #
-    #  Remove denyhosts.  Yummy!
-    #
-    if [ -d /usr/share/denyhosts/ ]; then
-        cat > /etc/cron.hourly/purgy <<EOF
-#!/bin/bash
-dpkg --purge bytemark-vhost-ssh-protection denyhosts 2>/dev/null >/dev/null
-rm -f /etc/denyhosts.conf*
-rm /etc/cron.hourly/purgy
-EOF
-        chmod 755 /etc/cron.hourly/purgy
-    fi
 
 else
     echo " - In a chroot()"

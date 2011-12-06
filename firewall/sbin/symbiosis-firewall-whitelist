@@ -149,10 +149,17 @@ if manual or help
   exit 0
 end
 
-#  Expire old entries first of all, then add new ones.
 #
-puts "Expiring old whitelist entries" if ( $VERBOSE )
+# Exit if we've been disabled
+#
+if File.exists(File.join(base_dir, "disabled.whitelist"))
+  puts "Firewall whitelist disabled.  Exiting." if $VERBOSE
+  exit 0
+end
 
+#
+# Basics.
+#
 expired = 0
 whitelist_d = File.join(base_dir, "whitelist.d")
 
@@ -162,6 +169,11 @@ unless File.directory?(whitelist_d)
 end
 
 expire_before = Time.now - ( expire_after * 24 * 60 * 60 )
+
+#
+#  Expire old entries first of all, then add new ones.
+#
+puts "Expiring old whitelist entries" if ( $VERBOSE )
 
 Dir.glob( File.join(whitelist_d,"*.auto" ) ).each do |entry|
 

@@ -1,0 +1,11 @@
+% if ipv6?
+#
+# ICMP packets essential for IPv6 to work.
+#
+#
+for itype in destination-unreachable packet-too-big parameter-problem \
+   router-solicitation router-advertisement \
+   neighbor-solicitation neighbor-advertisement ; do
+      /sbin/ip6tables -A <%= chain %> -p icmpv6 --icmpv6-type $itype <%= src_or_dst %> -j ACCEPT
+done
+% end
