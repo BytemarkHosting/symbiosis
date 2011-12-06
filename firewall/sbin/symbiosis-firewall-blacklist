@@ -26,8 +26,8 @@
 #  -e, --expire-after <n>  Number of days after which blacklisted IPs should be
 #                          expired. Defaults to 2.
 #
-#  -p, --prefix <dir>      Directory where action.d, incoming.d, outgoing.d etc
-#                          are located. Defaults to /etc/symbiosis/firewall.
+#  -p, --prefix <dir>      Directory where incoming.d, outgoing.d etc are
+#                          located. Defaults to /etc/symbiosis/firewall.
 #
 #  -t, --template-d <dir>  Additional directory to search for templates.
 #
@@ -85,7 +85,7 @@ base_dir     = "/etc/symbiosis/firewall/"
 delete       = false
 execute      = false
 template_dir = nil
-force        = true
+force        = false
 attempts     = 20
 expire_after = 2
 
@@ -117,7 +117,7 @@ opts.each do |opt,arg|
   when '--no-delete'
     delete = false
   when '--force'
-    force = false
+    force = true
   when '--prefix'
     base_dir     = File.expand_path(arg)
   when '--template-d'
@@ -167,7 +167,9 @@ blacklist_d = File.join(base_dir, "blacklist.d")
 
 # ensure the directory exists.
 if ( ! File.directory?( "#{blacklist_d}" ) )
+
   system( "mkdir -p #{blacklist_d}" )
+
 end
 
 if ( File.directory?( blacklist_d ) )
@@ -189,40 +191,99 @@ puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
 #
 # Fetch the IP addresses
 #
-blacklist = Symbiosis::Blacklist.new
+blacklist = Symbiosis::Firewall::Blacklist.new
 blacklist.attempts = attempts
 blacklist.base_dir = base_dir
-
-whitelist = Symbiosis::IPListDirectory.new(File.join(base_dir, "whitelist.d"))
-
 
 #
 #  Did we update?
 #
 updated=false
 
-
 #
 #  Iterate over each IP
 #
 blacklist.generate.each do |ip, ports|
+  #
+  # Make sure we can parse stuff
+  #
+  begin
+    ip = IPAddr.new(ip)
+  rescue ArgumentError => err
+    warn "Ignoring #{ip.inspect} because of #{err.to_s}"
+    next
+  end
+  
+  #
+  # Mask IPv6 to /64s.
+  #
+  ip = ip.mask(64) if ip.ipv6?
+
+  #
+  # Mask IPv4 to /32s.
+  #
+  ip = ip.mask(32) if ip.ipv4?
+
+  #
+  # Only include globally routable IPs.
+  #
+  # FIXME: Need better IPv6 conditions.
+  #
+  next if ip.ipv4? and (IPAddr.new("127.0.0.1/8").include?(ip) or IPAddr.new("0.0.0.0") == ip )
+  next if ip.ipv6? and !IPAddr.new("2000::/3").include?(ip)
 
   puts "Found IP address: #{ip}" if ( $VERBOSE )
 
-  fn = File.join(blacklist_d,ip.to_s.gsub("/","-")+".auto" )
+  #
+  # Check filename without .auto first.
+  #
+  fn = File.join(blacklist_d,ip.to_s.gsub("/","-"))
 
   if ( File.exists?(fn) )
-    puts "\tAlready blacklisted" if ( $VERBOSE )
-  else
-    # create the file
-    system( "touch #{fn}" )
+    puts "\tAlready manually blacklisted" if ( $VERBOSE )
 
-    updated=true
-    puts "\tAdding to blacklist" if ( $VERBOSE )
+  else
+    #
+    # Automatically blacklist.
+    #
+    fn += ".auto"
+
+    if ! File.exists?(fn)
+      updated=true
+      puts "\tAdding to blacklist" if ( $VERBOSE )
+
+      #
+      # Write the list of ports
+      #
+      File.open(fn,"w"){|fh| fh.print ports.join("\n") }
+
+      #
+      # Create a new file.
+      #
+      FileUtils.touch(fn, :mtime => at)
+
+    else
+      updated=true
+
+      #
+      # Update the mtime, if this entry is newer.
+      #
+      puts "\tUpdating blacklist entry" if ( $VERBOSE )
+
+      old_ports = File.readlines(fn).collect{|pt| pt.chomp.strip }
+      new_ports = (ports + old_ports).collect{|pt| pt.nil? ? "all" : pt.to_s }.uniq
+      new_ports = %w(all) if new_ports.any{|pt| "all" == pt}
+
+      #
+      # overwrite file.
+      #
+      File.open(fn,"w"){|fh| fh.print ports.join("\n") }
+    end
+
   end
+
 end
 
-#
 # Re-generate the blacklist chain
 #
 if ( updated || expired > 0 || force )
@@ -233,6 +294,6 @@ if ( updated || expired > 0 || force )
   cmd += ["--prefix", base_dir] 
   cmd += ["--template-d", template_dir] unless template_dir.nil?
   cmd << "reload-blacklist"
-  exec(cmd)
+  exec(*cmd)
 end
 

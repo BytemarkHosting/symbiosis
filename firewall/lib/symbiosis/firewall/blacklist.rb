@@ -27,7 +27,12 @@ module Symbiosis
       
       def generate
         results = do_read
-        do_parse_results(results)
+        do_parse(results)
+      end
+
+      def attempts=(a)
+        raise ArgumentError, "#{a.inspect} must be an integer" unless a.is_a?(Integer)
+        @attempts = a
       end
 
       private

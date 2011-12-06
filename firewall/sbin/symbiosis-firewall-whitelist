@@ -60,6 +60,7 @@
 
 require 'getoptlong'
 require 'tempfile'
+require 'fileutils'
 require 'symbiosis/utmp'
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
@@ -77,7 +78,7 @@ wtmp_file    = "/var/log/wtmp"
 delete       = false
 execute      = false
 template_dir = nil
-force        = true
+force        = false
 expire_after = 8
 
 opts = GetoptLong.new(
@@ -108,7 +109,7 @@ opts.each do |opt,arg|
   when '--no-delete'
     delete = false
   when '--force'
-    force = false
+    force = true
   when '--prefix'
     base_dir     = File.expand_path(arg)
   when '--template-d'
@@ -153,31 +154,33 @@ end
 puts "Expiring old whitelist entries" if ( $VERBOSE )
 
 expired = 0
-whitelist_d = File.join($PREFIX, "whitelist.d")
+whitelist_d = File.join(base_dir, "whitelist.d")
 
 # ensure the directory exists.
-if ( ! File.directory?( "#{whitelist_d}" ) )
-  system( "mkdir -p #{whitelist_d}" )
+unless File.directory?(whitelist_d)
+  FileUtils.mkdir_p(whitelist_d)
 end
 
-if ( File.directory?( whitelist_d ) )
-  Dir.foreach( whitelist_d ) do |entry|
-    if ( ( entry =~ /\.auto$/i ) &&
-         (File.mtime( "#{whitelist_d}/#{entry}" ) <  ( Time.now - 8 * 24 * 60 * 60 ) ) )
-    then
-      puts "Removing #{whitelist_d}/#{entry}" if ( $VERBOSE )
-      File.unlink("#{whitelist_d}/#{entry}")
+expire_before = Time.now - ( expire_after * 24 * 60 * 60 )
+
+if File.directory?( whitelist_d )
+
+
+  Dir.glob( File.join(whitelist_d,"*.auto" ) ).each do |entry|
+
+    if  File.mtime(entry) < expire_before
+
+      puts "Removing #{entry}" if ( $VERBOSE )
+      File.unlink(entry)
       expired += 1
+
     end
+
   end
+
 end
+
 puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
-
-
-#
-# Fetch the IP addresses
-#
-ip_addresses = Symbiosis::Utmp.read(wtmp_file).collect{|entry| entry["ip"]}
 
 #
 #  Did we update?
@@ -185,46 +188,80 @@ ip_addresses = Symbiosis::Utmp.read(wtmp_file).collect{|entry| entry["ip"]}
 updated=false
 
 #
-#  Iterate over each IP
 #
-ip_addresses.each do |ip|
-  #
-  # We only want IP addresses.
-  #
-  next unless ip.is_a?(IPAddr)
+# Fetch the IP addresses
+#
+Symbiosis::Utmp.read(wtmp_file).each do |entry|
 
+  begin
+    ip = Symbiosis::Firewall::IPAddr.new(entry['ip'].to_s)
+  rescue ArgumentError
+    #
+    # Oops.  Can't interpret the IP.
+    #
+    next
+  end
+  at = entry['time']
+
+  #
+  # Make sure the record isn't already expired.
+  #
+  next unless at > expire_before
+
+  #
+  # Mask IPv6 to /64s.
+  #
+  ip = ip.mask(64) if ip.ipv6?
+
+  #
+  # Mask IPv4 to /32s.
+  #
+  ip = ip.mask(32) if ip.ipv4?
+  
+  #
+  # Only include globally routable IPs.
   #
   # FIXME: Need better IPv6 conditions.
   #
-  if ( ( ip.ipv4? and 
-         !( IPAddr.new("127.0.0.1/8").include?(ip) or IPAddr.new("0.0.0.0") == ip )
-       ) or (
-         ip.ipv6? and IPAddr.new("2000::/3").include?(ip)
-       ) 
-     )
+  next if ip.ipv4? and (IPAddr.new("127.0.0.1/8").include?(ip) or IPAddr.new("0.0.0.0") == ip )
+  next if ip.ipv6? and !IPAddr.new("2000::/3").include?(ip)
 
+  puts "Found IP address: #{ip}" if ( $VERBOSE )
+
+  #
+  # Check filename without .auto first.
+  #
+  fn = File.join(whitelist_d,ip.to_s.gsub("/","-"))
+
+  if ( File.exists?(fn) )
+    puts "\tAlready manually whitelisted" if ( $VERBOSE )
+
+  else
     #
-    # Mask IPv6 to /64s.
+    # Automatically whitelist.
     #
-    ip = ip.mask(64) if ip.ipv6?
+    fn += ".auto"
 
-    puts "Found IP address: #{ip}" if ( $VERBOSE )
-
-    fn = File.join(whitelist_d,ip.to_s.gsub("/","-")+".auto" )
-
-    if ( File.exists?(fn) )
-      puts "\tAlready whitelisted" if ( $VERBOSE )
-    else
-      # create the file
-      system( "touch #{fn}" )
-
-      updated=true
+    if ! File.exists?(fn)
+      updated=true 
       puts "\tAdding to whitelist" if ( $VERBOSE )
+
+      #
+      # Create a new file.
+      #
+      FileUtils.touch(fn, :mtime => at)
+
+    elsif File.mtime(fn) < at
+      #
+      # Update the mtime, if this entry is newer.
+      #
+      puts "\tUpdating whitelist entry" if ( $VERBOSE )
+      FileUtils.touch(fn, :mtime => at)
     end
+
   end
+
 end
-
-
 
 #
 # Re-generate the whitelist chain
@@ -237,7 +274,6 @@ if ( updated || expired > 0 || force )
   cmd += ["--prefix", base_dir]
   cmd += ["--template-d", template_dir] unless template_dir.nil?
   cmd << "reload-whitelist"
-  exec(cmd)
+  puts "Executing #{cmd.join(" ")}" if $VERBOSE
+  exec(*cmd)
 end
-
-

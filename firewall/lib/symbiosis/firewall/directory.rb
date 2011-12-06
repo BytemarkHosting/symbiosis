@@ -90,11 +90,7 @@ module Symbiosis
         # resolve addresses
         #
         hostnames.each do |hostname|
-          if hostname.is_a?(String) 
-            addresses += do_resolve_name(hostname)
-          else
-            addresses << hostname
-          end
+          addresses += do_resolve_name(hostname)
         end
 
         #
@@ -131,7 +127,16 @@ module Symbiosis
         ips = []
 
         begin
-          ips << IPAddr.new(name) 
+          case name
+            when IPAddr
+              ips << name
+            when String
+              ips << IPAddr.new(name)
+            when Nilclass
+              ips << name
+            else
+              warn "#{name.inspect} could not be resolved because it is a #{name.class}." if $VERBOSE
+          end
         rescue ArgumentError
           %w(A AAAA).each do |type|
             begin
@@ -251,6 +256,10 @@ module Symbiosis
     #
     #
     class IPListDirectory < Directory
+
+      def include?(template, address)
+
+      end
 
       private
 

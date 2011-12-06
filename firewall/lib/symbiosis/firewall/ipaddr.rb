@@ -69,10 +69,14 @@ class IPAddr < ::IPAddr
     end
   end
   
+  #
+  # Append the CIDR mask if there is more than on IP in the range.
+  #
   def to_s
-    [super, cidr_mask].join('/')
+    s = [super]
+    s << cidr_mask if max.to_i - min.to_i > 0
+    s.join("/")
   end
-
 
 end
 
