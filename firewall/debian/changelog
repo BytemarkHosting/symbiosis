@@ -1,3 +1,12 @@
+symbiosis-firewall (2011:1206) stable; urgency=low
+
+  * Tidied packaging, and removed old perl scripts.
+  * Added black and whitelist generation to ruby
+  * Added verbose flag to bash scripts
+  * Improved man pages
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 06 Dec 2011 16:14:25 +0000
+
 symbiosis-firewall (2011:1202) stable; urgency=low
 
   * Rewrite into ruby.
