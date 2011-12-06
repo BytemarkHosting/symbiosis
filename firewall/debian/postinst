@@ -182,8 +182,8 @@ fi
 #
 if [ -z "$CHROOT" ]; then
 
-    symbiosis-firewall --flush
-    symbiosis-firewall
+    symbiosis-firewall flush
+    symbiosis-firewall load
 
     #
     #  Remove denyhosts.  Yummy!
