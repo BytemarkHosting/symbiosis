@@ -10,8 +10,14 @@
 #
 # exit nicely.
 #
-
 set -e
+
+% if $VERBOSE
+#
+# Be verbose
+#
+set -v
+% end
 
 #
 # Create black/whitelist rules

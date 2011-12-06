@@ -10,8 +10,14 @@
 #
 # exit nicely.
 #
-
 set -e
+
+% if $VERBOSE
+#
+# Be verbose
+#
+set -v
+% end
 
 #
 # If we don't have a module-aware kernel we're out of luck.
