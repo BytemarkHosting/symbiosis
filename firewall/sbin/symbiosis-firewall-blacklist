@@ -239,7 +239,7 @@ blacklist.generate.each do |ip, ports|
   #
   # Check filename without .auto first.
   #
-  fn = File.join(blacklist_d,ip.to_s.gsub("/","-"))
+  fn = File.join(blacklist_d,ip.to_s.gsub("/","|"))
 
   if ( File.exists?(fn) )
     puts "\tAlready manually blacklisted" if ( $VERBOSE )

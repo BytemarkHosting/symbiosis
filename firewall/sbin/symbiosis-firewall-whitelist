@@ -42,7 +42,7 @@
 # Each addition is one of the two forms:
 #
 #   1.2.3.4.auto                The IPv4 address 1.2.3.4
-#   2001:123:456:789::-64.auto  The IPv6 range 2001:123:456:789::/64
+#   2001:123:456:789::|64.auto  The IPv6 range 2001:123:456:789::/64
 #
 # Once that directory has been written, symbiosis-firewall(1) is called with
 # the reload-whitelist action.
@@ -226,7 +226,7 @@ Symbiosis::Utmp.read(wtmp_file).each do |entry|
   #
   # Check filename without .auto first.
   #
-  fn = File.join(whitelist_d,ip.to_s.gsub("/","-"))
+  fn = File.join(whitelist_d,ip.to_s.gsub("/","|"))
 
   if ( File.exists?(fn) )
     puts "\tAlready manually whitelisted" if ( $VERBOSE )

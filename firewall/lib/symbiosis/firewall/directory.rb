@@ -132,7 +132,7 @@ module Symbiosis
               ips << name
             when String
               ips << IPAddr.new(name)
-            when Nilclass
+            when NilClass
               ips << name
             else
               warn "#{name.inspect} could not be resolved because it is a #{name.class}." if $VERBOSE
@@ -296,7 +296,7 @@ module Symbiosis
           #
           # Cope with ranges by unmangling the CIDR notation.
           #
-          if hostname =~ /^([0-9a-f\.:]+)-([0-9]+)$/
+          if hostname =~ /^([0-9a-f\.:]+)\|([0-9]+)$/
            hostname = [$1, $2].join("/")
           end
 

@@ -63,7 +63,7 @@ test: ext/symbiosis_utmp.so
 	@touch  i/outgoing.d/00-related
 	@touch  i/outgoing.d/10-match-uid-not-www-data
 	@echo "212.110.161.177" > i/outgoing.d/20-accept
-	@echo "2001:41c8:20:862:ac1:1::" >> i/outgoing.d/20-accept
+	@echo "2001:41c8:20:862:ac1:1::|48" >> i/outgoing.d/20-accept
 	@touch  i/outgoing.d/99-reject
 	@ruby -I lib ./sbin/symbiosis-firewall -p ./i -t rule.d -x -v -d
 
