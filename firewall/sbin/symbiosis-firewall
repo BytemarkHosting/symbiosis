@@ -1,29 +1,113 @@
 #!/usr/bin/ruby
-#
 # NAME
-#   firewall -- The symbiosis firewall package.
+#  symbiosis-firewall -- Symbioisis firewall management
 #
 # SYNOPSIS
-#  General Options:
+#  symbiosis-firewall [ -h | --help ] [-m | --manual] [ -v | --verbose ]
+#       [ -p | --prefix <dir> ] [ -t | --template-d <dir> ] 
+#       [ -x | --no-exec] [ -d | --no-delete ] <action>
 #
-#  Help Options:
+# OPTIONS
+#  -h, --help            Show a help message, and exit.
 #
-#   --help        Show the help information for this script.
-#   --verbose     Show debugging information.
+#  -m, --manual          Show this manual, and exit.
 #
+#  -v, --verbose         Show verbose errors
 #
-# DETAILS
-#   This script is designed to both generate and load a simple firewall
-#  based upon the contents of a hierarchy of flat files and directories.
+#  -p, --prefix <dir>    Directory where action.d, incoming.d, outgoing.d etc
+#                        are located. Defaults to /etc/symbiosis/firewall.
 #
-#   This means that creating a firewall will be as simple as touching a file
-#  or removing and existing one.
+#  -t, --template-d <dir>  Additional directory to search for templates.
 #
+#  -x, --no-exec         Do not execute the generated firewall rules
+#
+#  -d, --no-delete       Do not delete the generated script
+#
+#  <action>              The action to run. This defaults to "load".
+#
+# USAGE
+#
+# This firewall script is designed to be simple to use, while still allowing a
+# reasonable level of control over your system. This command is used to update
+# the iptables(8) and ip6tables(8) firewalls. It uses a set of directories in
+# the prefix directory to define which rules should be applied.
+# 
+# The script will be executed once it has been generated, and then removed.
+# (You may use --no-delete and --no-execute to prevent either action from being
+# carried out.)
+#
+# Usage of the Symbiosis firewall is comprehensively documented in the
+# symbiosis-documentation package, as well as on the documentation website.
+#
+# CONFIGURATION
+#
+# To configure the firewall which is generated and applied to your server you
+# simply need to create files in the directories the script reads:
+#
+# $PREFIX/incoming.d/   This directory is examined to determine which rules
+#                       should be applied to incoming connections.
+#
+# $PREFIX/outgoing.d/   This directory is examined to determine which rules
+#                       should be applied to outgoing connections.
+#
+# $PREFIX/blacklist.d/  Any file present in this directory is assumed to be the
+#                       IP address of a machine you wish to globally prevent
+#                       connections from.
+#
+# $PREFIX/whitelist.d/  Any file present in this directory is assumed to be the
+#                       IP address of a machine you wish to globally allow connections from.
+#
+# $PREFIX/local.d/      Executable shell-scripts in this directory are executed
+#                       after the firewall is installed.
+#
+# For the incoming and outgoing directories you should create files with names
+# such as "10-ssh". (The prefix you choose merely determines sorting order.)
+#
+# The presence of a file named "NN-ssh" will mean that the firewall will
+# include rules it knows about for the service "ssh". These rule types may be
+# arbitrarily complex, as they are processed via bash(1).
+#
+# The presence of a rule file will allow access to the named service. For
+# example the file "10-ssh" placed in the incoming directory will allow all
+# access to port 22. If you wish to restrict access place the hostnames, or IP
+# addresses, in the file instead of leaving it empty. This will restrict
+# access to/from the named addresses.
+#
+# ACTIONS AND TEMPLATES
+#
+# The "actions" are bash(1) scripts, that have been templated using eRuby.
+# Each action is found in the action.d directory located inside the prefix
+# directory.
+#
+# The actions that this program comes with are
+# 
+#   load              Load the firewall.
+#   flush             Flush the firewall.
+#   reload-blacklist  Update the blacklist chain.
+#   reload-whitelist  Update the whitelist chain.
+# 
+# It is possible to add your own actions to the template as needed.
+#
+# ADDING ADDITIONAL RULETYPES
+#
+# For each "rule" type you should simply create two files:
+#
+#   /usr/local/share/symbiosis/firewall/rule.d/$name.incoming
+#   /usr/local/share/symbiosis/firewall/rule.d/$name.outgoing
+#
+# The contents of these file(s) will be inserted appropriately into the
+# generated firewall script.
+#
+# The magic strings '$SRC' and '$DEST' will be replaced by any IP addresses the
+# user has specified in their file - or removed if none are present.
+#
+# SEE ALSO
+#  symbiosis-firewall-whitelist(1), symbiosis-firewall-blacklist(1),
+#  iptables(8), ip6tables(8)
 #
 # AUTHOR
-# ------
-#
-#    Steve Kemp <steve@bytemark.co.uk>
+#  Steve Kemp <steve@bytemark.co.uk>
+#  Patrick J Cherry <patrick@bytemark.co.uk>
 #
 
 
@@ -44,84 +128,81 @@ end
 #######
 ##############
 
-
-
-
 #
 #  Parse the arguments
 #
 help     = false
 manual   = false
 $VERBOSE = false
-test     = false
-flush    = false
 execute  = true
 delete   = true
-base_dir = '/etc/symbiosis/firewall'
+base_dir     = '/etc/symbiosis/firewall'
 template_dir = '/usr/share/symbiosis/firewall/rule.d'
-services = '/etc/services'
-
-#
-# This allows us just to symlink straight to /etc/network/if-up.d and if-down.d
-#
-if ENV.has_key?('IFACE')
-  flush = true if "stop" == ENV['MODE']
-  $VERBOSE = true if ENV.has_key?('VERBOSE')
-end
 
 opts = GetoptLong.new(
-                      [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
-                      [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
-                      [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
-                      [ '--test', '-t', GetoptLong::NO_ARGUMENT ],
-                      [ '--flush', '-f', GetoptLong::NO_ARGUMENT ],
-                      [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ],
-                      [ '--no-delete', '-d', GetoptLong::NO_ARGUMENT ],
-                      [ '--no-root', '-R', GetoptLong::NO_ARGUMENT ],
-                      [ '--base-d', '-b', GetoptLong::REQUIRED_ARGUMENT ],
-                      [ '--template-d', '-T', GetoptLong::REQUIRED_ARGUMENT ],
-                      [ '--services', '-s', GetoptLong::REQUIRED_ARGUMENT ]
-                     )
+         [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
+         [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ],
+         [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ],
+         [ '--no-delete',  '-d', GetoptLong::NO_ARGUMENT ],
+         [ '--prefix',     '-p', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--template-d', '-t', GetoptLong::REQUIRED_ARGUMENT ]
+       )
 
 opts.each do |opt,arg|
   case opt
   when '--help'
     help = true
+  when '--manual'
+    manual = true
   when '--verbose'
     $VERBOSE = true
-  when '--flush'
-    flush = true
-  when '--test'
+   when '--test'
     test = true
   when '--no-execute'
     execute = false
   when '--no-delete'
     delete = false
-  when '--base-d'
-    base_dir = File.expand_path(arg)
+  when '--prefix'
+    base_dir     = File.expand_path(arg)
   when '--template-d'
     template_dir = File.expand_path(arg)
-  when '--services'
-    services = arg
   end
 end
+
+#
+# CAUTION! Here be quality kode.
+#
+if manual or help
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
+
+  found_synopsis = false
+
+  lines.each do |line|
+
+    line.chomp!
+    break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
+    puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
+  end
+
+  exit 0
+end
+
 
 #
 # Set the action
 #
 action = ARGV.first || "load"
-
-if ( help )
-  # Open the file, stripping the shebang line
-  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
-
-  lines.each do |line|
-    line.chomp!
-    break if line.empty?
-    puts line[2..-1].to_s
-  end
-  exit 0
-end
 
 # DONE parseCommandLineArguments
 # TODO sanityCheck
@@ -144,7 +225,7 @@ end
 begin
   include Symbiosis::Firewall
 
-  Ports.load(services)
+  Ports.load
 
   #
   #  Write the firewall to a local file

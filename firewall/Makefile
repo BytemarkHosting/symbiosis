@@ -22,20 +22,16 @@ clean:
 
 manpages/%.man: ./sbin/%
 	[ -d ./manpages ] || mkdir ./manpages
-	RUBYLIB=./lib $<  --help | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
+	RUBYLIB=./lib:./ext $<  --manual | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
 
-manpages/%.1: ./bin/%
-	[ -d ./manpages ] || mkdir ./manpages
-	pod2man -s 1 $< > $@ 
-
-manpages: ./manpages/symbiosis-firewall-whitelist.man ./manpages/symbiosis-firewall.man ./manpages/firewall.1 ./manpages/firewall-logtail.1 ./manpages/firewall-blacklist.1
+manpages: ./manpages/symbiosis-firewall-whitelist.man ./manpages/symbiosis-firewall.man ./manpages/symbiosis-firewall-blacklist.man
 
 all: manpages ext/symbiosis_utmp.so
 
 distclean: clean
 
 test: ext/symbiosis_utmp.so
-	#@cd test && ruby ./ts_firewall.rb
+	@cd test && ruby ./ts_firewall.rb
 	@if [ ! -d ./i ]; then mkdir ./i ; fi
 	@if [ ! -d ./i/incoming.d/ ]; then mkdir ./i/incoming.d/; fi
 	@if [ ! -d ./i/outgoing.d/ ]; then mkdir ./i/outgoing.d/; fi
@@ -69,7 +65,7 @@ test: ext/symbiosis_utmp.so
 	@echo "212.110.161.177" > i/outgoing.d/20-accept
 	@echo "2001:41c8:20:862:ac1:1::" >> i/outgoing.d/20-accept
 	@touch  i/outgoing.d/99-reject
-	@ruby -I lib ./sbin/symbiosis-firewall -b ./i -T rule.d -x -v -d
+	@ruby -I lib ./sbin/symbiosis-firewall -p ./i -t rule.d -x -v -d
 
 ext/symbiosis_utmp.so: ext/Makefile
 	make -C ext $(notdir $@)

@@ -17,4 +17,3 @@
 <%= cmd %> -A <%= chain%> <%= src_or_dst %> -j ACCEPT
 % end
 % end
-

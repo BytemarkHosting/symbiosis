@@ -1,4 +1,6 @@
 require 'symbiosis/firewall/template'
+require 'resolv-replace'
+
 #
 # A directory, like incoming.d, blacklist.d, local.d.
 #
@@ -50,8 +52,8 @@ module Symbiosis
         #
         # Read the rules, and generate.
         #
-        do_read.each do |template, addresses|
-          rules += do_generate_rules( template, addresses )
+        do_read.each do |template, hostnames|
+          rules += do_generate_rules( template, hostnames )
         end
 
         return rules.join("\n")
@@ -80,9 +82,24 @@ module Symbiosis
       #
       # This applies the template, and catches any error in its generation
       #
-      def do_generate_rules(template, addresses)
+      def do_generate_rules(template, hostnames)
         rules = []
+        addresses = []
 
+        #
+        # resolve addresses
+        #
+        hostnames.each do |hostname|
+          if hostname.is_a?(String) 
+            addresses += do_resolve_name(hostname)
+          else
+            addresses << hostname
+          end
+        end
+
+        #
+        # Now, for each address create a template and add it to our rules.
+        #
         addresses.each do |address|
           begin
             #
@@ -94,13 +111,53 @@ module Symbiosis
             #
             # Catch any error and display neatly.
             #
-            msg = "Ignoring #{self.direction} rule #{template} #{address.nil? ? "" : "to #{address.inspect} "}because #{err.to_s}"
+            msg = "Ignoring #{self.direction} rule #{template.name} #{address.nil? ? "" : "to #{address.inspect} "}because #{err.to_s}"
             warn msg
             rules << "# #{msg}"
           end
         end
 
         return rules
+      end
+
+      #
+      # Resolve hostnames to A and AAAA records.
+      #
+      # The name is a string, and can be a hostname or an IP address.  A
+      # hostname will get resolved to a set of IP addresses, based on the A or
+      # AAAA records available.
+      #
+      def do_resolve_name(name)
+        ips = []
+
+        begin
+          ips << IPAddr.new(name) 
+        rescue ArgumentError
+          %w(A AAAA).each do |type|
+            begin
+              Resolv::DNS.open do |dns|
+                #
+                # This works with CNAME records too, depending on what the
+                # resolver gives us.
+                #
+                dns.getresources(name, Resolv::DNS::Resource::IN.const_get(type)).each do |a|
+                  #
+                  # Convert to IPAddr straight away, ignoring errors.
+                  #
+                  begin
+                    ips << IPAddr.new(a.address.to_s)
+                  rescue ArgumentError
+                    warn "#{type} record for #{name} returned duff IP #{a.address.to_s.inspect}." if $VERBOSE
+                  end
+                end
+              end
+            rescue Resolv::ResolvError, Resolv::ResolvTimeout => e
+              warn "#{name} could not be resolved because #{e.message}." if $VERBOSE
+            end
+          end
+        end
+
+        ips.uniq
       end
 
     end
@@ -143,17 +200,17 @@ module Symbiosis
           #
           # File.readlines always returns an array, one element per line, even for dos-style files.
           #
-          addresses = File.readlines( File.join( self.path, entry ) ).collect{|l| l.chomp}
+          hostnames = File.readlines( File.join( self.path, entry ) ).collect{|l| l.chomp.strip}
 
           #
-          # Add a dummy address of nil if there are no addresses in the list
+          # Add a dummy address of nil if there are no hostnames in the list
           #
-          addresses << nil if addresses.empty?
+          hostnames << nil if hostnames.empty?
           
           #
           # Append our result
           #
-          results << [template, addresses] 
+          results << [template, hostnames] 
         end
 
         #
@@ -177,7 +234,17 @@ module Symbiosis
     # |---  1.2.3.4
     # \--   1.4.4.4
     #
-    # 0 directories, 3 files
+    # If the name looks like an IP address and is of the form
+    #
+    #  1.2.3.4-24
+    #
+    # or 
+    #
+    #  2001:dead:beef:cafe::1-64
+    #
+    # then these would be mangled to become 1.2.3.4/24 or
+    # 2001:dead:beef:cafe::1/64 respectively, before being transformed into
+    # an IP address.
     #
     # Each file can contain a list of ports/services/templates, or the word
     # "all", or nothing at all.
@@ -201,7 +268,7 @@ module Symbiosis
         #
         # A hash of arrays
         #
-        port_addresses = Hash.new{|i,j| i[j] = []}
+        port_hostnames = Hash.new{|i,j| i[j] = []}
 
         #
         #  Read the contents of the directory
@@ -215,7 +282,14 @@ module Symbiosis
           #
           #  Here we need to strip the optional ".auto" suffix.
           #
-          ip = File.basename(file,".auto") 
+          hostname = File.basename(file,".auto").downcase
+          
+          #
+          # Cope with ranges by unmangling the CIDR notation.
+          #
+          if hostname =~ /^([0-9a-f\.:]+)-([0-9]+)$/
+           hostname = [$1, $2].join("/")
+          end
 
           #
           # Now see if the file contains any lines for ports
@@ -248,21 +322,21 @@ module Symbiosis
           # Save each port/address combo.
           #
           ports.each do |port|
-            port_addresses[port] << ip
+            port_hostnames[port] << hostname
           end
         end
 
         #
         # Now translate our ports into templates.
         #
-        port_addresses.each do |port, addresses|
+        port_hostnames.each do |port, hostnames|
           template_path = do_find_template( self.default )
           template = Template.new( template_path )
           template.name = self.default
           template.direction = self.direction
           template.port = port unless port.nil? 
           template.chain = self.chain unless self.chain.nil?
-          templates << [template, addresses]
+          templates << [template, hostnames]
         end
 
         return templates

@@ -94,13 +94,17 @@ module Symbiosis
       #
       def address=( new_address )
         #
-        # Cope with ranges.
+        # If we're given an IPAddr, suck it up, otherwise if it is a string,
+        # convert it.
         #
-        if new_address.downcase =~ /^([0-9a-f\.:]+)-([0-9]+)$/
-          new_address = [$1, $2].join("/")
+        case new_address
+          when IPAddr 
+            @address = new_address
+          when String
+            @address = IPAddr.new(new_address)
+          else
+            raise ArgumentError, "Cannot do much with #{new_address.inspect}"
         end
-
-        @address = IPAddr.new(new_address)
       end
 
       #

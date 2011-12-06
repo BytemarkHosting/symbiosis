@@ -1,93 +1,161 @@
 #! /usr/bin/ruby1.8
 #
 # NAME
-#
 #   symbiosis-firewall-blacklist -- Automatically blacklist IP addresses.
 #
 # SYNOPSIS
+#  symbiosis-firewall-blacklist [ -h | --help ] [-m | --manual]
+#       [ -v | --verbose ] [ -x | --no-exec] [ -d | --no-delete ]
+#       [ -a | --attempts <n> ] [ -e | --expire-after <n> ]
+#       [ -p | --prefix <dir> ] [ -t | --template-d <dir> ] 
 #
-#  Options:
+# OPTIONS
+#  -h, --help              Show a help message, and exit.
 #
-#   --prefix      The directory to operate upon.
+#  -m, --manual            Show this manual, and exit.
 #
-#  Help Options:
+#  -v, --verbose           Show verbose errors
 #
-#   --help        Show the help information for this script.
-#   --verbose     Show debugging information.
+#  -x, --no-exec           Do not execute the generated firewall rules
+#
+#  -d, --no-delete         Do not delete the generated script
+#
+#  -a, --attempts <n>      Number of attempts before an IP address is
+#                          blacklisted. Defaults to 20.
+#
+#  -e, --expire-after <n>  Number of days after which blacklisted IPs should be
+#                          expired. Defaults to 2.
+#
+#  -p, --prefix <dir>      Directory where action.d, incoming.d, outgoing.d etc
+#                          are located. Defaults to /etc/symbiosis/firewall.
+#
+#  -t, --template-d <dir>  Additional directory to search for templates.
+#
+# USAGE
 #
 # This script is designed to automatically blacklist IP addresses which
-# have been used to successfully login via SSH.
+# have been used to brute force various services running on the machine.
 #
-# It does this by parsing the output of the "last" command, and creating
-# entries in /etc/symbiosis/firewall/blacklist.d/
+# It uses a set of definitions found in $PREFIX/pattern.d/ to match IP
+# addresses in log files, and then adds the offending IPs to the blacklist by
+# adding files to the directory $PREFIX/blacklist.d.
+#
+# Each addition is one of the two forms:
+#
+#   1.2.3.4.auto                The IPv4 address 1.2.3.4
+#   2001:123:456:789::-64.auto  The IPv6 range 2001:123:456:789::/64
+# 
+# It should be noted that IPv6 addresses will be added as entire /64s.
+#
+# Each file will contain a list of ports, one per line, or simply "all" to
+# blacklist all ports.
+#
+# Once that directory has been written, symbiosis-firewall(1) is called with
+# the reload-blacklist action.
+#
+# Most of the flags above are passed straigh on to symbiosis-firewall(1).
+#
+# SEE ALSO
+#
+# symbiosis-firewall(1), symbiosis-firewall-whitelist(1)
 #
 # AUTHOR
 #
 #   Steve Kemp <steve@bytemark.co.uk>
 #
 
-#
-#  Modules we require
-#
+# TODO: fix manpage (above)
 
 require 'getoptlong'
 require 'tempfile'
-require 'symbiosis/utmp'
+require 'symbiosis/firewall/blacklist'
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
 require 'symbiosis/firewall/ipaddr'
 require 'symbiosis/firewall/logtail'
 require 'symbiosis/firewall/pattern'
 
-opts = GetoptLong.new(
-    [ '--help',    '-h', GetoptLong::NO_ARGUMENT ],
-    [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
-    [ '--prefix',  '-p', GetoptLong::REQUIRED_ARGUMENT ],
-    [ '--template-d', '-t', GetoptLong::REQUIRED_ARGUMENT ]
-)
-
-
 #
 #  The options set by the command line.
 #
-$HELP    = false
-$VERBOSE = false
-$PREFIX = "/etc/symbiosis/firewall/"
-delete   = false
-execute  = false
+help         = false
+manual       = false
+$VERBOSE     = false
+base_dir     = "/etc/symbiosis/firewall/"
+delete       = false
+execute      = false
 template_dir = nil
-force = true
+force        = true
+attempts     = 20
+expire_after = 2
+
+opts = GetoptLong.new(
+         [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
+         [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ],
+         [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ],
+         [ '--no-delete',  '-d', GetoptLong::NO_ARGUMENT ],
+         [ '--force',      '-f', GetoptLong::NO_ARGUMENT ],
+         [ '--prefix',     '-p', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--template-d', '-t', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--attempts',   '-a', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--expire-after', '-e', GetoptLong::REQUIRED_ARGUMENT ]
+       )
 
 opts.each do |opt,arg|
   case opt
-    when '--help'
-      $HELP = true
-    when '--verbose'
-      $VERBOSE = true
-    when '--prefix'
-      $PREFIX = arg
-    when '--template-d'
-      template_dir = arg
+  when '--help'
+    help = true
+  when '--manual'
+    manual = true
+  when '--verbose'
+    $VERBOSE = true
+  when '--test'
+    test = true
+  when '--no-execute'
+    execute = false
+  when '--no-delete'
+    delete = false
+  when '--force'
+    force = false
+  when '--prefix'
+    base_dir     = File.expand_path(arg)
+  when '--template-d'
+    template_dir = File.expand_path(arg)
+  when '--expire-after'
+    expire_after = arg.to_i
+  when '--attempts'
+    attempts = arg.to_i
   end
 end
-
 
 #
 # CAUTION! Here be quality kode.
 #
-if $HELP
+if manual or help
   # Open the file, stripping the shebang line
-  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
+
+  found_synopsis = false
 
   lines.each do |line|
+
     line.chomp!
     break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
     puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
   end
 
   exit 0
 end
-
 
 #
 #  Expire old entries first of all, then add new ones.
@@ -95,7 +163,7 @@ end
 puts "Expiring old blacklist entries" if ( $VERBOSE )
 
 expired = 0
-blacklist_d = File.join($PREFIX, "blacklist.d")
+blacklist_d = File.join(base_dir, "blacklist.d")
 
 # ensure the directory exists.
 if ( ! File.directory?( "#{blacklist_d}" ) )
@@ -123,9 +191,9 @@ puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
 #
 blacklist = Symbiosis::Blacklist.new
 blacklist.attempts = attempts
-blacklist.base_dir = $PREFIX
+blacklist.base_dir = base_dir
 
-whitelist = Symbiosis::IPListDirectory.new(File.join($PREFIX, "whitelist.d"))
+whitelist = Symbiosis::IPListDirectory.new(File.join(base_dir, "whitelist.d"))
 
 
 #
@@ -154,21 +222,17 @@ blacklist.generate.each do |ip, ports|
   end
 end
 
-
-
 #
 # Re-generate the blacklist chain
 #
 if ( updated || expired > 0 || force )
-  system( "symbiosis-firewall reload-blacklist" )
+  cmd = %w(symbiosis-firewall)
+  cmd << "--verbose" if $VERBOSE
+  cmd << "--no-execute" unless execute
+  cmd << "--no-delete"  unless delete
+  cmd += ["--prefix", base_dir] 
+  cmd += ["--template-d", template_dir] unless template_dir.nil?
+  cmd << "reload-blacklist"
+  exec(cmd)
 end
-
-
-
-
-
-
-
-
-
 
