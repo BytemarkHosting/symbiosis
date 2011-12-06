@@ -1,0 +1,2 @@
+symbiosis-firewall binary: script-not-executable             ./usr/share/symbiosis/firewall/action.d/*
+symbiosis-firewall binary: shell-script-fails-syntax-check   ./usr/share/symbiosis/firewall/action.d/*

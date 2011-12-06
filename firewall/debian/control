@@ -8,10 +8,9 @@ Standards-Version: 3.8.0
 
 Package: symbiosis-firewall
 Architecture: any
-Depends: iptables, dnsutils, iproute, ruby1.8, ${shlibs:Depends}, ${misc:Depends}
+Depends: iptables, ruby, ruby1.8, symbiosis-common, ${shlibs:Depends}, ${misc:Depends}
 Replaces: bytemark-vhost-ssh-protection, bytemark-vhost-firewall
 Conflicts: bytemark-vhost-firewall, bytemark-vhost-ssh-protection (<< 20081110153344)
-Suggests: libnet-dns-perl
 Description: A simple firewall generator for the Bytemark vhost system
  This package contains a firewall generator which makes it simple to restrict
  the incoming and outgoing connections a machine is permitted to accept or
