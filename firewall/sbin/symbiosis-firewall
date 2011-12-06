@@ -39,6 +39,9 @@
 # Usage of the Symbiosis firewall is comprehensively documented in the
 # symbiosis-documentation package, as well as on the documentation website.
 #
+# If this script is run as a user other than root, then the --no-execute and
+# --no-delete flags are set.
+#
 # CONFIGURATION
 #
 # To configure the firewall which is generated and applied to your server you
@@ -113,6 +116,7 @@
 
 require 'getoptlong'
 require 'tempfile'
+require 'fileutils'
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
 
@@ -134,8 +138,7 @@ end
 help     = false
 manual   = false
 $VERBOSE = false
-execute  = true
-delete   = true
+execute  = delete = (Process.uid == 0)
 base_dir     = '/etc/symbiosis/firewall'
 template_dir = '/usr/share/symbiosis/firewall/rule.d'
 
@@ -218,25 +221,42 @@ action = ARGV.first || "load"
 # DONE addRule
 # TODO testFirewall
 # DONE loadKernelModules
-# TODO fixOwnership
+# DONE fixOwnership
 # DONE parseServices
 
 
 begin
   include Symbiosis::Firewall
 
+  #
+  # Change the ownership of the firewall directory, if we're going to execute
+  # the firewall script
+  #
+  FileUtils.chown_R("admin", "admin", base_dir) if execute 
+
+  #
+  # Load the ports from /etc/services
+  #
   Ports.load
 
   #
-  #  Write the firewall to a local file
+  # Set up the template directories.
   #
   Template.directories = %w(/usr/local/share/firewall/rule.d /usr/local/share/symbiosis/firewall/rule.d /usr/share/firewall/rule.d /usr/share/symbiosis/firewall/rule.d)
   Template.directories = template_dir unless template_dir.nil?
 
   #
-  # Handy file-finder.
+  # Find the script.
   #
-  script_path = Template.find("#{action}.sh.erb", Template.directories.collect{|d| d.sub("rule","action")} )
+  script_path = nil
+
+  #
+  # Search for the script in the same directores as the templates, ish.
+  #
+  Template.directories.collect{|d| d.sub("rule.d","action.d") }.each do |script_dir|
+    script_path = File.join(script_dir, "#{action}.sh.erb")
+    break if File.exists?(script_path)
+  end
 
   #
   # Make sure we can find the script
@@ -258,9 +278,54 @@ begin
   tf.puts ERB.new(script,0,'%').result(binding)
   tf.close
 
-  if ( execute )
-    system( "chmod 755 #{tf.path}" )
-    system( tf.path )
+  #
+  # Make the script executable.
+  #
+  FileUtils.chmod(0755, tf.path)
+
+  #
+  # Only execute if we're root.
+  #
+  if ( execute and ::Process.uid == 0 )
+
+    unless system( tf.path )
+      warn "Firewall script failed.  Flushing rules."
+
+      #
+      # FIXME: This is deliberatly hard-coded, although it probably needs to catch errors better.
+      #
+      %w(/sbin/iptables /sbin/ip6tables).each do |cmd|
+        #
+        # Check that the command exists, and we can run it.
+        #
+        next unless File.executable?(cmd)
+
+        %w(INPUT FORWARD OUTPUT).each do |chain|
+          #
+          # Fix policy, flush chain, and allow everything on loopback.
+          #
+          system(cmd, "-P #{chain} ACCEPT") 
+        end
+        #
+        # Flush everything
+        #
+        system(cmd,"-F")
+        #
+        # Delete any old chains
+        #
+        system(cmd,"-X")
+      end
+
+      #
+      # Leave the script for inspection.
+      #
+      delete = false
+
+      #
+      # Further warning.
+      #
+      warn "This machine is now running *without* a firewall in place."
+    end
   end
 
   unless( delete )
@@ -268,9 +333,10 @@ begin
     #  TODO: Fix this.  Because we used Tempfile we have to manually
     # copy the firewall to a new name as it is unlinked at process exit.
     #
-    Kernel.system("cp #{tf.path} #{tf.path}-saved")
-    puts "Left firewall in #{tf.path}-saved"
+    new_path = tf.path+"-saved"
+    FileUtils.cp tf.path, new_path 
+    puts "Left firewall script in #{new_path} for inspection."
   end
-end
 
+end
 

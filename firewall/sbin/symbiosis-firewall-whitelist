@@ -163,18 +163,13 @@ end
 
 expire_before = Time.now - ( expire_after * 24 * 60 * 60 )
 
-if File.directory?( whitelist_d )
+Dir.glob( File.join(whitelist_d,"*.auto" ) ).each do |entry|
 
+  if  File.mtime(entry) < expire_before
 
-  Dir.glob( File.join(whitelist_d,"*.auto" ) ).each do |entry|
-
-    if  File.mtime(entry) < expire_before
-
-      puts "Removing #{entry}" if ( $VERBOSE )
-      File.unlink(entry)
-      expired += 1
-
-    end
+    puts "Removing #{entry}" if ( $VERBOSE )
+    File.unlink(entry)
+    expired += 1
 
   end
 

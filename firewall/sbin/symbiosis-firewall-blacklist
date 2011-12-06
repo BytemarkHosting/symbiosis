@@ -68,6 +68,7 @@
 
 require 'getoptlong'
 require 'tempfile'
+require 'fileutils'
 require 'symbiosis/firewall/blacklist'
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
@@ -157,31 +158,32 @@ if manual or help
   exit 0
 end
 
+
+expired = 0
+blacklist_d = File.join(base_dir, "blacklist.d")
+
+# 
+# ensure the directory exists.
+#
+unless File.directory?( blacklist_d )
+  FileUtils.mkdir_p blacklist_d
+end
+
+expire_before = Time.now - ( expire_after * 24 * 60 * 60 )
+
 #
 #  Expire old entries first of all, then add new ones.
 #
 puts "Expiring old blacklist entries" if ( $VERBOSE )
 
-expired = 0
-blacklist_d = File.join(base_dir, "blacklist.d")
+Dir.glob( File.join(blacklist_d,"*.auto" ) ).each do |entry|
 
-# ensure the directory exists.
-if ( ! File.directory?( "#{blacklist_d}" ) )
+  if  File.mtime(entry) < expire_before
 
-  system( "mkdir -p #{blacklist_d}" )
+    puts "Removing #{entry}" if ( $VERBOSE )
+    File.unlink(entry)
+    expired += 1
 
-end
-
-if ( File.directory?( blacklist_d ) )
-
-  Dir.foreach( blacklist_d ) do |entry|
-    if ( ( entry =~ /\.auto$/i ) &&
-         (File.mtime( "#{blacklist_d}/#{entry}" ) <  ( Time.now - 8 * 24 * 60 * 60 ) ) )
-    then
-      puts "Removing #{blacklist_d}/#{entry}" if ( $VERBOSE )
-      File.unlink("#{blacklist_d}/#{entry}")
-      expired += 1
-    end
   end
 
 end
