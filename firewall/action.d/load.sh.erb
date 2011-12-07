@@ -108,7 +108,7 @@ done
 # Run scripts in local.d
 #
 if [ -d <%= dir %> ] ; then
-  /bin/run-parts <%= dir %>
+  /bin/run-parts <%= $VERBOSE ? "--verbose" : "" %> --exit-on-error <%= dir %>
 fi
 #######################################################################
 
