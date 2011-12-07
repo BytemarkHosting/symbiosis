@@ -10,13 +10,26 @@ if [ "$1" != "configure" ]; then
         exit 0
 fi
 
-# If this is a new setup...
-if [ "$2" = "" ] ; then
-	#
-	#  Then remove existing PAMAuthentication setup,
-	#
-	find /etc/pure-ftpd/auth/ -lname "*/PAMAuthentication"  -exec rm -f \{\} \;
-	find /etc/pure-ftpd/auth/ -lname "*/UnixAuthentication" -exec rm -f \{\} \;
+#
+#  Remove existing PAMAuthentication setup,
+#
+find /etc/pure-ftpd/auth/ -lname "*/PAMAuthentication"  -exec rm -f \{\} \;
+find /etc/pure-ftpd/auth/ -lname "*/UnixAuthentication" -exec rm -f \{\} \;
+
+#
+# Edit our defaults to set it to "standalone"
+#
+if [ -f /etc/default/pure-ftpd-common ] ; then
+  sed -i -e 's/STANDALONE_OR_INETD=inetd/STANDALONE_OR_INETD=standalone/'
+fi
+
+#
+# Disable our inetd service
+#
+if [ -f /etc/inetd.conf -a -x /usr/sbin/update-inetd ] ; then
+  update-inetd --disable ftp
+  # Don't really care if this errors.
+  invoke-rc.d  openbsd-inetd restart || true
 fi
 
 #
@@ -25,9 +38,6 @@ fi
 find /etc/pure-ftpd/auth/ -lname "*/ExtAuth" -exec rm -f \{\} \;
 ln -sf /etc/pure-ftpd/conf/ExtAuth /etc/pure-ftpd/auth/60ext
 
-#
-#
-#
 #
 #  Always show dotfiles.
 #
@@ -46,9 +56,7 @@ echo "/var/run/pure-ftpd/pure-authd.sock" > /etc/pure-ftpd/conf/ExtAuth
 #  Link in the certificate if we have one.
 #
 if [ ! -e /etc/ssl/private/pure-ftpd.pem ]; then
-
     ln -s /etc/ssl/ssl.combined /etc/ssl/private/pure-ftpd.pem
-
 fi
 
 #
@@ -62,10 +70,10 @@ echo '1' > /etc/pure-ftpd/conf/TLS
 if [ -x "/etc/init.d/pure-authd" ]; then
   update-rc.d pure-authd defaults >/dev/null
 fi
+
 if [ -x "/etc/init.d/pure-ftpd" ]; then
   update-rc.d pure-ftpd defaults >/dev/null
 fi
-
 
 #
 #  Restart (or start)
@@ -77,12 +85,18 @@ else
 fi
 
 invoke-rc.d pure-authd $action
+
 #
-# Pure-ftpd seems not create its pidfile on a fresh install.
-# 
-if [ ! -f /var/run/pure-ftpd/pure-ftpd.pid ] ; then
-  killall pure-ftpd
+# Pure-ftpd seems not create its pidfile on a fresh install.  If it is running,
+# kill it off.
+#
+
+pid=`pgrep pure-ftpd` 
+
+if [ -s $pid -a ! -f /var/run/pure-ftpd/pure-ftpd.pid ] ; then
+  kill $pid
 fi
+
 invoke-rc.d pure-ftpd  $action
 
 #DEBHELPER#
