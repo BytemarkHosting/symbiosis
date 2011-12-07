@@ -8,7 +8,7 @@ Standards-Version: 3.8.0
 
 Package: symbiosis-ftpd
 Replaces: bytemark-vhost-ftpd
-Conflicts: bytemark-vhost-ftpd
+Conflicts: bytemark-vhost-ftpd, symbiosis-monit (<< 2011:1206)
 Architecture: all
 Depends: pure-ftpd, ${misc:Depends}
 Pre-Depends: symbiosis-common
