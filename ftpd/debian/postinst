@@ -20,7 +20,7 @@ find /etc/pure-ftpd/auth/ -lname "*/UnixAuthentication" -exec rm -f \{\} \;
 # Edit our defaults to set it to "standalone"
 #
 if [ -f /etc/default/pure-ftpd-common ] ; then
-  sed -i -e 's/STANDALONE_OR_INETD=inetd/STANDALONE_OR_INETD=standalone/'
+  sed -i -e 's/STANDALONE_OR_INETD=inetd/STANDALONE_OR_INETD=standalone/' /etc/default/pure-ftpd-common
 fi
 
 #
