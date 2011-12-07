@@ -122,6 +122,25 @@ void process_domains( const char *dirname )
            continue ;
        }
 
+       snprintf(filename, sizeof(filename)-1,
+                "/srv/%s", entry );
+       if ( stat(filename, &domain ) != 0 )
+       {
+           if ( g_verbose )
+               printf("\tstat( /srv/%s ) - failed\n", entry );
+           continue;
+       }
+      
+
+      /**
+       *  Make sure the domain entry is a directory
+       */
+      if ( ! S_ISDIR( domain.st_mode ) )
+      {
+          if ( g_verbose )
+              printf( "\tIgnoring as /srv/%s is not a directory.\n", entry );
+          continue;
+      }
 
        /**
         * Look for /srv/$name/config/crontab
@@ -136,37 +155,23 @@ void process_domains( const char *dirname )
                       entry );
            continue;
        }
-       else
-       {
-           if ( S_ISDIR(crontab.st_mode) )
-           {
-               if ( g_verbose )
-                   printf("\tIgnoring as /srv/%s/config/crontab is a directory\n",
-                          entry);
-
-               continue;
-           }
-
-       }
 
        /**
-        * OK we have /srv/$name & /srv/$name/config/crontab.
-        *
-        * Ensure the owners match.
+        * Make sure our crontab is a regular file
         */
-       snprintf(filename, sizeof(filename)-1,
-                "/srv/%s", entry );
-       if ( stat(filename, &domain ) != 0 )
+       if ( ! S_ISREG(crontab.st_mode) )
        {
            if ( g_verbose )
-               printf("\tstat( /srv/%s ) - failed\n", entry );
+               printf("\tIgnoring as /srv/%s/config/crontab is not a regular file\n",
+                   entry);
            continue;
        }
-
 
        /**
         * OK here we have two statbufs - one for /srv/$name, and
         * one for /srv/$name/config/crontab
+        *
+        * Ensure the owners match.
         */
        if ( domain.st_uid != crontab.st_uid )
        {
