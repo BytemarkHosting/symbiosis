@@ -3,15 +3,15 @@ Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man, perl, perl-modules
+Build-Depends: debhelper (>= 7.0.0), rdoc, cdbs, txt2man, perl, perl-modules
 Standards-Version: 3.8.0
 
 Package: symbiosis-common
 Architecture: all
-Depends: ruby, perl, perl-modules
-Provides: symbiosis-range
-Replaces: bytemark-vhost-range
-Conflicts: symbiosis-range, bytemark-vhost-range
+Depends: ruby, perl, perl-modules, libopenssl-ruby, ${misc:Depends}
+Provides: symbiosis-range, symbiosis-test
+Replaces: bytemark-vhost-range, bytemark-vhost-test
+Conflicts: symbiosis-range, symbiosis-test, bytemark-vhost-range, bytemark-vhost-test
 Description: Common library functions for Bytemark Symbiosis
  This package contains shared code and scripts for use by the
  Symbiosis system.
