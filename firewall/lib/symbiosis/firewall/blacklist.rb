@@ -38,8 +38,8 @@ module Symbiosis
       private
 
       def do_read
-        Dir.glob(File.join(@base_dir, "pattern.d", "*.patterns")) do |entry|
-          @patterns << Pattern.new("pattern.d/openssh.patterns")
+        Dir.glob(File.join(@base_dir, "patterns.d", "*.patterns")) do |entry|
+          @patterns << Pattern.new(entry)
         end
 
         logfiles = Hash.new
