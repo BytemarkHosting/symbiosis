@@ -16,7 +16,7 @@ module Symbiosis
         #
         raise Errno::ENOENT, file unless File.exists?(file)
         @filename = file
-        
+        @pos = nil 
         @identifier = nil
         @lines = []
 
