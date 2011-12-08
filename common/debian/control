@@ -9,6 +9,9 @@ Standards-Version: 3.8.0
 Package: symbiosis-common
 Architecture: all
 Depends: ruby, perl, perl-modules
+Provides: symbiosis-range
+Replaces: bytemark-vhost-range
+Conflicts: symbiosis-range, bytemark-vhost-range
 Description: Common library functions for Bytemark Symbiosis
  This package contains shared code and scripts for use by the
  Symbiosis system.
