@@ -43,7 +43,7 @@
 # Each addition is one of the two forms:
 #
 #   1.2.3.4.auto                The IPv4 address 1.2.3.4
-#   2001:123:456:789::-64.auto  The IPv6 range 2001:123:456:789::/64
+#   2001:123:456:789::|64.auto  The IPv6 range 2001:123:456:789::/64
 # 
 # It should be noted that IPv6 addresses will be added as entire /64s.
 #
@@ -53,7 +53,7 @@
 # Once that directory has been written, symbiosis-firewall(1) is called with
 # the reload-blacklist action.
 #
-# Most of the flags above are passed straigh on to symbiosis-firewall(1).
+# Most of the flags above are passed straight on to symbiosis-firewall(1).
 #
 # SEE ALSO
 #
@@ -176,7 +176,10 @@ unless File.directory?( blacklist_d )
   FileUtils.mkdir_p blacklist_d
 end
 
-expire_before = Time.now - ( expire_after * 24 * 60 * 60 )
+#
+# Expiry is defined in terms of days.
+#
+expire_before = Time.now - ( expire_after * ( 24 * 60 * 60 ) )
 
 #
 #  Expire old entries first of all, then add new ones.
@@ -293,6 +296,8 @@ blacklist.generate.each do |ip, ports|
 
 end
 
+
+#
 # Re-generate the blacklist chain
 #
 if ( updated || expired > 0 || force )

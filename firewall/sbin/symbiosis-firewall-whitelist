@@ -168,7 +168,10 @@ unless File.directory?(whitelist_d)
   FileUtils.mkdir_p(whitelist_d)
 end
 
-expire_before = Time.now - ( expire_after * 24 * 60 * 60 )
+#
+# Expiry is measured in days.
+#
+expire_before = Time.now - ( expire_after * ( 24 * 60 * 60 ) )
 
 #
 #  Expire old entries first of all, then add new ones.
@@ -224,7 +227,7 @@ Symbiosis::Utmp.read(wtmp_file).each do |entry|
   # Mask IPv4 to /32s.
   #
   ip = ip.mask(32) if ip.ipv4?
-  
+
   #
   # Only include globally routable IPs.
   #
@@ -250,7 +253,7 @@ Symbiosis::Utmp.read(wtmp_file).each do |entry|
     fn += ".auto"
 
     if ! File.exists?(fn)
-      updated=true 
+      updated=true
       puts "\tAdding to whitelist" if ( $VERBOSE )
 
       #
@@ -269,6 +272,8 @@ Symbiosis::Utmp.read(wtmp_file).each do |entry|
   end
 
 end
+
+
 
 #
 # Re-generate the whitelist chain
