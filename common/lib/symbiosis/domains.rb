@@ -58,7 +58,11 @@ module Symbiosis
         #
         next if domain =~ /^\./ 
 
-        results << Domain.new(domain, this_prefix)
+        begin
+          results << Domain.new(domain, this_prefix)
+        rescue ArgumentError => err
+          warn err.to_s
+        end
       end
 
       results
