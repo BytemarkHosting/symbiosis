@@ -1,4 +1,4 @@
-# Crontab snippet which will invoke our firewall-based blocker to firewall
+# Crontab snippet which will invoke our iptables-based blocker to firewall
 # away people who conduct dictionary attacks.
 #
 # We run every fifteen minutes deliberately so that we get a fair chance of
@@ -19,5 +19,5 @@
 #
 # TODO: Check the firewall works every hour.
 #
-# 55   * * * * root [ -x /usr/sbin/symbiosis-firewall ] && /usr/sbin/symbiosis-firewall test
+# 55   * * * * root [ -x /usr/sbin/symbiosis-firewall ] && /usr/sbin/symbiosis-firewall --test
 
