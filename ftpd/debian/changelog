@@ -1,3 +1,9 @@
+symbiosis-ftpd (2011:1209) stable; urgency=low
+
+  * Updated standards version.  (No change).
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 09 Dec 2011 15:36:54 +0000
+
 symbiosis-ftpd (2011:1201) stable; urgency=low
 
   * Moved SSL certificate generation into symbiosis-common 
