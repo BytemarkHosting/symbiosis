@@ -6,8 +6,9 @@
 # (c) 2010 Bytemark Computer Consulting Ltd
 #
 
+require 'symbiosis/domain'
 
-class Symbiosis
+module Symbiosis
 
   #
   # A class for working with domains
@@ -15,40 +16,49 @@ class Symbiosis
   class Domains
 
     #
-    # Class variables
+    # An iterator for each domain.
     #
-    # * prefix is the location of doamins.
-    #
-    attr_reader :prefix
-
-
-    #
-    # The constructor
-    #
-    def initialize( prefix = "/srv" )
-      @prefix = prefix
+    def self.each(&block)
+      all.each(&block)
     end
 
     #
-    # An iterator for each domain.
+    # Does the specified domain exist on this system?
     #
-    def each(&block)
-      domains().each(&block)
+    def self.include?(domain)
+      all.find(domain).is_a?(Domain)
+    end
+
+    #
+    # Finds a domain.  Returns either a Domain, or nil if nothing was found.
+    #
+    def self.find(domain)
+      return nil unless domain.to_s =~ /^([a-z0-9\-]+\.?)+$/
+      all.find{|d| d.name =~ /^#{domain}$/i}
     end
 
     #
     # Return each domain name
     #
-    def domains
+    def self.all(prefix = "/srv")
       results = Array.new
 
       #
       #  For each domain.
       #
-      Dir.foreach( @prefix ) do |domain|
-        if ( domain !~ /^\./ )
-          results.push(domain)
-        end
+      Dir.glob( File.join(prefix,"*") ) do |entry|
+        #
+        # Only interested in directories
+        #
+        next unless File.directory?(entry)
+
+        this_prefix, domain = File.split(entry)
+        #
+        # Don't want dotfiles.
+        #
+        next if domain =~ /^\./ 
+
+        results << Domain.new(domain, this_prefix)
       end
 
       results
