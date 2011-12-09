@@ -1,3 +1,9 @@
+symbiosis-test (2011:1209) stable; urgency=low
+
+  * Updated standards version.  (No change).
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 09 Dec 2011 15:40:00 +0100
+
 symbiosis-test (2010:0914) stable; urgency=low
 
   * Removed dovecot test -- now in email package.
