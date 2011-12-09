@@ -1,3 +1,9 @@
+symbiosis-tinydns (2011:1209) stable; urgency=low
+
+  * Updated standards versions.  (No change).
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 09 Dec 2011 15:55:02 +0100
+
 symbiosis-tinydns (2010:09240) stable; urgency=low
 
   [ Steve Kemp ]
