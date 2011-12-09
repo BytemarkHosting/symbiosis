@@ -3,12 +3,12 @@ Section: mail
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), rdoc, txt2man, cdbs, perl
+Build-Depends: debhelper (>= 7.0.0), rdoc, txt2man, cdbs
 Standards-Version: 3.9.1
 
 Package: symbiosis-email
 Architecture: all
-Depends: exim4-daemon-heavy, spamassassin, dovecot-imapd, dovecot-pop3d, clamav-daemon, ruby, perl, libsys-syslog-perl, adduser, make, rdoc, ${misc:Depends}
+Depends: exim4-daemon-heavy, spamassassin, dovecot-imapd, dovecot-pop3d, clamav-daemon, ruby, adduser, make, rdoc, ${misc:Depends}
 Pre-Depends: symbiosis-common
 Replaces: bytemark-vhost-email
 Recommends: symbiosis-webmail-roundcube | symbiosis-webmail-squirrelmail

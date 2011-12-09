@@ -3,12 +3,12 @@ Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man, perl, perl-modules
+Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man
 Standards-Version: 3.9.1
 
 Package: symbiosis-common
 Architecture: all
-Depends: ruby, perl, perl-modules, libopenssl-ruby, ${misc:Depends}
+Depends: ruby, libopenssl-ruby, ${misc:Depends}
 Provides: symbiosis-range, symbiosis-test
 Replaces: bytemark-vhost-range, bytemark-vhost-test
 Conflicts: symbiosis-range, symbiosis-test, bytemark-vhost-range, bytemark-vhost-test
