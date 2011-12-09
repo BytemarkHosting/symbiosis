@@ -4,11 +4,11 @@ Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man, perl, perl-modules
-Standards-Version: 3.8.0
+Standards-Version: 3.9.1
 
 Package: symbiosis-common
 Architecture: all
-Depends: ruby, perl, perl-modules
+Depends: ruby, perl, perl-modules,${misc:Depends}
 Description: Common library functions for Bytemark Symbiosis
  This package contains shared code and scripts for use by the
  Symbiosis system.

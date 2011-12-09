@@ -27,7 +27,7 @@ fi
 #
 #  Shadow passwords must be on.
 #
-/sbin/shadowconfig on 2>/dev/null >/dev/null
+shadowconfig on 2>/dev/null >/dev/null
 
 
 
@@ -91,7 +91,6 @@ passwd=""
 for i in /etc/bytemark-vhost/.vhost.pass /etc/.vhost.pass ; do
     if [ -e $i ]; then
         if [ -s $i ]; then
-            mkdir -p /etc/symbiosis || true
             cat $i > /etc/symbiosis/.passwd
         fi
         rm -f $i
@@ -156,7 +155,7 @@ if [ -e /etc/ssl/ssl.combined ] ; then
   if [ ! -e /etc/ssl/ssl.key ] ; then
     openssl rsa -out /etc/ssl/ssl.key -in /etc/ssl/ssl.combined > /dev/null
   fi
-  
+
   if [ ! -e /etc/ssl/ssl.crt ] ; then
     openssl x509 -out /etc/ssl/ssl.crt -in /etc/ssl/ssl.combined > /dev/null
   fi

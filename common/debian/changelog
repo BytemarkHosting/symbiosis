@@ -1,3 +1,12 @@
+symbiosis-common (2011:1209) stable; urgency=low
+
+  * Updated standards version.
+    - Avoid hardcoding 'shadowconfig' path in the postinstall script.
+    - Depend upon "${misc:Depends}".
+    - Test for eerrors in commands
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 09 Dec 2011 14:44:41 +0000
+
 symbiosis-common (2011:1201) stable; urgency=low
 
   * Moved SSL certificate generation into this package.
