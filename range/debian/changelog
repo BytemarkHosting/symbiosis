@@ -1,3 +1,9 @@
+symbiosis-range (2011:1209) stable; urgency=low
+
+  * Updated standards versions.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 09 Dec 2011 15:44:55 +0000
+
 symbiosis-range (2010:0923) stable; urgency=low
 
   * Added new helper script "symbiosis-ip" to determine the primary
