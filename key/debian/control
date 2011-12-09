@@ -13,7 +13,7 @@ Architecture: all
 Depends: gnupg, ${misc:Depends}
 Description: The Bytemark Debian package-signing key
  This package contains a key which may be used to validate the signature
- of the Bytemark Virtual Hosting repository.
+ of the Bytemark Symbiosis repository.
  .
- Once installed there will be no further warnings about the signature
- of the bytemark packages.
+ Once installed this package will prevent any signature warnings about the
+ Bytemark Symbiosis packages.
