@@ -1,3 +1,10 @@
+symbiosis-monit (2011:1209) stable; urgency=low
+
+  * Updated standards version (no change).
+  * Build-Depend upon liblog4r-ruby1.8 to ensure manpage is built.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 09 Dec 2011 15:40:51 +0000
+
 symbiosis-monit (2011:1206) stable; urgency=low
 
   * Moved monit templates into their respective packages.
