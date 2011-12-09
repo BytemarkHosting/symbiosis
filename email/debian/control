@@ -24,20 +24,3 @@ Description: A complete virtual hosting solution for email
   * SMTP
   * Sieve
 
-Package: symbiosis-webmail-squirrelmail
-Architecture: all
-Depends: squirrelmail
-Conflicts: symbiosis-webmail-roundcube
-Description: SquirrelMail configured as the default webmail client for Symbiosis
- Installs SquirrelMail and its dependencies as the default mail client for
- machines running Symbiosis.
-
-Package: symbiosis-webmail-roundcube
-Architecture: all
-Depends: roundcube (>> 0.5), roundcube-mysql, roundcube-plugins
-Conflicts: symbiosis-webmail-squirrelmail
-Description: Roundcube configured as the default webmail client for Symbiosis
- Installs Roundcube and its dependencies as the default webmail client for
- Symbiosis.  Roundcube is a modern client that is configured to include support
- for Sieve filters.
-
