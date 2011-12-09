@@ -1,3 +1,9 @@
+bytemark-symbiosis (2011:1209) stable; urgency=low
+
+  * Updated standards version (no change).
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 09 Dec 2011 15:43:43 +0000
+
 bytemark-symbiosis (2010:0817) stable; urgency=low
 
   * Remove the old bytemark-vhost init script.
