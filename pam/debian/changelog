@@ -1,3 +1,9 @@
+symbiosis-pam (2011:1209) stable; urgency=low
+
+  * Updated standards version.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 09 Dec 2011 15:33:51 +0000
+
 symbiosis-pam (2010:0914) stable; urgency=low
 
   * Tidied packaging
