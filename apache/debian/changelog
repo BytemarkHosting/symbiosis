@@ -1,3 +1,9 @@
+symbiosis-httpd (2011:1209) stable; urgency=low
+
+  * Updated standard versions.  (No change).
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 09 Dec 2011 15:34:51 +0000
+
 symbiosis-httpd (2011:1201) stable; urgency=low
 
   * Removed certificate generation
