@@ -2,3 +2,4 @@ exim4/                     etc/
 dovecot/                   etc/
 sbin/                      usr/
 symbiosis/                 etc/
+lib/*                      usr/lib/ruby/1.8/

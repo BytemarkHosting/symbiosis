@@ -270,9 +270,10 @@ blacklist.generate.each do |ip, ports|
       File.open(fn,"w"){|fh| fh.print ports.join("\n") }
 
       #
-      # Create a new file.
+      # Create a new file.  We don't know what time the attack happened,
+      # without parsing the logfile properly.
       #
-      FileUtils.touch(fn, :mtime => at)
+      FileUtils.touch(fn) 
 
     else
       updated=true

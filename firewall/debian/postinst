@@ -5,10 +5,10 @@ set -e
 #
 # Skip, if we are not in "configure" state
 #
-#if [ "$1" != "configure" ]; then
-#        echo "I: Skipping configuration"
-#        exit 0
-#fi
+if [ "$1" != "configure" ]; then
+        echo "I: Skipping configuration"
+        exit 0
+fi
 
 #
 #  The prefix of our tree.
@@ -19,8 +19,6 @@ PREFIX=/etc/symbiosis/firewall
 #  The old tree.
 #
 OLD=/etc/firewall
-
-
 
 #
 #  If we have the old tree then move it into place.

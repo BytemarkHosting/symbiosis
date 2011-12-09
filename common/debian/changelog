@@ -10,6 +10,7 @@ symbiosis-common (2011:1209) stable; urgency=low
 symbiosis-common (2011:1201) stable; urgency=low
 
   * Moved SSL certificate generation into this package.
+  * Merged symbiosis-range package
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 01 Dec 2011 09:30:14 +0000
 
