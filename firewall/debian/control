@@ -2,9 +2,9 @@ Source: symbiosis-firewall
 Section: net
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
-Uploaders: Patrick J Cherry <patch@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man, ruby-pkg-tools, ruby-dev, ruby1.8-dev
-Standards-Version: 3.8.0
+Standards-Version: 3.9.1
 
 Package: symbiosis-firewall
 Architecture: any
