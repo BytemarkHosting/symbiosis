@@ -3,20 +3,20 @@
 require 'test/unit'
 require 'net/imap'
 require 'net/pop'
-require 'symbiosis/test/mail'
+require 'symbiosis/domain/mailbox'
 
 class TestDovecot < Test::Unit::TestCase
 
   def setup
-    @domain = Symbiosis::Test::Mail.new()
+    @domain = Symbiosis::Domain.new()
     @domain.create
 
-    @mailbox = @domain.add_mailbox("test")
-    @mailbox.password = Symbiosis::Test.random_string
+    @mailbox = @domain.create_mailbox("test")
+    @mailbox.encrypt_password = false
+    @mailbox.password = Symbiosis::Utils.random_string
     
-    @mailbox_crypt = @domain.add_mailbox("te-s.t_crypt")
-    @mailbox_crypt.password = Symbiosis::Test.random_string
-    @mailbox_crypt.crypt_password 
+    @mailbox_crypt = @domain.create_mailbox("te-s.t_crypt")
+    @mailbox_crypt.password = Symbiosis::Utils.random_string
 
     Net::IMAP.debug = true if $DEBUG
   end
@@ -35,7 +35,7 @@ class TestDovecot < Test::Unit::TestCase
     assert(capabilities.include?("IMAP4REV1"), "Server does not seem to support IMAP4REV1")
     assert(capabilities.include?("AUTH=PLAIN"), "Server does not seem to support PLAIN auth.")
     assert(capabilities.include?("AUTH=LOGIN"), "Server does not seem to support LOGIN auth.")
-	  assert(capabilities.include?("STARTTLS"), "Server does not seem to support STARTTLS.")
+    assert(capabilities.include?("STARTTLS"), "Server does not seem to support STARTTLS.")
   end
 
   def test_imap_auth_plain
@@ -59,7 +59,7 @@ class TestDovecot < Test::Unit::TestCase
   def test_imap_auth_login_crypt
     assert_nothing_raised do
       imap = Net::IMAP.new('localhost', 143, false) 
-      imap.authenticate('LOGIN', @mailbox_crypt.username, @mailbox_crypt.uncrypted_password)
+      imap.authenticate('LOGIN', @mailbox_crypt.username, @mailbox_crypt.password)
       imap.logout
       imap.disconnect unless imap.disconnected?
     end
@@ -91,7 +91,7 @@ class TestDovecot < Test::Unit::TestCase
     assert_nothing_raised do
       pop = Net::POP.new('localhost', 110)
       pop.set_debug_output STDOUT if $DEBUG
-      pop.start(@mailbox_crypt.username, @mailbox_crypt.uncrypted_password)
+      pop.start(@mailbox_crypt.username, @mailbox_crypt.password)
       pop.finish
     end
   end
