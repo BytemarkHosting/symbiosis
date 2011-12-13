@@ -73,7 +73,20 @@ module Symbiosis
           unless param.is_a?(String)
             @ftp_quota = nil
           else
-            @ftp_quota = param.split($/).first.strip.to_i
+            if param.split($/).first.strip =~ /^([0-9\.]+)\s*([kMGT])?/
+              n = $1.to_f
+              m = $2
+              case m.to_s
+                when "k": n*1e3;
+                when "M": n*1e6;
+                when "G": n*1e9;
+                when "T": n*1e12;
+                else n
+              end
+              @ftp_quota = n.round.to_i
+            else
+              @ftp_quota = nil
+            end
           end
         end
       end
@@ -82,7 +95,8 @@ module Symbiosis
     end
 
     def ftp_quota=(q)
-      raise ArgumentError, "FTP Quota must be an integer" unless q.is_a?(Integer)
+      raise ArgumentError, "Bad quota format" unless q =~ /^([0-9\.]+)\s*([kMGT])?$/
+
       @ftp_quota = q
 
       set_param("ftp-quota", @ftp_quota, self.config_dir)

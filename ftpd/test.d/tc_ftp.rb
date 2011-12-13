@@ -40,4 +40,38 @@ class TestFTP < Test::Unit::TestCase
       end
     end
   end
+
+
+  def test_quota
+    quota_file = File.join(@domain.directory,"ftp-quota")
+    [[1e6, "1M"],
+     [2.5e9, "2.5G"],
+     [300,"300 "]
+     [300e6,"300 M"]
+    ].each do |expected,contents|
+      #
+      # Make sure no quota has been set.
+      #
+      File.unlink(quota_file) if File.exists?(quota_file)
+
+      File.open(quota_file,"a+") do |fh|
+        fh.puts contents
+      end
+      assert_equal(expected, @domain.ftp_quota)
+      #
+      # Delete it again
+      #
+      File.unlink(quota_file)
+
+      #
+      # Set the contents
+      #
+      @domain.ftp_quota = contents
+
+      new_contents = File.read(quota_file)
+      assert_equal(contents, new_contents)
+    end
+
+  end
+
 end
