@@ -59,6 +59,7 @@ module Symbiosis
         param = get_param("quota",self.directory)
 
         begin
+          quota = param.split.first.strip
           quota = parse_quota(param)
         rescue ArgumentError
           quota = nil
@@ -81,7 +82,7 @@ module Symbiosis
           unless param.is_a?(String)
             @password = nil
           else
-            @password = param.split($/).first.strip
+            @password = param.split.first.strip
           end
         end
         @password
@@ -163,7 +164,8 @@ module Symbiosis
         param = get_param("default-mailbox-quota",self.directory)
 
         begin
-          quota = parse_quota(param)
+          quota = param.split.first.strip
+          quota = parse_quota(quota)
         rescue ArgumentError
           quota = nil
         end
