@@ -74,7 +74,8 @@ module Symbiosis
             @ftp_quota = nil
           else
             begin
-              @ftp_quota = parse_quota(param)
+              quota = param.split.first.strip
+              @ftp_quota = parse_quota(quota)
             rescue ArgumentError => err
               @ftp_quota = nil
             end
