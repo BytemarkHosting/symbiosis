@@ -58,11 +58,16 @@ module Symbiosis
         quota = nil
         param = get_param("quota",self.directory)
 
-        begin
-          quota = param.split.first.strip
-          quota = parse_quota(param)
-        rescue ArgumentError
+
+        unless param.is_a?(String)
           quota = nil
+        else
+          quota = param.split.first.strip
+          begin
+            quota = parse_quota(param)
+         rescue ArgumentError
+            quota = nil
+          end
         end
 
         if quota.nil?
@@ -153,30 +158,32 @@ module Symbiosis
       mailbox.create
     end
 
-      def default_mailbox_quota=(quota)
-        parse_quota(quota)
-        set_param("default-mailbox-quota", quota, self.directory)
-        quota
-      end
+    def default_mailbox_quota=(quota)
+      parse_quota(quota)
+      set_param("default-mailbox-quota", quota, self.config_dir)
+      quota
+    end
 
-      def default_mailbox_quota
+    def default_mailbox_quota
+      quota = nil
+      param = get_param("default-mailbox-quota",self.config_dir)
+
+      unless param.is_a?(String)
         quota = nil
-        param = get_param("default-mailbox-quota",self.directory)
-
+      else
+        quota = param.split.first.strip
         begin
-          quota = param.split.first.strip
-          quota = parse_quota(quota)
-        rescue ArgumentError
+          quota = parse_quota(param)
+       rescue ArgumentError
           quota = nil
         end
-
-        quota
       end
 
+      quota
     end
 
   end
-  
+
   class Domains
     
     def self.find_mailbox(address)
