@@ -36,7 +36,7 @@ class TestFTP < Test::Unit::TestCase
     #
     assert_nothing_raised("Login failed") do
       Net::FTP.open('localhost') do |ftp|
-        ftp.login( @domain.name, @domain.password )
+        ftp.login( @domain.name, @domain.ftp_password )
       end
     end
   end
