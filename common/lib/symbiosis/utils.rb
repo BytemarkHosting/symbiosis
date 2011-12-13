@@ -131,7 +131,7 @@ module Symbiosis
           when "Gi": 2**30
           when "Ti": 2**40
           when "Pi": 2**50
-          else: 1
+          else 1
         end
 
         return (n*m).round.to_i
