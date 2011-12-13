@@ -109,7 +109,40 @@ module Symbiosis
       value
     end
 
-    module_function :mkdir_p, :set_param, :get_param, :random_string
+
+    #
+    # Function to parse quotas
+    #
+    def parse_quota(str)
+      if str.is_a?(Numeric)
+        return str.round.to_i
+ 
+      elsif str.is_a?(String) and str =~ /^([\d\.]+)\s*([bkMGTP]i?)?/
+
+        n = $1.to_f
+        m = case $2
+          when "k": 1e3
+          when "M": 1e6
+          when "G": 1e9
+          when "T": 1e12
+          when "P": 1e15
+          when "ki": 2**10
+          when "Mi": 2**20
+          when "Gi": 2**30
+          when "Ti": 2**40
+          when "Pi": 2**50
+          else: 1
+        end
+
+        return (n*m).round.to_i
+      elsif str.is_a?(String)
+        raise ArgumentError, "Cannot parse quota #{str.inspect}"
+      else
+        raise ArgumentError, "parse_quota requires either a String or Numeric argument"
+      end
+    end
+
+    module_function :mkdir_p, :set_param, :get_param, :random_string, :parse_quota
 
   end
 

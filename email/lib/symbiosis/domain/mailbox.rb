@@ -17,10 +17,6 @@ module Symbiosis
         lp.is_a?(String) and lp !~ /^(\.|.*[@%!\/|])/
       end
 
-      def self.valid_mailbox_quota(q)
-        q =~ /^(\d+[kMG]?)$/
-      end
-
       attr_reader :local_part, :domain, :mailboxes_dir
 
       def initialize(local_part, domain, mailboxes_dir="mailboxes")
@@ -53,14 +49,8 @@ module Symbiosis
       end
 
       def quota=(quota)
-        raise ArgumentError, "quota must be a string" unless quota.is_a?(String)
-
-        if Mailbox.valid_mailbox_quota?(quota)
-          set_param("quota", quota, self.directory)
-        else
-          quota = 0
-        end
-
+        parse_quota(quota)
+        set_param("quota", quota, self.directory)
         quota
       end
 
@@ -68,9 +58,10 @@ module Symbiosis
         quota = nil
         param = get_param("quota",self.directory)
 
-        if param.is_a?(String)
-          quota = param.split($/).first.strip
-          quota = nil unless Mailbox.valid_mailbox_quota?(quota)
+        begin
+          quota = parse_quota(param)
+        rescue ArgumentError
+          quota = nil
         end
 
         if quota.nil?
@@ -161,28 +152,25 @@ module Symbiosis
       mailbox.create
     end
 
-    def default_mailbox_quota=(quota)
-      raise ArgumentError, "quota must be a string" unless quota.is_a?(String)
-
-      if Mailbox.valid_mailbox_quota?(quota)
-        set_param("default-mailbox-quota", quota, self.config_dir) 
-      else
-        quota = 0
+      def default_mailbox_quota=(quota)
+        parse_quota(quota)
+        set_param("default-mailbox-quota", quota, self.directory)
+        quota
       end
 
-      quota
-    end
+      def default_mailbox_quota
+        quota = nil
+        param = get_param("default-mailbox-quota",self.directory)
 
-    def default_mailbox_quota
-      quota = 0
-      param = get_param("default-mailbox-quota",self.config_dir)
+        begin
+          quota = parse_quota(param)
+        rescue ArgumentError
+          quota = nil
+        end
 
-      if param.is_a?(String)
-        quota = param.split($/).first.strip
-        quota = 0 unless Mailbox.valid_mailbox_quota?(quota)
+        quota
       end
 
-      quota
     end
 
   end
