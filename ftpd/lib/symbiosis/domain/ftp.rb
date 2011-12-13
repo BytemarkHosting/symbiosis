@@ -24,7 +24,9 @@ module Symbiosis
     end
 
     def ftp_password
-      if ! defined? @ftp_password or @ftp_password.nil?
+      @ftp_password ||= nil
+
+      if @ftp_password.nil?
         if self.ftp_enabled?
           #
           # Read the password
@@ -42,6 +44,9 @@ module Symbiosis
       @ftp_password
     end
 
+    #
+    # Set the FTP password.  Plaintext is for testing only, really.
+    #
     def ftp_password=(f, plaintext = false)
       @ftp_password = f
 
@@ -53,12 +58,43 @@ module Symbiosis
 
       return @ftp_password
     end
+    
+    #
+    # Handle the quota, in bytes.
+    #
+    def ftp_quota
+      if ! defined? @ftp_quota or @ftp_quota.nil?
+        if self.ftp_enabled?
+          #
+          # Read the quota
+          #
+          param = get_param("ftp-quota",self.config_dir)
 
+          unless param.is_a?(String)
+            @ftp_quota = nil
+          else
+            @ftp_quota = param.split($/).first.strip.to_i
+          end
+        end
+      end
+
+      @ftp_quota
+    end
+
+    def ftp_quota=(q)
+      raise ArgumentError, "FTP Quota must be an integer" unless q.is_a?(Integer)
+      @ftp_quota = q
+
+      set_param("ftp-quota", @ftp_quota, self.config_dir)
+
+      return @ftp_quota
+    end
+    
     def ftp_login(password)
       #
       # Do the password check.
       #
-      return ArgumentError, "Bad password" unless check_password(password, self.ftp_password)
+      raise ArgumentError, "Bad password" unless check_password(password, self.ftp_password)
 
       #
       # OK, we've successfully logged in.  Create the directory
