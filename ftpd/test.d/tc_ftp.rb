@@ -27,7 +27,11 @@ class TestFTP < Test::Unit::TestCase
     #
     #  Delete the temporary domain
     #
-    @domain.destroy()
+    unless $DEBUG
+      @domain.destroy()
+    else
+      puts "Domian configuration kept in #{@domain.directory}"
+    end
   end
 
   def test_login
@@ -43,10 +47,11 @@ class TestFTP < Test::Unit::TestCase
 
 
   def test_quota
-    quota_file = File.join(@domain.directory,"ftp-quota")
+    quota_file = File.join(@domain.config_dir,"ftp-quota")
+
     [[1e6, "1M"],
      [2.5e9, "2.5G"],
-     [300,"300 "]
+     [300,"300 "],
      [300e6,"300 M"]
     ].each do |expected,contents|
       #
@@ -58,6 +63,7 @@ class TestFTP < Test::Unit::TestCase
         fh.puts contents
       end
       assert_equal(expected, @domain.ftp_quota)
+
       #
       # Delete it again
       #
