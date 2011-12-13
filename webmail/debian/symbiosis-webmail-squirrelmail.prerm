@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+#
+# Remove the existing link.
+#
+rm -f /etc/apache2/conf.d/squirrelmail.conf
+rm -f /etc/apache2/conf.d/squirrelmail.local.conf
+
+#
+# Remove our symbiosis alternative.
+#
+update-alternatives --remove symbiosis-webmail /usr/share/squirrelmail/
+
+
+#
+#  Restart Apache2.
+#
+invoke-rc.d apache2 force-reload || true
+
+
+#DEBHELPER#
+exit 0

@@ -11,9 +11,31 @@ Package: symbiosis-webmail
 Replaces: bytemark-vhost-webmail
 Conflicts: bytemark-vhost-webmail
 Architecture: all
+Depends: symbiosis-webmail-squirrelmail | symbiosis-webmail-roundcube, ${misc:Depends}
+Description: This package gives webmail access to a Symbiosis system
+ This package will enable a global webmail system for all domains hosted
+ using the Bytemark Symbiosis system.
+
+Package: symbiosis-webmail-squirrelmail
+Architecture: all
 Depends: squirrelmail, ${misc:Depends}
-Description: This package gives webmail access
+Recommends: symbiosis-webmail
+Description: This package gives webmail access to Symbiosis using Squirrelmail
  This package will enable a global webmail system for all domains hosted
  using the Bytemark system.
  .
- The webmail is provided by the squirrelmail project.
+ This package implements webmail using the Squirrelmail system.
+
+
+Package: symbiosis-webmail-roundcube
+Architecture: all
+Depends: roundcube (>= 0.5.4), roundcube-core, roundcube-mysql, ${misc:Depends}
+Recommends: symbiosis-webmail
+Description: This package gives webmail access to Symbiosis using Roundcube
+ This package will enable a global webmail system for all domains hosted
+ using the Bytemark system.
+ .
+ This package implements webmail using the Roundcube system.
+
+
+

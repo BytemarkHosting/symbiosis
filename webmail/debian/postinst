@@ -10,31 +10,10 @@ if [ "$1" != "configure" ]; then
         exit 0
 fi
 
-
 #
-# Remove existing link, and add new one.
+# Remove old config files
 #
-if [ -e  /etc/apache2/conf.d/squirrelmail.conf  ]; then
-    rm -f /etc/apache2/conf.d/squirrelmail.conf
-fi
-
-#
-# Link in the default file.
-#
-ln -s /etc/squirrelmail/apache.conf  /etc/apache2/conf.d/squirrelmail.conf
-
-#
-#  Ensure we have our alias.
-#
-cat > /etc/apache2/conf.d/squirrelmail.local.conf<<EOF
-
-#
-#  Setup a friendlier login link
-#
-Alias /webmail /usr/share/squirrelmail
-
-EOF
-
+rm -f /etc/apache2/conf.d/squirrelmail.local.conf
 
 #
 #  Restart Apache2.

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+#
+# Remove our alternative
+#
+update-alternatives --remove symbiosis-webmail /var/lib/roundcube/
+
+#
+#  Restart Apache2.
+#
+invoke-rc.d apache2 force-reload || true
+
+
+#DEBHELPER#
+exit 0

@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+        echo "I: Skipping configuration"
+        exit 0
+fi
+
+#
+# Update our webmail alternative.
+#
+update-alternatives --install /var/www/webmail symbiosis-webmail /var/lib/roundcube/ 100
+
+#
+# Configure filterning
+#
+
+
+#
+#  Restart Apache2.
+#
+invoke-rc.d apache2 force-reload || true
+
+#DEBHELPER#
+exit 0

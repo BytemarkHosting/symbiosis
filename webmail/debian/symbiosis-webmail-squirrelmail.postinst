@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+        echo "I: Skipping configuration"
+        exit 0
+fi
+
+
+#
+# Remove existing link, and add new one.
+#
+rm -f /etc/apache2/conf.d/squirrelmail.conf
+rm -f /etc/apache2/conf.d/squirrelmail.local.conf
+
+#
+# Link in the default file.
+#
+ln -s /etc/squirrelmail/apache.conf  /etc/apache2/conf.d/squirrelmail.conf
+
+#
+# Stick alternatives in place
+#
+update-alternatives --install /var/www/webmail symbiosis-webmail /usr/share/squirrelmail 50
+
+#
+#  Restart Apache2.
+#
+invoke-rc.d apache2 force-reload || true
+
+#DEBHELPER#
+exit 0
