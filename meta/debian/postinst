@@ -12,23 +12,17 @@ fi
 
 
 #
-#  If there is no volatile then add it.
+#  If there is volatile then comment it out.
 #
-if ( ! grep volatile /etc/apt/sources.list 2>/dev/null >/dev/null ); then
-    cat >> /etc/apt/sources.list <<EOF
-
-deb     http://mirror.bytemark.co.uk/debian-volatile/ stable/volatile main contrib non-free
-deb-src http://mirror.bytemark.co.uk/debian-volatile/ stable/volatile main contrib non-free
-EOF
-
+if ( grep -q volatile /etc/apt/sources.list 2>/dev/null >/dev/null ); then
+  sed -i -e 's/^[^#].*volatile.*$/# Removed since volatile no longer exists for squeeze\n# \0/g' /etc/apt/sources.list
 fi
 
 
 #
 #  Update /etc/motd.
 #
-uname -snrvm > /etc/motd
-cat >>/etc/motd<<EOF
+cat >> /etc/motd.tail <<EOF
 
 To access the Bytemark Symbiosis documentation, please visit:
 
