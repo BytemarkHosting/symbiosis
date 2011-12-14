@@ -279,7 +279,7 @@ end
 # Re-generate the whitelist chain
 #
 if ( updated || expired > 0 || force )
-  cmd = %w(symbiosis-firewall)
+  cmd = %w(/usr/sbin/symbiosis-firewall)
   cmd << "--verbose" if $VERBOSE
   cmd << "--no-execute" unless execute
   cmd << "--no-delete"  unless delete
