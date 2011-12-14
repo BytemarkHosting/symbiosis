@@ -1,3 +1,11 @@
+symbiosis-firewall (2011:1214) stable; urgency=low
+
+  * New standards version
+  * Fixed path in symbiosis-firewall-white/blacklist
+  * Moved ipaddr library to common
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 14 Dec 2011 21:12:30 +0000
+
 symbiosis-firewall (2011:1206) stable; urgency=low
 
   * Tidied packaging, and removed old perl scripts.
