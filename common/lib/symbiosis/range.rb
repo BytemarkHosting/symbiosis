@@ -1,5 +1,4 @@
-
-require 'ipaddr'
+require 'linux/netlink/route'
 require 'pp'
 require 'socket'
 require 'resolv-replace'
@@ -19,6 +18,10 @@ module Symbiosis
       BYTEMARK_RANGES.any?{|range| range.include?(IPAddr.new(ip.to_s))}
     end
 
+    def self.netlink_socket
+      @netlink_socket ||= Linux::Netlink::Route::Socket.new
+    end
+
     #
     # Returns all IP addresses in use by a machine, in the order they were
     # configured on the interfaces, as an array of IPAddr objects.
@@ -29,14 +32,16 @@ module Symbiosis
       # Call ip with a set of arguments that returns an easy-to-parse list of
       # IPs, for both IPv4 and 6.
       #
-      (do_system("/bin/ip -o -f inet  addr show scope global") +
-       do_system("/bin/ip -o -f inet6 addr show scope global")).split("\n").each do |l|
-        # 
-        # This only matches the IP address, not the range.
-        #
-        next unless l =~ /inet6? ((\d{1,3}\.){3,3}\d{1,3}|[0-9a-f:]+)/
-        ip_addresses << IPAddr.new($1)
+      netlink_socket.addr.list(:family=>Socket::AF_INET6) do |ifaddr|
+        next unless 0 == ifaddr.scope
+        ip_addresses << ifaddr.address
       end
+
+      netlink_socket.addr.list(:family=>Socket::AF_INET) do |ifaddr|
+        next unless 0 == ifaddr.scope
+        ip_addresses << ifaddr.address
+      end
+
       ip_addresses
     end
 
@@ -61,10 +66,12 @@ module Symbiosis
     #
     def self.ipv6_ranges
       ipv6_ranges = []
-      do_system("/bin/ip -o -f inet6 addr show scope global").split("\n").each do |l|
-        next unless l =~ /inet6 ([0-9a-f:]+\/\d{1,3})/
-        ipv6_ranges << IPAddr.new($1)
+
+      netlink_socket.addr.list(:family=>Socket::AF_INET6) do |ifaddr|
+        next unless 0 == ifaddr.scope
+        ipv6_ranges << IPAddr.new(ifaddr.address.to_s+"/"+ifaddr.prefixlen.to_s)
       end
+
       ipv6_ranges
     end
 

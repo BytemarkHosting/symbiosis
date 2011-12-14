@@ -8,7 +8,7 @@ Standards-Version: 3.9.1
 
 Package: symbiosis-common
 Architecture: all
-Depends: ruby, libopenssl-ruby, ${misc:Depends}
+Depends: ruby, libopenssl-ruby, liblinux-netlink-ruby, ${misc:Depends}
 Provides: symbiosis-range, symbiosis-test
 Replaces: bytemark-vhost-range, bytemark-vhost-test
 Conflicts: symbiosis-range, symbiosis-test, bytemark-vhost-range, bytemark-vhost-test

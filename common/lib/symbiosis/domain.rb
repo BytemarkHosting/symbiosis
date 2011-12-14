@@ -1,4 +1,5 @@
 require 'symbiosis/utils'
+require 'symbiosis/range'
 require 'etc'
 #
 #  Ruby class to model a domain.
@@ -111,6 +112,53 @@ module Symbiosis
     end
 
     #
+    # Return all this domain's IPs (IPv4 and 6) as an array.
+    #
+    def ips
+      param = get_param("ip",self.config_dir)
+      @ip_addresses = []
+
+      if param.is_a?(String)     
+        param.split.each do |l|
+          begin
+            ip = IPAddr.new(l.strip)
+            @ip_addresses << ip
+          rescue ArgumentError => err
+            # should probably warn at this point..
+          end
+        end
+      end
+
+      if @ip_addresses.empty?
+        @ip_addresses << Symbiosis::Range.ipv4_addresses.first
+        @ip_addresses << Symbiosis::Range.ipv6_addresses.first
+      end
+
+      @ip_addresses
+    end
+
+    #
+    # Returns the first IPv4 address, or the first IPv6 address if no IPv4
+    # addresses are defined, or nil.
+    #
+    def ip
+      self.ipv4.first || self.ipv6.first
+    end
+
+    #
+    # Return this domain's IPv4 addresses as an array
+    #
+    def ipv4
+      @ip_addresses.select{|ip| ip.ipv4?}
+    end
+
+    #
+    # Return this domains IPv6 addresses as an array.
+    #
+    def ipv6
+      @ip_addresses.select{|ip| ip.ipv6?}
+    end
+
     #
     # Encrypt a password
     #
