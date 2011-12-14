@@ -1,5 +1,0 @@
-#
-# Update the system, for new Symbiosis packages and security updates.
-#
-
-10 9 * * 1-5 root [ -x /usr/bin/symbiosis-updater ] && /usr/bin/symbiosis-updater

@@ -1,3 +1,2 @@
-cron/symbiosis-updater     etc/cron.d/
-usr/bin/symbiosis-updater  usr/bin/
+sbin/symbiosis-updater  usr/sbin/
 etc/                       etc/apt/

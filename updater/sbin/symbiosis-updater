@@ -18,24 +18,16 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 export PATH
 
-
-#
-#  We need to find the architecture of this host, to know which
-# source list entry to use.
-#
-arch=$(/usr/bin/dpkg --print-architecture)
-
-
 #
 #  The sources list we update from.
 #
-SOURCES="/etc/apt/sources.list.security.$arch"
+SOURCES="/etc/apt/sources.list.security"
 
 
 #
 #  The email address to notify, if any.
 #
-EMAIL=automatic@lists.bytemark.co.uk
+EMAIL=root@`hostname`
 
 
 #
@@ -87,7 +79,7 @@ fi
 #
 if [ ! -x /usr/bin/apt-get ] ; then
     echo "/usr/bin/apt-get missing or non-executable."
-    exit
+    exit 1
 fi
 
 
@@ -96,7 +88,7 @@ fi
 #
 if [ ! -e "$SOURCES" ] ; then
     echo "$SOURCES missing"
-    exit
+    exit 1
 fi
 
 
@@ -105,33 +97,26 @@ fi
 #
 if [ "$UID" -ne "0" ] ; then
     echo "You're not root."
-    exit
+    exit 1
 fi
 
 
 #
-# Mark ourself as running to avoid monit issues.
+# Sleep a random amount of time, max one hour, unless running under sudo or
+# SSH.
 #
-touch /var/tmp/update.packages
-
-
-#
-# Sleep a random amount of time, max ten minutes, unless running under sudo.
-#
-if [ ! -z "$SSH_TTY" ]; then
+if [ -z "$SSH_TTY" -a -z "$SUDO_COMMAND" ]; then
     splay=$RANDOM
 
     #
     # modulo: Which is why we have /bin/bash in the
     # shebang line of thie script.
     #
-    MAXSLEEP=600
+    MAXSLEEP=3600
     let "splay %= $MAXSLEEP"
 
     sleep $splay
 fi
-
-
 
 #
 #  Update our sources list
@@ -162,9 +147,9 @@ if ( grep ^Inst "$tmp" 2>/dev/null >/dev/null ) ; then
     #  Send output by email if we have an email address setup
     # and mailx available.
     #
-    if ( test ! -z "$EMAIL" -a -x /usr/bin/mailx ); then
+    if ( test ! -z "$EMAIL" -a -x /usr/bin/mail ); then
 
-        cat "$tmp" | /usr/bin/mailx -s "[update-packages] `hostname`" "$EMAIL"
+        cat "$tmp" | /usr/bin/mail -s "[symbiosis-updater] `hostname`" "$EMAIL"
 
     else
         cat "$tmp"
@@ -176,8 +161,8 @@ fi
 #
 # Make sure we have an archive directory.
 #
-if [ ! -d /var/log/update-packages ]; then
-    mkdir -p /var/log/update-packages
+if [ ! -d /var/log/symbiosis-updater ]; then
+    mkdir -p /var/log/symbiosis-updater
 fi
 
 #
@@ -191,8 +176,8 @@ if [ -s "$tmp" ]; then
     #
     #  Move it into place.
     #
-    mv "$tmp" "/var/log/update-packages/$now"
-    chmod 644 "/var/log/update-packages/$now"
+    mv "$tmp" "/var/log/symbiosis-updater/$now"
+    chmod 644 "/var/log/symbiosis-updater/$now"
 else
 
     rm -f "$tmp"
@@ -202,8 +187,8 @@ fi
 #
 # Remove our lockfile
 #
-if [ -e /var/tmp/update.packages ]; then
-    rm -f /var/tmp/update.packages
+if [ -e /var/tmp/symbiosis.updater ]; then
+    rm -f /var/tmp/symbiosis.updater
 fi
 
 
@@ -257,11 +242,8 @@ This will ensure the updater exits.
 =head1 FILES
 
 The system will invoke B<apt-get> against the file
-B</etc/apt/sources.list.security.$arch> and archive the results of any updates
+B</etc/apt/sources.list.security> and archive the results of any updates
 applied to the directory B</var/log/symbiosis-updater/>
-
-The architecture of the host is determined via dpkg, and
-will be one of i386 or amd64.
 
 =cut
 

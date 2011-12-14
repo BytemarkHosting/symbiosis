@@ -1,5 +1,5 @@
 #
-#  Makefile for the updateer package
+#  Makefile for the updater package
 #
 
 nop:
@@ -13,5 +13,5 @@ clean:
 	rm -f *.1 || true
 
 manpage:
-	pod2man usr/bin/symbiosis-updater > symbiosis-updater.1
+	pod2man -r '' -c '' -n symbiosis-updater sbin/symbiosis-updater > symbiosis-updater.1
 
