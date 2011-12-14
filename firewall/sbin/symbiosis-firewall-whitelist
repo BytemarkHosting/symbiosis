@@ -64,7 +64,7 @@ require 'fileutils'
 require 'symbiosis/utmp'
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
-require 'symbiosis/firewall/ipaddr'
+require 'symbiosis/ipaddr'
 
 
 #
@@ -204,7 +204,7 @@ updated=false
 Symbiosis::Utmp.read(wtmp_file).each do |entry|
 
   begin
-    ip = Symbiosis::Firewall::IPAddr.new(entry['ip'].to_s)
+    ip = Symbiosis::IPAddr.new(entry['ip'].to_s)
   rescue ArgumentError
     #
     # Oops.  Can't interpret the IP.
@@ -233,8 +233,8 @@ Symbiosis::Utmp.read(wtmp_file).each do |entry|
   #
   # FIXME: Need better IPv6 conditions.
   #
-  next if ip.ipv4? and (IPAddr.new("127.0.0.1/8").include?(ip) or IPAddr.new("0.0.0.0") == ip )
-  next if ip.ipv6? and !IPAddr.new("2000::/3").include?(ip)
+  next if ip.ipv4? and (Symbiosis::IPAddr.new("127.0.0.1/8").include?(ip) or Symbiosis::IPAddr.new("0.0.0.0") == ip )
+  next if ip.ipv6? and !Symbiosis::IPAddr.new("2000::/3").include?(ip)
 
   puts "Found IP address: #{ip}" if ( $VERBOSE )
 

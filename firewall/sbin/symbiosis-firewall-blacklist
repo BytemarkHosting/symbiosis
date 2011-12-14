@@ -69,10 +69,10 @@
 require 'getoptlong'
 require 'tempfile'
 require 'fileutils'
+require 'symbiosis/ipaddr'
 require 'symbiosis/firewall/blacklist'
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
-require 'symbiosis/firewall/ipaddr'
 require 'symbiosis/firewall/logtail'
 require 'symbiosis/firewall/pattern'
 
@@ -220,7 +220,7 @@ blacklist.generate.each do |ip, ports|
   # Make sure we can parse stuff
   #
   begin
-    ip = IPAddr.new(ip)
+    ip = Symbiosis::IPAddr.new(ip)
   rescue ArgumentError => err
     warn "Ignoring #{ip.inspect} because of #{err.to_s}"
     next
@@ -241,8 +241,8 @@ blacklist.generate.each do |ip, ports|
   #
   # FIXME: Need better IPv6 conditions.
   #
-  next if ip.ipv4? and (IPAddr.new("127.0.0.1/8").include?(ip) or IPAddr.new("0.0.0.0") == ip )
-  next if ip.ipv6? and !IPAddr.new("2000::/3").include?(ip)
+  next if ip.ipv4? and (Symbiosis::IPAddr.new("127.0.0.1/8").include?(ip) or Symbiosis::IPAddr.new("0.0.0.0") == ip )
+  next if ip.ipv6? and !Symbiosis::IPAddr.new("2000::/3").include?(ip)
 
   puts "Found IP address: #{ip}" if ( $VERBOSE )
 

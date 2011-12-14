@@ -1,5 +1,5 @@
 
-require 'symbiosis/firewall/ipaddr'
+require 'symbiosis/ipaddr'
 
 module Symbiosis
   module Firewall

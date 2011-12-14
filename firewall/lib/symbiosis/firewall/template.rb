@@ -1,4 +1,4 @@
-require 'symbiosis/firewall/ipaddr'
+require 'symbiosis/ipaddr'
 require 'symbiosis/firewall/ports'
 require 'erb'
 
