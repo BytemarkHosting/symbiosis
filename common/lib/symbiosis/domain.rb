@@ -1,5 +1,5 @@
 require 'symbiosis/utils'
-require 'symbiosis/range'
+require 'symbiosis/host'
 require 'etc'
 #
 #  Ruby class to model a domain.
@@ -130,8 +130,8 @@ module Symbiosis
       end
 
       if @ip_addresses.empty?
-        @ip_addresses << Symbiosis::Range.ipv4_addresses.first
-        @ip_addresses << Symbiosis::Range.ipv6_addresses.first
+        @ip_addresses << Symbiosis::Host.ipv4_addresses.first
+        @ip_addresses << Symbiosis::Host.ipv6_addresses.first
       end
 
       @ip_addresses

@@ -1,2 +1,3 @@
 bin        usr/
+sbin       usr/
 lib/*      usr/lib/ruby/1.8/

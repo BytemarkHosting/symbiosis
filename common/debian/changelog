@@ -1,9 +1,18 @@
+symbiosis-common (2011:1214) stable; urgency=low
+
+  * Added dependency on liblinux-netlink-ruby
+  * Added IP configuration script to automatically add IP addresses.
+  * Better determination of the primary interface / IP addresses
+  * Lots of misc bugfixes 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 14 Dec 2011 21:16:23 +0000
+
 symbiosis-common (2011:1209) stable; urgency=low
 
   * Updated standards version.
     - Avoid hardcoding 'shadowconfig' path in the postinstall script.
     - Depend upon "${misc:Depends}".
-    - Test for eerrors in commands
+    - Test for errors in commands
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 09 Dec 2011 14:44:41 +0000
 

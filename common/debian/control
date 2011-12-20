@@ -11,7 +11,7 @@ Architecture: all
 Depends: ruby, libopenssl-ruby, liblinux-netlink-ruby, ${misc:Depends}
 Provides: symbiosis-range, symbiosis-test
 Replaces: bytemark-vhost-range, bytemark-vhost-test
-Conflicts: symbiosis-range, symbiosis-test, bytemark-vhost-range, bytemark-vhost-test
+Conflicts: symbiosis-firewall (<< 2011:1214), symbiosis-range, symbiosis-test, bytemark-vhost-range, bytemark-vhost-test
 Description: Common library functions for Bytemark Symbiosis
  This package contains shared code and scripts for use by the
  Symbiosis system.

@@ -223,5 +223,12 @@ for i in /srv /srv/* ; do
 done
 
 
+#
+# Finally add our magic IP adding script to if-up.d
+#
+
+ln -sf /usr/sbin/symbiosis-configure-ips /etc/network/if-up.d
+
+
 #DEBHELPER#
 exit 0

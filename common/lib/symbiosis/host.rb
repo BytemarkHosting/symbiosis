@@ -1,7 +1,7 @@
 require 'linux/netlink/route'
-require 'pp'
 require 'socket'
 require 'resolv-replace'
+require 'symbiosis/ipaddr'
 
 module Symbiosis
 
@@ -18,6 +18,9 @@ module Symbiosis
       BYTEMARK_RANGES.any?{|range| range.include?(IPAddr.new(ip.to_s))}
     end
 
+    #
+    # Returned a cached netlink socket.
+    #
     def self.netlink_socket
       @netlink_socket ||= Linux::Netlink::Route::Socket.new
     end
@@ -28,18 +31,20 @@ module Symbiosis
     #
     def self.ip_addresses
       ip_addresses = []
+      
+      #
+      # We only want addresses associated with the primary interface.
+      #
+      interface = self.primary_interface
+      return [] if interface.nil?
+
       #
       # Call ip with a set of arguments that returns an easy-to-parse list of
-      # IPs, for both IPv4 and 6.
+      # IPs, for both IPv4 and 6, for the primary interface, with global scope.
       #
-      netlink_socket.addr.list(:family=>Socket::AF_INET6) do |ifaddr|
+      netlink_socket.addr.list(:index => interface.index) do |ifaddr|
         next unless 0 == ifaddr.scope
-        ip_addresses << ifaddr.address
-      end
-
-      netlink_socket.addr.list(:family=>Socket::AF_INET) do |ifaddr|
-        next unless 0 == ifaddr.scope
-        ip_addresses << ifaddr.address
+        ip_addresses << IPAddr.new(ifaddr.address.to_s)
       end
 
       ip_addresses
@@ -67,7 +72,13 @@ module Symbiosis
     def self.ipv6_ranges
       ipv6_ranges = []
 
-      netlink_socket.addr.list(:family=>Socket::AF_INET6) do |ifaddr|
+      #
+      # Find the primary interface.
+      #
+      interface = self.primary_interface
+      return ipv6_ranges if interface.nil?
+
+      netlink_socket.addr.list(:index => interface.index, :family=>Socket::AF_INET6) do |ifaddr|
         next unless 0 == ifaddr.scope
         ipv6_ranges << IPAddr.new(ifaddr.address.to_s+"/"+ifaddr.prefixlen.to_s)
       end
@@ -76,16 +87,44 @@ module Symbiosis
     end
 
     #
-    # Returns the "primary" IP of the machine.  This is assumed to be the first
-    # globally routable IPv4 address of the first interface in the list
-    # returned by the "ip addr" command above.
+    # Returns the "primary" IP of the machine.  This is assumed to be the
+    # address with the smallest prefix.  If there is more than one with the
+    # same prefix, then we take the first. 
     #
     def self.primary_ip
-      self.ipv4_addresses.first
-    end
+      interface = self.primary_interface
+      
+      return nil if interface.nil?
 
-    def self.primary_bytemark_ip
-      self.ipv4_addresses.find{|ip| self.is_bytemark_ip?(ip)}
+      candidates = []      
+
+      netlink_socket.addr.list(:index => interface.index) do |ifaddr|
+        next unless 0 == ifaddr.scope
+        candidates << [IPAddr.new(ifaddr.address.to_s), ifaddr.prefixlen.to_i]
+      end
+
+      winner = candidates.inject(nil) do |best, current|
+        # If this is the first then return the current  
+        if best.nil?
+          current
+        # IPv4 is preferred to IPv6 
+        elsif current[0].ipv4? and best[0].ipv6?
+          current 
+        # IPv4 is preferred to IPv6 
+        elsif current[0].ipv6? and best[0].ipv4?
+          best
+        # Smaller prefix wins
+        elsif current[1] < best[1]
+          current
+        # Otherwise return the best (This should never happen!)
+        else
+          best
+        end
+      end
+
+      return nil if winner.nil? or winner.empty?
+
+      return winner[0]
     end
 
     #
@@ -148,11 +187,44 @@ module Symbiosis
       end
     end
 
+    
+    # Returns the primary interface for the machine as an Linux::Netlink::Link
+    # object.
     #
-    # This just calls the command, and returns the output.
+    # We can define the primary interface as the one with the default route.
     #
-    def self.do_system(cmd)
-      IO.popen(cmd){|pipe| pipe.readlines}.join
+    # We match on scope == 0 (RT_SCOPE_UNIVERSE) and type == 1 (RTN_UNICAST)
+    # and gateway != nil
+    #
+    def self.primary_interface
+      route = self.netlink_socket.route.read_route.select do |rt|
+        rt.scope == 0 and rt.type == 1 and !rt.gateway.nil?
+      end.sort{|a,b| a.oif <=> b.oif}.first
+
+      return nil if route.nil?
+
+      #
+      # Bit of an omission.  Need for the #find method.
+      #
+      self.netlink_socket.link.extend(Enumerable)
+
+      primary_interface = self.netlink_socket.link.find{|l| route.oif == l.index }
+
+      return primary_interface
+    end
+
+    def self.add_ip(ip)
+      interface = self.primary_interface
+
+      return ArgumentError, "Unable to find primary interface" if interface.nil?
+
+      @netlink_socket.addr.add(
+        :index=>interface.index.to_i,
+        :local=>ip.to_s,
+        :prefixlen=>(ip.ipv4? ? 32 : 128)
+      )
+
+      return nil
     end
 
   end
