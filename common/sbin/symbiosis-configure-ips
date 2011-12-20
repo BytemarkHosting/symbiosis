@@ -1,0 +1,120 @@
+#!/usr/bin/ruby
+#
+# NAME
+#   symbiosis-configure-ips -- Automatically configure IPs for domains
+#
+# SYNOPSIS
+#  symbiosis-configure-ips [ -h | --help ] [-m | --manual]
+#       [ -v | --verbose ] <interface>
+#
+# OPTIONS
+#  -h, --help              Show a help message, and exit.
+# 
+#  -m, --manual            Show this manual, and exit.
+#
+#  -v, --verbose           Show verbose errors.
+#
+# USAGE
+#
+# This script uses the information provided by Symbiosis domains to add IP
+# addresses to the primary interface of a machine. The primary interface is
+# defined as the lowest numbered interface that has a global, unicast route
+# with a gateway, i.e. a default route.
+#
+# The interface name can be specified on the commnand line, in which case the
+# script will exit if that interface name does not match its idea of what the
+# primary interface should be called. It also uses the IFACE variable set by
+# if-up in the same way. This is to prevent it from running repeatedly when
+# interfaces are brought up on boot.
+#
+# AUTHOR
+#
+# Patrick J Cherry <patrick@bytemark.co.uk>
+#
+
+require 'getoptlong'
+
+help = manual = verbose = false
+
+opts = GetoptLong.new(
+         [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
+         [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ]
+)
+
+opts.each do |opt,arg|
+  case opt
+  when '--help'
+    help = true
+  when '--manual'
+    manual = true
+  when '--verbose'
+    $VERBOSE = true
+  end
+end
+
+#
+# CAUTION! Here be quality kode.
+#
+if manual or help
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
+
+  found_synopsis = false
+
+  lines.each do |line|
+
+    line.chomp!
+    break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
+    puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
+  end
+
+  exit 0
+end
+#
+# Don't need anything until here.
+#
+require 'symbiosis/domains'
+require 'symbiosis/host'
+
+target_iface = nil
+target_iface = ARGV.pop if target_iface.nil?
+target_iface = ENV['IFACE'] if ENV.has_key?("IFACE") and target_iface.nil?
+
+primary_interface = Symbiosis::Host.primary_interface
+
+if primary_interface.nil?
+  warn "Not running since the primary interface cannot be determined." if $VERBOSE
+  exit 0 
+
+end
+
+if !target_iface.nil? and target_iface != primary_interface.ifname
+  warn "Not running since the requested interface (#{target_iface}) is not the primary interface"
+  exit 0 
+
+end
+
+Symbiois::Domains.each do |domain|
+  domain.ips.each do |ip|
+    #
+    # Add the IP.  If it already exists, nothing will happen...
+    #
+    begin
+      Symbiosis::Host.add_ip(ip)
+      warn "Added #{ip}" if $VERBOSE
+    rescue ArgumentError, Errno::EEXIST => ignore
+    end
+  end
+
+end
+

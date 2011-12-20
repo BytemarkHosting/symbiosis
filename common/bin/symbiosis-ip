@@ -24,7 +24,6 @@
 #
 
 require 'getoptlong'
-require 'symbiosis/range'
 
 opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
@@ -62,5 +61,9 @@ if help
   exit 0
 end
 
+#
+# Don't need range until here, allowing us to generate the manpage.
+#
+require 'symbiosis/range'
 ips = Symbiosis::Range.ip_addresses
 puts ips.first()

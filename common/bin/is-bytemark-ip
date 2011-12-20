@@ -24,7 +24,6 @@
 #
 
 require 'getoptlong'
-require 'symbiosis/range'
 
 opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
@@ -62,6 +61,11 @@ if help
 
   exit 0
 end
+
+#
+# Don't need the range until here.
+#
+require 'symbiosis/range'
 
 if ARGV.length > 0
 
