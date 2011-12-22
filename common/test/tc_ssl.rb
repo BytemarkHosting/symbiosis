@@ -1,9 +1,10 @@
 #!/usr/bin/ruby 
 
+$:.unshift  "../lib/" if File.directory?("../lib")
+
 require 'test/unit'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/test/domain'
-require 'pp'
 
 class SSLTest < Test::Unit::TestCase
 
@@ -347,7 +348,6 @@ class SSLTest < Test::Unit::TestCase
   # since they're all done as part of the verification tests below.
   #
 
-
   def test_ssl_verify_self_signed
     #
     # Generate a key and cert
@@ -358,8 +358,6 @@ class SSLTest < Test::Unit::TestCase
     # Write a combined cert
     #
     File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
-
-
 
     #
     # Now make sure it verifies OK
