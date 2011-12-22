@@ -36,16 +36,39 @@ module Symbiosis
       @ssl_x509_certificate_file
     end
 
+    alias ssl_certificate_file ssl_x509_certificate_file
+
+    def ssl_x509_certificate_file=(f)
+      @ssl_x509_certificate_file = f
+    end
+
+    alias ssl_certificate_file= ssl_x509_certificate_file=
+
     #
     # Returns the X509 certificate object
     #
     def ssl_x509_certificate
-      if !self.ssl_certificate_file.nil?
-        OpenSSL::X509::Certificate.new(File.read(self.ssl_certificate_file))
+      if !self.ssl_x509_certificate_file.nil?
+        OpenSSL::X509::Certificate.new(File.read(self.ssl_x509_certificate_file))
       else
         nil
       end
     end
+
+    def ssl_key_file
+      @ssl_key_file ||= nil
+
+      if @ssl_key_file.nil?
+        @ssl_x509_certificate_file, @ssl_key_file = self.ssl_find_matching_certificate_and_key
+      end
+
+      @ssl_key_file
+    end
+
+    def ssl_key_file=(f)
+      @ssl_key_file = f
+    end
+
 
     #
     # Returns the RSA key object
@@ -85,8 +108,11 @@ module Symbiosis
     # This is regenerated on every call.
     #
     def ssl_certificate_store
+      @ssl_ca_paths ||= []
+
       certificate_store = OpenSSL::X509::Store.new
       certificate_store.set_default_paths
+
       @ssl_ca_paths.each{|path| certificate_store.add_path(path)}
       certificate_store.add_file(self.ssl_certificate_chain_file) unless self.ssl_certificate_chain_file.nil?
       certificate_store
@@ -113,7 +139,7 @@ module Symbiosis
         #
         # If it doesn't exist/is unreadble, return nil.
         #
-        return nil if false == contents
+        next if false == contents
  
         this_fn = File.join(self.config_dir, "ssl.#{ext}")
 
@@ -151,16 +177,24 @@ module Symbiosis
         # match, otherwise reject.
         #
         if this_key and this_cert and this_cert.check_private_key(this_key)
-          certificate_files << this_cert
-          key_files << this_key
-        elsif this_key
-          key_files << this_key
-        elsif this_cert
-          certificate_files << this_cert
+          certificate_files << this_fn
+          key_files         << this_fn
+        elsif this_key and !this_cert
+          key_files << this_fn
+        elsif this_cert and !this_key
+          certificate_files << this_fn
         end
       end
 
       [certificate_files, key_files]
+    end
+    
+    def ssl_available_certificate_files
+      self.ssl_available_files.first
+    end
+
+    def ssl_available_key_files
+      self.ssl_available_files.last
     end
 
     #
@@ -173,6 +207,8 @@ module Symbiosis
       # Find the certificates and keys
       #
       certificate_files, key_files = self.ssl_available_files
+
+      return nil if certificate_files.empty? or key_files.empty?
 
       #
       # Test each certificate...
@@ -198,8 +234,8 @@ module Symbiosis
       #
       # Firstly check that the certificate is valid for the domain.
       #
-      unless OpenSSL::SSL.verify_certificate_identity(self.ssl_x509_certificate, @domain) or
-             OpenSSL::SSL.verify_certificate_identity(self.ssl_x509_certificate, "www.#{@domain}")
+      unless OpenSSL::SSL.verify_certificate_identity(self.ssl_x509_certificate, self.name) or
+             OpenSSL::SSL.verify_certificate_identity(self.ssl_x509_certificate, "www.#{self.name}")
 
         raise OpenSSL::X509::CertificateError, "The certificate subject is not valid for this domain."
       end

@@ -22,16 +22,14 @@ class IPAddr < ::IPAddr
   alias max broadcast
   alias min network
 
+  def include?(other)
+    raise ArgumentError unless other.is_a?(Symbiosis::IPAddr)
+    other >= self.min and other <= self.max
+  end
+
   def each
-    case @family
-    when Socket::AF_INET
-      (self.network.to_i..self.broadcast.to_i).each do |addr|
-        yield self.clone.set(addr).mask!(32)
-      end
-    when Socket::AF_INET6
-      (self.network.to_i..self.broadcast.to_i).each do |addr|
-        yield self.clone.set(addr).mask!(128)
-      end
+    (self.network.to_i..self.broadcast.to_i).each do |addr|
+      yield IPAddr.from_i(addr, @family)
     end
   end
   
@@ -39,11 +37,20 @@ class IPAddr < ::IPAddr
     @addr.to_i <=> other.to_i
   end
 
-  def IPAddr.from_i(arg)
-    if arg < 0xffffffff
+  def IPAddr.from_i(arg, family=nil)
+    if family.nil? 
+      family = (arg < 0xffffffff ? Socket::AF_INET : Socket::AF_INET6)
+    end
+
+    if Socket::AF_INET == family 
       IPAddr.new((0..3).collect{|x| x*8}.collect{|x| (arg.to_i >> x & 0xff).to_s}.reverse.join("."))
-    else
+
+    elsif Socket::AF_INET6 == family 
       IPAddr.new((0..7).collect{|x| x*16}.collect{|x| (arg.to_i >> x & 0xffff).to_s(16)}.reverse.join(":"))
+
+    else
+
+      raise ArgumentError, "Unknown address family"
     end
   end
 

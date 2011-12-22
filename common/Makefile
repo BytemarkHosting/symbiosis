@@ -12,4 +12,7 @@ clean:
 	$(RM) -r man
 
 test:
-	prove --shuffle tests/*.t
+	cd test ; for i in t*.rb ; do ruby -I ../lib $$i ; done
+
+.PHONY: test clean all docs
+ 
