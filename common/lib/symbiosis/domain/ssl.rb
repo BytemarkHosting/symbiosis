@@ -9,39 +9,41 @@ require 'erb'
 module Symbiosis
 
   class Domain
-    #
-    # Add a path with extra SSL certs for testing
-    #
-    def ssl_add_ca_path(path)
-      @ssl_ca_paths = [] unless defined? @ssl_ca_paths
-
-      @ssl_ca_paths << path if File.directory?(path)
-    end
 
     #
     # Is SSL enabled for the domain?
     #
-    # SSL is enabled if an IP has been set, as well as matching key and certificate.
+    # SSL is enabled if there is a matching key and certificate.
     #
     def ssl_enabled?
-      self.ip and not self.ssl_find_matching_certificate_and_key.nil? 
+      self.ssl_x509_certificate and self.ssl_key
     end
 
     #
     # Do we redirect to the SSL only version of this site?
     #
     def ssl_mandatory?
-      get_param("ssl-only", config_dir)
+      get_param("ssl-only", self.config_dir)
+    end
+
+    def ssl_x509_certificate_file
+      @ssl_x509_certificate_file ||= nil
+      
+      if @ssl_x509_certificate_file.nil?
+        @ssl_x509_certificate_file, @ssl_key_file = self.ssl_find_matching_certificate_and_key
+      end
+
+      @ssl_x509_certificate_file
     end
 
     #
     # Returns the X509 certificate object
     #
     def ssl_x509_certificate
-      if self.ssl_certificate_file.nil?
-        nil
-      else
+      if !self.ssl_certificate_file.nil?
         OpenSSL::X509::Certificate.new(File.read(self.ssl_certificate_file))
+      else
+        nil
       end
     end
 
@@ -49,10 +51,10 @@ module Symbiosis
     # Returns the RSA key object
     #
     def ssl_key
-      if self.ssl_key_file.nil?
-        nil
-      else
+      unless self.ssl_key_file.nil?
         OpenSSL::PKey::RSA.new(File.read(self.ssl_key_file))
+      else
+        nil
       end
     end
 
@@ -60,14 +62,8 @@ module Symbiosis
     # Returns the certificate chain file, if one exists, or one has been set.
     #
     def ssl_certificate_chain_file
-      @ssl_certificate_chain_file = nil unless defined? @ssl_certificate_chain_file
-
-      if @ssl_certificate_chain_file.nil? and File.exists?( File.join( self.config_dir,"ssl.bundle" ) )
-        @ssl_certificate_chain_file = File.join( self.config_dir,"ssl.bundle" )
-      end
-
-      if @ssl_certificate_chain_file and File.exists?(@ssl_certificate_chain_file)
-        @ssl_certificate_chain_file 
+      if get_param("ssl.bundle", self.config_dir)
+        File.join( self.config_dir,"ssl.bundle" )
       else
         nil
       end
@@ -76,7 +72,17 @@ module Symbiosis
     alias ssl_bundle_file ssl_certificate_chain_file
 
     #
-    # Returns the X509 certificate store, including any specified chain file
+    # Add a path with extra SSL certs for testing
+    #
+    def ssl_add_ca_path(path)
+      @ssl_ca_paths ||= [] 
+
+      @ssl_ca_paths << path if File.directory?(path)
+    end
+
+    #
+    # Returns the X509 certificate store, including any specified chain file.
+    # This is regenerated on every call.
     #
     def ssl_certificate_store
       certificate_store = OpenSSL::X509::Store.new
@@ -85,97 +91,76 @@ module Symbiosis
       certificate_store.add_file(self.ssl_certificate_chain_file) unless self.ssl_certificate_chain_file.nil?
       certificate_store
     end
-                
+
     #
-    # Return the available certificate files
+    # Return the available certificate/key files
     #
-    def ssl_available_certificate_files
+    # It will return an array [[certificate_files] , [key_files]]
+    #
+    def ssl_available_files
+      certificate_files = []
+      key_files = []
+
+      # 
       # Try a number of permutations
-      %w(combined key crt cert pem).collect do |ext|
+      #
+      %w(combined key crt cert pem).each do |ext|
         #
+        # See if the file exists.
         #
-        if get_param("ssl.#{ext}", self.config_dir)
-          "ssl.#{ext}"
-        else
-          nil
+        contents = get_param("ssl.#{ext}", self.config_dir)
+
+        #
+        # If it doesn't exist/is unreadble, return nil.
+        #
+        return nil if false == contents
+ 
+        this_fn = File.join(self.config_dir, "ssl.#{ext}")
+
+        this_cert = nil
+        this_key = nil
+
+        #
+        # Check the certificate
+        #
+        begin
+          this_cert = OpenSSL::X509::Certificate.new(contents)
+        rescue OpenSSL::OpenSSLError
+          #
+          # This means the file did not contain a cert, or the cert it contains
+          # is unreadable.
+          #
+          this_cert = nil
         end
 
-      end.reject do |fn|
-        begin
-          raise Errno::ENOENT if fn.nil?
-          #
-          # See if there is a key in the same file
-          #
-          this_key  = OpenSSL::PKey::RSA.new(File.read(fn))
-          this_cert = OpenSSL::X509::Certificate.new(File.read(fn))
-
-          # 
-          # If the cert can't validate the private key, reject!
-          #
-          true unless this_cert.check_private_key(this_key)
-        rescue OpenSSL::OpenSSLError
-          #
-          # Keep if there is no key in this file
-          #
-          false
-        rescue Errno::ENOENT
-          # 
-          # Reject if the file can't be found
-          #
-          true
-        end  
-      end
-    end
-
-    #
-    # Return the available key files
-    #
-    def ssl_available_key_files
-      # Try a number of permutations
-      %w(combined key cert crt pem).collect do |ext|
-
-        fn = File.join(self.config_dir, "ssl.#{ext}")
-
         #
-        # Try to open and read the key
+        # Check to see if the file contains a key.
         #
         begin
-          OpenSSL::PKey::RSA.new(File.read(fn))
-          fn
-        rescue Errno::ENOENT, Errno::EPERM
-          # Skip if the file doesn't exist
-          nil
+          this_key = OpenSSL::PKey::RSA.new(contents)
         rescue OpenSSL::OpenSSLError
-          # Skip if we can't read the cert
-          nil
+          #
+          # This means the file did not contain a key, or the key it contains
+          # is unreadable.
+          #
+          this_key = nil
         end
-      end.reject do |fn|
-        begin
-          raise Errno::ENOENT if fn.nil?
-          #
-          # See if there is a key in the same file
-          #
-          this_cert = OpenSSL::X509::Certificate.new(File.read(fn))
-          this_key  = OpenSSL::PKey::RSA.new(File.read(fn))
 
-          # 
-          # If the cert can't validate the private key, reject!
-          #
-          true unless this_cert.check_private_key(this_key)
-        rescue OpenSSL::OpenSSLError
-
-          #
-          # Keep if there is no certificate in this file
-          #
-          false
-        rescue Errno::ENOENT
-
-          # 
-          # Reject if the file can't be found
-          #
-          true
-        end  
+        # 
+        # Finally, if we have a key and certificate in one file, check they
+        # match, otherwise reject.
+        #
+        if this_key and this_cert and this_cert.check_private_key(this_key)
+          certificate_files << this_cert
+          key_files << this_key
+        elsif this_key
+          key_files << this_key
+        elsif this_cert
+          certificate_files << this_cert
+        end
       end
+
+      [certificate_files, key_files]
     end
 
     #
@@ -185,12 +170,17 @@ module Symbiosis
     #
     def ssl_find_matching_certificate_and_key
       #
+      # Find the certificates and keys
+      #
+      certificate_files, key_files = self.ssl_available_files
+
+      #
       # Test each certificate...
-      self.ssl_available_certificate_files.each do |cert_fn|
+      certificate_files.each do |cert_fn|
         cert = OpenSSL::X509::Certificate.new(File.read(cert_fn))
         #
         # ...with each key
-        self.ssl_available_key_files.each do |key_fn|
+        key_files.each do |key_fn|
           key = OpenSSL::PKey::RSA.new(File.read(key_fn))
           #
           # This tests the private key, and returns the current certificate and
@@ -201,14 +191,16 @@ module Symbiosis
 
       #
       # Return nil if no matching keys and certs are found
-      return nil    
+      return nil
     end
 
     def ssl_verify
+      #
       # Firstly check that the certificate is valid for the domain.
       #
-      #
-      unless OpenSSL::SSL.verify_certificate_identity(self.ssl_x509_certificate, @domain) or OpenSSL::SSL.verify_certificate_identity(self.ssl_x509_certificate, "www.#{@domain}")
+      unless OpenSSL::SSL.verify_certificate_identity(self.ssl_x509_certificate, @domain) or
+             OpenSSL::SSL.verify_certificate_identity(self.ssl_x509_certificate, "www.#{@domain}")
+
         raise OpenSSL::X509::CertificateError, "The certificate subject is not valid for this domain."
       end
 
