@@ -7,12 +7,11 @@ man/%.man: ./bin/%
 
 docs: man/encrypt_password.man man/encrypt_password.man  man/is-bytemark-ip.man  man/symbiosis-ip.man  man/symbiosis-test.man  man/which-backup-space.man
 
-
 clean:
 	$(RM) -r man
 
 test:
-	cd test ; for i in t*.rb ; do ruby -I ../lib $$i ; done
+	cd test ; for i in t*.rb ; do [ -x $$i ] && ruby -I ../lib $$i ; true ; done
 
 .PHONY: test clean all docs
  
