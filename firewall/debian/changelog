@@ -1,3 +1,10 @@
+symbiosis-firewall (2012:0111) stable; urgency=low
+
+  * Default to deleting the firewall when adding new whitelist
+    entries.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 11 Jan 2012 12:29:21 +0000
+
 symbiosis-firewall (2011:1214) stable; urgency=low
 
   * New standards version
