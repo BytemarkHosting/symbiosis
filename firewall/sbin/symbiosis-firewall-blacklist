@@ -103,32 +103,38 @@ opts = GetoptLong.new(
          [ '--expire-after', '-e', GetoptLong::REQUIRED_ARGUMENT ]
        )
 
-opts.each do |opt,arg|
-  case opt
-  when '--help'
-    help = true
-  when '--manual'
-    manual = true
-  when '--verbose'
-    $VERBOSE = true
-  when '--test'
-    test = true
-  when '--no-execute'
-    execute = false
-  when '--no-delete'
-    delete = false
-  when '--force'
-    force = true
-  when '--prefix'
-    base_dir     = File.expand_path(arg)
-  when '--template-d'
-    template_dir = File.expand_path(arg)
-  when '--expire-after'
-    expire_after = arg.to_i
-  when '--attempts'
-    attempts = arg.to_i
+begin
+  opts.each do |opt,arg|
+    case opt
+    when '--help'
+      help = true
+    when '--manual'
+      manual = true
+    when '--verbose'
+      $VERBOSE = true
+    when '--test'
+      test = true
+    when '--no-execute'
+      execute = false
+    when '--no-delete'
+      delete = false
+    when '--force'
+      force = true
+    when '--prefix'
+      base_dir     = File.expand_path(arg)
+    when '--template-d'
+      template_dir = File.expand_path(arg)
+    when '--expire-after'
+      expire_after = arg.to_i
+    when '--attempts'
+      attempts = arg.to_i
+    end
   end
+rescue
+  # any errors, show the help
+  help = true
 end
+
 
 #
 # CAUTION! Here be quality kode.

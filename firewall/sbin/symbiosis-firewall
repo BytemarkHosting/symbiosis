@@ -152,25 +152,30 @@ opts = GetoptLong.new(
          [ '--template-d', '-t', GetoptLong::REQUIRED_ARGUMENT ]
        )
 
-opts.each do |opt,arg|
-  case opt
-  when '--help'
-    help = true
-  when '--manual'
-    manual = true
-  when '--verbose'
-    $VERBOSE = true
-   when '--test'
-    test = true
-  when '--no-execute'
-    execute = false
-  when '--no-delete'
-    delete = false
-  when '--prefix'
-    base_dir     = File.expand_path(arg)
-  when '--template-d'
-    template_dir = File.expand_path(arg)
+begin
+  opts.each do |opt,arg|
+    case opt
+    when '--help'
+      help = true
+    when '--manual'
+      manual = true
+    when '--verbose'
+      $VERBOSE = true
+    when '--test'
+      test = true
+    when '--no-execute'
+      execute = false
+    when '--no-delete'
+      delete = false
+    when '--prefix'
+      base_dir     = File.expand_path(arg)
+    when '--template-d'
+      template_dir = File.expand_path(arg)
+    end
   end
+rescue
+  # Any exceptions show the help.
+  help = true
 end
 
 #
