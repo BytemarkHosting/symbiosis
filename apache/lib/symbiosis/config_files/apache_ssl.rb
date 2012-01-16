@@ -35,15 +35,22 @@ module Symbiosis
 
         config = self.generate_config(self.template)
 
-        tempfile = Tempfile.new($0)
-
+        tempfile = Tempfile.new(self.domain.name)
         tempfile.puts(config)
+        tempfile.close(false)
 
         IO.popen( "/usr/sbin/apache2 -C 'UseCanonicalName off' -C 'Include /etc/apache2/mods-enabled/*.load' -C 'Include /etc/apache2/mods-enabled/*.conf' -f #{tempfile.path} -t 2>&1 ") {|io| output = io.readlines }
 
-        warn output.collect{|o| "\t"+o}.join unless "Syntax OK" == output.last.chomp or $VERBOSE
-
-        "Syntax OK" == output.last.chomp
+        if "Syntax OK" == output.last.chomp
+          warn output.collect{|o| "\t"+o}.join if $VERBOSE
+          tempfile.unlink
+          return true
+        else
+          warn output.collect{|o| "\t"+o}.join
+          File.rename(tempfile.path, tempfile.path+".conf")
+          warn "\tTemporary config snippet retained at #{tempfile.path}.conf"
+          return false
+        end
       end
 
 
@@ -53,13 +60,13 @@ module Symbiosis
       #
       def enabled?(fn = nil)
 
-        fn = self.filename.gsub("sites-available","sites-enabled")) if fn.nil?
-        
+        fn = self.filename.sub("sites-available","sites-enabled") if fn.nil?
+
         #
         # Make sure the file exists, and that it is a symlink pointing to our
         # config file
         #
-        if File.symlink?(fn) and File.expand_path(fn.readlink) == self.filename
+        if File.symlink?(fn) and File.expand_path(File.readlink(fn)) == self.filename
           return true
         end
 
@@ -78,6 +85,83 @@ module Symbiosis
         # Otherwise return false
         #
         false
+      end
+
+      def enable(fn = nil)
+        fn = self.filename.sub("sites-available","sites-enabled") if fn.nil?
+
+        File.symlink(self.filename, fn) unless self.enabled?(fn)
+               
+      end
+
+      def disable(fn = nil)
+        fn = self.filename.sub("sites-available","sites-enabled") if fn.nil?
+
+        File.unlink(fn) if self.enabled?(fn)
+      end
+
+      ###################################################
+      #
+      # The following methods are used in the template.
+      #
+
+      #
+      # Return all the IPs as apache-compatible strings.
+      #
+      def ips
+        @domain.ips.collect do |ip|
+          if ip.ipv6?
+            "["+ip.to_s+"]"
+          else
+            ip.to_s
+          end
+        end
+      end
+
+      #
+      # Return just the first IP.
+      #
+      def ip
+        ip = @domain.ips.first
+        warn "\tUsing one IP (#{ip}) where the domain has more than one configured!" if @domain.ips.length > 1 and $VERBOSE
+        if ip.ipv6?
+          "["+ip.to_s+"]"
+        else
+          ip.to_s
+        end
+      end
+
+      #
+      # Return the domain config directory.
+      #
+      def domain_directory
+        @domain.config_dir
+      end
+
+      #
+      # Returns the certificate (+key) snippet 
+      #
+      def certificate
+        return nil unless @domain.ssl_certificate_file and @domain.ssl_key_file
+
+        if @domain.ssl_certificate_file == @domain.ssl_key_file
+          "SSLCertificateFile #{@domain.ssl_certificate_file}"
+        else
+          "SSLCertificateFile #{@domain.ssl_certificate_file}\n\tSSLCertificateKeyFile #{@domain.ssl_key_file}"
+        end
+      end
+
+      #
+      # Returns the bundle filename + the apache directive
+      #
+      def bundle
+        return "" unless @domain.ssl_bundle_file
+        
+        "SSLCertificateChainFile "+@domain.ssl_bundle_file
+      end
+
+      def mandatory_ssl?
+        @domain.ssl_mandatory?
       end
 
     end

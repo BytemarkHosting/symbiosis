@@ -13,7 +13,7 @@ module Symbiosis
 
   class ConfigFile
 
-    attr_reader :comment_char, :filename, :template
+    attr_reader :comment_char, :filename, :template, :domain
 
     def initialize(filename, comment_char="#")
       @filename = filename
@@ -57,7 +57,7 @@ module Symbiosis
       #
       # Return our template + MD5.
       #
-      return config + [comment_char,"Checksum MD5",Digest::MD5.new(config).hexdigest].join(" ")
+      return config + [comment_char,"Checksum MD5",Digest::MD5.new.hexdigest(config)].join(" ")
     end
 
     #
@@ -79,7 +79,7 @@ module Symbiosis
       true
     end
 
-    alias ok? test
+   # alias ok? test
 
     #
     # Does the configuration need updating
@@ -122,7 +122,7 @@ module Symbiosis
         #
         # And compare to the calculated checksum of the rest of the snippet
         #
-        return Digest::MD5.new(snippet.join).hexdigest != supposed_checksum
+        return Digest::MD5.new.hexdigest(snippet.join) != supposed_checksum
       
       #
       # We're OK if the file has a big warning in it.

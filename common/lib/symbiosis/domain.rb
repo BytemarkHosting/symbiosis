@@ -230,6 +230,8 @@ module Symbiosis
       #
       return password == real_password
     end
+
+    def to_s ; self.name ; end
   end
 end
 

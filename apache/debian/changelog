@@ -1,3 +1,9 @@
+symbiosis-httpd (2012:0116) stable; urgency=low
+
+  * Rewrote symbiosis-create-ssl in ruby.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 16 Jan 2012 18:05:22 +0000
+
 symbiosis-httpd (2011:1209) stable; urgency=low
 
   * Updated standard versions.  (No change).

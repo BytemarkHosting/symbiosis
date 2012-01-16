@@ -23,9 +23,12 @@
 ##
 ###
 
+<% ips.each do |ip| %>
 NameVirtualHost <%= ip %>:443
+NameVirtualHost <%= ip %>:80
+<% end %>
 
-<VirtualHost <%= ip %>:443>
+<VirtualHost <%= ips.collect{|ip| ip+":443"}.join(" ") %>>
 
         ServerName  <%= domain %>
         ServerAlias www.<%= domain %>
@@ -98,11 +101,7 @@ NameVirtualHost <%= ip %>:443
         CustomLog  /var/log/apache2/<%= domain %>.ssl.access.log combined
 </VirtualHost>
 
-
-
-NameVirtualHost <%= ip %>:80
-
-<VirtualHost <%= ip %>:80>
+<VirtualHost <%= ips.collect{|ip| ip+":80"}.join(" ") %>>
 
 <% if mandatory_ssl? %>
         #

@@ -46,6 +46,7 @@ $VERBOSE  = false
 #  Do we need to restart apache?
 #
 $RESTART=false
+root = ""
 
 opts = GetoptLong.new(
          [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
@@ -87,18 +88,20 @@ def verbose(s)
   puts s if $VERBOSE
 end
 
+
 #
 #  For each domain.
 #
-Symbiosis::Domains.new.domains.each do |domain|
+Symbiosis::Domains.each do |domain|
 
-  verbose "Domain: #{domain} "
+  verbose "Domain: #{domain.name} "
 
-  sites_available_file = File.join("etc","apache","sites-available","#{domain.name}.conf")
-  sites_enabled_file = File.join("etc","apache","sites-available","#{domain.name}.conf")
+  sites_available_file = File.join(root, "etc","apache2","sites-available","#{domain.name}.conf")
+  sites_enabled_file = File.join(root, "etc","apache2","sites-available","#{domain.name}.conf")
 
-  config = Symbiosis::ConfigFile.new(sites_available_file, "#")
-  config.template = File.join("etc","symbiosis","apache.d","ssl.template.erb")
+  config = Symbiosis::ConfigFiles::ApacheSSL.new(sites_available_file, "#")
+  config.template = File.join(root, "etc","symbiosis","apache.d","ssl.template.erb")
+  config.domain = domain
 
   #
   #  If SSL is not enabled then we can skip
@@ -152,7 +155,7 @@ Symbiosis::Domains.new.domains.each do |domain|
 
       unless config.enabled?
         verbose "\tEnabling site"
-        config.enable(sites_enabled_file)
+        config.enable
       end
 
     else
