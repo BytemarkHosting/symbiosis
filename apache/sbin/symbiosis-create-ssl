@@ -31,7 +31,8 @@
 require 'erb'
 require 'getoptlong'
 require 'symbiosis/domains'
-require 'symbiosis/ssl_configuration'
+require 'symbiosis/domain/ssl'
+require 'symbiosis/config_files/apache_ssl'
 
 
 #
@@ -93,15 +94,16 @@ Symbiosis::Domains.new.domains.each do |domain|
 
   verbose "Domain: #{domain} "
 
-  #
-  #  Create a helper for the domain.
-  #
-  helper = SSLConfiguration.new( domain )
+  sites_available_file = File.join("etc","apache","sites-available","#{domain.name}.conf")
+  sites_enabled_file = File.join("etc","apache","sites-available","#{domain.name}.conf")
+
+  config = Symbiosis::ConfigFile.new(sites_available_file, "#")
+  config.template = File.join("etc","symbiosis","apache.d","ssl.template.erb")
 
   #
   #  If SSL is not enabled then we can skip
   #
-  if ( helper.ssl_enabled? )
+  if ( domain.ssl_enabled? )
 
     verbose "\tSSL is enabled"
 
@@ -118,13 +120,13 @@ Symbiosis::Domains.new.domains.each do |domain|
     if ( $FORCE )
       verbose "\tForcing re-creation of configuration due to --force"
 
-    elsif helper.site_enabled?
+    elsif config.exists?
 
-      if helper.changed?
+      if config.changed?
         verbose "\tNot updating configuration, as it has been edited by hand"
         next
 
-      elsif helper.outdated? 
+      elsif config.outdated?
         verbose "\tRe-creating configuration as it is older than the input file(s)"
 
       else
@@ -138,29 +140,24 @@ Symbiosis::Domains.new.domains.each do |domain|
 
     end
 
-    if helper.site_enabled?
-      verbose "\tDisabling site"
-      helper.disable_site
-      # Definitely restart if the site has been disabled
-      $RESTART = true
-    end
-
-    verbose "\tGenerating configuration snippet"
-    snippet = helper.config_snippet( $TEMPLATE )
-
-    verbose "\tWriting configuration"
-    helper.write_configuration( snippet )
-
     #
-    # This gets apache2 to check the configuration.
+    # This gets apache2 to check the configuration using a temporary file.
     #
-    if helper.configuration_ok?
-      verbose "\tEnabling site"
-      helper.enable_site
-      # Definitely restart if the site has been disabled
+    if config.ok?
+      # Definitely restart if the config tests OK.
       $RESTART = true
+
+      verbose "\tWriting configuration"
+      config.write
+
+      unless config.enabled?
+        verbose "\tEnabling site"
+        config.enable(sites_enabled_file)
+      end
+
     else
-      verbose "\tNot enabling site as Apache has rejected the configuration"
+      verbose "\tApache has rejected the new configuration -- no changes have been made."
+
     end
   else
 
