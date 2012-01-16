@@ -112,6 +112,18 @@ module Symbiosis
     end
 
     #
+    # Return the filename of the IP file, or nil if none has been set.
+    #
+    def ip_file
+      if get_param("ip",self.config_dir)
+        File.join(config_dir, "ip")
+      else
+        nil
+      end
+    end
+
+
+    #
     # Return all this domain's IPs (IPv4 and 6) as an array.
     #
     def ips
