@@ -15,7 +15,7 @@ class TestHTTP < Test::Unit::TestCase
     #
     #  Create the domain
     #
-    @domain = Symbiosis::Test::Http.new()
+    @domain = Symbiosis::Domain.new()
     @domain.create()
 
     #
@@ -33,19 +33,8 @@ class TestHTTP < Test::Unit::TestCase
   end
 
   #
-  # We need this because our copy of Apache explicitly listens on the
-  # external IP address.
+  # Helper methods
   #
-  def IP()
-    ip=""
-    `ifconfig eth0 | grep 'inet addr:'`.split("\n").each do |line|
-      if ( /([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/i.match( line ) )
-        ip=$1 + "." + $2 + "." + $3 + "." + $4
-      end
-    end
-    ip
-  end
-
   def getCode( path, dname )
     result=nil
     sock = TCPSocket.new("#{IP()}", "80")

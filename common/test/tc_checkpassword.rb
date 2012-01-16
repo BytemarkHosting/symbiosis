@@ -1,14 +1,12 @@
 #!/usr/bin/ruby
 
 require 'test/unit'
-require 'symbiosis/test/mail'
-require 'pp'
-require 'etc'
+require 'symbiosis/test/domain'
 
 class TestCheckpassword < Test::Unit::TestCase
 
   def setup
-    @domain = Symbiosis::Test::Mail.new()
+    @domain = Symbiosis::Domain.new()
     @domain.create
   end
 
