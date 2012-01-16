@@ -1,6 +1,7 @@
 require 'digest/md5'
 require 'erb'
 require 'tempfile'
+require 'symbiosis/domain'
 
 #
 # This class is used to make configuration files easier to handle.
@@ -12,22 +13,41 @@ module Symbiosis
 
   class ConfigFile
 
-    attr_reader :comment_char, :filename
+    attr_reader :comment_char, :filename, :template
 
     def initialize(filename, comment_char="#")
       @filename = filename
       @comment_char = comment_char
       @contents = nil
+      @template = nil
+      @domain = nil
+    end
+
+    #
+    # Set the domain -- potentially used in tests later, or in the template.
+    #
+    def domain=(d)
+      raise "The domain must be a Symbiosis::Domain not a #{d.class}" unless d.is_a?(Symbiosis::Domain)
+      @domain = d
+    end
+
+    #
+    # Set the template filename
+    #
+    def template=(f)
+      raise Errno::ENOENT,f unless File.exists?(f)
+
+      @template = f
     end
 
     #
     # Template the configuration
     #
-    def generate_config( template )
+    def generate_config( templ = self.template )
       #
       # Read the template file.
       #
-      content = File.open( template, "r" ).read()
+      content = File.open( templ, "r" ).read()
 
       #
       # Create a template object, and add a newline for good measure.
@@ -55,9 +75,11 @@ module Symbiosis
     #
     # See if the generated config is OK
     #
-    def test(filename)
+    def ok?
       true
     end
+
+    alias ok? test
 
     #
     # Does the configuration need updating
@@ -66,6 +88,12 @@ module Symbiosis
       false
     end
 
+    #
+    # Test to see if the config file exists
+    #
+    def exists?
+      File.exists?(filename)
+    end
 
     #
     # This tests to see if the configuration has been altered.
