@@ -2,7 +2,7 @@ Source: symbiosis-httpd
 Section: web
 Priority: optional
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), apache2-dev, libcap-dev
+Build-Depends: debhelper (>= 7.0.0), apache2-dev, libcap-dev, cdbs, config-package-dev, php5-common
 Standards-Version: 3.9.1
 
 Package: libapache2-mod-vhost-bytemark
@@ -33,7 +33,7 @@ Description: A per-uid module for Apache 2.x
 Package: symbiosis-httpd
 Replaces: bytemark-vhost-httpd
 Conflicts: bytemark-vhost-httpd, symbiosis-monit (<< 2011:1206)
-Architecture: any
+Architecture: all
 Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static, symbiosis-common (>> 2011:1101), symbiosis-range
 Description: Tools to manage Apache virtual hosting
  This package contains tools to manage the virtual hosting of websites
@@ -48,7 +48,7 @@ Description: Tools to manage Apache virtual hosting
 
 Package: symbiosis-httpd-static
 Depends: ${misc:Depends}
-Architecture: any
+Architecture: all
 Description: Static files
  This package contains the static welcome page for the Bytemark Symbiosis
  system.

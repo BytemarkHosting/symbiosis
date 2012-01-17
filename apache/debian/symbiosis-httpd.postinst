@@ -239,14 +239,6 @@ NameVirtualHost $ip:443
 
 EOF
 
-
-#
-#  Ensure we listen for SSL requests
-#
-if ( ! grep 443 /etc/apache2/ports.conf >/dev/null 2>/dev/null ); then
-    echo "Listen 443" >> /etc/apache2/ports.conf
-fi
-
 ##
 # SSL cert generation now in symbiosis-common.
 ##
@@ -283,31 +275,7 @@ a2enmod  mod_vhost_bytemark  >/dev/null 2>/dev/null
 a2dismod vhost_alias         >/dev/null 2>/dev/null
 
 
-#
-#  Change the server tokens
-#
-if [ -e /etc/apache2/conf.d/security ]; then
-
-    perl -pi -e 's/^ServerTokens.*/ServerTokens Prod/g'  /etc/apache2/conf.d/security
-    # if there is no setting then add it.
-    if ( ! grep ^ServerTokens /etc/apache2/conf.d/security  >/dev/null 2>/dev/null ) ; then
-        echo "ServerTokens Prod" >> /etc/apache2/conf.d/security
-    fi
-
-    perl -pi -e 's/^ServerSignature.*/ServerSignature Off/g' /etc/apache2/conf.d/security
-    # if there is no setting then add it.
-    if ( ! grep ^ServerSignature /etc/apache2/conf.d/security  >/dev/null 2>/dev/null ) ; then
-        echo "ServerSignature Off" >> /etc/apache2/conf.d/security
-    fi
-
-    perl -pi -e 's/^TraceEnable.*/TraceEnable Off/g' /etc/apache2/conf.d/security
-    # if there is no setting then add it.
-    if ( ! grep ^TraceEnable /etc/apache2/conf.d/security  >/dev/null 2>/dev/null ) ; then
-        echo "TraceEnable Off" >> /etc/apache2/conf.d/security
-    fi
-
-
-else
+if [ ! -e /etc/apache2/conf.d/security ]; then
     cat > /etc/apache2/conf.d/security<<EOF
 ServerTokens Prod
 ServerSignature Off
@@ -315,31 +283,17 @@ TraceEnable Off
 EOF
 fi
 
-
-if [ -e /etc/php5/apache2/php.ini ]; then
-
-    # change any existing setting to be Off.
-    perl -pi -e 's/^expose_php = On/expose_php = Off/g'  /etc/php5/apache2/php.ini
-
-    # if there is no setting then add it.
-    if ( ! grep ^expose_php /etc/php5/apache2/php.ini  >/dev/null 2>/dev/null ) ; then
-        echo "" >> /etc/php5/apache2/php.ini
-        echo "expose_php = Off" >> /etc/php5/apache2/php.ini
-
-    fi
-fi
-
 #################
 # Remove old cron jobs
 #
 #  /usr/sbin/symbiosis-configure-additional no longer exists.  Remove old cronjob. 
 #
-if [ -l /etc/cron.hourly/symbiosis-configure-additional ]; then
+if [ -L /etc/cron.hourly/symbiosis-configure-additional ]; then
     rm -f /etc/cron.hourly/symbiosis-configure-additional 
 fi
 
 #  /usr/sbin/symbiosis-create-ssl no longer exists.  Remove old cronjob. 
-if [ -l /etc/cron.hourly/symbiosis-create-ssl ] ; then
+if [ -L /etc/cron.hourly/symbiosis-create-ssl ] ; then
   rm -f /etc/cron.hourly/symbiosis-create-ssl
 fi
 
@@ -368,6 +322,8 @@ if [ -x /usr/sbin/symbiosis-make-ssl-logs ] ; then
   ln -sf /usr/sbin/symbiosis-make-ssl-logs /etc/cron.daily
 fi
 
+#DEBHELPER#
+
 #
 #  Restart Apache2.
 #
@@ -377,5 +333,4 @@ else
     /etc/init.d/apache2 restart
 fi
 
-#DEBHELPER#
 exit 0
