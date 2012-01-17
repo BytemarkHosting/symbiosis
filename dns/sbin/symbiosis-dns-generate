@@ -41,7 +41,6 @@ $UPLOAD=false
 # The root directory -- '/' by default.
 #
 root = "/"
-non_dns_template = nil 
 dns_template     = nil 
 bytemarkdns_data_dir      = nil
 

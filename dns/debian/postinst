@@ -92,6 +92,13 @@ for i in /srv/*/config/dns/zone*; do
     fi
 done
 
+#
+# Munge the old template as needed
+#
+if [ -e /etc/symbiosis/dns.d/template ] ; then
+  sed -e 's/$\([a-z]\+\)/<%= \1 %>/g' < template > /etc/symbiosis/dns.d/tinydns.template.erb
+fi
+
 
 #
 #  Now regenerate and re-upload all DNS files.
