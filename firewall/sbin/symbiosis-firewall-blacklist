@@ -1,7 +1,7 @@
 #! /usr/bin/ruby1.8
 #
 # NAME
-#   symbiosis-firewall-blacklist -- Automatically blacklist IP addresses.
+#   symbiosis-firewall-blacklist - Automatically blacklist IP addresses.
 #
 # SYNOPSIS
 #  symbiosis-firewall-blacklist [ -h | --help ] [-m | --manual]
@@ -69,12 +69,6 @@
 require 'getoptlong'
 require 'tempfile'
 require 'fileutils'
-require 'symbiosis/ipaddr'
-require 'symbiosis/firewall/blacklist'
-require 'symbiosis/firewall/directory'
-require 'symbiosis/firewall/template'
-require 'symbiosis/firewall/logtail'
-require 'symbiosis/firewall/pattern'
 
 #
 #  The options set by the command line.
@@ -163,6 +157,16 @@ if manual or help
 
   exit 0
 end
+
+#
+# These requires are here to prevent dependency failures when generating manpages.
+#
+require 'symbiosis/ipaddr'
+require 'symbiosis/firewall/blacklist'
+require 'symbiosis/firewall/directory'
+require 'symbiosis/firewall/template'
+require 'symbiosis/firewall/logtail'
+require 'symbiosis/firewall/pattern'
 
 #
 # Exit if we've been disabled

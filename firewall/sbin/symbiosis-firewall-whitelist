@@ -1,7 +1,7 @@
 #! /usr/bin/ruby1.8
 #
 # NAME
-#   symbiosis-firewall-whitelist -- Automatically whitelist IP addresses.
+#   symbiosis-firewall-whitelist - Automatically whitelist IP addresses.
 #
 # SYNOPSIS
 #  symbiosis-firewall-whitelist [ -h | --help ] [-m | --manual]
@@ -61,10 +61,6 @@
 require 'getoptlong'
 require 'tempfile'
 require 'fileutils'
-require 'symbiosis/utmp'
-require 'symbiosis/firewall/directory'
-require 'symbiosis/firewall/template'
-require 'symbiosis/ipaddr'
 
 
 #
@@ -154,6 +150,15 @@ if manual or help
 
   exit 0
 end
+
+#
+# These requires are here to prevent un-needed dependencies when just making
+# manpages.
+#
+require 'symbiosis/utmp'
+require 'symbiosis/firewall/directory'
+require 'symbiosis/firewall/template'
+require 'symbiosis/ipaddr'
 
 #
 # Exit if we've been disabled

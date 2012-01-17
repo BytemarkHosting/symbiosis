@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # NAME
-#  symbiosis-firewall -- Symbioisis firewall management
+#  symbiosis-firewall - Symbioisis firewall management
 #
 # SYNOPSIS
 #  symbiosis-firewall [ -h | --help ] [-m | --manual] [ -v | --verbose ]
@@ -117,8 +117,6 @@
 require 'getoptlong'
 require 'tempfile'
 require 'fileutils'
-require 'symbiosis/firewall/directory'
-require 'symbiosis/firewall/template'
 
 def verbose(s)
   puts s if $VERBOSE
@@ -213,6 +211,12 @@ if File.exists?(File.join(base_dir, "disabled"))
   puts "Firewall disabled.  Exiting." if $VERBOSE
   exit 0 
 end
+
+#
+# These requires are here to avoid dependency failures when generating manpages.
+#
+require 'symbiosis/firewall/directory'
+require 'symbiosis/firewall/template'
 
 #
 # Set the action
