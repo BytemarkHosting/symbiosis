@@ -1,0 +1,51 @@
+#
+#  Nameserver records.
+#
+.<%= domain %>::a.ns.bytemark.co.uk:300
+.<%= domain %>::b.ns.bytemark.co.uk:300
+.<%= domain %>::c.ns.bytemark.co.uk:300
+
+<% if ipv4? %>
+#
+#  The domain name itself
+#
+=<%= domain %>:<%= ip %>:300
+
+#
+#  Useful aliases.
+#
++ftp.<%= domain %>:<%= ip %>:300
++www.<%= domain %>:<%= ip %>:300
++mail.<%= domain %>:<%= ip %>:300
+
+# 
+# A record for MX
+#
+3mx.<%= domain %>:<%= ip %>:300
+
+<% end %>
+
+<% if ipv6? %>
+#
+#  The domain name itself -- AAAA record and reverse.
+#
+6<%= domain %>:<%= ipv6 %>:300
+
+#
+#  Useful aliases -- AAAA records only
+#
+3ftp.<%= domain %>:<%= ipv6 %>:300
+3www.<%= domain %>:<%= ipv6 %>:300
+3mail.<%= domain %>:<%= ipv6 %>:300
+
+#
+# AAAA record for MX
+#
+3mx.<%= domain %>:<%= ipv6 %>:300
+<% end %>
+
+#
+#  MX record -- no IP defined, as this is done separately above.
+#
+@<%= domain %>::mx.<%= domain %>:15:300
+

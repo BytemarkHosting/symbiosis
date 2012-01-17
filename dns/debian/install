@@ -1,6 +1,7 @@
 sbin                  usr/
-template              etc/symbiosis/dns.d/
-bug.report            usr/share/bug/bytemark-vhost-tinydns/control
+dns.d                 etc/symbiosis/
+lib/*                 usr/lib/ruby/1.8/
+bug.report            usr/share/bug/symbiosis-tinydns/control
 exim4                 etc/
 
 

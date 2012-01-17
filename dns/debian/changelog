@@ -1,3 +1,10 @@
+symbiosis-tinydns (2012:0117) stable; urgency=low
+
+  * Rewrote symbiosis-dns-generate script in ruby making use of
+    Symbiosis::ConfigFile utilities. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 20:52:03 +0000
+
 symbiosis-tinydns (2011:1209) stable; urgency=low
 
   * Updated standards versions.  (No change).

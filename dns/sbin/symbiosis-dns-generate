@@ -1,673 +1,173 @@
-#!/usr/bin/perl -w
-
-=head1 NAME
-
-symbiosis-dns-generate - Create tinydns snippets for each hosted domain
-
-=cut
-
-=head1 SYNOPSIS
-
-  Options:
-
-   --force       Force the DNS data to be uploaded, even if not changed.
-
-  Help Options:
-
-   --help        Show the help information for this script.
-   --manual      Read the manual for this script.
-   --verbose     Show useful debugging information.
-   --prefix      Directory beneath which domains are found (default: /srv)
-   --template    DNS template file
-                 (default: /etc/symbiosis/dns.d/template)
-   --output      Directory where the DNS data should be output
-                 (default: /root/BytemarkDNS)
-
-=cut
-
-
-=head1 ABOUT
-
-The create-dns script is used to generate a valid TinyDNS file for
-each hosted domain.
-
-These snippets will then be uploaded to the Bytemark DNS server(s).
-
-=cut
-
-
-=head1 AUTHOR
-
- Steve
- --
-
-=cut
-
-=head1 LICENSE
-
-Copyright (c) 2008-2010 by Bytemark Computer Consulting Ltd.
-All rights reserved.
-
-This program is free software;
-you can redistribute it and/or modify it under
-the same terms as Perl itself.
-The LICENSE file contains the full text of the license.
-
-=cut
-
-
-
-use strict;
-use warnings;
-use File::Copy;
-use Getopt::Long;
-use Pod::Usage;
-use Digest::MD5;
-
+#!/usr/bin/ruby
 #
-#  Configuration handling.
+# NAME
 #
-my %CONFIG;
+#   symbiosis-dns-generate - Generate DNS snippet files for Symbiosis domains. 
+#
+# SYNOPSIS
+#
+#   --force       Force the re-creation of all SSL sites.
+#   --template    Specify an alternative template file to read.
+#   --help        Show the help information for this script.
+#   --verbose     Show debugging information.
+#
+# DETAILS
+#
+# This script is designed to iterate over the domains hosted upon a Symbiosis
+# system, and create TinyDNS snippets for each one. 
+#
+# AUTHOR
+#
+# Steve Kemp <steve@bytemark.co.uk>
+#
+
+
+require 'getoptlong'
 
 
 #
-#  Defaults
+#  Entry point to the code
 #
-$CONFIG{ 'prefix' }   = "/srv";
-$CONFIG{ 'output' }   = "/root/BytemarkDNS";
-$CONFIG{ 'template' } = "/etc/symbiosis/dns.d/template";
-
-
-#
-#  Parse command line arguments.
-#
-parseCommandLineArguments();
-
+$FORCE    = false
+$HELP     = false
+$VERBOSE  = false
 
 #
-#  Find the priamry IP of the machine we're running upon.
+#  Do we need to restart apache?
 #
-my $ip = findHostDetails();
-$CONFIG{ 'verbose' } && print "Local machine is : $ip\n";
-
+$UPLOAD=false
 
 #
-#  Find subdirectories, which are actually used as hostnames.
+# The root directory -- '/' by default.
 #
-my @dirs = findDirs( $CONFIG{ 'prefix' } );
+root = "/"
+non_dns_template = nil 
+dns_template     = nil 
+bytemarkdns_data_dir      = nil
 
+opts = GetoptLong.new(
+         [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+         [ '--template', '-t', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--force', '-f', GetoptLong::NO_ARGUMENT ]
+       )
 
-#
-#  No directories?  Then this is an empty machine...
-#
-if ( scalar(@dirs) < 1 )
-{
-    $CONFIG{ 'verbose' } &&
-      print "Found no domains beneath: $CONFIG{'prefix'}\n";
-
-    exit;
-}
-
-
-
-#
-#  OK we have directories.
-#
-foreach my $dir (@dirs)
-{
-
-    #
-    #  Generate file
-    #
-    processDomain( $dir, $ip );
-
-    #
-    #  Fixup the permissions of each directory
-    #
-    fixupPermissions($dir);
-}
-
+opts.each do |opt, arg|
+  case opt
+  when '--help'
+    $HELP = true
+  when '--verbose'
+    $VERBOSE = true
+  when '--template'
+    dns_template = arg
+  when '--bytemarkdns-data-dir'
+    bytemarkdns_data_dir = arg
+  when '--root'
+    root = arg
+  when '--force'
+    $FORCE = true
+  end
+end
 
 #
-#  Make sure we have an output directory
+# CAUTION! Here be quality kode.
 #
-if ( !-d "$CONFIG{'output'}/data" )
-{
-    system( "mkdir", "-p", $CONFIG{ 'output' } . "/data" );
-}
-else
-{
+if $HELP
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
 
-    #
-    #  Remove all previously generated files.
-    #
-    foreach my $old ( sort( glob("$CONFIG{'output'}/data/*.txt") ) )
-    {
-        $CONFIG{ 'verbose' } && print "Removing old file : $old\n";
-        unlink($old);
-    }
-}
+  lines.each do |line|
+    line.chomp!
+    break if line.empty?
+    puts line[2..-1].to_s
+  end
 
+  exit 0
+end
 
-#
-#  Copy each generated file into /root/BytemarkDNS/data/$domain.txt
-#
-foreach my $file ( sort glob("$CONFIG{'prefix'}/*/config/dns/*.txt") )
-{
+def verbose(s)
+  puts s if $VERBOSE
+end
 
-    #
-    #  Get the domain name from the zonefile.
-    #
-    my $name = $file;
-    if ( $name =~ /\/([^\\\/]+)\.txt$/i )
-    {
-        $name = $1;
-    }
-
-
-    $CONFIG{ 'verbose' } &&
-      print "Copying generated file to $CONFIG{'output'}/data/$name.txt\n";
-
-    open( OUT, ">", "$CONFIG{'output'}/data/$name.txt" ) or
-      die "Failed to write to $CONFIG{'output'}/data/$name.txt - $!";
-    open( IN, "<", $file ) or die "Failed to read $file - $!";
-
-    print OUT <<EOF;
-#
-#  Don't edit this file.
-#
-#  Edit the source of this file:
-#
-#   /srv/$name/config/dns/$name.txt
-#
-EOF
-
-    #
-    # copy contents
-    #
-    while (<IN>)
-    {
-        print OUT;
-    }
-    close(OUT);
-    close(IN);
-}
-
+require 'symbiosis/domains'
+require 'symbiosis/domain'
+require 'symbiosis/config_files/tinydns'
 
 #
-#  Generated. Now upload
+# Set the default paths.
 #
-if ( -x "$CONFIG{'output'}/upload" )
-{
+dns_template         = File.join(root, "/etc/symbiosis/dns.d/tinydns.template.erb") if dns_template.nil?
+bytemarkdns_data_dir = File.join(root, "/root/BytemarkDNS/data") if bytemarkdns_data_dir.nil?
 
-    my $cmd = "cd $CONFIG{'output'} && ./upload";
-    $cmd .= " 2>/dev/null >/dev/null" unless ( $CONFIG{ 'verbose' } );
+#
+# Any arguments on the command line specify which domains to do.
+#
+domains_to_configure = ARGV
 
-    #
-    #  Has our data changed?
-    #
-    my $changed = hasDataChanged();
+#
+#  For each domain.
+#
+Symbiosis::Domains.each do |domain|
 
+  verbose "Domain: #{domain.name} "
 
-    #
-    #  We either upload if we're forced, or if we've changed.
-    #
-    if ( $CONFIG{ 'force' } || $changed )
-    {
+  next unless domains_to_configure.empty? or domains_to_configure.include?(domain.name)
 
-        $CONFIG{ 'verbose' } && print "Uploading ...\n";
-        system($cmd);
-        $CONFIG{ 'verbose' } && print "Upload complete\n";
-    }
+  begin
+    output        = File.join(domain.config_dir, "dns", domain.name+".txt")
+    config        = Symbiosis::ConfigFiles::Tinydns.new(output, "#")
+    config.domain   = domain
+    config.template = dns_template
+
+    if ( $FORCE )
+      verbose "\tForcing re-creation of configuration due to --force."
+
+    elsif config.exists?
+
+      if config.changed?
+        verbose "\tNot updating configuration, as it has been edited by hand."
+        next
+
+      elsif config.outdated?
+        verbose "\tRe-creating configuration as it is out of date."
+
+      else
+        verbose "\tDomain already present and up-to date."
+        next
+
+      end
+
     else
-    {
-        $CONFIG{ 'verbose' } &&
-          print "Not uploading - no change, and --force not specified\n";
-    }
+      verbose "\tConfiguring site for the first time"
 
-}
-else
-{
-    print "Upload script missing!\n";
-}
+    end
 
+    #
+    # This gets apache2 to check the configuration using a temporary file.
+    #
+    if config.ok?
+
+      verbose "\tWriting configuration"
+      config.write
+      
+      # Definitely restart if we've rewritten the config.
+      $UPLOAD = true
+
+    else
+      verbose "\tApache has rejected the new configuration -- no changes have been made."
+    end
+
+    #
+    # Rescue errors for this domain, but continue for others.
+    #
+  rescue StandardError => err
+    warn "\tUnable to create DNS data for #{domain.name} because #{err.to_s}"
+    verbose "\t"+err.backtrace.join("\n\t")
+  end
+end
 
 #
-#  All done
+#  All done.
 #
-exit;
-
-
-
-=begin doc
-
-  Parse any command line arguments which might be present.
-
-=end doc
-
-=cut
-
-
-
-sub parseCommandLineArguments
-{
-    my $HELP   = 0;
-    my $MANUAL = 0;
-
-    if (
-        !GetOptions(
-            "verbose",    \$CONFIG{ 'verbose' },
-            "prefix=s",   \$CONFIG{ 'prefix' },
-            "force",      \$CONFIG{ 'force' },
-            "template=s", \$CONFIG{ 'template' },
-            "output=s",   \$CONFIG{ 'output' },
-            "manual",     \$MANUAL,
-            "help",       \$HELP,
-
-                   ) )
-    {
-        exit;
-    }
-
-
-    pod2usage(1) if $HELP;
-    pod2usage( -verbose => 2 ) if $MANUAL;
-
-
-}
-
-
-
-=begin doc
-
-  Find the subdirectories beneath the given root.
-
-=end doc
-
-=cut
-
-
-
-sub findDirs
-{
-    my ($root) = (@_);
-
-    #
-    #  Ensure the prefix exists.
-    #
-    if ( !-d $root )
-    {
-        $CONFIG{ 'verbose' } &&
-          print "Prefix $CONFIG{'prefix'} is not a directory\n";
-        exit;
-    }
-
-
-    my @results;
-
-    foreach my $file ( sort( glob( $root . "/*" ) ) )
-    {
-        if ( ( -d $file ) &&
-             ( $file !~ /lost\+found/ ) )
-        {
-            push( @results, $file );
-            $CONFIG{ 'verbose' } && print "Found directory: $file\n";
-        }
-    }
-    return (@results);
-}
-
-
-
-=begin doc
-
-  Return a stub file for the given domain.
-
-  This stub file will refer to the primary IP of the machine unless the
- file /srv/$domain/config/ip is present in which case it will be used.
-
-=end doc
-
-=cut
-
-
-
-sub processDomain
-{
-    my ( $domain, $ip ) = (@_);
-
-    #
-    #  Strip prefix, if present.
-    #
-    if ( $domain =~ /^(.*)[\\\/](.*)$/ )
-    {
-        $domain = $2;
-    }
-
-    $CONFIG{ 'verbose' } && print "Found domain : $domain\n";
-
-    #
-    #  Should we over-ride the IP address for the domain?
-    #
-    if ( -e $CONFIG{ 'prefix' } . "/" . $domain . "/config/ip" )
-    {
-        open( IP, "<", $CONFIG{ 'prefix' } . "/" . $domain . "/config/ip" ) or
-          die "failed to open $CONFIG{'prefix'}/$domain/config/ip - $!";
-        $ip = <IP>;
-        close(IP);
-        chomp($ip);
-        $CONFIG{ 'verbose' } && print "\tOverriden IP: $ip\n";
-    }
-
-
-    #
-    #  Does a zonefile exist?
-    #
-    # e.g. /srv/foo.com/config/dns/foo.com.txt
-    #
-    if ( -e $CONFIG{ 'prefix' } . "/" . $domain . "/config/dns/$domain.txt" )
-    {
-        $CONFIG{ 'verbose' } && print "Existing file found for $domain\n";
-
-        #
-        #  OK we have an existing file - but does it match?
-        #
-        if ( -e $CONFIG{ 'prefix' } . "/" . $domain . "/config/ip" )
-        {
-
-            #
-            #  Open the generated file and see if it contains the
-            # IP we expect.  If it doesn't then we need to replace it.
-            #
-            #
-            my $found = 0;
-
-            open( EXISTING,
-                  "<",
-                  $CONFIG{ 'prefix' } . "/" . $domain .
-                    "/config/dns/$domain.txt"
-                );
-            while (<EXISTING>)
-            {
-                my $line = $_;
-                next if ( ( !$line ) || ( !length($line) ) );
-                chomp($line);
-                if ( $line =~ /\Q$ip\E/i )
-                {
-                    $found = 1;
-                }
-            }
-            close(EXISTING);
-
-            if ($found)
-            {
-                $CONFIG{ 'verbose' } &&
-                  print "The IP is correct - leaving file alone\n";
-                return;
-            }
-            else
-            {
-                $CONFIG{ 'verbose' } &&
-                  print "File needs replacing due to config/ip\n";
-            }
-        }
-        else
-        {
-            $CONFIG{ 'verbose' } && print "Not overwriting existing file.\n";
-
-            #
-            return;
-        }
-    }
-
-    #
-    #  Read the template
-    #
-    my @template = readFile( $CONFIG{ 'template' } );
-
-
-    #
-    #  Process the template
-    #
-    my $tmp;
-    foreach my $line (@template)
-    {
-        $line =~ s/\$domain/$domain/g if ( $line =~ /\$domain/ );
-        $line =~ s/\$ip/$ip/g         if ( $line =~ /\$ip/ );
-        $tmp .= $line;
-    }
-
-    #
-    #  Make sure the output exists
-    #
-    if ( !-d $CONFIG{ 'prefix' } . "/" . $domain . "/config/dns" )
-    {
-        system( "mkdir", "-p",
-                $CONFIG{ 'prefix' } . "/" . $domain . "/config/dns" );
-    }
-
-    #
-    #  Now write it out
-    #
-    open( OUTPUT, ">",
-          $CONFIG{ 'prefix' } . "/" . $domain . "/config/dns/$domain.txt" ) or
-      die "Failed to write output for $domain - $!";
-    print OUTPUT $tmp;
-    close(OUTPUT);
-
-    $CONFIG{ 'verbose' } && print "\tWrote output file\n";
-}
-
-
-=begin doc
-
-  Read a files contents, and return as an array.
-
-=end doc
-
-=cut
-
-
-
-sub readFile
-{
-    my ($file) = (@_);
-
-    open( INPUT, "<", $file ) or
-      die "failed to read file $file for reading - $!";
-
-    my @results;
-
-    while (<INPUT>)
-    {
-        push( @results, $_ );
-    }
-    return (@results);
-}
-
-
-
-=begin doc
-
-  Find the hostname & IP address of this host.
-
-=end doc
-
-=cut
-
-
-
-sub findHostDetails
-{
-    #
-    #  Find via the helper script.
-    #
-    if ( -x "/usr/bin/symbiosis-ip" )
-    {
-        my $ip = `/usr/bin/symbiosis-ip`;
-        chomp( $ip );
-        return( $ip );
-    }
-    else
-    {
-        print "/usr/bin/symbiosis-ip is missing\n";
-        print "To fix: apt-get update;apt-get upgrade; apt-get install symbiosis-range\n";
-        exit 1;
-    }
-
-}
-
-
-=begin doc
-
-  Ensure that /srv/domain/config/dns is owned by the same
- user as /srv/domain
-
-=end doc
-
-=cut
-
-
-
-sub fixupPermissions
-{
-    my ($domain) = (@_);
-
-    #
-    #  If the directory doesn't exist we have problems
-    #
-    if ( !-d $domain )
-    {
-        $CONFIG{ 'verbose' } && print "$domain not found\n";
-        return;
-    }
-
-    #
-    #  Get the owner + group
-    #
-    my ( $dev,  $ino,   $mode,  $nlink, $uid,     $gid, $rdev,
-         $size, $atime, $mtime, $ctime, $blksize, $blocks
-       ) = stat($domain);
-
-    #
-    #  Find the find the username
-    #
-    my $username  = getpwuid($uid);
-    my $groupname = getgrgid($gid);
-
-    #
-    #  If we found both then we can do it
-    #
-    if ( defined($username) && defined($groupname) )
-    {
-
-        #
-        #  Change the ownership
-        #
-        system( "chown", "-R", $username . ":" . $groupname, "$domain/config" );
-    }
-    else
-    {
-        $CONFIG{ 'verbose' } && print "Failed to find uid/gid for $domain\n";
-        $CONFIG{ 'verbose' } && print "UID: $uid -> $username\n";
-        $CONFIG{ 'verbose' } && print "GID: $gid -> $groupname\n";
-    }
-}
-
-
-
-=begin doc
-
-Determine if the data has changed.
-
-Do this by keeping track of the number of files in /root/BytemarkDNS/data
-and a hash of their contents.
-
-=end doc
-
-=cut
-
-sub hasDataChanged
-{
-
-    #
-    #  Find each file in the output directory
-    #
-    my @files = sort( glob("/root/BytemarkDNS/data/*") );
-
-
-    #
-    #  Now hash each contents
-    #
-    my $hash = Digest::MD5->new;
-
-    foreach my $file (@files)
-    {
-        #
-        #  Add the name of the file.
-        #
-        $hash->add( $file );
-
-        #
-        #  Now add the contents of the file.
-        #
-        open( FILE, "<", $file ) or
-          die "Failed to open $file - $!";
-
-        while ( my $line = <FILE> )
-        {
-            $hash->add($line);
-        }
-        close(FILE);
-    }
-
-    #
-    #  The hash of the contents.
-    #
-    my $result = $hash->hexdigest;
-
-
-    #
-    #  If there is no existing record, then create one.
-    #
-    #  (If there is no hash then we've changed.)
-    #
-    if ( !-e "/root/BytemarkDNS/.hash" )
-    {
-        open( FILE, ">", "/root/BytemarkDNS/.hash" );
-        print FILE $result . "\n";
-        close(FILE);
-
-        return 1;
-    }
-
-    #
-    #  OK there is a hash.  Does the contents match?
-    #
-    open( FILE, "<", "/root/BytemarkDNS/.hash" ) or
-      die "Failed to open hash file for reading - $!";
-    my $line = <FILE>;
-    chomp($line);
-    close(FILE);
-
-
-    #
-    #  OK does the hash match that recorded?  If so we've not changed
-    #
-    if ( $result eq $line )
-    {
-        #
-        #  No change.
-        #
-        return 0;
-    }
-
-    #
-    #  Hash differs.  Store the new one.
-    #
-    open( FILE, ">", "/root/BytemarkDNS/.hash" );
-    print FILE $result . "\n";
-    close(FILE);
-
-    return 1;
-}
+if ( $UPLOAD )
+end
