@@ -329,22 +329,29 @@ if [ -e /etc/php5/apache2/php.ini ]; then
     fi
 fi
 
+#################
+# Remove old cron jobs
 #
-#  If we have additional sites add them
+#  /usr/sbin/symbiosis-configure-additional no longer exists.  Remove old cronjob. 
 #
-if [ -x /usr/sbin/symbiosis-configure-additional ]; then
-    /usr/sbin/symbiosis-configure-additional
-    #
-    # And install the cron job
-    #
-    ln -sf /usr/sbin/symbiosis-configure-additional /etc/cron.hourly
+if [ -l /etc/cron.hourly/symbiosis-configure-additional ]; then
+    rm -f /etc/cron.hourly/symbiosis-configure-additional 
 fi
 
+#  /usr/sbin/symbiosis-create-ssl no longer exists.  Remove old cronjob. 
+if [ -l /etc/cron.hourly/symbiosis-create-ssl ] ; then
+  rm -f /etc/cron.hourly/symbiosis-create-ssl
+fi
+
+###########
 #
-# Install cron jobs
+# Add new cronjobs
 #
-if [ -x /usr/sbin/symbiosis-configure-ssl ] ; then
-  ln -sf /usr/sbin/symbiosis-configure-ssl /etc/cron.hourly
+#
+#  Helper to create apache snippets for sites
+#
+if [ -x /usr/sbin/symbiosis-create-sites ] ; then
+  ln -sf /usr/sbin/symbiosis-create-sites /etc/cron.daily
 fi
 
 #
