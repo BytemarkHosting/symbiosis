@@ -11,7 +11,7 @@
 # --
 #
 
-
+set -e
 
 
 #
@@ -224,10 +224,12 @@ done
 
 
 #
-# Finally add our magic IP adding script to if-up.d
+# Finally add our magic IP adding script to if-up.d, and as a cronjob
 #
 
-ln -sf /usr/sbin/symbiosis-configure-ips /etc/network/if-up.d
+ln -sf /usr/sbin/symbiosis-configure-ips /etc/network/if-up.d/
+ln -sf /usr/sbin/symbiosis-configure-ips /etc/cron.hourly/
+
 
 
 #DEBHELPER#
