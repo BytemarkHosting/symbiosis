@@ -1,8 +1,21 @@
+symbiosis-ftpd (2012:0117) stable; urgency=low
+
+  * Added explicit dependency on symbiosis-common (>> 2011:1214)
+  * Added FTP quota support
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 17:02:54 +0000
+
 symbiosis-ftpd (2011:1209) stable; urgency=low
 
+  [ Steve Kemp ]
   * Updated standards version.  (No change).
 
- -- Steve Kemp <steve@bytemark.co.uk>  Fri, 09 Dec 2011 15:36:54 +0000
+  [ Patrick J Cherry ]
+  * Moved check-ftp-password to symbiosis-check-ftp-password
+  * symbiosis-check-ftp-password now written in ruby
+  * Added test cases
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 17:00:30 +0000
 
 symbiosis-ftpd (2011:1201) stable; urgency=low
 
