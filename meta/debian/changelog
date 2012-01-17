@@ -2,8 +2,9 @@ bytemark-symbiosis (2012:0117) stable; urgency=low
 
   * Removes debian-volatile distro from sources.lists if found.
   * Now adds to the MOTD rather than overwriting it.
+  * Versioned all symbiosis dependencies to force upgrades.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 16:41:35 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 17:22:19 +0000
 
 bytemark-symbiosis (2011:1209) stable; urgency=low
 
