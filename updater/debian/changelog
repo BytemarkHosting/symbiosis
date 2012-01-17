@@ -1,3 +1,21 @@
+symbiosis-updater (2012:0117) stable; urgency=low
+
+  * Updated manpage generation to not mention perl so loudly.
+  * Moved symbiosis-updater script to /usr/sbin
+  * Moved crontab into debian/symbiosis-updater.cron.d
+  * Updated sources.list.security to use correct symbiosis repo, and removed
+    arch-dependent parts in updater.
+  * Updater now emails root@$(hostname) as opposed to the Bytemark automatic
+    list.
+  * Updater now exit with status 1 in error cases
+  * No longer neet to touch /var/tmp/update.packages because our monit is more
+    intellegent these days.
+  * Random sleep now disabled if command is being run under sudo.
+  * updater now fully renamed to symbiosis-updater, not update-packages
+  * "mail" rather than "mailx" is used to send mail.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 16:45:35 +0000
+
 symbiosis-updater (2011:0316) stable; urgency=low
 
   * Updated the package to install two arch-specific files, with a suitable
