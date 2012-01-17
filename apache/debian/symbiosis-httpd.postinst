@@ -337,28 +337,28 @@ if [ -x /usr/sbin/symbiosis-configure-additional ]; then
     #
     # And install the cron job
     #
-    ln -s /usr/sbin/symbiosis-configure-additional /etc/cron.hourly
+    ln -sf /usr/sbin/symbiosis-configure-additional /etc/cron.hourly
 fi
 
 #
 # Install cron jobs
 #
 if [ -x /usr/sbin/symbiosis-configure-ssl ] ; then
-  ln -s /usr/sbin/symbiosis-configure-ssl /etc/cron.hourly
+  ln -sf /usr/sbin/symbiosis-configure-ssl /etc/cron.hourly
 fi
 
 #
 #  Helper to make stats for standard sites.
 #
 if [ -x /usr/sbin/symbiosis-make-logs ] ; then
-  ln -s /usr/sbin/symbiosis-make-logs /etc/cron.daily
+  ln -sf /usr/sbin/symbiosis-make-logs /etc/cron.daily
 fi
 
 #
 #  Helper to make stats for SSL-based sites.
 #
 if [ -x /usr/sbin/symbiosis-make-ssl-logs ] ; then
-  ln -s /usr/sbin/symbiosis-make-ssl-logs /etc/cron.daily
+  ln -sf /usr/sbin/symbiosis-make-ssl-logs /etc/cron.daily
 fi
 
 #
