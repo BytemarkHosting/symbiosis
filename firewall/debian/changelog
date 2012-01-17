@@ -1,3 +1,10 @@
+symbiosis-firewall (2012:017) stable; urgency=low
+
+  * Added rescue block to show help when parsing options in
+    symbiosis-blacklist/whitelist
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 16:38:43 +0000
+
 symbiosis-firewall (2012:0111) stable; urgency=low
 
   * Default to deleting the firewall when adding new whitelist
