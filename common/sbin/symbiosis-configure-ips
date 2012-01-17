@@ -99,8 +99,8 @@ if primary_interface.nil?
 end
 
 if !target_iface.nil? and target_iface != primary_interface.ifname
-  warn "Not running since the requested interface (#{target_iface}) is not the primary interface"
-  exit 0 
+  warn "Not running since the requested interface (#{target_iface}) is not the primary interface (#{primary_interface.ifname}" if $VERBOSE
+  exit 0
 
 end
 
@@ -111,8 +111,11 @@ Symbiosis::Domains.each do |domain|
     #
     begin
       Symbiosis::Host.add_ip(ip)
-      warn "Added #{ip}" if $VERBOSE
-    rescue ArgumentError, Errno::EEXIST => ignore
+      warn "Added #{ip} to #{primary_interface.ifname}" if $VERBOSE
+    rescue Errno::EEXIST
+      warn "#{ip} already configured on #{primary_interface.ifname}" if $VERBOSE
+    rescue ArgumentError => err
+      warn "Couldn't add #{ip} -- #{err.to_s}" if $VERBOSE
     end
   end
 
