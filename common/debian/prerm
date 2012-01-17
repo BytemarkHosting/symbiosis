@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+#  This script has the task of performing the "common" post-install
+# setup for all the Symbiosis packages.
+#
+#  It shouldn't do anything too package-specific, as that is a task
+# for the specific packages, but global actions are good.
+#
+#
+# Steve
+# --
+#
+
+set -e
+
+#
+# Remove the symlinks we installed
+#
+
+rm -f /usr/sbin/symbiosis-configure-ips /etc/network/if-up.d/
+rm -f /usr/sbin/symbiosis-configure-ips /etc/cron.hourly/
+
+
+
+#DEBHELPER#
+exit 0
