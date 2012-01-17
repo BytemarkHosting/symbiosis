@@ -93,7 +93,7 @@ module Symbiosis
       #
       # First read the filename, and then generate the snippet.  Work out the 
       #
-      [File.readlines(self.filename), self.generate_config(template).split].each do |snippet|
+      [File.readlines(self.filename), self.generate_config(template).split($/)].each do |snippet|
         #
         # We expect the checksum to be the last line of the file
         #
