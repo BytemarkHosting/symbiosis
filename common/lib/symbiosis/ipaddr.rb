@@ -73,6 +73,8 @@ class IPAddr < ::IPAddr
       128 - (0..128).find{|m| 2**m == n_addresses}
     end
   end
+
+  alias prefixlen cidr_mask 
   
   #
   # Append the CIDR mask if there is more than on IP in the range.
