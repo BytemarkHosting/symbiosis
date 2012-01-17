@@ -1,3 +1,9 @@
+symbiosis-key (2012:0117) stable; urgency=low
+
+  * Fixed up descriptions in control file.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 16:42:58 +0000
+
 symbiosis-key (2011:1209) stable; urgency=low
 
   * Updated standards version.  (No change.)
