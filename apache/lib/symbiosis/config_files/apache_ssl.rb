@@ -6,26 +6,6 @@ module Symbiosis
     class ApacheSSL < Symbiosis::ConfigFile
 
       #
-      # Does the SSL site need updating because a file is more
-      # recent than the generated Apache site?
-      #
-      def outdated?
-
-        #
-        # creation time of the (previously generated) SSL-site.
-        #
-        site = File.mtime( self.filename )
-  
-        #
-        #  For each configuration file see if it is more recent
-        #
-        %w( ssl_bundle_file ssl_key_file ssl_certificate_file ip_file ).any? do |meth|
-          file = self.domain.__send__(meth)
-          !file.nil? and File.exists?( file ) and File.mtime( file ) > site 
-        end
-      end
-
-      #
       # Test the file using Apache and a temporary file.
       #
       def ok?
@@ -71,11 +51,6 @@ module Symbiosis
         end
 
         #
-        # If a file with the correct name exists, raise an EEXIST error
-        #
-        raise Errno::EEXIST, fn if File.exists?(fn)
-
-        #
         # FIXME: should probably check at this point to see if any files point
         # back to the config, or if any file contains the configuration for
         # this domain.
@@ -87,17 +62,59 @@ module Symbiosis
         false
       end
 
-      def enable(fn = nil)
+      def enable(fn = nil, force = false)
+        #
+        # Take the filename and and replace available with enabled if no
+        # filename is given.
+        #
         fn = self.filename.sub("sites-available","sites-enabled") if fn.nil?
 
-        File.symlink(self.filename, fn) unless self.enabled?(fn)
-               
+        #
+        # Do nothing if we're already enabled.
+        #
+        return if self.enabled?(fn)
+
+        #
+        # Clobber any files in the way, if the force flag is set.
+        #
+        if force and File.exists?(fn)
+          File.unlink(fn)
+        end
+
+        #
+        # If the file is still there after disabling, raise an error
+        #
+        raise Errno::EEXIST, fn if File.exists?(fn)
+
+        #
+        # Symlink away!
+        #
+        File.symlink(self.filename, fn)
+        
+        nil
       end
 
-      def disable(fn = nil)
+      def disable(fn = nil, force = false)
+        #
+        # Take the filename and and replace available with enabled if no
+        # filename is given.
+        #
         fn = self.filename.sub("sites-available","sites-enabled") if fn.nil?
 
-        File.unlink(fn) if self.enabled?(fn)
+        #
+        # Remove the file, only if it is a symlink to our filename, or if the
+        # force flag is set.
+        #
+        if self.enabled?(fn) or (File.exists?(fn) and force)
+          File.unlink(fn)
+        end
+
+        #
+        # If the file is still there after disabling, raise an error
+        #
+        raise Errno::EEXIST, fn if File.exists?(fn)
+
+        nil
       end
 
       ###################################################

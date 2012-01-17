@@ -40,13 +40,20 @@ require 'symbiosis/config_files/apache_ssl'
 #
 $FORCE    = false
 $HELP     = false
-$TEMPLATE = nil
 $VERBOSE  = false
+
 #
 #  Do we need to restart apache?
 #
 $RESTART=false
-root = ""
+
+#
+# The root directory -- '/' by default.
+#
+root = "/"
+non_ssl_template = nil 
+ssl_template     = nil 
+apache2_dir      = nil
 
 opts = GetoptLong.new(
          [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
@@ -62,7 +69,15 @@ opts.each do |opt, arg|
   when '--verbose'
     $VERBOSE = true
   when '--template'
-    $TEMPLATE = arg
+    ssl_template = arg
+  when '--ssl-template'
+    ssl_template = arg
+  when '--non-ssl-template'
+    non_ssl_template = arg
+  when '--apache2-dir'
+    apache2_dir = arg
+  when '--root'
+    root = arg
   when '--force'
     $FORCE = true
   end
@@ -88,6 +103,19 @@ def verbose(s)
   puts s if $VERBOSE
 end
 
+#
+# Set the default paths.
+#
+non_ssl_template = File.join(root, "/etc/symbiosis/apache.d/non_ssl.template.erb") if non_ssl_template.nil?
+ssl_template     = File.join(root, "/etc/symbiosis/apache.d/ssl.template.erb") if ssl_template.nil?
+apache2_dir      = File.join(root, "/etc/apache2") if apache2_dir.nil?
+
+#
+# Any arguments on the command line specify which domains to do.
+#
+domains_to_configure = ARGV
+
+primary_ips = [Symbiosis::Host.primary_ipv4, Symbiosis::Host.primary_ipv6]
 
 #
 #  For each domain.
@@ -96,19 +124,32 @@ Symbiosis::Domains.each do |domain|
 
   verbose "Domain: #{domain.name} "
 
-  sites_available_file = File.join(root, "etc","apache2","sites-available","#{domain.name}.conf")
-  sites_enabled_file = File.join(root, "etc","apache2","sites-available","#{domain.name}.conf")
+  next unless domains_to_configure.empty? or domains_to_configure.include?(domain.name)
 
-  config = Symbiosis::ConfigFiles::ApacheSSL.new(sites_available_file, "#")
-  config.template = File.join(root, "etc","symbiosis","apache.d","ssl.template.erb")
-  config.domain = domain
+  begin
+    sites_available_file = File.join(apache2_dir, "sites-available","#{domain.name}.conf")
+    sites_enabled_file   = File.join(apache2_dir, "sites-available","#{domain.name}.conf")
 
-  #
-  #  If SSL is not enabled then we can skip
-  #
-  if ( domain.ssl_enabled? )
+    config        = Symbiosis::ConfigFiles::ApacheSSL.new(sites_available_file, "#")
+    config.domain = domain
 
-    verbose "\tSSL is enabled"
+    if domain.ips.any?{|ip| primary_ips.include?(ip)}
+      verbose "\tNot configuring this site, as it is using at least one of this host's primary IPs."
+      next
+    end
+
+    #
+    #  If SSL is not enabled then we can skip
+    #
+    if ( domain.ssl_enabled? )
+      config.template = ssl_template
+
+      verbose "\tSSL is enabled -- using SSL template"
+    else
+      config.template = non_ssl_template
+    
+      verbose "\tSSL is not enabled -- using non-SSL template"
+    end
 
     #
     #  If there is already a site enabled we only
@@ -121,16 +162,16 @@ Symbiosis::Domains.each do |domain|
 
 
     if ( $FORCE )
-      verbose "\tForcing re-creation of configuration due to --force"
+      verbose "\tForcing re-creation of configuration due to --force."
 
     elsif config.exists?
 
       if config.changed?
-        verbose "\tNot updating configuration, as it has been edited by hand"
+        verbose "\tNot updating configuration, as it has been edited by hand."
         next
 
       elsif config.outdated?
-        verbose "\tRe-creating configuration as it is older than the input file(s)"
+        verbose "\tRe-creating configuration as it is out of date."
 
       else
         verbose "\tSite already present and up-to date."
@@ -141,30 +182,34 @@ Symbiosis::Domains.each do |domain|
     else
       verbose "\tConfiguring site for the first time"
 
-    end
+      end
 
     #
     # This gets apache2 to check the configuration using a temporary file.
     #
     if config.ok?
-      # Definitely restart if the config tests OK.
-      $RESTART = true
 
       verbose "\tWriting configuration"
       config.write
+      
+      # Definitely restart if we've rewritten the config.
+      $RESTART = true
 
-      unless config.enabled?
+      unless config.enabled?(sites_enabled_file)
         verbose "\tEnabling site"
-        config.enable
+        config.enable(sites_enabled_file, $FORCE)
       end
 
     else
       verbose "\tApache has rejected the new configuration -- no changes have been made."
-
     end
-  else
 
-    verbose "\tSSL is not enabled"
+    #
+    # Rescue errors for this domain, but continue for others.
+    #
+  rescue StandardError => err
+    warn "\tUnable to configure site for #{domain.name} because #{err.to_s}"
+    verbose "\t"+err.backtrace.join("\n\t")
   end
 end
 
