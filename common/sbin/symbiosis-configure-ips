@@ -104,7 +104,7 @@ if !target_iface.nil? and target_iface != primary_interface.ifname
 
 end
 
-Symbiois::Domains.each do |domain|
+Symbiosis::Domains.each do |domain|
   domain.ips.each do |ip|
     #
     # Add the IP.  If it already exists, nothing will happen...
