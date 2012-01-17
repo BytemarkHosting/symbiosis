@@ -10,8 +10,8 @@ Package: bytemark-symbiosis
 Replaces: bytemark-vhost
 Conflicts: bytemark-vhost
 Architecture: all
-Depends: symbiosis-updater (>= 2012:0117), symbiosis-key (>= 2012:0117), symbiosis-pam (>= 2011:1209)
-Recommends: symbiosis-httpd (>= 2012:0117), symbiosis-backup (>= 2011:1121), symbiosis-common (>= 2012:0117), symbiosis-crack (>= 2011:1109), symbiosis-cron (>= 2012:0117), symbiosis-tinydns (>= 2011:1209), symbiosis-email (>= 2012:0117), symbiosis-firewall (>= 2012:0117), symbiosis-ftpd (>= 2012:0117), bytemark-symbiosis (>= 2012:0117), symbiosis-monit (>= 2012:0117), symbiosis-mysql (>= 2012:0117), symbiosis-phpmyadmin (>= 2011:1013), symbiosis-webmail (>= 2012:0117), ${misc:Depends}
+Depends: symbiosis-updater (>= 2012:0117), symbiosis-key (>= 2012:0117), symbiosis-pam (>= 2011:1209), ${misc:Depends}
+Recommends: symbiosis-httpd (>= 2012:0117), symbiosis-backup (>= 2011:1121), symbiosis-common (>= 2012:0117), symbiosis-crack (>= 2011:1109), symbiosis-cron (>= 2012:0117), symbiosis-tinydns (>= 2011:1209), symbiosis-email (>= 2012:0117), symbiosis-firewall (>= 2012:0117), symbiosis-ftpd (>= 2012:0117), symbiosis-monit (>= 2012:0117), symbiosis-mysql (>= 2012:0117), symbiosis-phpmyadmin (>= 2011:1013), symbiosis-webmail (>= 2012:0117)
 Description: An easy, complete, and Debian-friendly server administration system
  This package is a metapackage which will pull in each package which
  is a component of the Bytemark Symbiosis system.
@@ -22,14 +22,5 @@ Description: An easy, complete, and Debian-friendly server administration system
   * Webhosting
   * FTP hosting.
   * Email hosting (and webmail).
-
-Package: bytemark-vhost
-Architecture: all
-Depends: bytemark-symbiosis, ${misc:Depends}
-Description: An easy, complete, and Debian-friendly server administration system
- This package is present to ease the renaming transition and can safely be
- removed.
- .
- (metapackage)
 
 
