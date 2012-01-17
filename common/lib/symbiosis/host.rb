@@ -244,12 +244,12 @@ module Symbiosis
       #
       ip = ip.mask((ip.ipv4? ? 32 : 128))
 
-      return ArgumentError, "Unable to find primary interface" if interface.nil?
+      raise ArgumentError, "Unable to find primary interface" if interface.nil?
 
       #
       # Don't add IPs that already exist.
       #
-      return Errno::EEXIST, ip.to_s if self.ip_addresses.include?(ip)
+      raise Errno::EEXIST, ip.to_s if self.ip_addresses.include?(ip)
 
       @netlink_socket.addr.add(
         :index=>interface.index.to_i,
