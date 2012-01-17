@@ -233,15 +233,28 @@ module Symbiosis
       return primary_interface
     end
 
+    #
+    # Add a /32 or /128 to the primary interface.
+    #
     def self.add_ip(ip)
       interface = self.primary_interface
 
+      #
+      # Make sure the IP address is fully masked.
+      #
+      ip = ip.mask((ip.ipv4? ? 32 : 128))
+
       return ArgumentError, "Unable to find primary interface" if interface.nil?
+
+      #
+      # Don't add IPs that already exist.
+      #
+      return Errno::EEXIST, ip.to_s if self.ip_addresses.include?(ip)
 
       @netlink_socket.addr.add(
         :index=>interface.index.to_i,
         :local=>ip.to_s,
-        :prefixlen=>(ip.ipv4? ? 32 : 128)
+        :prefixlen=>ip.prefixlen
       )
 
       return nil
