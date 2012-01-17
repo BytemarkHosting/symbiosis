@@ -91,14 +91,20 @@ module Symbiosis
     # address with the smallest prefix.  If there is more than one with the
     # same prefix, then we take the first. 
     #
-    def self.primary_ip
+    def self.primary_ip(conditions = {})
       interface = self.primary_interface
       
       return nil if interface.nil?
 
       candidates = []      
 
-      netlink_socket.addr.list(:index => interface.index) do |ifaddr|
+      #
+      # Select addresses based on conditions
+      #
+      # We only want the primary interface.
+      conditions[:index] = interface.index
+
+      netlink_socket.addr.list(conditions) do |ifaddr|
         next unless 0 == ifaddr.scope
         candidates << [IPAddr.new(ifaddr.address.to_s), ifaddr.prefixlen.to_i]
       end
@@ -125,6 +131,20 @@ module Symbiosis
       return nil if winner.nil? or winner.empty?
 
       return winner[0]
+    end
+
+    #
+    # Return the primary IPv4 address
+    #
+    def self.primary_ipv4
+      self.primary_ip(:family => Socket::AF_INET)
+    end
+   
+    #
+    # Return the primary IPv6 address
+    #
+    def self.primary_ipv6
+      self.primary_ip(:family => Socket::AF_INET6)
     end
 
     #
