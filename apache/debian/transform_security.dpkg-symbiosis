@@ -1,0 +1,10 @@
+#!/bin/sed -f
+
+#
+# Remove NameVirtualHost directive
+#
+
+s/^ServerTokens.*/ServerTokens Prod/
+s/^ServerSignature.*/ServerSignature Off/
+s/^TraceEnable.*/TraceEnable Off/
+

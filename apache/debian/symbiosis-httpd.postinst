@@ -20,27 +20,39 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
-#  Remove default site
-#
-if [ -e /etc/apache2/sites-enabled/000-default ]; then
-    rm -f /etc/apache2/sites-enabled/000-default
-fi
-
-
-#
 #  Remove any existing sites.
 #
-for i in mass-hosting mass-hosting.ssl zz-mass-hosting zz-mass-hosting.ssl default 00-default ; do
-    if [ -e /etc/apache2/sites-enabled/$i ]; then
-        rm /etc/apache2/sites-enabled/$i
-    fi
+for i in mass-hosting mass-hosting.ssl zz-mass-hosting zz-mass-hosting.ssl default 000-default 00-default ; do
+  a2dissite $i > /dev/null 2>&1 || true
 done
 
 #
 #  Find IP address of the primary interfaces
 #
-ip=$(/usr/bin/symbiosis-ip)
+ipv4=$(/usr/bin/symbiosis-ip -4)
+ipv6=$(/usr/bin/symbiosis-ip -6)
 
+#
+# Yuckity yuck. TODO make this sane!
+#
+name_virtual_host_80=()
+name_virtual_host_443=()
+virtual_host_ip_stanza_80=()
+virtual_host_ip_stanza_443=()
+
+if [ -n "$ipv4" ] ; then
+  name_virtual_host_80[4]="NameVirtualHost $ipv4:80"
+  name_virtual_host_443[4]="NameVirtualHost $ipv4:443"
+  virtual_host_ip_stanza_80[4]="$ipv4:80"
+  virtual_host_ip_stanza_443[4]="$ipv4:443"
+fi
+
+if [ -n "$ipv6" ] ; then
+  name_virtual_host_80[6]="NameVirtualHost [$ipv6]:80"
+  name_virtual_host_443[6]="NameVirtualHost [$ipv6]:443"
+  virtual_host_ip_stanza_80[6]="[$ipv6]:80"
+  virtual_host_ip_stanza_443[6]="[$ipv6]:443"
+fi
 
 #
 #  Create the mass-hosting configuration file
@@ -59,9 +71,10 @@ cat > /etc/apache2/sites-available/zz-mass-hosting <<EOF
 ##
 ###
 
-NameVirtualHost $ip:80
+${name_virtual_host_80[4]}
+${name_virtual_host_80[6]}
 
-<VirtualHost $ip:80>
+<VirtualHost ${virtual_host_ip_stanza_80[*]}>
 
         #
         #  This is the directory people are redirected to
@@ -149,9 +162,10 @@ cat > /etc/apache2/sites-available/zz-mass-hosting.ssl <<EOF
 ##
 ###
 
-NameVirtualHost $ip:443
+${name_virtual_host_443[4]}
+${name_virtual_host_443[6]}
 
-<VirtualHost $ip:443>
+<VirtualHost ${virtual_host_ip_stanza_443[*]}>
 
         #
         #  Ensure that the SSL options are configured.

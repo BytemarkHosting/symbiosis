@@ -1,3 +1,13 @@
+symbiosis-httpd (2012:0117) stable; urgency=low
+
+  * Now fully IPv6 tastic.
+  * Packaged by cdbs now.
+  * Config file changes are helped by config-package-dev.
+  * symbiosis-httpd* packages are now arch-indep
+  * Non-ssl sites are now templated via apache.d/non_ssl.template.erb
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 15:57:50 +0000
+
 symbiosis-httpd (2012:0116) stable; urgency=low
 
   * Rewrote symbiosis-create-ssl in ruby.

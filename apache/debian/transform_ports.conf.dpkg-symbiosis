@@ -1,0 +1,8 @@
+#!/bin/sed -f
+
+#
+# Remove NameVirtualHost directive
+#
+s/^NameVirtualHost/# \0/
+
+

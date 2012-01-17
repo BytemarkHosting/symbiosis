@@ -1,0 +1,7 @@
+#!/bin/sed -f
+
+#
+# Make sure expose_php is off.
+#
+s/^expose_php = On/expose_php = Off/
+
