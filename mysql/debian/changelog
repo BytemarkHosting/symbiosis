@@ -1,3 +1,11 @@
+symbiosis-mysql (2012:0117) stable; urgency=low
+
+  * Added mysql check for monit
+  * Added conflict against old version of symbiosis-monit
+  * Forced upgrade to mysql 5.1, instead of sticking with any old version.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 17:06:42 +0000
+
 symbiosis-mysql (2011:0811) stable; urgency=low
 
   * Updated Debian standards version; no change.
