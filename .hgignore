@@ -7,6 +7,7 @@ syntax: glob
 #  GLobal
 #
 Release
+Release.gpg
 Packages
 Sources
 Packages.gz
@@ -17,6 +18,7 @@ Sources.gz
 */debian/*.substvars
 */debian/files
 */debian/*.debhelper
+*/debian/check_file_copies/*
 *.deb
 *.build
 *.changes
