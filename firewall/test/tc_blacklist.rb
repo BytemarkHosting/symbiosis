@@ -20,6 +20,8 @@ class TestBlacklist < Test::Unit::TestCase
     bl.logtail_db = @db
     bl.base_dir = "."
     results = bl.do_read_patterns
+
+    # TODO test the output!
     pp results
     pp bl.do_generate_blacklist(results)
 
