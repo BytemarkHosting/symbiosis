@@ -6,11 +6,22 @@ syntax: glob
 #
 #  GLobal
 #
+Release
+Packages
+Sources
+Packages.gz
+Sources.gz
 */build-stamp
 */configure-stamp
 */debian/*.log
 */debian/*.substvars
 */debian/files
+*/debian/*.debhelper
+*.deb
+*.build
+*.changes
+*.dsc
+*.tar.gz
 
 #
 #  Per-Package
