@@ -1,3 +1,10 @@
+symbiosis-common (2012:0117) stable; urgency=low
+
+  * Added ipv4/6 flags to symbiosis-ip to determine the primary IP of a
+    system.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 15:56:23 +0000
+
 symbiosis-common (2011:1214) stable; urgency=low
 
   * Added dependency on liblinux-netlink-ruby

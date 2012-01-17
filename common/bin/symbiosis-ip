@@ -6,13 +6,25 @@
 #
 # SYNOPSIS
 #
-#  Help Options:
+#   symbiosis-ip [ --all ] [ --ipv4 ] [ --ipv6 ] [ --verbose ] [ --help ]
+#
+# OPTIONS
+#
+#   --all         Show all available addresses on the system, not just the
+#                 primary one.
+#
+#  --ipv4         Show IPv4 addresses
+#
+#  --ipv6         Show IPv6 addresses
 #
 #   --help        Show the help information for this script.
+#
 #   --verbose     Show debugging information.
 #
-# Output the system's primary IP address, which will traditionally
-# belong to eth0, or bond0.
+# Output the system's primary IP address. This is determined as being the
+# address with the smallest CIDR prefix on the interface which has the default
+# route. IPv4 addresses are given in preference to IPv6, unless the options
+# specify otherwise.
 #
 # AUTHOR
 #
@@ -27,12 +39,17 @@ require 'getoptlong'
 
 opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
-    [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ]
+    [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+    [ '--all', '-a', GetoptLong::NO_ARGUMENT ],
+    [ '--ipv4', '-4', GetoptLong::NO_ARGUMENT ],
+    [ '--ipv6', '-6', GetoptLong::NO_ARGUMENT ]
 )
 
 help = false
 $VERBOSE = false
 show_all = false
+ipv6 = false
+ipv4 = false
 
 opts.each do |opt,arg|
   case opt
@@ -40,8 +57,12 @@ opts.each do |opt,arg|
       help = true
     when '--verbose'
       $VERBOSE = true
-    when '--show-all'
+    when '--all'
       show_all = true
+    when '--ipv6'
+      ipv6 = true
+    when '--ipv4'
+      ipv4 = true
   end
 end
 
@@ -64,6 +85,19 @@ end
 #
 # Don't need range until here, allowing us to generate the manpage.
 #
-require 'symbiosis/range'
-ips = Symbiosis::Range.ip_addresses
-puts ips.first()
+require 'symbiosis/host'
+
+addresses = []
+
+if show_all
+  addresses << Symbiosis::Host.ipv6_addresses if ipv6
+  addresses << Symbiosis::Host.ipv4_addresses if ipv4
+  addresses << Symbiosis::Host.ip_addresses if addresses.empty?
+else
+  addresses << Symbiosis::Host.primary_ipv6 if ipv6
+  addresses << Symbiosis::Host.primary_ipv4 if ipv4
+  addresses << Symbiosis::Host.primary_ip if addresses.empty?
+end
+
+puts addresses.join(" ")
+
