@@ -13,11 +13,11 @@ module Symbiosis
 
   class ConfigFile
 
-    attr_reader :self.comment_char, :filename, :template, :domain
+    attr_reader :comment_char, :filename, :template, :domain
 
-    def initialize(filename, self.comment_char="#")
+    def initialize(filename, comment_char="#")
       @filename = filename
-      @self.comment_char = self.comment_char
+      @comment_char = comment_char
       @contents = nil
       @template = nil
       @domain = nil
