@@ -1,3 +1,12 @@
+symbiosis-cron (2012:0117) lucid; urgency=low
+
+  * Added check in wrapper to make sure /srv/domain is a directory, not a
+    symlink or file.
+  * Updated makefile to have a test target
+  * Added a basic help message to symbiois-crontab script
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 16:32:33 +0000
+
 symbiosis-cron (2011:1026) stable; urgency=low
 
   * Fixed --test to finish in a finite amount of time
