@@ -1,3 +1,15 @@
+symbiosis-email (2012:0117) stable; urgency=low
+
+  * /usr/sbin/symbiosis_checkpassword now called
+    symbiosis-check-mailbox-password.
+  * symbiosis-check-mailbox-password now written in ruby
+  * Tests improved
+  * Ruby domain/mailbox library written
+  * Mailbox quotas added
+  * Sieve support added
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 17:14:13 +0000
+
 symbiosis-email (2011:1209) stable; urgency=low
 
   * Updated standards version (no change).
