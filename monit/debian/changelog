@@ -1,3 +1,9 @@
+symbiosis-monit (2012:0117) stable; urgency=low
+
+  * Added brief template for monit alerts
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 16:57:03 +0000
+
 symbiosis-monit (2011:1209) stable; urgency=low
 
   * Updated standards version (no change).
