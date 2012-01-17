@@ -11,7 +11,7 @@ Package: symbiosis-phpmyadmin
 Replaces: bytemark-vhost-phpmyadmin
 Conflicts: bytemark-vhost-phpmyadmin
 Architecture: all
-Depends: phpmyadmin, symbiosis-mysql, ${misc:Depends}
+Depends: phpmyadmin, symbiosis-mysql, ruby, ${misc:Depends}
 Description: This package gives remote database access
  This package will enable a global MySQL administrative interface
  which may be used remotely.
