@@ -161,14 +161,14 @@ module Symbiosis
     # Return this domain's IPv4 addresses as an array
     #
     def ipv4
-      @ip_addresses.select{|ip| ip.ipv4?}
+      self.ips.select{|ip| ip.ipv4?}
     end
 
     #
     # Return this domains IPv6 addresses as an array.
     #
     def ipv6
-      @ip_addresses.select{|ip| ip.ipv6?}
+      self.ips.select{|ip| ip.ipv6?}
     end
 
     #
