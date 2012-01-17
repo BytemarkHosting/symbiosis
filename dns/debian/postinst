@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 
 #
 # Skip, if we are not in "configure" state
@@ -104,7 +105,6 @@ fi
 #  Now regenerate and re-upload all DNS files.
 #
 symbiosis-dns-generate
-
 
 #DEBHELPER#
 exit 0
