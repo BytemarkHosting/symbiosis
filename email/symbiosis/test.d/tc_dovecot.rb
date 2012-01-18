@@ -3,6 +3,7 @@
 require 'test/unit'
 require 'net/imap'
 require 'net/pop'
+require 'symbiosis/domain'
 require 'symbiosis/domain/mailbox'
 
 class TestDovecot < Test::Unit::TestCase
