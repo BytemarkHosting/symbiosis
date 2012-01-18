@@ -149,7 +149,7 @@ Symbiosis::Domains.each do |domain|
     #
     if config.ok?
 
-      verbose "\tWriting snippet"
+      verbose "\tWriting snippet to #{output}"
 
       #
       # Create directory with the same ownership as the parent
@@ -164,7 +164,7 @@ Symbiosis::Domains.each do |domain|
       #
       # Make sure the ownership is correct.
       #
-      FileUtils.chown(config.filename, @domain.uid, @domain.gid)
+      File.chown(domain.uid, domain.gid, config.filename)
 
     else
       verbose "\tThe new DNS snippet is invalid -- no changes have been made."
@@ -176,13 +176,16 @@ Symbiosis::Domains.each do |domain|
     # FIXME: At this point more checks are needed, to prevent overwriting of
     # another user's DNS data.
     #
-    Dir.glob(File.join(output_dir),"*.txt").each do |file|
+    Dir.glob(File.join(output_dir,"*.txt")).each do |file|
       input = File.read(file)
 
       string_to_hash << file
       string_to_hash << input
 
-      File.open(File.join(bytemarkdns_data_dir, File.basename(file))) do |fh|
+      new_filename = File.join(bytemarkdns_data_dir, File.basename(file))
+
+      verbose "\tWriting data to #{new_filename}"
+      File.open(new_filename,"w") do |fh|
 
         fh.puts <<EOF
 #
@@ -208,6 +211,9 @@ EOF
 end
 
 begin
+
+  verbose "All new data have been written.  Checking for changes."
+
   #
   # Check to see if our new hash is the same as the one we have recorded.
   #
@@ -233,16 +239,19 @@ begin
   if $UPLOAD
     upload_script = File.expand_path(File.join(bytemarkdns_data_dir,"../upload"))
 
+    verbose "Uploading using #{upload_script}"
+
     #
     # Run the upload script -- this will raise an appropriate error if the
     # script doesn't exist or fails.
     #
-    system(upload_script)
+    system(upload_script) or raise "Upload script failed"
 
+    verbose "Writing hash to #{hash_file}"
     #
-    # Finally rRecord the new hash
+    # Finally record the new hash
     #
-    File.open(hash_file){|fh| fh.puts new_hash }
+    File.open(hash_file, "w"){|fh| fh.puts new_hash }
   end
 rescue StandardError => err
   warn "Unable to upload DNS data because #{err.to_s}"
