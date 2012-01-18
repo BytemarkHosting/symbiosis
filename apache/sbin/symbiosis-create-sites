@@ -2,7 +2,7 @@
 #
 # NAME
 #
-#   create-ssl-sites -- Auto-configure SSL sites
+#   symbiosis-create-sites -- Auto-configure Apache2 sites with specified IPs
 #
 # SYNOPSIS
 #
@@ -33,7 +33,6 @@ require 'getoptlong'
 require 'symbiosis/domains'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/config_files/apache_ssl'
-
 
 #
 #  Entry point to the code
