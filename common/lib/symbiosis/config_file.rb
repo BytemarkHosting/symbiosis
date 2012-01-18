@@ -105,9 +105,12 @@ module Symbiosis
           if checksum.nil?
             checksum = $1 
           else
-            return checksum == $1
+            return checksum != $1
           end
 
+          #
+          # The checksum should not be nil now.
+          #
           break if checksum.nil?
 
         end
