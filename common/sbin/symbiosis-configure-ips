@@ -45,7 +45,7 @@ opts = GetoptLong.new(
 opts.each do |opt,arg|
   case opt
   when '--help'
-    manual = true
+    help = true
   when '--manual'
     manual = true
   when '--verbose'
