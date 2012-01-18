@@ -80,10 +80,6 @@
 
 
 require 'getoptlong'
-require 'symbiosis/monitor/runner'
-require 'systemexit'
-require 'log4r'
-require 'log4r/outputter/syslogoutputter'
 
 #
 #  Ensure we have a sensible path.
@@ -188,6 +184,14 @@ if manual or help
 
   exit 0
 end
+
+#
+# These requires are here such that manpage generation works on build machines.
+#
+require 'symbiosis/monitor/runner'
+require 'systemexit'
+require 'log4r'
+require 'log4r/outputter/syslogoutputter'
 
 
 begin
