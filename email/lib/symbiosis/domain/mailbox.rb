@@ -186,14 +186,14 @@ module Symbiosis
 
   class Domains
     
-    def self.find_mailbox(address)
+    def self.find_mailbox(address, prefix="/srv")
       raise ArgumentError, "Address is not a String" unless address.is_a?(String)
       address = address.downcase.split("@")
 
       domain = address.pop
       local_part = address.join("@")
       
-      domain = find(domain)
+      domain = find(domain, prefix)
       return nil if domain.nil?
 
       return domain.find_mailbox(local_part)
