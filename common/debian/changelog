@@ -1,3 +1,9 @@
+symbiosis-common (2012:0118) stable; urgency=low
+
+  * Moved http test into symbiosis-httpd packages
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 18 Jan 2012 16:31:38 +0000
+
 symbiosis-common (2012:0117) stable; urgency=low
 
   * Added ipv4/6 flags to symbiosis-ip to determine the primary IP of a

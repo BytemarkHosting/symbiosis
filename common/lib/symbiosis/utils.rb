@@ -35,7 +35,7 @@ module Symbiosis
       fu_chown_opts = [:noop, :verbose]
       fu_opts = {}
       options.find_all{|k,v| fu_chown_opts.include?(k)}.each{|k,v| fu_opts[k] = v}
-      FileUtils::chown_R options[:user], options[:group], File.join(parent,child), fu_opts
+      FileUtils::chown_R options[:user], options[:group], File.join(parent.to_s,child.to_s), fu_opts
     end
 
     # 

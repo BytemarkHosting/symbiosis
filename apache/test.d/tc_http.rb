@@ -5,6 +5,7 @@
 #
 
 
+require 'symbiosis/domain'
 require 'symbiosis/test/http'
 require 'socket'
 require 'test/unit'
@@ -23,13 +24,15 @@ class TestHTTP < Test::Unit::TestCase
     @domain.setup_http()
     @domain.create_php()
 
+    @ip = Symbiosis::Host.primary_ipv4
+
   end
 
   def teardown
     #
     #  Delete the temporary domain
     #
-    @domain.destroy()
+    @domain.destroy() unless @domain.nil?
   end
 
   #
@@ -37,7 +40,7 @@ class TestHTTP < Test::Unit::TestCase
   #
   def getCode( path, dname )
     result=nil
-    sock = TCPSocket.new("#{IP()}", "80")
+    sock = TCPSocket.new("#{@ip}", "80")
     sock.print "GET #{path} HTTP/1.1\nHost: #{dname}\nConnection: close\n\n"
     response = sock.readline
     if /^HTTP.* (\d\d\d) /.match(response)
@@ -53,7 +56,7 @@ class TestHTTP < Test::Unit::TestCase
   #
   def getFullResponse( path, dname )
     result=nil
-    sock = TCPSocket.new("#{IP()}", "80")
+    sock = TCPSocket.new("#{@ip}", "80")
     sock.print "GET #{path} HTTP/1.0\nHost: #{@domain.name}\nConnection: close\n\n"
 
     body = ""
@@ -74,27 +77,27 @@ class TestHTTP < Test::Unit::TestCase
       #
       #  Fetching /index.php
       #
-      assert( getCode( "/index.php", @domain.name) == "200",
-              "Fetching /index.php worked" )
-      assert( getCode( "/index.php", "www.#{@domain.name}") == "200",
-              "Fetching /index.html worked with www prefix" )
+      assert_equal( "200", getCode(  "/index.php", @domain.name ),
+              "Fetching /index.php did not work" )
+      assert_equal( "200", getCode(  "/index.php", "www.#{@domain.name}" ),
+              "Fetching /index.html did not work with www prefix" )
 
       #
       #  A missing file should result in a 404.
       #
-      assert( getCode( "/missing.php", @domain.name) == "404",
-              "Fetching /missing.php failed as expected" )
-      assert( getCode( "/missing.php", "www.#{@domain.name}") == "404",
-              "Fetching /missing.php failed as expected with www prefix" )
+      assert_equal( "404", getCode(  "/missing.php", @domain.name ),
+              "Fetching /missing.php did not return 404" )
+      assert_equal( "404", getCode(  "/missing.php", "www.#{@domain.name}" ),
+              "Fetching /missing.php did not return 404 with www prefix" )
 
 
       #
       #  Test that "phpinfo" expands to a full page of text
       #
       assert( getFullResponse( "/index.php", @domain.name ) =~ /PHP License/ ,
-              "Expanding PHPInfo worked" )
+              "Expanding PHPInfo did not work" )
       assert( getFullResponse( "/index.php", "www.#{@domain.name}" ) =~ /PHP License/ ,
-              "Expanding PHPInfo worked with www prefix" )
+              "Expanding PHPInfo did not work with www prefix" )
     end
   end
 
@@ -108,17 +111,17 @@ class TestHTTP < Test::Unit::TestCase
       #
       #  Normal file
       #
-      assert( getCode( "/index.html", @domain.name) == "200",
-              "Fetching /index.html worked" )
-      assert( getCode( "/index.html", "www.#{@domain.name}") == "200",
-              "Fetching /index.html worked with www. prefix" )
+      assert_equal( "200", getCode(  "/index.html", @domain.name ),
+              "Fetching /index.html did not work" )
+      assert_equal( "200", getCode(  "/index.html", "www.#{@domain.name}" ),
+              "Fetching /index.html did not work with www. prefix" )
 
       #
       #  Missing file.
       #
-      assert( getCode( "/missing.html", @domain.name) == "404",
+      assert_equal( "404", getCode(  "/missing.html", @domain.name ),
               "Fetching /missing.html gave the correct error" )
-      assert( getCode( "/missing.html", "www.#{@domain.name}") == "404",
+      assert_equal( "404", getCode(  "/missing.html", "www.#{@domain.name}" ),
               "Fetching /missing.html gave the correct error with the www prefix" )
     end
   end
@@ -135,21 +138,21 @@ class TestHTTP < Test::Unit::TestCase
       #
       @domain.create_cgi
 
-      assert( getCode( "/cgi-bin/test.cgi", @domain.name) == "500",
-              "Fetching /cgi-bin/test.cgi failed as expected" )
+      assert_equal( "500", getCode(  "/cgi-bin/test.cgi", @domain.name ),
+              "Fetching /cgi-bin/test.cgi did not return 500" )
 
-      assert( getCode( "/cgi-bin/test.cgi", "www.#{@domain.name}" ) == "500",
-              "Fetching /cgi-bin/test.cgi failed as expected with www prefix" )
+      assert_equal( "500", getCode(  "/cgi-bin/test.cgi", "www.#{@domain.name}"  ),
+              "Fetching /cgi-bin/test.cgi did not return 500 with www prefix" )
 
 
       #
       #  Missing CGI
       #
-      assert( getCode( "/cgi-bin/not.cgi", @domain.name) == "404",
-              "Fetching /cgi-bin/not.cgi failed as expected" )
+      assert_equal( "404", getCode(  "/cgi-bin/not.cgi", @domain.name ),
+              "Fetching /cgi-bin/not.cgi did not return 404" )
 
-      assert( getCode( "/cgi-bin/not.cgi", "www.#{@domain.name}" ) == "404",
-              "Fetching /cgi-bin/not.cgi failed as expected with www prefix" )
+      assert_equal( "404", getCode(  "/cgi-bin/not.cgi", "www.#{@domain.name}"  ),
+              "Fetching /cgi-bin/not.cgi did not return 404 with www prefix" )
 
 
       #
@@ -157,19 +160,19 @@ class TestHTTP < Test::Unit::TestCase
       #
       @domain.setup_cgi()
 
-      assert( getCode( "/cgi-bin/test.cgi", @domain.name) == "200",
-              "Fetching /cgi-bin/test.cgi worked as expected" )
+      assert_equal( "200", getCode(  "/cgi-bin/test.cgi", @domain.name ),
+              "Fetching /cgi-bin/test.cgi did not work as expected" )
 
-      assert( getCode( "/cgi-bin/test.cgi", "www.#{@domain.name}" ) == "200",
-              "Fetching /cgi-bin/test.cgi worked as expected with www prefix" )
+      assert_equal( "200", getCode(  "/cgi-bin/test.cgi", "www.#{@domain.name}"  ),
+              "Fetching /cgi-bin/test.cgi did not work as expected with www prefix" )
 
       #
       #  Now does it have the output we expect?
       #
       assert( getFullResponse( "/cgi-bin/test.cgi", @domain.name ) =~ /load average/ ,
-              "CGI executed as expected" )
+              "CGI did not execute as expected" )
       assert( getFullResponse( "/cgi-bin/test.cgi", "www.#{@domain.name}" ) =~ /load average/ ,
-              "CGI executed as expected with www prefix" )
+              "CGI did not execute as expected with www prefix" )
 
     end
   end
