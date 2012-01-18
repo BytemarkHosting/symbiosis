@@ -12,6 +12,8 @@ require 'timeout'
 # require "exim4/exim_rewrite_scan"
 require 'fileutils'
 
+# TODO Rewrite the basics of these tests..
+
 class Exim4ConfigTest < Test::Unit::TestCase
 
   # This tests the actual Exim4 routing.
@@ -28,7 +30,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
     # Create a temporary directory for all our stuff.
     @tempdir = nil
     loop do
-      @tempdir = File.join("/tmp", $0+"."+$$.to_s+"."+Time.now.usec.to_s)
+      @tempdir = File.join("/tmp", File.basename($0)+"."+$$.to_s+"."+Time.now.usec.to_s)
       FileUtils.mkdir(@tempdir) unless File.exists?(@tempdir)
       if File.exists?(@tempdir)
         puts "Created directory #{@tempdir}" if $DEBUG
