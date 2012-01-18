@@ -182,7 +182,7 @@ Symbiosis::Domains.each do |domain|
       string_to_hash << file
       string_to_hash << input
 
-      File.open(File.join(bytemarkdns_data_dir, File.basename(file)) do |fh|
+      File.open(File.join(bytemarkdns_data_dir, File.basename(file))) do |fh|
 
         fh.puts <<EOF
 #
