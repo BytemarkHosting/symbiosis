@@ -1,34 +1,66 @@
-#!/bin/bash
+#!/usr/bin/ruby
+# NAME
 #
-#  Run each of our test scripts.
+#  symbiosis-test - Test systems' functionality running under Symbiosis
 #
-# Steve
-# --
+# SYNOPSIS
+#
+#  symbiosis-test [ --help ] [ --verbose ] [directory]
+#
+# AUTHOR
+#
+#  Patrick J. Cherry <patrick@bytemark.co.uk>
 #
 
-
-PREFIX=/etc/symbiosis/test.d
-
-if [ ! -d $PREFIX ]; then
-    exit
-fi
-
-#
-#  Go to the correct directory
-#
-cd $PREFIX
 
 #
 #  Run all tests.
 #
-for i in $PREFIX/tc_*.rb ; do
-    if [ -e $i ]; then
-        if [ -x $i ]; then
-            echo "Running  : $(basename $i)"
-            ./$(basename $i)
-            echo "Completed: $(basename $i)"
-        else
-            echo "Ignoring non-executable $i"
-        fi
-    fi
-done
+
+
+require 'getoptlong'
+require 'test/unit'
+require 'fileutils'
+
+opts = GetoptLong.new(
+         [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ]
+       )
+
+opts.each do |opt, arg|
+  case opt
+  when '--help'
+    $HELP = true
+  when '--verbose'
+    $VERBOSE = true
+  end
+end
+
+#
+# CAUTION! Here be quality kode.
+#
+if $HELP
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
+
+  lines.each do |line|
+    line.chomp!
+    break if line.empty?
+    puts line[2..-1].to_s
+  end
+
+  exit 0
+end
+
+if ARGV.empty?
+  dir = '/etc/symbiosis/test.d'
+else
+  dir = File.expand_path(ARGV.shift)
+end
+
+FileUtils.chdir(dir)
+
+Dir.glob(File.join(dir,"t*.rb")).each do |test|
+  require test
+end
+
