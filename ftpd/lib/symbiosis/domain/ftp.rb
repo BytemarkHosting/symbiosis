@@ -74,8 +74,7 @@ module Symbiosis
             @ftp_quota = nil
           else
             begin
-              quota = param.split.first.strip
-              @ftp_quota = parse_quota(quota)
+              @ftp_quota = parse_quota(param)
             rescue ArgumentError => err
               @ftp_quota = nil
             end
@@ -87,9 +86,13 @@ module Symbiosis
     end
 
     def ftp_quota=(q)
-      @ftp_quota = parse_quota(q)
+      if q.nil?
+        @ftp_quota = nil
+      else
+        @ftp_quota = parse_quota(q)
+      end
 
-      set_param("ftp-quota", @ftp_quota, self.config_dir)
+      set_param("ftp-quota", q, self.config_dir)
 
       return @ftp_quota
     end
