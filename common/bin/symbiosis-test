@@ -1,4 +1,5 @@
 #!/usr/bin/ruby
+#
 # NAME
 #
 #  symbiosis-test - Test systems' functionality running under Symbiosis
@@ -19,8 +20,6 @@
 
 
 require 'getoptlong'
-require 'test/unit'
-require 'fileutils'
 
 opts = GetoptLong.new(
          [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
@@ -51,6 +50,12 @@ if $HELP
 
   exit 0
 end
+
+#
+# This require is here to allow manpage generation without it.
+#
+require 'test/unit'
+require 'fileutils'
 
 if ARGV.empty?
   dir = '/etc/symbiosis/test.d'
