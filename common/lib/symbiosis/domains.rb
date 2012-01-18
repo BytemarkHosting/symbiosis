@@ -18,23 +18,23 @@ module Symbiosis
     #
     # An iterator for each domain.
     #
-    def self.each(&block)
-      all.each(&block)
+    def self.each(prefix="/srv",&block)
+      all(prefix).each(&block)
     end
 
     #
     # Does the specified domain exist on this system?
     #
-    def self.include?(domain)
-      all.find(domain).is_a?(Domain)
+    def self.include?(domain, prefix="/srv")
+      all(prefix).find(domain).is_a?(Domain)
     end
 
     #
     # Finds a domain.  Returns either a Domain, or nil if nothing was found.
     #
-    def self.find(domain)
+    def self.find(domain, prefix="/srv")
       return nil unless domain.to_s =~ /^([a-z0-9\-]+\.?)+$/
-      all.find{|d| d.name =~ /^#{domain}$/i}
+      all(prefix).find{|d| d.name =~ /^#{domain}$/i}
     end
 
     #
