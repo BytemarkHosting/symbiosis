@@ -78,8 +78,8 @@
 #
 # 2011-11-25
 
-
 require 'getoptlong'
+require 'socket'
 
 #
 #  Ensure we have a sensible path.
