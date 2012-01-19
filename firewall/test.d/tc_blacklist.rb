@@ -22,8 +22,8 @@ class TestBlacklist < Test::Unit::TestCase
     results = bl.do_read_patterns
 
     # TODO test the output!
-    pp results
-    pp bl.do_generate_blacklist(results)
+    pp results if $VERBOSE
+    pp bl.do_generate_blacklist(results) if $VERBOSE
 
   end
   

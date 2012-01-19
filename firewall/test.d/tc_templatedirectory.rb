@@ -11,7 +11,7 @@ class TestFirewallIPDirectory < Test::Unit::TestCase
   def test_to_s
     list = TemplateDirectory.new("incoming.d","incoming")
     Template.directories = ["rule.d"]
-    puts list.to_s
+    puts list.to_s if $VERBOSE
   end
 
   

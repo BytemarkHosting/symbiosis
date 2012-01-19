@@ -14,14 +14,14 @@ class TestPattern < Test::Unit::TestCase
 
   def test_load
     patt = Pattern.new("pattern.d/openssh.patterns")
-    pp patt
+    pp patt if $VERBOSE
   end
 
   
   def test_apply
     lines = File.readlines 'log/auth.log'
     patt = Pattern.new("pattern.d/openssh.patterns")
-    pp patt.apply(lines)
+    pp patt.apply(lines) if $VERBOSE
 
   end
 

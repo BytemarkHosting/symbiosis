@@ -33,7 +33,7 @@ all: manpages ext/symbiosis_utmp.so
 distclean: clean
 
 test: ext/symbiosis_utmp.so
-	@cd test && RUBYLIB=$(RUBYLIB) ruby ./ts_firewall.rb
+	@cd test.d && RUBYLIB=$(RUBYLIB) ruby ./ts_firewall.rb
 	@if [ ! -d ./i ]; then mkdir ./i ; fi
 	@if [ ! -d ./i/incoming.d/ ]; then mkdir ./i/incoming.d/; fi
 	@if [ ! -d ./i/outgoing.d/ ]; then mkdir ./i/outgoing.d/; fi
