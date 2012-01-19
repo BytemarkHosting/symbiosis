@@ -49,7 +49,7 @@ module Symbiosis
           # Read the status file and find the name.
           #
           name = nil
-          File.readlines(statusfile, 'r').find{|l| l.chomp =~ /^Name:\s+(.*)$/ }
+          File.readlines(statusfile).find{|l| l.chomp =~ /^Name:\s+(.*)$/ }
           name = $1 unless $1.nil?
 
           raise Errno::ESRCH, self.pid if name.nil?
