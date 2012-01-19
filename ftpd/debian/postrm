@@ -5,7 +5,8 @@ set -e
 # Remove from the rc levels.
 #
 if [ "$1" = "purge" ] ; then
-  update-rc.d pure-authd remove >/dev/null || exit $?
+  update-rc.d pure-authd remove 
+  update-rc.d pure-ftpd remove 
 fi
 
 #DEBHELPER#
