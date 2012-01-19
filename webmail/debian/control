@@ -29,7 +29,7 @@ Description: This package gives webmail access to Symbiosis using Squirrelmail
 
 Package: symbiosis-webmail-roundcube
 Architecture: all
-Depends: roundcube (>= 0.5.4), roundcube-core, roundcube-mysql, ${misc:Depends}
+Depends: roundcube (>= 0.5.4), roundcube-core (>= 0.5.4), roundcube-mysql (>= 0.5.4), ${misc:Depends}
 Recommends: symbiosis-webmail
 Description: This package gives webmail access to Symbiosis using Roundcube
  This package will enable a global webmail system for all domains hosted
