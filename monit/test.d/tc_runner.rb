@@ -12,7 +12,12 @@ class TestRunner < Test::Unit::TestCase
   def setup
     @statedb_fn = "#{__FILE__}.#{$$}-#{rand(1000)}.db"
     @monit_d = File.join(File.dirname(__FILE__), "monit.d")
-    @template_d = File.join(File.dirname(__FILE__), "../templates")
+    @template_d = File.expand_path(File.join(File.dirname(__FILE__), "../templates"))
+    #
+    # Use system-wide direcory if the local one can't be found.
+    #
+    @template_d = "/usr/share/symbiosis/monit" unless File.directory?(@template_d)
+
     @log = Log4r::Logger.new("Symbiosis::Monitor")
     @log.level = Log4r::CRIT unless $debug or $verbose
     @log.add Log4r::Outputter.stdout()
