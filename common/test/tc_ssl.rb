@@ -4,7 +4,6 @@ $:.unshift  "../lib/" if File.directory?("../lib")
 
 require 'test/unit'
 require 'symbiosis/domain/ssl'
-require 'symbiosis/test/domain'
 
 class SSLTest < Test::Unit::TestCase
 
