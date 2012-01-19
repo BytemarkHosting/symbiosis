@@ -2,4 +2,4 @@ sbin                  usr/
 patterns.d/           etc/symbiosis/firewall
 rule.d                usr/share/symbiosis/firewall
 action.d              usr/share/symbiosis/firewall
-test.d                etc/symbiosis/test.d
+test.d                etc/symbiosis
