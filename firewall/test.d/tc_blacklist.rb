@@ -19,12 +19,10 @@ class TestBlacklist < Test::Unit::TestCase
     bl = Blacklist.new
     bl.logtail_db = @db
     bl.base_dir = "."
-    results = bl.do_read_patterns
+    results = bl.generate
 
     # TODO test the output!
     pp results if $VERBOSE
-    pp bl.do_generate_blacklist(results) if $VERBOSE
-
   end
   
 end
