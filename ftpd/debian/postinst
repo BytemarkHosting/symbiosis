@@ -93,8 +93,8 @@ invoke-rc.d pure-authd $action
 
 pid=`pgrep -x pure-ftpd` 
 
-if [ -n "$pid" -a ! -f /var/run/pure-ftpd/pure-ftpd.pid ] ; then
-  kill -9 $pid
+if [ -n "$pid" ] ; then
+  echo $pid >  /var/run/pure-ftpd/pure-ftpd.pid 
 fi
 
 invoke-rc.d pure-ftpd  $action
