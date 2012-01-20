@@ -3,19 +3,17 @@
 #  Simple tests of the PHPMyAdmin installation
 #
 #
-
-
-require 'symbiosis/test/http'
+require 'symbiosis/host'
 require 'net/http'
 require 'net/https'
 require 'socket'
 require 'test/unit'
 
-class TestHTTP < Test::Unit::TestCase
+class TestPhpMyAdmin < Test::Unit::TestCase
 
   def setup
 	# NOP
-	@ip = IP()
+	@ip = Symbiosis::Host.primary_ip.to_s
 
 	@username = "root"
 	@password = passwd()
@@ -24,21 +22,6 @@ class TestHTTP < Test::Unit::TestCase
   def teardown
 	# NOP
   end
-
-  #
-  #  Fetch our main external IP address.  We need this because our
-  # SSL site(s) only listen externally.
-  #
-  def IP()
-    ip=""
-    `ifconfig eth0 | grep 'inet addr:'`.split("\n").each do |line|
-      if ( /([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/i.match( line ) )
-        ip=$1 + "." + $2 + "." + $3 + "." + $4
-      end
-    end
-    ip
-  end
-
 
   #
   #  Fetch the admin password
@@ -57,7 +40,6 @@ class TestHTTP < Test::Unit::TestCase
   #
   def test_raw_http_phpmyadmin
       assert_nothing_raised("test that http://localhost/phpmyadmin redirects to SSL") do
-
 	    http             = Net::HTTP.new( @ip, 80 )
 	    http.use_ssl     = false
 
@@ -90,7 +72,6 @@ class TestHTTP < Test::Unit::TestCase
 	    http.start do |http|
 	      request  = Net::HTTP::Get.new("/phpmyadmin/")
 	      response = http.request(request)
-puts response.code.to_i
 
               assert( response.code.to_i == 401, "We received an 'unauthenticated' response when fetching /phpmyadmin/" )
 	    end
