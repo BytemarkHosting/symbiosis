@@ -92,23 +92,11 @@ if ( mysql --user=root --pass="" -e "SHOW DATABASES" 2>/dev/null >/dev/null ); t
 
 fi
 
-#
-#  If we're not binding globally then fix things, and restart.
-#
-if ( grep ^bind-address /etc/mysql/my.cnf >/dev/null 2>/dev/null ); then
-    sed -i~ -e "s/^bind-address[ \t]*=[ \t]*127.0.0.1/# \0/" /etc/mysql/my.cnf
-    invoke-rc.d mysql restart
-fi
-
-
-#
-#  Restart apache 2.x
-#
-if which invoke-rc.d >/dev/null 2>&1; then
-    invoke-rc.d apache2 restart
-else
-    /etc/init.d/apache2 restart
-fi
-
 #DEBHELPER#
+
+#
+# Restart mysql just in case the config has been modified.
+#
+invoke-rc.d mysql restart
+
 exit 0
