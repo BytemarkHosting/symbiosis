@@ -2,7 +2,7 @@
 # export DH_VERBOSE=1
 
 DEB_DIVERT_EXTENSION = .dpkg-symbiosis
-DEB_TRANSFORM_FILES_symbiosis-mysql += /etc/mysql/my.cnf
+DEB_TRANSFORM_FILES_symbiosis-mysql += /etc/mysql/my.cnf.dpkg-symbiosis
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/config-package.mk
