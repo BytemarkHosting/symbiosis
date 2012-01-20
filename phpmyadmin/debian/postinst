@@ -48,6 +48,10 @@ if [ -e /etc/phpmyadmin/config.inc.php ]; then
 \$cfg['Servers'][\$i]['auth_type'] = 'http';
 EOF
     fi
+    #
+    # change cookie auth to http, everywhere.  This is to catch the configuration section used when dbconfig-common is used to configure the database.
+    #
+    sed  -i -e "s/^\([ \t]*\$cfg\[[\"']Servers[\"']\]\[\$i\]\[[\"']auth_type[\"']\][ \t]*=[ \t]*[\"']\)cookie\(['\"];\)/\1http\2/" /etc/phpmyadmin/config.inc.php
 fi
 
 
