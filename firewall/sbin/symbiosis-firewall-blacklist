@@ -295,7 +295,7 @@ blacklist.generate.each do |ip, ports|
 
       old_ports = File.readlines(fn).collect{|pt| pt.chomp.strip }
       new_ports = (ports + old_ports).collect{|pt| pt.nil? ? "all" : pt.to_s }.uniq
-      new_ports = %w(all) if new_ports.any{|pt| "all" == pt}
+      new_ports = %w(all) if new_ports.any?{|pt| "all" == pt}
 
       #
       # overwrite file.
