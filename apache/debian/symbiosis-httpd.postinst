@@ -272,8 +272,8 @@ fi
 #
 # Rename ssl.pem to ssl.crt, and link it back.
 #
-if [ -e /etc/ssl/ssl.pem ] ; then
-  mv /etc/ssl/ssl.pem /etc/ssl/ssl.crt
+if [ -f /etc/ssl/ssl.pem ] ; then
+  mv -b /etc/ssl/ssl.pem /etc/ssl/ssl.crt
   ln -s /etc/ssl/ssl.crt /etc/ssl/ssl.pem
 fi
 
