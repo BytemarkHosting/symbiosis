@@ -5,12 +5,13 @@ module Symbiosis
   module Firewall
     class Pattern
 
-      attr_reader :logfile
+      attr_reader :logfile, :filename
 
       def initialize(filename)
         @logfile  = nil
         @ports    = nil
         @patterns = []
+        @filename = filename
 
         File.readlines(filename).each do |line|
           #
@@ -38,6 +39,11 @@ module Symbiosis
             @patterns << Regexp.new(line)
           end
 
+        end
+
+        if @ports.nil? or @ports.empty?
+          puts "No ports set in #{filename} -- assuming 'all'." if $VERBOSE
+          @ports = %w(all)
         end
 
       end

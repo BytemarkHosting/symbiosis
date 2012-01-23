@@ -11,7 +11,7 @@ module Symbiosis
       def initialize()
         @attempts     = 20
         @base_dir     = '/etc/symbiosis/firewall'
-        @logtail_db   = '/var/lib/symbiosis/firewall-logtail.db'
+        @logtail_db   = '/var/lib/symbiosis/firewall-blacklist-logtail.db'
         @patterns     = []
       end
 
@@ -46,6 +46,11 @@ module Symbiosis
         results = Hash.new{|h,k| h[k] = Hash.new{|i,l| i[l] = 0}}
 
         @patterns.each do |pattern|
+          if pattern.logfile.nil?
+            puts "No logfile set in #{pattern.filename} -- ignoring." if $VERBOSE
+            next
+          end
+
           #
           # Read the log file, if needed.
           #

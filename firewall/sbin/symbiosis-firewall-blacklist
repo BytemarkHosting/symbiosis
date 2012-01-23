@@ -162,6 +162,7 @@ end
 # These requires are here to prevent dependency failures when generating manpages.
 #
 require 'symbiosis/ipaddr'
+require 'symbiosis/utils'
 require 'symbiosis/firewall/blacklist'
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
@@ -176,6 +177,13 @@ if File.exists?(File.join(base_dir, "disabled.blacklist"))
   exit 0
 end
 
+#
+# Work out which user we're supposed to create the blacklist directory as.
+#
+srv = File.stat("/srv")
+admin_uid = srv.uid
+admin_gid = srv.gid
+
 expired = 0
 blacklist_d = File.join(base_dir, "blacklist.d")
 
@@ -183,32 +191,8 @@ blacklist_d = File.join(base_dir, "blacklist.d")
 # ensure the directory exists.
 #
 unless File.directory?( blacklist_d )
-  FileUtils.mkdir_p blacklist_d
+  Symbiosis::Utils.mkdir_p(blacklist_d, :user => admin_uid, :group => admin_gid)
 end
-
-#
-# Expiry is defined in terms of days.
-#
-expire_before = Time.now - ( expire_after * ( 24 * 60 * 60 ) )
-
-#
-#  Expire old entries first of all, then add new ones.
-#
-puts "Expiring old blacklist entries" if ( $VERBOSE )
-
-Dir.glob( File.join(blacklist_d,"*.auto" ) ).each do |entry|
-
-  if  File.mtime(entry) < expire_before
-
-    puts "Removing #{entry}" if ( $VERBOSE )
-    File.unlink(entry)
-    expired += 1
-
-  end
-
-end
-
-puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
 
 #
 # Fetch the IP addresses
@@ -256,57 +240,71 @@ blacklist.generate.each do |ip, ports|
 
   puts "Found IP address: #{ip}" if ( $VERBOSE )
 
+  setting = ip.to_s.gsub("/","|")
+
   #
   # Check filename without .auto first.
   #
-  fn = File.join(blacklist_d,ip.to_s.gsub("/","|"))
-
-  if ( File.exists?(fn) )
-    puts "\tAlready manually blacklisted" if ( $VERBOSE )
-
-  else
+  if Symbiosis::Utils.get_param(setting, blacklist_d) == false
     #
     # Automatically blacklist.
     #
-    fn += ".auto"
+    setting += ".auto"
 
-    if ! File.exists?(fn)
-      updated=true
-      puts "\tAdding to blacklist" if ( $VERBOSE )
+    old_ports = Symbiosis::Utils.get_param(setting, blacklist_d)
 
+    if old_ports.is_a?(String) or true == old_ports
+      puts "\tUpdating blacklist entry" if  $VERBOSE 
+      
       #
-      # Write the list of ports
+      # Set old_ports to everything if it is just "true" (i.e. an empty file).
       #
-      File.open(fn,"w"){|fh| fh.print ports.join("\n") }
+      old_ports = "all" if true == old_ports
+      old_ports = old_ports.split($/).collect{|pt| pt.strip }
 
-      #
-      # Create a new file.  We don't know what time the attack happened,
-      # without parsing the logfile properly.
-      #
-      FileUtils.touch(fn) 
+      ports = (ports + old_ports).collect{|pt| pt.nil? ? "all" : pt.to_s }.uniq
 
+      ports = %w(all) if ports.any?{|pt| "all" == pt}
     else
-      updated=true
-
       #
-      # Update the mtime, if this entry is newer.
+      # Add to the blacklist.
       #
-      puts "\tUpdating blacklist entry" if ( $VERBOSE )
-
-      old_ports = File.readlines(fn).collect{|pt| pt.chomp.strip }
-      new_ports = (ports + old_ports).collect{|pt| pt.nil? ? "all" : pt.to_s }.uniq
-      new_ports = %w(all) if new_ports.any?{|pt| "all" == pt}
-
-      #
-      # overwrite file.
-      #
-      File.open(fn,"w"){|fh| fh.print ports.join("\n") }
+      puts "\tAdding to blacklist" if ( $VERBOSE )
     end
+
+    updated=true
+
+    Symbiosis::Utils.set_param(setting, ports.join("\n"), blacklist_d)
+
+  else
+    puts "\tAlready manually blacklisted" if ( $VERBOSE )
 
   end
 
 end
 
+#
+# Expiry is defined in terms of days.
+#
+expire_before = Time.now - ( expire_after * ( 24 * 60 * 60 ) )
+
+#
+#  Now expire old entries.
+#
+puts "Expiring old blacklist entries" if ( $VERBOSE )
+
+Dir.glob( File.join(blacklist_d,"*.auto" ) ).each do |entry|
+
+  if  File.mtime(entry) < expire_before
+
+    puts "Removing #{entry}" if ( $VERBOSE )
+    File.unlink(entry)
+    expired += 1
+  end
+
+end
+
+puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
 
 #
 # Re-generate the blacklist chain
@@ -319,6 +317,7 @@ if ( updated || expired > 0 || force )
   cmd += ["--prefix", base_dir] 
   cmd += ["--template-d", template_dir] unless template_dir.nil?
   cmd << "reload-blacklist"
+  puts "Running #{cmd.join(" ")}" if $VERBOSE
   exec(*cmd)
 end
 
