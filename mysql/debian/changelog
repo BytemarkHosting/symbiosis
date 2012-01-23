@@ -1,3 +1,9 @@
+symbiosis-mysql (2010:0916) oldstable; urgency=low
+
+  * Updated postinst to remove skip-bdb from my.cnf as needed.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 23 Jan 2012 12:35:23 +0000
+
 symbiosis-mysql (2010:0914) oldstable; urgency=low
 
   * Tidied packaging 
