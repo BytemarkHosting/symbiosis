@@ -97,7 +97,7 @@ done
 # Munge the old template as needed
 #
 if [ -e /etc/symbiosis/dns.d/template ] ; then
-  sed -e 's/$\([a-z]\+\)/<%= \1 %>/g' < template > /etc/symbiosis/dns.d/tinydns.template.erb
+  sed -e 's/$\([a-z]\+\)/<%= \1 %>/g' < /etc/symbiosis/dns.d/template > /etc/symbiosis/dns.d/tinydns.template.erb
 fi
 
 
