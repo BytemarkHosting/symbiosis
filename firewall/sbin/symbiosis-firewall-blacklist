@@ -77,8 +77,8 @@ help         = false
 manual       = false
 $VERBOSE     = false
 base_dir     = "/etc/symbiosis/firewall/"
-delete       = false
-execute      = false
+delete       = true
+execute      = true
 template_dir = nil
 force        = false
 attempts     = 20
@@ -180,9 +180,13 @@ end
 #
 # Work out which user we're supposed to create the blacklist directory as.
 #
-srv = File.stat("/srv")
-admin_uid = srv.uid
-admin_gid = srv.gid
+begin
+  srv = File.stat("/srv")
+  admin_uid = srv.uid
+  admin_gid = srv.gid
+rescue Errno::ENOENT
+  admin_gid = admin_uid = 0
+end
 
 expired = 0
 blacklist_d = File.join(base_dir, "blacklist.d")
