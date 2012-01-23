@@ -72,7 +72,7 @@ $VERBOSE     = false
 base_dir     = "/etc/symbiosis/firewall/"
 wtmp_file    = "/var/log/wtmp"
 delete       = true
-execute      = false
+execute      = true
 template_dir = nil
 force        = false
 expire_after = 8
@@ -156,6 +156,7 @@ end
 # manpages.
 #
 require 'symbiosis/utmp'
+require 'symbiosis/utils'
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
 require 'symbiosis/ipaddr'
@@ -174,39 +175,33 @@ end
 expired = 0
 whitelist_d = File.join(base_dir, "whitelist.d")
 
+#
+# Work out which user we're supposed to create the whitelist directory as.
+#
+begin
+  srv = File.stat("/srv")
+  admin_uid = srv.uid
+  admin_gid = srv.gid
+rescue Errno::ENOENT
+  admin_gid = admin_uid = 0
+end
+
+# 
 # ensure the directory exists.
-unless File.directory?(whitelist_d)
-  FileUtils.mkdir_p(whitelist_d)
+#
+unless File.directory?( whitelist_d )
+  Symbiosis::Utils.mkdir_p(whitelist_d, :user => admin_uid, :group => admin_gid)
 end
-
-#
-# Expiry is measured in days.
-#
-expire_before = Time.now - ( expire_after * ( 24 * 60 * 60 ) )
-
-#
-#  Expire old entries first of all, then add new ones.
-#
-puts "Expiring old whitelist entries" if ( $VERBOSE )
-
-Dir.glob( File.join(whitelist_d,"*.auto" ) ).each do |entry|
-
-  if  File.mtime(entry) < expire_before
-
-    puts "Removing #{entry}" if ( $VERBOSE )
-    File.unlink(entry)
-    expired += 1
-
-  end
-
-end
-
-puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
 
 #
 #  Did we update?
 #
 updated=false
+
+#
+# Expiry is measured in days.
+#
+expire_before = Time.now - ( expire_after * ( 24 * 60 * 60 ) )
 
 #
 #
@@ -249,42 +244,58 @@ Symbiosis::Utmp.read(wtmp_file).each do |entry|
 
   puts "Found IP address: #{ip}" if ( $VERBOSE )
 
+  setting = ip.to_s.gsub("/","|")
+
   #
   # Check filename without .auto first.
   #
-  fn = File.join(whitelist_d,ip.to_s.gsub("/","|"))
-
-  if ( File.exists?(fn) )
-    puts "\tAlready manually whitelisted" if ( $VERBOSE )
-
-  else
+  if Symbiosis::Utils.get_param(setting, whitelist_d) == false
     #
     # Automatically whitelist.
     #
-    fn += ".auto"
+    setting += ".auto"
+    value = Symbiosis::Utils.get_param(setting, whitelist_d)
 
-    if ! File.exists?(fn)
-      updated=true
-      puts "\tAdding to whitelist" if ( $VERBOSE )
+    if false == value
+      puts "\tAdding whitelist entry" if  $VERBOSE
+      value = "all"
 
-      #
-      # Create a new file.
-      #
-      FileUtils.touch(fn, :mtime => at)
+    else
+      puts "\tUpdating whitelist entry" if  $VERBOSE
 
-    elsif File.mtime(fn) < at
-      #
-      # Update the mtime, if this entry is newer.
-      #
-      puts "\tUpdating whitelist entry" if ( $VERBOSE )
-      FileUtils.touch(fn, :mtime => at)
     end
+    #
+    # Yes, we're updating.
+    #
+    updated = true
+
+    Symbiosis::Utils.set_param(setting, value, whitelist_d)
+  else
+    puts "\tAlready manually whitelisted" if ( $VERBOSE )
 
   end
 
 end
 
 
+#
+# Now expire old entries
+#
+puts "Expiring old whitelist entries" if ( $VERBOSE )
+
+Dir.glob( File.join(whitelist_d,"*.auto" ) ).each do |entry|
+
+  if  File.mtime(entry) < expire_before
+
+    puts "Removing #{entry}" if ( $VERBOSE )
+    File.unlink(entry)
+    expired += 1
+
+  end
+
+end
+
+puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
 
 #
 # Re-generate the whitelist chain
