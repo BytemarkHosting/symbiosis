@@ -1,3 +1,13 @@
+symbiosis-email (2012:0124) stable; urgency=low
+
+  * Tightened dependencies to fix conflicts in lenny upgrades
+  * Fixed exim4 and dovecot tests to work betterly.
+  * Fixed bug introduced earlier that prevented mail passwords being
+    authenticated. Also improved mailbox tests to work
+  * Moved tc_checkpassword to email package, where it belongs and fixed it up.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 13:29:08 +0000
+
 symbiosis-email (2012:0117) stable; urgency=low
 
   * /usr/sbin/symbiosis_checkpassword now called
