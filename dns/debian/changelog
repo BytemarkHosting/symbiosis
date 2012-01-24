@@ -1,3 +1,12 @@
+symbiosis-tinydns (2012:0124) stable; urgency=low
+
+   * symbiosis-tinydns packaging now tidy.
+   * symbiosis-tinydns postinst now munches old template into new (if one is
+     left lying around) symbiosis-dns-generate tidyied a little.
+   * symbiosis-dns-generate generation is now fully rubyfied.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 13:18:05 +0000
+
 symbiosis-tinydns (2012:0117) stable; urgency=low
 
   * Rewrote symbiosis-dns-generate script in ruby making use of
