@@ -1,3 +1,13 @@
+symbiosis-monit (2012:0124) stable; urgency=low
+
+  * Added "verbose" flag, and ability to disable.
+  * Monit tests now installed with the rest. The process handling has
+    been improved.
+  * Added socket library to symbiosis-monit to allow manpage to generate
+    correctly.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 13:32:15 +0000
+
 symbiosis-monit (2012:0117) stable; urgency=low
 
   * Added brief template for monit alerts
