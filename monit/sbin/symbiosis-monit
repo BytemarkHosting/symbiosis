@@ -72,6 +72,11 @@
 #   1   if any of the tests fail;
 #   75  if dpkg is running.
 #
+# DISABLING
+#
+# You may disable the monit script by creating an empty file with the name:
+#   /etc/symbiosis.d/monit/disabled
+#
 # AUTHOR
 #
 # Patrick J Cherry <patrick@bytemark.co.uk>
