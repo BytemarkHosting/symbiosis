@@ -1,3 +1,21 @@
+symbiosis-common (2012:0124) stable; urgency=low
+
+  * Removed references to symbiosis-range and symbiosis-test in
+    Provides/Requires lines.
+  * Moved common tests to test.d
+  * Removed old test libraries
+  * Moved tc_httpd into apache tree. Fixed tests to work.
+  * Fixed symbiosis-common prerm to work.
+  * Fixed Symbiosis::ConfigFile#outdated to return the correct answer
+  * Added make rule for symbiosis-configre-ips manpage
+  * Fixed symbiosis-test to create a manpage in build environments
+  * Moved tc_checkpassword to email package, where it belongs and fixed it up.
+  * Added ability to specify a prefix directory (for testing) in
+    Symbiosis::Domains
+  * Fixed up symbiosis-test as a ruby script with a manpage.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 13:14:53 +0000
+
 symbiosis-common (2012:0118) stable; urgency=low
 
   * Moved http test into symbiosis-httpd packages
