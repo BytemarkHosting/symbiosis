@@ -128,8 +128,8 @@ if [ $(ls -l /srv/ | grep ^d | wc -l) -lt 1 ] ; then
         cat /etc/symbiosis/.passwd  > /srv/$(hostname --fqdn)/mailboxes/root/password
     fi
 
-    chown admin:admin /srv/
-    chown -R /srv/$(hostname --fqdn)
+    chown    admin:admin /srv/
+    chown -R admin:admin /srv/$(hostname --fqdn)
 fi
 
 #

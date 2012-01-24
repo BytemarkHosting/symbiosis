@@ -1,6 +1,6 @@
 symbiosis-common (2012:0124) stable; urgency=low
 
-  * Removed chown -R of doom in postinst.
+  * Removed chown -R of doom in postinst. 
   * Removed references to symbiosis-range and symbiosis-test in
     Provides/Requires lines.
   * Moved common tests to test.d
