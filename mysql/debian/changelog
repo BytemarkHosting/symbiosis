@@ -1,3 +1,15 @@
+symbiosis-mysql (2012:0124) stable; urgency=low
+
+  * Removed global alias for Apache at http://$hostname/_db/.
+  * Added mysql-common build-dep (for /etc/mysql/my.cnf)
+  * Correctly implemented the config-pacakge-dev requirements.  Postinst now
+    doesn't "just edit" my.cnf
+  * Added ruby dep for symbiosis-mysql packages
+  * symbiosis-mysql postinst now aborts on error
+  * Added i18n-ability to mysql package.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 13:24:36 +0000
+
 symbiosis-mysql (2012:0117) stable; urgency=low
 
   * Added mysql check for monit
