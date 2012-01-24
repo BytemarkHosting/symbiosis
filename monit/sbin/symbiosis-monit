@@ -7,7 +7,7 @@
 #                    [ --help | -h ] [ --manual | -n ] [ --always-mail | -a ]
 #                    [ -m | --mailto <email> ] [ -f | --mailfrom <email> ] 
 #                    [ -t | --template <template> ] [ -d | --template-dir <dir> ]
-#                    [ -s | --state-db <file> ]
+#                    [ -s | --state-db <file> ] [ --verbose | -v ]
 #
 # OPTIONS
 # <directory>                The directory containing the test scripts. If
@@ -38,6 +38,8 @@
 #
 # -s, --state-db <file>      Specify where the state databse should be kept.
 #                            The default is /var/lib/symbiosis/monit.db.
+#
+# -v, --verbose              Show verbose output.
 #
 # -h, --help                 Show help.
 #
@@ -95,8 +97,8 @@ end
 #
 #  Defaults.
 #
-$DEBUG      = ( ENV['DEBUG']     ? 1 : nil )  unless $DEBUG
-$VERBOSE    = ( ENV['VERBOSE']   ? 1 : nil )  unless $VERBOSE
+$DEBUG      = ( ENV['DEBUG']     ? true : nil )  unless $DEBUG
+$VERBOSE    = ( ENV['VERBOSE']   ? true : nil )  unless $VERBOSE
 
 # Default mailing addresses
 user          = (ENV['USER'].to_s.empty? ? "nobody" : ENV['USER'])
@@ -111,7 +113,7 @@ level         = "INFO"
 state_db_fn   = "/var/lib/symbiosis/monit.db"
 template      = "default"
 template_dir  = "/usr/share/symbiosis/monit/"
-help = manual = verbose = false
+help = manual = false
 opts = nil
 interactive = true unless ENV['TERM'].nil? or ENV['TERM'].empty?
 
@@ -123,6 +125,7 @@ begin
                         [ "--always-mail","-a", GetoptLong::NO_ARGUMENT ],
                         [ "--help" ,      "-h", GetoptLong::NO_ARGUMENT ],
                         [ "--manual" ,    "-n", GetoptLong::NO_ARGUMENT ],
+                        [ "--verbose" ,   "-v", GetoptLong::NO_ARGUMENT ],
                         [ "--mailto",     "-m", GetoptLong::REQUIRED_ARGUMENT ],
                         [ "--mailfrom",   "-f", GetoptLong::REQUIRED_ARGUMENT ],
                         [ "--state-db",   "-s", GetoptLong::REQUIRED_ARGUMENT ],
@@ -132,8 +135,6 @@ begin
   opts.quiet = true
   opts.each do |opt, arg|
     case opt
-      when "--verbose"
-        verbose  = true
       when "--always-mail"
         always_mail = true
       when "--help"
@@ -150,6 +151,8 @@ begin
         template = arg
       when "--template-directory"
         template_dir = arg
+      when "--verbose"
+        $VERBOSE = true
     end
   end
 rescue GetoptLong::InvalidOption => e
@@ -186,6 +189,14 @@ if manual or help
 end
 
 #
+# Exit if we've been disabled
+#
+if File.exists?(File.join(dir, "disabled"))
+  puts "symbiosis-monit disabled.  Exiting." if $VERBOSE
+  exit 0
+end
+
+#
 # These requires are here such that manpage generation works on build machines.
 #
 require 'symbiosis/monitor/runner'
@@ -208,7 +219,7 @@ begin
   #
   if 0 == Process.uid
     if Symbiosis::Monitor::Check.dpkg_running?
-      print "dpkg running -- not conducting tests." if verbose
+      print "dpkg running -- not conducting tests." if $VERBOSE
       exit SystemExit::EX_TEMPFAIL
     end
   end
