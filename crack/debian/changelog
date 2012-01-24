@@ -1,3 +1,10 @@
+symbiosis-crack (2012:0124) stable; urgency=low
+
+  * Updated Patrick's email address to avoid NMU warnings, since his
+    changelog entries always use "patrick@" not "patch@".
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 24 Jan 2012 13:35:26 +0000
+
 symbiosis-crack (2011:1109) stable; urgency=low
 
   * Updated standards version.  (No changes).
