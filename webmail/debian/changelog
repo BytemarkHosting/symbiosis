@@ -1,3 +1,10 @@
+symbiosis-webmail (2012:0124) stable; urgency=low
+
+  * symbiosis-webmail-roundcube now has all its roundcube dependencies
+    versioned -- installation possible with the squeeze-backports version.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 13:27:26 +0000
+
 symbiosis-webmail (2012:0117) stable; urgency=low
 
   * Broke package into three -- symbiosis-webmail,
