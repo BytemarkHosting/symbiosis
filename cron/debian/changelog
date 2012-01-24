@@ -1,4 +1,4 @@
-symbiosis-cron (2012:0117) stable; urgency=low
+symbiosis-cron (2012:0124) stable; urgency=low
 
   * Added check in wrapper to make sure /srv/domain is a directory, not a
     symlink or file.

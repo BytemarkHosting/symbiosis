@@ -1,4 +1,4 @@
-symbiosis-updater (2012:0117) stable; urgency=low
+symbiosis-updater (2012:0124) stable; urgency=low
 
   * Updated manpage generation to not mention perl so loudly.
   * Moved symbiosis-updater script to /usr/sbin
