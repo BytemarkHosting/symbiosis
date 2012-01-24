@@ -10,8 +10,8 @@ Package: bytemark-symbiosis
 Replaces: bytemark-vhost
 Conflicts: bytemark-vhost
 Architecture: all
-Depends: symbiosis-updater (>= 2012:0117), symbiosis-key (>= 2012:0117), symbiosis-pam (>= 2011:1209), ${misc:Depends}
-Recommends: symbiosis-httpd (>= 2012:0117), symbiosis-backup (>= 2011:1121), symbiosis-common (>= 2012:0117), symbiosis-crack (>= 2011:1109), symbiosis-cron (>= 2012:0117), symbiosis-tinydns (>= 2011:1209), symbiosis-email (>= 2012:0117), symbiosis-firewall (>= 2012:0117), symbiosis-ftpd (>= 2012:0117), symbiosis-monit (>= 2012:0117), symbiosis-mysql (>= 2012:0117), symbiosis-phpmyadmin (>= 2011:1013), symbiosis-webmail (>= 2012:0117)
+Depends: symbiosis-updater (>= 2012:0124), symbiosis-key (>= 2012:0124), symbiosis-pam (>= 2012:0124), ${misc:Depends}
+Recommends: symbiosis-httpd (>= 2012:0124), symbiosis-backup (>= 2012:0124), symbiosis-common (>= 2012:0124), symbiosis-crack (>= 2012:0124), symbiosis-cron (>= 2012:0124), symbiosis-tinydns (>= 2012:0124), symbiosis-email (>= 2012:0124), symbiosis-firewall (>= 2012:0124), symbiosis-ftpd (>= 2012:0124), symbiosis-monit (>= 2012:0124), symbiosis-mysql (>= 2012:0124), symbiosis-phpmyadmin (>= 2012:0124), symbiosis-webmail (>= 2012:0124)
 Description: An easy, complete, and Debian-friendly server administration system
  This package is a metapackage which will pull in each package which
  is a component of the Bytemark Symbiosis system.

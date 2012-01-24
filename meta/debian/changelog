@@ -1,3 +1,12 @@
+bytemark-symbiosis (2012:0124) stable; urgency=low
+
+  * Updated bytemark-symbiosis package to depend on versions in squeeze-rc1
+    release (i.e. 2012:0124).
+  * Updated dependencies for bytemark-symbiosis not to have a weak-misc-
+    depends.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 13:39:09 +0000
+
 bytemark-symbiosis (2012:0117) stable; urgency=low
 
   * Removes debian-volatile distro from sources.lists if found.
