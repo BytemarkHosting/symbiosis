@@ -1,5 +1,6 @@
 symbiosis-updater (2012:0124) stable; urgency=low
 
+  * Fixed install locations for updater.
   * Updated manpage generation to not mention perl so loudly.
   * Moved symbiosis-updater script to /usr/sbin
   * Moved crontab into debian/symbiosis-updater.cron.d

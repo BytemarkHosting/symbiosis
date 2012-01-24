@@ -1,2 +1,2 @@
-sbin/symbiosis-updater  usr/sbin/
-etc/                       etc/apt/
+sbin/*                  usr/sbin/
+etc/*                   etc/apt/
