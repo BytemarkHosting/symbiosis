@@ -1,3 +1,11 @@
+symbiosis-httpd (2012:0124) stable; urgency=low
+
+  * Updated manpage description for symbiosis-create-sites
+  * Moved tc_httpd into apache tree. Fixed tests to work.
+  * Removed old vhost entry from postinst
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 12:59:04 +0000
+
 symbiosis-httpd (2012:0117) stable; urgency=low
 
   * Now fully IPv6 tastic.
