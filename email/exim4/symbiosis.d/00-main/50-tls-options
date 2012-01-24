@@ -55,6 +55,6 @@ tls_on_connect_ports = 465
 tls_require_ciphers      = AES_256:AES_128:3DES:ARCFOUR_128
 gnutls_require_kx        = DHE_RSA:DHE_DSS:RSA
 gnutls_require_mac       = MD5:SHA1
-gnutls_require_protocols = SSL3
+gnutls_require_protocols = SSL3:TLS1
 
 
