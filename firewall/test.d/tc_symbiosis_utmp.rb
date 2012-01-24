@@ -8,9 +8,9 @@ class TestUtmp < Test::Unit::TestCase
 
   def setup
     @wtmp = "wtmp-test"
-    system("gcc create-wtmp-test.c -o create-wtmp-test")
-    FileUtils.touch(@wtmp)
-    system("./create-wtmp-test")
+    if File.executable?('/usr/bin/gcc') and File.exists?('/usr/include/pwd.h')
+      system("/usr/bin/gcc create-wtmp-test.c -o create-wtmp-test")
+    end
   end
 
   def teardown
@@ -20,6 +20,15 @@ class TestUtmp < Test::Unit::TestCase
 
   def test_read
     wtmp = nil
+
+    unless File.executable?("create-wtmp-test")
+      puts "Not running TestUtmp::test_read because create-wtmp-test not found."
+      return
+    end
+      
+    FileUtils.touch(@wtmp)
+    system("./create-wtmp-test")
+
     assert(File.exists?(@wtmp))
     assert_nothing_raised {
       wtmp = Symbiosis::Utmp.read(@wtmp);

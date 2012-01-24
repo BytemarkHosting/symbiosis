@@ -9,8 +9,9 @@ symbiosis-firewall (2012:0124) stable; urgency=low
   * Fixed blacklist test
   * Added firewall tests to test suite and fixed firewall test.d install location.
   * Updated firewall tests to be quieter.
+  * Updated utmp test to check for gcc and /usr/include/pwd.h before starting.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 12:54:05 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 17:34:27 +0000
 
 symbiosis-firewall (2012:0117) stable; urgency=low
 
