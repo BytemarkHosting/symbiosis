@@ -1,3 +1,10 @@
+symbiosis-backup (2012:0124) stable; urgency=low
+
+  * Removed references to symbiosis-range and symbiosis-test in
+    Provides/Requires lines.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 13:21:18 +0000
+
 symbiosis-backup (2011:1121) stable; urgency=low
 
   [ Steve Kemp ]
