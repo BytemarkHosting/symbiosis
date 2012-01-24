@@ -1,5 +1,6 @@
 symbiosis-email (2012:0124) stable; urgency=low
 
+  * Enabled TLSv1 for outlook compatibility with exim4.
   * Tightened dependencies to fix conflicts in lenny upgrades
   * Fixed exim4 and dovecot tests to work betterly.
   * Fixed bug introduced earlier that prevented mail passwords being
