@@ -5,6 +5,8 @@ symbiosis-monit (2012:0124) stable; urgency=low
     been improved.
   * Added socket library to symbiosis-monit to allow manpage to generate
     correctly.
+  * Allow the deamon to be disabled via the use of the file
+     /etc/symbiosis/monit.d/disabled
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 13:32:15 +0000
 
