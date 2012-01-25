@@ -2,17 +2,18 @@
 #
 # NAME
 #
-#  symbiosis-create-sites -- Auto-configure Apache2 sites with specified IPs
+#  symbiosis-create-mass-hosting-sites -- Auto-configure Apache2 mass-hosted sites for Symbiosis
 #
 # OPTIONS
 #
+#
 # --ssl-template, -s <file>      Specify the template file for SSL sites.
 #                                Defaults to
-#                                /etc/symbiosis/apache.d/non_ssl.template.erb
+#                                /etc/symbiosis/apache.d/zz-mass-hosting.ssl.template.erb
 #
 # --non-ssl-template, -t <file>  Specify the template file for non-SSL sites.
 #                                Defaults to
-#                                /etc/symbiosis/apache.d/non_ssl.template.erb
+#                                /etc/symbiosis/apache.d/zz-mass-hosting.template.erb
 #
 # --apache2-dir, -a <directory>  Specify the location of the apache2
 #                                configuration directory. Defaults to
@@ -28,13 +29,14 @@
 #
 # USAGE
 #
-#   This script is designed to iterate over the domains hosted
-#  upon a Symbiosis system, and configure Apache to listen appropriate
-#  when a domain is configured for SSL hosting and not yet configured.
+# This script generates two snippets of Apache configuration for use on the
+# primary IP addresses of a machine.
+#
+# Having done so it restarts apache2.
 #
 # AUTHOR
 #
-#   Steve Kemp <steve@bytemark.co.uk>
+#   Patrick J Cherry <patrick@bytemark.co.uk>
 #
 
 
@@ -74,6 +76,12 @@ opts = GetoptLong.new(
 
 opts.each do |opt, arg|
   case opt
+  when '--help'
+    $HELP = true
+  when '--verbose'
+    $VERBOSE = true
+  when '--template'
+    ssl_template = arg
   when '--ssl-template'
     ssl_template = arg
   when '--non-ssl-template'
@@ -84,10 +92,6 @@ opts.each do |opt, arg|
     root = arg
   when '--no-restart'
     no_restart = true
-  when '--help'
-    $HELP = true
-  when '--verbose'
-    $VERBOSE = true
   when '--force'
     $FORCE = true
   end
@@ -119,13 +123,13 @@ end
 require 'erb'
 require 'symbiosis/domains'
 require 'symbiosis/domain/ssl'
-require 'symbiosis/config_files/apache_ssl'
+require 'symbiosis/config_files/apache_mass_hosting'
 
 #
 # Set the default paths.
 #
-non_ssl_template = File.join(root, "/etc/symbiosis/apache.d/non_ssl.template.erb") if non_ssl_template.nil?
-ssl_template     = File.join(root, "/etc/symbiosis/apache.d/ssl.template.erb") if ssl_template.nil?
+non_ssl_template = File.join(root, "/etc/symbiosis/apache.d/zz-mass-hosting.template.erb") if non_ssl_template.nil?
+ssl_template     = File.join(root, "/etc/symbiosis/apache.d/zz-mass-hosting.ssl.template.erb") if ssl_template.nil?
 apache2_dir      = File.join(root, "/etc/apache2") if apache2_dir.nil?
 
 #
@@ -138,36 +142,15 @@ primary_ips = [Symbiosis::Host.primary_ipv4, Symbiosis::Host.primary_ipv6]
 #
 #  For each domain.
 #
-Symbiosis::Domains.each do |domain|
 
-  verbose "Domain: #{domain.name} "
-
-  next unless domains_to_configure.empty? or domains_to_configure.include?(domain.name)
-
+[non_ssl_template, ssl_template].each do |tmpl|
   begin
-    sites_available_file = File.join(apache2_dir, "sites-available","#{domain.name}.conf")
-    sites_enabled_file   = File.join(apache2_dir, "sites-enabled","#{domain.name}.conf")
+    tmpl_basename        = File.basename(tmpl, ".template.erb")
+    sites_available_file = File.join(apache2_dir, "sites-available","#{tmpl_basename}")
+    sites_enabled_file   = File.join(apache2_dir, "sites-enabled","#{tmpl_basename}")
 
-    config        = Symbiosis::ConfigFiles::ApacheSSL.new(sites_available_file, "#")
-    config.domain = domain
-
-    if domain.ips.any?{|ip| primary_ips.include?(ip)}
-      verbose "\tNot configuring this site, as it is using at least one of this host's primary IPs."
-      next
-    end
-
-    #
-    #  If SSL is not enabled then we can skip
-    #
-    if ( domain.ssl_enabled? )
-      config.template = ssl_template
-
-      verbose "\tSSL is enabled -- using SSL template"
-    else
-      config.template = non_ssl_template
-    
-      verbose "\tSSL is not enabled -- using non-SSL template"
-    end
+    config          = Symbiosis::ConfigFiles::ApacheMassHosting.new(sites_available_file, "#")
+    config.template = tmpl
 
     #
     #  If there is already a site enabled we only
@@ -177,7 +160,6 @@ Symbiosis::Domains.each do |domain|
     #  e.g. User adds /config/ssl.combined and a site
     # is generated but broken because a mandatory bundle is missing.
     #
-
 
     if ( $FORCE )
       verbose "\tForcing re-creation of configuration due to --force."
@@ -200,7 +182,7 @@ Symbiosis::Domains.each do |domain|
     else
       verbose "\tConfiguring site for the first time"
 
-      end
+    end
 
     #
     # This gets apache2 to check the configuration using a temporary file.
@@ -209,7 +191,7 @@ Symbiosis::Domains.each do |domain|
 
       verbose "\tWriting configuration"
       config.write
-      
+        
       # Definitely restart if we've rewritten the config.
       $RESTART = true
 
@@ -226,7 +208,7 @@ Symbiosis::Domains.each do |domain|
     # Rescue errors for this domain, but continue for others.
     #
   rescue StandardError => err
-    warn "\tUnable to configure site for #{domain.name} because #{err.to_s}"
+    warn "\tUnable to configure site for #{tmpl} because #{err.to_s}"
     verbose "\t"+err.backtrace.join("\n\t")
   end
 end
@@ -234,8 +216,8 @@ end
 #
 #  All done.
 #
-if ( $RESTART and !no_restart )
+if ( $RESTART and not no_restart )
   verbose "Restarting Apache"
-
   system( "/etc/init.d/apache2 restart" )
 end
+

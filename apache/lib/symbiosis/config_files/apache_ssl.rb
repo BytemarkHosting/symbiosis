@@ -15,18 +15,18 @@ module Symbiosis
 
         config = self.generate_config(self.template)
 
-        tempfile = Tempfile.new(self.filename)
+        tempfile = Tempfile.new(File.basename(self.filename))
         tempfile.puts(config)
         tempfile.close(false)
 
         IO.popen( "/usr/sbin/apache2 -C 'UseCanonicalName off' -C 'Include /etc/apache2/mods-enabled/*.load' -C 'Include /etc/apache2/mods-enabled/*.conf' -f #{tempfile.path} -t 2>&1 ") {|io| output = io.readlines }
 
         if "Syntax OK" == output.last.chomp
-          warn output.collect{|o| "\t"+o}.join if $VERBOSE
+          warn output.collect{|o| "\t"+o}.join.chomp if $VERBOSE
           tempfile.unlink
           return true
         else
-          warn output.collect{|o| "\t"+o}.join
+          warn output.collect{|o| "\t"+o}.join.chomp
           File.rename(tempfile.path, tempfile.path+".conf")
           warn "\tTemporary config snippet retained at #{tempfile.path}.conf"
           return false
@@ -46,8 +46,14 @@ module Symbiosis
         # Make sure the file exists, and that it is a symlink pointing to our
         # config file
         #
-        if File.symlink?(fn) and File.expand_path(File.readlink(fn)) == self.filename
-          return true
+        if File.symlink?(fn) 
+          ln = File.readlink(fn)
+
+          unless ln =~ /^\//
+            ln = File.join(File.dirname(fn),ln)
+          end
+
+          return File.expand_path(ln) == self.filename
         end
 
         #
