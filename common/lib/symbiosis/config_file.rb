@@ -117,7 +117,10 @@ module Symbiosis
 
       end
 
-      return false
+      #
+      # If no checksum can be found, assume it is out of date.
+      #
+      return true
     end
 
     #

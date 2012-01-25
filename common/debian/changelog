@@ -2,6 +2,8 @@ symbiosis-common (2012:0201) lucid; urgency=low
 
   * Fixed IP address detection on machines with point-to-point links.  Closes
     #2971.
+  * Updated ConfigFile#outdated? to return true if no checksum could be found
+    in the file.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 25 Jan 2012 10:28:12 +0000
 
