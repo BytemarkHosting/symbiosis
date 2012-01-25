@@ -1,3 +1,12 @@
+symbiosis-tinydns (2012:0201) stable; urgency=low
+
+  * Changed packaging not to overwrite template.
+  * symbiosis-dns-generate no longer spams cron (fixes #2976)
+  * Fixed tinydns.template.erb to define an A record for the mx.domain
+  * Added bytemark-antispam automatic updating of DNS records.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 25 Jan 2012 17:43:35 +0000
+
 symbiosis-tinydns (2012:0124) stable; urgency=low
 
    * symbiosis-tinydns packaging now tidy.

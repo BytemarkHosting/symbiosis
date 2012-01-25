@@ -52,6 +52,10 @@ module Symbiosis
         !@domain.ipv6.empty?
       end
 
+      def bytemark_antispam?
+        @domain.__send__("get_param","bytemark-antispam",@domain.config_dir)
+      end
+
     end
       
   end
