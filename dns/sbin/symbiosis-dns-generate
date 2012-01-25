@@ -225,7 +225,7 @@ begin
   hash_file = File.expand_path(File.join(bytemarkdns_data_dir,"../.hash"))
 
   if File.exists?(hash_file)
-    old_hash = File.readlines(hash_file).first
+    old_hash = File.readlines(hash_file).first.to_s.chomp
   else
     old_hash = nil
   end
@@ -241,17 +241,29 @@ begin
 
     verbose "Uploading using #{upload_script}"
 
+
+    #
+    # Change directory before uploading.
+    #
+    FileUtils.chdir(File.dirname(upload_script))
+
     #
     # Run the upload script -- this will raise an appropriate error if the
     # script doesn't exist or fails.
     #
-    system(upload_script) or raise "Upload script failed"
+    IO.popen("/bin/bash #{upload_script} 2>&1","r") do |io|
+      while !io.eof? do
+        verbose io.readline
+      end
+    end
 
     verbose "Writing hash to #{hash_file}"
     #
     # Finally record the new hash
     #
     File.open(hash_file, "w"){|fh| fh.puts new_hash }
+  else
+    verbose "No need to upload as no changes in the data have been detected."
   end
 rescue StandardError => err
   warn "Unable to upload DNS data because #{err.to_s}"
