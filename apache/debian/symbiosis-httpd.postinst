@@ -273,29 +273,18 @@ a2enmod ssl          >/dev/null 2>/dev/null
 a2enmod dir          >/dev/null 2>/dev/null
 
 #
-#  Ensure that index.htm is valid.
-#
-cat > /etc/apache2/mods-enabled/dir.conf <<EOF
-<IfModule mod_dir.c>
-          DirectoryIndex index.html index.htm index.cgi index.pl index.php index.xhtml
-</IfModule>
-EOF
-
-
-#
 #  Use the bytemark module for mass-hosting.
 #
 a2enmod  mod_vhost_bytemark  >/dev/null 2>/dev/null
 a2dismod vhost_alias         >/dev/null 2>/dev/null
 
+#
+# We'll assume that /etc/apache2/conf/security exists, and is valid.
+#
 
-if [ ! -e /etc/apache2/conf.d/security ]; then
-    cat > /etc/apache2/conf.d/security<<EOF
-ServerTokens Prod
-ServerSignature Off
-TraceEnable Off
-EOF
-fi
+#
+# dir.conf in apache2.2 now allows index.htm
+#
 
 #################
 # Remove old cron jobs
@@ -303,7 +292,7 @@ fi
 #  /usr/sbin/symbiosis-configure-additional no longer exists.  Remove old cronjob. 
 #
 if [ -L /etc/cron.hourly/symbiosis-configure-additional ]; then
-    rm -f /etc/cron.hourly/symbiosis-configure-additional 
+  rm -f /etc/cron.hourly/symbiosis-configure-additional 
 fi
 
 #  /usr/sbin/symbiosis-create-ssl no longer exists.  Remove old cronjob. 
@@ -311,29 +300,19 @@ if [ -L /etc/cron.hourly/symbiosis-create-ssl ] ; then
   rm -f /etc/cron.hourly/symbiosis-create-ssl
 fi
 
-###########
-#
-# Add new cronjobs
-#
-#
-#  Helper to create apache snippets for sites
-#
-if [ -x /usr/sbin/symbiosis-create-sites ] ; then
-  ln -sf /usr/sbin/symbiosis-create-sites /etc/cron.daily
+# /etc/cron.hourly/configure-additional needs to go too.
+if [ -e /etc/cron.hourly/configure-additional ] ; then
+  rm -f /etc/cron.hourly/configure-additional
 fi
 
-#
-#  Helper to make stats for standard sites.
-#
-if [ -x /usr/sbin/symbiosis-make-logs ] ; then
-  ln -sf /usr/sbin/symbiosis-make-logs /etc/cron.daily
+# Remove /etc/cron.hourly/create-ssl-sites as well
+if [ -e /etc/cron.hourly/create-ssl-sites ] ; then
+  rm -f /etc/cron.hourly/create-ssl-sites
 fi
 
-#
-#  Helper to make stats for SSL-based sites.
-#
-if [ -x /usr/sbin/symbiosis-make-ssl-logs ] ; then
-  ln -sf /usr/sbin/symbiosis-make-ssl-logs /etc/cron.daily
+# Remove the old make-logs script too.
+if [ -e /etc/cron.daily/make-logs ] ; then
+  rm -f /etc/cron.daily/make-logs
 fi
 
 #DEBHELPER#

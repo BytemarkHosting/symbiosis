@@ -1,1 +1,4 @@
 usr/sbin/symbiosis-create-sites usr/sbin/symbiosis-create-ssl
+usr/sbin/symbiosis-create-sites etc/cron.hourly/symbiosis-create-sites
+usr/sbin/symbiosis-make-logs    etc/cron.daily/symbiosis-make-logs
+usr/sbin/symbiosis-make-ssl-logs etc/cron.daily/symbiosis-make-ssl-logs
