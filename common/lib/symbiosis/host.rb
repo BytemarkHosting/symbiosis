@@ -44,7 +44,7 @@ module Symbiosis
       #
       netlink_socket.addr.list(:index => interface.index) do |ifaddr|
         next unless 0 == ifaddr.scope
-        if ifaddr.responds_to?("local") and ifaddr.local.is_a?(::IPAddr)
+        if ifaddr.respond_to?("local") and ifaddr.local.is_a?(::IPAddr)
           ip_addresses << IPAddr.new(ifaddr.local.to_s)
         else
           ip_addresses << IPAddr.new(ifaddr.address.to_s)
@@ -111,7 +111,7 @@ module Symbiosis
       netlink_socket.addr.list(conditions) do |ifaddr|
         next unless 0 == ifaddr.scope
 
-        if ifaddr.responds_to?("local") and ifaddr.local.is_a?(::IPAddr)
+        if ifaddr.respond_to?("local") and ifaddr.local.is_a?(::IPAddr)
           this_ip = IPAddr.new(ifaddr.local.to_s)
         else
           this_ip = IPAddr.new(ifaddr.address.to_s)
