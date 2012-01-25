@@ -21,7 +21,7 @@
 # 
 # A record for MX
 #
-3mx.<%= domain %>:<%= ip %>:300
++mx.<%= domain %>:<%= ip %>:300
 
 <% end %>
 
@@ -44,8 +44,24 @@
 3mx.<%= domain %>:<%= ipv6 %>:300
 <% end %>
 
+<% if bytemark_antispam? %>
+#
+# MX records for the Bytemark anti-spam service
+#
+# Tag my real records so only Bytemark can see them.  The IP is defined above,
+# so not needed here.
+#
+@<%= domain %>::mx.<%= domain %>:5:::nospam
+
+#
+# Tell the rest of the world to go via Bytemark
+@<%= domain %>::a.nospam.bytemark.co.uk:5:::world
+@<%= domain %>::b.nospam.bytemark.co.uk:10:::world
+
+<% else %>
 #
 #  MX record -- no IP defined, as this is done separately above.
 #
 @<%= domain %>::mx.<%= domain %>:15:300
 
+<% end %>
