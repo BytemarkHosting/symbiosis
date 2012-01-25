@@ -127,7 +127,7 @@ Symbiosis::Domains.each do |domain|
 
   begin
     sites_available_file = File.join(apache2_dir, "sites-available","#{domain.name}.conf")
-    sites_enabled_file   = File.join(apache2_dir, "sites-available","#{domain.name}.conf")
+    sites_enabled_file   = File.join(apache2_dir, "sites-enabled","#{domain.name}.conf")
 
     config        = Symbiosis::ConfigFiles::ApacheSSL.new(sites_available_file, "#")
     config.domain = domain
