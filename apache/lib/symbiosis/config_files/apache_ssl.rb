@@ -15,7 +15,7 @@ module Symbiosis
 
         config = self.generate_config(self.template)
 
-        tempfile = Tempfile.new(self.domain.name)
+        tempfile = Tempfile.new(self.filename)
         tempfile.puts(config)
         tempfile.close(false)
 
