@@ -1,1 +1,3 @@
-/var/lib/symbiosis
+var/lib/symbiosis
+etc/network/if-up.d
+etc/network/if-down.d

@@ -117,9 +117,10 @@
 require 'getoptlong'
 require 'tempfile'
 require 'fileutils'
+require 'pp'
 
 def verbose(s)
-  puts s if $VERBOSE
+  puts "symbiosis-firewall: "+s if $VERBOSE
 end
 
 
@@ -139,11 +140,14 @@ $VERBOSE = false
 execute  = delete = (Process.uid == 0)
 base_dir     = '/etc/symbiosis/firewall'
 template_dir = '/usr/share/symbiosis/firewall/rule.d'
+address_families = %w(inet inet6)
 
 opts = GetoptLong.new(
          [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
          [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
          [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ],
+         [ '--ipv4-only',  '-4', GetoptLong::NO_ARGUMENT ],
+         [ '--ipv6-only',  '-6', GetoptLong::NO_ARGUMENT ],
          [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ],
          [ '--no-delete',  '-d', GetoptLong::NO_ARGUMENT ],
          [ '--prefix',     '-p', GetoptLong::REQUIRED_ARGUMENT ],
@@ -165,6 +169,10 @@ begin
       execute = false
     when '--no-delete'
       delete = false
+    when "--ipv6-only"
+      address_families = %w(inet6)
+    when "--ipv4-only"
+      address_families = %w(inet)
     when '--prefix'
       base_dir     = File.expand_path(arg)
     when '--template-d'
@@ -208,7 +216,7 @@ end
 # Exit if we've been disabled
 #
 if File.exists?(File.join(base_dir, "disabled"))
-  puts "Firewall disabled.  Exiting." if $VERBOSE
+  verbose "Firewall disabled.  Exiting." 
   exit 0 
 end
 
@@ -217,6 +225,7 @@ end
 #
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
+require 'symbiosis/host'
 
 #
 # Set the action
@@ -231,7 +240,6 @@ action = ARGV.first || "load"
 # TODO processHostsAllow -- and hosts.deny, I suppose..
 # DONE processBlacklist
 # DONE findRules
-# TODO findDevices -- is this needed?
 # DONE processRule
 # DONE processRuleTemplate
 # DONE addRule
@@ -240,9 +248,66 @@ action = ARGV.first || "load"
 # DONE fixOwnership
 # DONE parseServices
 
+#
+# Check to see if we've been called as part of a if-up or if-down.
+#
+if ENV.has_key?("IFACE") and ENV.has_key?("PHASE")
+  phase = ENV["PHASE"].to_s
+  iface = ENV["IFACE"].to_s
+  addrfam = ENV["ADDRFAM"].to_s
+  
+  if ENV.has_key?("VERBOSITY") and ENV["VERBOSITY"].to_s == "1"
+    $VERBOSE = true
+  end
+
+  case phase
+    when "post-up"
+      action = "load"
+    when "pre-down" 
+      action = "flush"
+    when "post-down" 
+      action = "flush"
+    else
+      warn "symbiosis-firewalls: Don't know what to do during if-up/if-down phase #{phase.inspect}"
+      exit 1
+  end
+
+  #
+  # Run for ipv4 / ipv6 as needed
+  #
+  if %w(inet inet6).include?(addrfam)
+    address_families = [addrfam]
+  end
+
+  if Symbiosis::Host.primary_interface.nil? 
+
+    if "flush" == action 
+      verbose "Flushing firewall for all #{address_families.join(" and ")} interfaces."
+    else
+      warn "symbiosis-firewall: Not running firewall as no primary interface was found." if $VERBOSE
+      exit 1
+    end
+
+  elsif Symbiosis::Host.primary_interface.ifname == iface
+    verbose "Running #{action} for interface #{iface} (#{address_families.join(" and ")})" if $VERBOSE
+
+  else
+    warn "symbiosis-firewalls: Not running firewall for secondary interface #{iface.inspect}" if $VERBOSE
+    exit 0
+  end
+
+end
+
 
 begin
   include Symbiosis::Firewall
+
+  #
+  # Pick out iptables commands as needed.
+  #
+  iptables_cmds = []
+  iptables_cmds << "/sbin/iptables" if address_families.include?("inet")
+  iptables_cmds << "/sbin/ip6tables" if  address_families.include?("inet6")
 
   #
   # Change the ownership of the firewall directory, if we're going to execute
@@ -260,6 +325,8 @@ begin
   #
   Template.directories = %w(/usr/local/share/firewall/rule.d /usr/local/share/symbiosis/firewall/rule.d /usr/share/firewall/rule.d /usr/share/symbiosis/firewall/rule.d)
   Template.directories = template_dir unless template_dir.nil?
+  Template.address_families = address_families
+  iptables_cmds = Template.iptables_cmds
 
   #
   # Find the script.
@@ -278,7 +345,7 @@ begin
   # Make sure we can find the script
   #
   unless ( File.exists?(script_path) )
-    warn "Could not find action script for #{action.inspect}"
+    warn "symbiosis-firewall: Could not find action script for #{action.inspect}"
     exit 1
   end
 
@@ -305,12 +372,12 @@ begin
   if ( execute and ::Process.uid == 0 )
 
     unless system( tf.path )
-      warn "Firewall script failed.  Flushing rules."
+      warn "symbiosis-firewall: Firewall script failed.  Flushing rules."
 
       #
       # FIXME: This is deliberatly hard-coded, although it probably needs to catch errors better.
       #
-      %w(/sbin/iptables /sbin/ip6tables).each do |cmd|
+      iptables_cmds.each do |cmd|
         #
         # Check that the command exists, and we can run it.
         #
@@ -340,7 +407,7 @@ begin
       #
       # Further warning.
       #
-      warn "This machine is now running *without* a firewall in place."
+      warn "symbiosis-firewall: This machine is now running *without* a firewall in place."
     end
   end
 

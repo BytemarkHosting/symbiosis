@@ -12,7 +12,7 @@
 #
 set -e
 
-% if $VERBOSE
+% if $DEBUG
 #
 # Be verbose
 #
@@ -33,7 +33,7 @@ fi
 # Clean up existing tables
 #
 #######################################################################
-for cmd in /sbin/iptables /sbin/ip6tables ; do
+for cmd in <%= iptables_cmds.join(" ") %> ; do
   for chain in INPUT FORWARD OUTPUT ; do
     #
     # Fix policy, flush chain, and allow everything on loopback.
@@ -63,7 +63,7 @@ done
 #
 % %w(whitelist blacklist).each do |chain|
 #######################################################################
-for cmd in /sbin/iptables /sbin/ip6tables ; do
+for cmd in <%= iptables_cmds.join(" ") %> ; do
   #
   # See if the chain exists, create if not.
   #
@@ -83,7 +83,7 @@ done
 #
 # Add the jump in
 #
-for cmd in /sbin/iptables /sbin/ip6tables ; do
+for cmd in <%= iptables_cmds.join(" ") %> ; do
   $cmd -A INPUT -j <%= chain %> 
 done
 

@@ -12,7 +12,7 @@
 #
 set -e
 
-% if $VERBOSE
+% if $DEBUG
 #
 # Be verbose
 #
@@ -23,7 +23,7 @@ set -v
 # Create black/whitelist rules
 # 
 % chain = "whitelist"
-for cmd in /sbin/iptables /sbin/ip6tables ; do
+for cmd in <%= iptables_cmds.join(" ") %> ; do
   #
   # See if the chain exists, create if not.
   #

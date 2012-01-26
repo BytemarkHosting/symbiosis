@@ -31,6 +31,38 @@ module Symbiosis
       end
 
       #
+      # Return which address families have been set.  Defaults to inet inet6
+      #
+      def self.address_families
+        @address_families ||= %w(inet inet6)
+      end
+
+      #
+      # Specify which address families the templates can be run for,
+      #
+      def self.address_families=(afs)
+        case afs
+          when String
+            @address_families = [ afs ]
+          when Array
+            @address_families = afs
+          else
+            raise ArgumentError, "#{afs.inspect} is not a string or an array"
+        end
+        
+      end
+
+      #
+      # Return a list of suitable iptables commands.
+      #
+      def self.iptables_cmds
+        iptables_cmds = []
+        iptables_cmds << "/sbin/iptables"  if self.address_families.include?("inet")
+        iptables_cmds << "/sbin/ip6tables" if self.address_families.include?("inet6")
+        iptables_cmds
+      end
+
+      #
       # Search our template directories for files
       #
       def self.find(files, directories = @directories)
@@ -211,21 +243,29 @@ module Symbiosis
       # Is this an IPv6 rule
       #
       def ipv6?
-        self.address.nil? or (self.address.is_a?(IPAddr) and self.address.ipv6?)
+        self.class.address_families.include?("inet6") and
+        (self.address.nil? or (self.address.is_a?(IPAddr) and self.address.ipv6?) )
       end
     
+      #
+      # Is this an IPv4 rule?
+      #
       def ipv4?
-        self.address.nil? or (self.address.is_a?(IPAddr) and self.address.ipv4?)
+        self.class.address_families.include?("inet") and
+        (self.address.nil? or (self.address.is_a?(IPAddr) and self.address.ipv4?) )
       end
 
       #
       # Return the correct iptables command for the protocol
       #
       def iptables_cmds
-        cmds = %w(iptables ip6tables)
-        cmds.delete("iptables") unless self.ipv4?
-        cmds.delete("ip6tables") unless self.ipv6?
-        cmds.collect{|c| "/sbin/#{c}"}
+        #
+        # This returns the iptables commands based on the Template address_families param.
+        #
+        cmds = self.class.iptables_cmds
+        cmds.delete("/sbin/iptables") unless self.ipv4?
+        cmds.delete("/sbin/ip6tables") unless self.ipv6?
+        cmds
       end
 
       #
@@ -241,11 +281,19 @@ module Symbiosis
         # Detect if this is a legacy-style rule, or an ERB one. 
         #
         if template =~ /\$(SRC|DEST)/
+          #
+          # Legacy template.
+          #
           lines = template.split("\n")
 
           if !ipv4? and lines.any?{|l| l =~ /^[^#]*iptables /}
             warn "Disabling IPv4 rules for non-IPv4 addresses in #{self.name}" if $VERBOSE
             lines = lines.collect{|l| l =~ /^[^#]*iptables / ? "# "+l : l }
+          end
+
+          if !ipv6? and lines.any?{|l| l =~ /^[^#]*ip6tables /}
+            warn "Disabling IPv6 rules for non-IPv6 addresses in #{self.name}" if $VERBOSE
+            lines = lines.collect{|l| l =~ /^[^#]*ip6tables / ? "# "+l : l }
           end
 
           lines = lines.collect{|l| l.gsub("$SRC",src).gsub("$DEST",dst)}
