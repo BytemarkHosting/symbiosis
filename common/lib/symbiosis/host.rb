@@ -251,6 +251,11 @@ module Symbiosis
       interface = self.primary_interface
 
       #
+      # Don#t want nils or other junk here.
+      #
+      raise ArgumentError, "ip not an IPAddr, but a #{ip.class.to_s}." unless ip.is_a?(IPAddr)
+
+      #
       # Make sure the IP address is fully masked.
       #
       ip = ip.mask((ip.ipv4? ? 32 : 128))

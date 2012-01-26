@@ -146,6 +146,11 @@ module Symbiosis
         @ip_addresses << Symbiosis::Host.ipv6_addresses.first
       end
 
+      #
+      # Remove nils.
+      #
+      @ip_addresses.compact
+
       @ip_addresses
     end
 
