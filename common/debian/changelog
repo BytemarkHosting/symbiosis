@@ -1,4 +1,4 @@
-symbiosis-common (2012:0201) lucid; urgency=low
+symbiosis-common (2012:0201) stable; urgency=low
 
   * Fixed IP address detection on machines with point-to-point links.  Closes
     #2971.
