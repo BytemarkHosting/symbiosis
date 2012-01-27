@@ -162,6 +162,31 @@ class TestStateDb < Test::Unit::TestCase
     assert_equal(output, result['output'])
   end
 
+  def test_clean
+    test = "test_last_success"
+    output = "ok\nok\nok\nblah\nbah"
+    exitstatus = 0
+    #
+    # 20 days ago.
+    #
+    at = Time.now-20*86400
+
+    20.times do
+      assert_nothing_raised{ @statedb.record(test, exitstatus, output, at) }
+      at += 86400
+      exitstatus += 1
+    end
+
+    results = @statedb.all_results_for(test)
+    assert(20, results.length)
+
+    @statedb.clean(10, at)
+
+    results = @statedb.all_results_for(test)
+    assert(10, results.length)
+
+  end
+
   # TODO more tests..
 
 end

@@ -128,6 +128,11 @@ module Symbiosis
         ERB.new(template,0,'%<>').result(binding)
       end
 
+      def clean_db(n_days=30)
+        raise ArgumentError unless n_days.is_a?(Integer)
+        @state_db.clean(n_days)
+      end
+
     end
 
   end

@@ -88,11 +88,9 @@ module Symbiosis
         r.nil? ? nil : r['timestamp']
       end
 
-      def cleanup(n_days = 30)
-        @dbh.execute("DELETE FROM #{@tbl_name} WHERE
-           (strftime('%s','now') - timestamp) > :seconds ",
-          "seconds" => n_days * 24 * 3600
-        )
+      def clean(n_days = 30, now = Time.now)
+        from = (now.to_i - n_days*24*3600)
+        @dbh.execute("DELETE FROM #{@tbl_name} WHERE timestamp <= ? ", from)
       end
 
     end

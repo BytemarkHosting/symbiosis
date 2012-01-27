@@ -245,6 +245,12 @@ EOF
       pipe.print msg
     end
   end
+
+  #
+  # Clean up entries in the database older than 30 days.
+  #
+  @runner.clean_db(30)
+
 rescue StandardError => err
   error err.to_s
 end
