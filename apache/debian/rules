@@ -16,6 +16,12 @@ endif
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/config-package.mk
 
+makebuilddir/symbiosois-httpd::
+	make docs
+
+cleanbuilddir/symbiosois-httpd::
+	make clean
+
 build/libapache2-mod-vhost-bytemark::
 	cd vhost-alias && make
 

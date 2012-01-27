@@ -22,4 +22,4 @@ clean:
 	@find . -name 'build-stamp' -exec rm \{\} \;
 	$(RM) -r man
 
-.PHONY: clean nop docs
+.PHONY: clean nop symbiosis-httpd-man
