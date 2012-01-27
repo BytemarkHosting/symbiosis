@@ -1,5 +1,3 @@
-#!/usr/bin/ruby 
-
 $:.unshift  "../lib/" if File.directory?("../lib")
 
 require 'test/unit'

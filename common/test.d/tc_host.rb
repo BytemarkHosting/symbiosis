@@ -1,5 +1,3 @@
-#!/usr/bin/ruby 
-
 require 'test/unit'
 require 'symbiosis/host'
 require 'symbiosis/ipaddr'
