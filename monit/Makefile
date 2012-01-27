@@ -13,7 +13,7 @@ man: man/symbiosis-monit.man
 docs: man/symbiosis-monit.man doc/index.html
 
 test:
-	cd test && ruby ts_monit.rb
+	cd test && ruby1.8 ts_monit.rb
 
 clean:
 	$(RM) man/symbiosis-monit.man
