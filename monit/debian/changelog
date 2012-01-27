@@ -1,3 +1,9 @@
+symbiosis-monit (2012:0201) stable; urgency=low
+
+  * Updated all scripts to specify ruby1.8
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 11:58:25 +0000
+
 symbiosis-monit (2012:0124) stable; urgency=low
 
   * Added "verbose" flag, and ability to disable.

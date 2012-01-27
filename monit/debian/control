@@ -3,14 +3,14 @@ Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), txt2man, cdbs
+Build-Depends: debhelper (>= 7.0.0), txt2man, cdbs, ruby1.8
 Standards-Version: 3.9.1
 
 Package: symbiosis-monit
 Replaces: bytemark-vhost-monit
 Conflicts: bytemark-vhost-monit, monit
 Architecture: all
-Depends: ruby, ruby1.8, cron, libsqlite3-ruby1.8, liblog4r-ruby1.8, procps, symbiosis-common (>= 2012:0117), ${misc:Depends}
+Depends: ruby1.8, cron, libsqlite3-ruby1.8, liblog4r-ruby1.8, procps, symbiosis-common (>= 2012:0117), ${misc:Depends}
 Description: Service monitoring and restarting
  This package configures your server to include monitoring, so that
  failed services are restarted automatically.
