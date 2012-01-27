@@ -9,9 +9,10 @@ never_users = root
 # IP calls, in order to get the true host name. If you feel this is too
 # expensive, you can specify the networks for which a lookup is done, or
 # remove the setting entirely.
+#
+# This setting looks up IPs from machines not allowed to relay mail by default. 
 
-host_lookup = *
-
+host_lookup = !+relay_from_hosts
 
 # The settings below, which are actually the same as the defaults in the
 # code, cause Exim to make RFC 1413 (ident) callbacks for all incoming SMTP
@@ -41,10 +42,9 @@ ignore_bounce_errors_after = 2d
 timeout_frozen_after = 7d
 
 # Everyone *should* be able to send envelope-from to arbitrary values, but
-# Exim4 doesn't like allowing everyone, so only www-data and admin have been
-# specified.
+# Exim4 doesn't like allowing everyone, so only www-data has been specified.
 #
-trusted_users = www-data
+trusted_users = www-data 
 
 # set GECOS correctly
 gecos_pattern = ^([^,:]*)
