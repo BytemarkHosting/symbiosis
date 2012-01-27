@@ -5,8 +5,9 @@ symbiosis-tinydns (2012:0201) stable; urgency=low
   * Fixed tinydns.template.erb to define an A record for the mx.domain
   * Added bytemark-antispam automatic updating of DNS records.
   * Updated Bytemark antispam hostlist to include the IPv6 range.
+  * Updated scripts to specify ruby1.8
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 25 Jan 2012 17:43:35 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 11:46:12 +0000
 
 symbiosis-tinydns (2012:0124) stable; urgency=low
 
