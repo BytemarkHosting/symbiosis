@@ -249,7 +249,7 @@ EOF
   #
   # Clean up entries in the database older than 30 days.
   #
-  @runner.clean_db(30)
+  runner.clean_db(30)
 
 rescue StandardError => err
   error err.to_s
