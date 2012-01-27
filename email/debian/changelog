@@ -2,8 +2,10 @@ symbiosis-email (2012:0201) stable; urgency=low
 
   * Removed host rdns lookups for trusted IPs (i.e. ones permitted to relay /
     local ones) to avoid monit errors during times of DNS flakiness. 
+  * Dovecot ManageSieve now on IPv6.
+  * ManageSieve port now added to the firewall patterns list.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 16:53:06 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 18:43:48 +0000
 
 symbiosis-email (2012:0124) stable; urgency=low
 
