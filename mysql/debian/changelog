@@ -1,3 +1,10 @@
+symbiosis-mysql (2012:0201) lucid; urgency=low
+
+  * Tightened dependencies
+  * Specified ruby1.8 for monit script
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 12:00:20 +0000
+
 symbiosis-mysql (2012:0124) stable; urgency=low
 
   * Removed global alias for Apache at http://$hostname/_db/.
