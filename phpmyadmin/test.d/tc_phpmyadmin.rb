@@ -1,4 +1,3 @@
-#!/usr/bin/ruby
 #
 #  Simple tests of the PHPMyAdmin installation
 #
