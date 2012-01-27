@@ -1,7 +1,7 @@
 #!/usr/bin/ruby1.8
 
 require 'symbiosis/monitor/check'
-require 'symbiosis/range'
+require 'symbiosis/host'
 
 class ApacheCheck < Symbiosis::Monitor::Check
 
@@ -21,7 +21,7 @@ class ApacheCheck < Symbiosis::Monitor::Check
 
     %w(http https).each do |proto|
       tcpconnection = Symbiosis::Monitor::TCPConnection.new(
-        Symbiosis::Range.primary_ip.to_s,
+        Symbiosis::Host.primary_ip.to_s,
         proto,
         ["OPTIONS / HTTP/1.0\r\n","Host: localhost\r\n","\r\n",nil],
         "https" == proto )
