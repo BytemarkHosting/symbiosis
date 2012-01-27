@@ -1,4 +1,3 @@
-#!/usr/bin/ruby
 #
 #  Simple FTP test - create a new domain and attempt to login with the
 # new credentials.

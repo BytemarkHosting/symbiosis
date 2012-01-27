@@ -1,3 +1,9 @@
+symbiosis-ftpd (2012:0201) stable; urgency=low
+
+  * Specified ruby1.8 everywhere.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 11:56:42 +0000
+
 symbiosis-ftpd (2012:0124) stable; urgency=low
 
   * Tightened dependencies to fix conflicts in lenny upgrades.
@@ -8,7 +14,7 @@ symbiosis-ftpd (2012:0124) stable; urgency=low
   * Removed old test libraries
   * Tidied FTP packaging a little.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 Jan 2012 13:22:32 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 11:56:33 +0000
 
 symbiosis-ftpd (2012:0117) stable; urgency=low
 
