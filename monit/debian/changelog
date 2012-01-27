@@ -1,8 +1,10 @@
 symbiosis-monit (2012:0201) stable; urgency=low
 
   * Updated all scripts to specify ruby1.8
+  * Only changes in status are now recorded in the database, to slow down the
+    growth of the sqlite3 database.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 11:58:25 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 18:07:22 +0000
 
 symbiosis-monit (2012:0124) stable; urgency=low
 

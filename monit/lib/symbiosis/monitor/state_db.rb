@@ -37,11 +37,32 @@ module Symbiosis
         @dbh.execute(sql)
       end
 
-      def record(test, exitstatus, output, timestamp = Time.now)
+      def insert(test, exitstatus, output, timestamp)
         @dbh.execute("INSERT INTO #{@tbl_name}
           VALUES (?, ?, ?, ?)",
           test, exitstatus, output, timestamp.to_i
         )
+      end
+      
+      def update(test, exitstatus, output, timestamp, last_timestamp)
+        @dbh.execute("UPDATE #{@tbl_name}
+          SET output = ?, timestamp = ?, exitstatus = ? 
+          WHERE test = ? AND timestamp = ?", 
+          output, timestamp.to_i, exitstatus, test, last_timestamp.to_i
+        )
+      end
+
+      def record(test, exitstatus, output, timestamp = Time.now)
+        #
+        # Insert or update based on the exit status of the last result.
+        #
+        last = last_result_for(test)
+
+        if last.nil? or last['exitstatus'].to_i != exitstatus
+          insert(test, exitstatus, output, timestamp.to_i)
+        else
+          update(test, exitstatus, output, timestamp.to_i, last['timestamp'].to_i)
+        end
       end
 
       def all_results_for(test)

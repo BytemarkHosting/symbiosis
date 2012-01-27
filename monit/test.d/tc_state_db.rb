@@ -36,7 +36,63 @@ class TestStateDb < Test::Unit::TestCase
 
     assert_nothing_raised{ @statedb.record(test, exitstatus, output, at) }
 
-    result = @statedb.dbh.execute("SELECT * FROM states WHERE test = ? ORDER BY timestamp DESC",test).first
+    results = @statedb.dbh.execute("SELECT * FROM states WHERE test = ? ORDER BY timestamp DESC",test)
+
+    result = results.first
+    assert_equal(1, results.length)
+    assert_equal(test, result['test'])
+    assert_equal(at.to_i, result['timestamp'])
+    assert_equal(exitstatus, result['exitstatus'])
+    assert_equal(output, result['output'])
+
+    #
+    # New result, a few seconds later.
+    #
+    at += 9
+    assert_nothing_raised{ @statedb.record(test, exitstatus, output, at) }
+    
+    results = @statedb.dbh.execute("SELECT * FROM states WHERE test = ? ORDER BY timestamp DESC",test)
+    #
+    # Make sure we still only have one result.
+    #
+    assert_equal(1, results.length)
+    result = results.first
+    assert_equal(test, result['test'])
+    assert_equal(at.to_i, result['timestamp'])
+    assert_equal(exitstatus, result['exitstatus'])
+    assert_equal(output, result['output'])
+    
+    #
+    # Record a different exit status.
+    #
+    at += 9
+    exitstatus += 1
+    assert_nothing_raised{ @statedb.record(test, exitstatus, output, at) }
+    
+    results = @statedb.dbh.execute("SELECT * FROM states WHERE test = ? ORDER BY timestamp DESC",test)
+    #
+    # Make sure we now have two results
+    #
+    assert_equal(2, results.length)
+    result = results.first
+    assert_equal(test, result['test'])
+    assert_equal(at.to_i, result['timestamp'])
+    assert_equal(exitstatus, result['exitstatus'])
+    assert_equal(output, result['output'])
+
+    #
+    # Now go back to the old exit status.
+    #
+    at += 9
+    exitstatus -= 1
+    assert_nothing_raised{ @statedb.record(test, exitstatus, output, at) }
+
+    results = @statedb.dbh.execute("SELECT * FROM states WHERE test = ? ORDER BY timestamp DESC",test)
+    #
+    # Make sure we now have three results.
+    #
+    assert_equal(3, results.length)
+    result = results.first
     assert_equal(test, result['test'])
     assert_equal(at.to_i, result['timestamp'])
     assert_equal(exitstatus, result['exitstatus'])
