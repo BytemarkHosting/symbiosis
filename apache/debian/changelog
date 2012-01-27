@@ -2,6 +2,8 @@ symbiosis-httpd (2012:0201) stable; urgency=low
 
   * Added templating fuctionality for zz-mass-hosting sites, allowing the
     postinst to work better.
+  * Fixed all scripts to specify /usr/bin/ruby1.8 instead of just "ruby" to
+    avoid conflicts with ruby1.9.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 25 Jan 2012 12:32:44 +0000
 

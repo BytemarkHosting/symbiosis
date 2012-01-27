@@ -33,7 +33,7 @@ Description: A per-uid module for Apache 2.x
 
 Package: symbiosis-httpd
 Architecture: all
-Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static, symbiosis-common (>= 2012:0117), ruby, ruby1.8
+Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static, symbiosis-common (>= 2012:0117), ruby1.8
 Replaces: bytemark-vhost-httpd
 Conflicts: bytemark-vhost-httpd, symbiosis-common (<= 2011:0117), symbiosis-test, symbiosis-monit (<< 2011:1206)
 Description: Tools to manage Apache virtual hosting
