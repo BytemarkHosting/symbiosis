@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/ruby1.8
 #
 # Overview
 # --------
@@ -30,7 +30,7 @@
 # --
 #
 
-require 'symbiosis/range'
+require 'symbiosis/host'
 require 'fileutils'
 
 #
@@ -41,7 +41,7 @@ src = "/var/backups"
 #
 # Automatically determine the primary backup space
 #
-name = Symbiosis::Range.primary_backup_space.to_s
+name = Symbiosis::Host.primary_backup_space.to_s
 
 #
 #  If we didn't get a name then exit.

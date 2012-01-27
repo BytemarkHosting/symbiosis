@@ -10,7 +10,7 @@ Package: symbiosis-backup
 Replaces: bytemark-vhost-simple-backup
 Conflicts: bytemark-vhost-simple-backup
 Architecture: all
-Depends: backup2l, ruby, symbiosis-common (>>2011:1216), ${misc:Depends}
+Depends: backup2l, ruby1.8, symbiosis-common (>>2011:1216), ${misc:Depends}
 Description: Automatically backup your files
  This package configures backup2l to backup your data.
  .

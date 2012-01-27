@@ -1,3 +1,11 @@
+symbiosis-backup (2012:0201) stable; urgency=low
+
+  * Removed further references to Symbiosis::Range (replaced with
+    Symbiosis::Host).
+  * Specified ruby1.8 for the shebang lines.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 11:26:55 +0000
+
 symbiosis-backup (2012:0124) stable; urgency=low
 
   * Removed references to symbiosis-range and symbiosis-test in
