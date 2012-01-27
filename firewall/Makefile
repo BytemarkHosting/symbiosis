@@ -48,6 +48,7 @@ test: ext/symbiosis_utmp.so
 	@touch  i/incoming.d/00-related
 	@touch  i/incoming.d/05-ping
 	@touch  i/incoming.d/07-ssh
+	@touch  i/incoming.d/09-this-template-should-not-be-used
 	@touch  i/incoming.d/10-http
 	@touch  i/incoming.d/15-https
 	@touch  i/incoming.d/20-ftp

@@ -3,8 +3,13 @@ symbiosis-firewall (2012:0201) stable; urgency=low
   * Firewall is now called when interfaces go up and down.
   * Firewall can now be called with -4 and -6 flags for ipv4/6 only
     invocations.
+  * Fixed bug whereby an "accept all" rule was inserted when templates, ports
+    or services could not be found.
+  * Added more directories to the default search path.
+  * Added check to make sure unused variables are removed from legacy
+    templates.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 26 Jan 2012 12:38:21 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 16:09:59 +0000
 
 symbiosis-firewall (2012:0124) stable; urgency=low
 

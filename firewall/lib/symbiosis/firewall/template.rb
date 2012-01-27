@@ -298,6 +298,26 @@ module Symbiosis
 
           lines = lines.collect{|l| l.gsub("$SRC",src).gsub("$DEST",dst)}
 
+          lines = lines.collect do |l|
+            # 
+            # Replace SRC and DEST variable
+            #
+            l = l.gsub("$SRC",src).gsub("$DEST",dst)
+
+            #
+            # Check there aren't any more odd variables.
+            #
+            while l =~ /(\$[A-Z]+)/
+              warn "Bad variable #{$1} in #{self.template_file} -- removing!"
+              l = l.gsub($1,"")
+            end
+
+            #
+            # Return the newly mangled line.
+            #
+            l
+          end
+
           return lines.join("\n") 
         else
           begin

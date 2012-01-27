@@ -323,7 +323,7 @@ begin
   #
   # Set up the template directories.
   #
-  Template.directories = %w(/usr/local/share/firewall/rule.d /usr/local/share/symbiosis/firewall/rule.d /usr/share/firewall/rule.d /usr/share/symbiosis/firewall/rule.d)
+  Template.directories = %w(/usr/local/share/firewall /usr/local/share/firewall/rule.d /usr/local/share/symbiosis/firewall/rule.d /usr/share/firewall /usr/share/firewall/rule.d /usr/share/symbiosis/firewall/rule.d)
   Template.directories = template_dir unless template_dir.nil?
   Template.address_families = address_families
   iptables_cmds = Template.iptables_cmds

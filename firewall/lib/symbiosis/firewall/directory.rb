@@ -75,7 +75,7 @@ module Symbiosis
         #
         # Use the method defined in Template.
         #
-        Template.find(["#{template}.#{ext}", "#{self.default}.#{ext}"])
+        Template.find("#{template}.#{ext}")
       end
  
 
@@ -191,12 +191,29 @@ module Symbiosis
         #
         results = Array.new
 
+        default_template_path = do_find_template(self.default)
+
         Dir.entries( self.path ).sort.each do |entry|
 
           next unless entry =~ /^([0-9]*)-(.*)$/
           name = $2
 
-          template_path = do_find_template( name )
+          #
+          # Try to find a template.  If none is found use the default template,
+          # but only if the service/port can be found.  I.e. don't default to
+          # "accept".
+          #
+          begin
+            template_path = do_find_template( name )
+          rescue ArgumentError => err
+            if name == self.default or Ports.lookup(name) != nil
+              template_path = default_template_path 
+            else
+              warn "Skipping #{entry} -- #{err.to_s}"
+              next
+            end
+          end
+          
           template = Template.new( template_path )
           template.name = name
           template.direction = self.direction
@@ -257,10 +274,6 @@ module Symbiosis
     #
     class IPListDirectory < Directory
 
-      def include?(template, address)
-
-      end
-
       private
 
       #
@@ -278,6 +291,11 @@ module Symbiosis
         # A hash of arrays
         #
         port_hostnames = Hash.new{|i,j| i[j] = []}
+        
+        #
+        # We only ever use the default template.
+        #
+        default_template_path = do_find_template( self.default )
 
         #
         #  Read the contents of the directory
@@ -339,8 +357,7 @@ module Symbiosis
         # Now translate our ports into templates.
         #
         port_hostnames.each do |port, hostnames|
-          template_path = do_find_template( self.default )
-          template = Template.new( template_path )
+          template = Template.new( default_template_path )
           template.name = self.default
           template.direction = self.direction
           template.port = port unless port.nil? 
