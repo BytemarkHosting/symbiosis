@@ -20,33 +20,17 @@ find /etc/pure-ftpd/auth/ -lname "*/UnixAuthentication" -exec rm -f \{\} \;
 # Edit our defaults to set it to "standalone"
 #
 if [ -f /etc/default/pure-ftpd-common ] ; then
-  sed -i -e 's/STANDALONE_OR_INETD=inetd/STANDALONE_OR_INETD=standalone/' /etc/default/pure-ftpd-common
+  sed -i -e 's/^STANDALONE_OR_INETD=/STANDALONE_OR_INETD=standalone/' /etc/default/pure-ftpd-common
 fi
 
 #
-# Disable our inetd service
+# Disable any inetd service
 #
 if [ -f /etc/inetd.conf -a -x /usr/sbin/update-inetd ] ; then
   update-inetd --disable ftp
   # Don't really care if this errors.
   invoke-rc.d  openbsd-inetd restart || true
 fi
-
-#
-# Always reconfigure to allow external authentication.
-# 
-find /etc/pure-ftpd/auth/ -lname "*/ExtAuth" -exec rm -f \{\} \;
-ln -sf /etc/pure-ftpd/conf/ExtAuth /etc/pure-ftpd/auth/60ext
-
-#
-#  Always show dotfiles.
-#
-echo "yes" > /etc/pure-ftpd/conf/DisplayDotFiles
-
-#
-#  Use our authentication method
-#
-echo "/var/run/pure-ftpd/pure-authd.sock" > /etc/pure-ftpd/conf/ExtAuth
 
 ##
 # SSL cert generation now in symbiosis-common
@@ -59,10 +43,12 @@ if [ ! -e /etc/ssl/private/pure-ftpd.pem ]; then
     ln -s /etc/ssl/ssl.combined /etc/ssl/private/pure-ftpd.pem
 fi
 
-#
-#  TLS should be enabled if we did the linking.
-#
-echo '1' > /etc/pure-ftpd/conf/TLS
+if [ -e /etc/ssl/private/pure-ftpd.pem ] ; then
+  #
+  #  TLS should be enabled if we did the linking.
+  #
+  echo '1' > /etc/pure-ftpd/conf/TLS
+fi
 
 #
 # Update default runlevels.
