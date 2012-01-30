@@ -304,6 +304,10 @@ task "check_changelogs" do
   end
 end
 
+task "rdoc" do
+  sh "rdoc1.8 --exclude 't[sc]_.*.rb' "
+end
+
 
 rsync_args = %w(
    --recursive 
