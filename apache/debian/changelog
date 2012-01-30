@@ -6,6 +6,8 @@ symbiosis-httpd (2012:0201) stable; urgency=low
     avoid conflicts with ruby1.9.
   * Updated build process to create manpages.
   * Updated Symbiosis::Range to Symbiosis::Host in monit script.
+  * Removed assumption that a host has an IPv6 address in the
+    Symbiosis::ConfigFiles::ApacheMassHosting#ips
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 11:29:21 +0000
 

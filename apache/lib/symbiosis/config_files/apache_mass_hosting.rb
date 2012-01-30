@@ -8,13 +8,13 @@ module Symbiosis
       # Return all the IPs as apache-compatible strings.
       #
       def ips
-        [Symbiosis::Host.primary_ipv4, Symbiosis::Host.primary_ipv6].collect do |ip|
+        [Symbiosis::Host.primary_ipv4, Symbiosis::Host.primary_ipv6].compact.collect do |ip|
           if ip.ipv6?
             "["+ip.to_s+"]"
           elsif ip.ipv4?
             ip.to_s
           end
-        end.compact
+        end
       end
 
       #

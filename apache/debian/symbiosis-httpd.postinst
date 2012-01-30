@@ -26,6 +26,15 @@ for i in mass-hosting mass-hosting.ssl zz-mass-hosting zz-mass-hosting.ssl defau
   a2dissite $i > /dev/null 2>&1 || true
 done
 
+#
+# Now create the mass-hsting snippets
+#
+
+symbiosis-create-mass-hosting-sites --no-restart --verbose
+
+#################
+# Remove old cron jobs
+
 
 ##
 # SSL cert generation now in symbiosis-common.
@@ -61,14 +70,6 @@ a2dismod vhost_alias         >/dev/null 2>/dev/null
 # dir.conf in apache2.2 now allows index.htm
 #
 
-#
-# Now create the mass-hsting snippets
-#
-
-symbiosis-create-mass-hosting-sites --no-restart --verbose
-
-#################
-# Remove old cron jobs
 #
 #  /usr/sbin/symbiosis-configure-additional no longer exists.  Remove old cronjob. 
 #
