@@ -62,6 +62,8 @@ METHOD="dist-upgrade"
 #
 if [ -e /etc/symbiosis/updater ]; then
     . /etc/symbiosis/updater
+else
+    exit
 fi
 
 

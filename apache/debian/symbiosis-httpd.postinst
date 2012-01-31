@@ -20,31 +20,15 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
-#  Remove any existing sites.
+#  Remove any existing sites (the zz-mass-hosting ones will be recreated later).
 #
 for i in mass-hosting mass-hosting.ssl zz-mass-hosting zz-mass-hosting.ssl default 000-default 00-default ; do
   a2dissite $i > /dev/null 2>&1 || true
 done
 
-#
-# Now create the mass-hsting snippets
-#
-
-symbiosis-create-mass-hosting-sites --no-restart --verbose
-
-#################
-# Remove old cron jobs
-
-
 ##
 # SSL cert generation now in symbiosis-common.
 ##
-
-#
-#  Enable the new sites
-#
-a2ensite zz-mass-hosting           >/dev/null 2>/dev/null
-a2ensite zz-mass-hosting.ssl       >/dev/null 2>/dev/null
 
 #
 #  Enable common modules
@@ -61,15 +45,19 @@ a2enmod dir          >/dev/null 2>/dev/null
 a2enmod  mod_vhost_bytemark  >/dev/null 2>/dev/null
 a2dismod vhost_alias         >/dev/null 2>/dev/null
 
+#
+# Now create the mass-hosting snippets
+#
+symbiosis-create-mass-hosting-sites --no-restart --verbose
 
 #
-# We'll assume that /etc/apache2/conf/security exists, and is valid.
+# And enable (if not already enabled)
 #
+a2ensite zz-mass-hosting     > /dev/null 2>&1
+a2ensite zz-mass-hosting.ssl > /dev/null 2>&1
 
-#
-# dir.conf in apache2.2 now allows index.htm
-#
-
+#######################################
+# Remove old cronjobs.
 #
 #  /usr/sbin/symbiosis-configure-additional no longer exists.  Remove old cronjob. 
 #

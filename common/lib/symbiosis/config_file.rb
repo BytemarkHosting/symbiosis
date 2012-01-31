@@ -52,7 +52,7 @@ module Symbiosis
       #
       # Create a template object, and add a newline for good measure.
       #
-      config = ERB.new( content ).result( binding ) + "\n"
+      config = ERB.new( content, 0, "%>" ).result( binding ) + "\n"
 
       #
       # Return our template + MD5.

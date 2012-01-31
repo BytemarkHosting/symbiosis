@@ -8,8 +8,12 @@ symbiosis-httpd (2012:0201) stable; urgency=low
   * Updated Symbiosis::Range to Symbiosis::Host in monit script.
   * Removed assumption that a host has an IPv6 address in the
     Symbiosis::ConfigFiles::ApacheMassHosting#ips
+  * Change prerm not to disable all sites indiscriminately
+  * Merged ApacheMassHosting and ApacheSSL classes into one.
+  * Tidied up templates to use neater ERb
+  * Fixed postinst to behave better.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 11:29:21 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 31 Jan 2012 17:26:36 +0000
 
 symbiosis-httpd (2012:0124) stable; urgency=low
 

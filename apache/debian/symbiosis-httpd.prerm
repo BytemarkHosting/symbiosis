@@ -2,18 +2,20 @@
 
 set -e
 
-#
-#  Disable the sites
-#
-for i in /etc/apache2/sites-enabled/* ; do
-    if [ -e $i ]; then
-        rm $i
-    fi
-done
+if [ "$1" == "upgrade" ] ; then
+  #
+  #  Do nothing for upgrades.
+  #
+  echo "I: Skipping removal."
+  exit 0
+fi
 
 #
-#  Remove any files that are Per-IP based.
+#  Disable the zz-mass-hosting sites
 #
+for i in zz-mass-hosting zz-mass-hosting.ssl ; do
+  a2dissite $i >/dev/null 2>&1
+done
 
 #
 #  Disable the module(s)
