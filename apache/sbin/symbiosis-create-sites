@@ -119,7 +119,7 @@ end
 require 'erb'
 require 'symbiosis/domains'
 require 'symbiosis/domain/ssl'
-require 'symbiosis/config_files/apache_ssl'
+require 'symbiosis/config_files/apache'
 
 #
 # Set the default paths.
@@ -148,7 +148,7 @@ Symbiosis::Domains.each do |domain|
     sites_available_file = File.join(apache2_dir, "sites-available","#{domain.name}.conf")
     sites_enabled_file   = File.join(apache2_dir, "sites-enabled","#{domain.name}.conf")
 
-    config        = Symbiosis::ConfigFiles::ApacheSSL.new(sites_available_file, "#")
+    config        = Symbiosis::ConfigFiles::Apache.new(sites_available_file, "#")
     config.domain = domain
 
     if domain.ips.any?{|ip| primary_ips.include?(ip)}

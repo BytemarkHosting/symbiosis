@@ -3,10 +3,11 @@ require 'tempfile'
 
 module Symbiosis
   module ConfigFiles
-    class ApacheSSL < Symbiosis::ConfigFile
+    class Apache < Symbiosis::ConfigFile
 
       #
-      # Test the file using Apache and a temporary file.
+      # Tests the file using Apache and a temporary file.  Returns true if
+      # apache2 deems the snippet OK.
       #
       def ok?
         return false unless File.executable?("/usr/sbin/apache2")
@@ -36,7 +37,10 @@ module Symbiosis
 
       #
       # This checks a site has its config file linked into the sites-enabled
-      # directory.
+      # directory.  If no filename has been specified, it defaults to
+      # self.filename with "sites-available" transformed to "sites-enabled".
+      #
+      # This function returns true if self.filename is symlinked to fn.
       #
       def enabled?(fn = nil)
 
@@ -68,6 +72,15 @@ module Symbiosis
         false
       end
 
+      #
+      # This enables a site by symlinking the self.filename to fn.
+      #
+      # If fn is not specified, then self.filename is used, with
+      # sites-available changed to sites-enabled.
+      #
+      # If the force flag is set to true, then any file in the way is removed
+      # first.
+      #
       def enable(fn = nil, force = false)
         #
         # Take the filename and and replace available with enabled if no
@@ -100,6 +113,12 @@ module Symbiosis
         nil
       end
 
+      #
+      # This disables a site whose configuration is contained in fn.  This
+      # function makes sure that the site is enabled, before disabling it.
+      # 
+      # 
+      #
       def disable(fn = nil, force = false)
         #
         # Take the filename and and replace available with enabled if no
@@ -123,16 +142,24 @@ module Symbiosis
         nil
       end
 
-      ###################################################
       #
-      # The following methods are used in the template.
+      # Returns an array of Symbiosis::IPAddr objects, one for each IP
+      # available for this domain, if defined, or the system's primary IPv4 and
+      # IPv6 addresses.
       #
+      def available_ips
+        if defined? @domain and @domain.is_a?(Symbiosis::Domain)
+          @domain.ips
+        else
+          [Symbiosis::Host.primary_ipv4, Symbiosis::Host.primary_ipv6].compact
+        end
+      end
 
       #
-      # Return all the IPs as apache-compatible strings.
+      # Return all the IPs as apache-compatible strings for use in templates.
       #
       def ips
-        @domain.ips.collect do |ip|
+        self.available_ips.collect do |ip|
           if ip.ipv6?
             "["+ip.to_s+"]"
           else
@@ -142,11 +169,11 @@ module Symbiosis
       end
 
       #
-      # Return just the first IP.
+      # Return just the first IP for use in templates.
       #
       def ip
-        ip = @domain.ips.first
-        warn "\tUsing one IP (#{ip}) where the domain has more than one configured!" if @domain.ips.length > 1 and $VERBOSE
+        ip = self.available_ips.first
+        warn "\tUsing one IP (#{ip}) where the domain has more than one configured!" if self.available_ips.length > 1 and $VERBOSE
         if ip.ipv6?
           "["+ip.to_s+"]"
         else
@@ -157,34 +184,60 @@ module Symbiosis
       #
       # Return the domain config directory.
       #
+      # If no domain has been defined, nil is returned.
+      #
       def domain_directory
-        @domain.config_dir
-      end
-
-      #
-      # Returns the certificate (+key) snippet 
-      #
-      def certificate
-        return nil unless @domain.ssl_certificate_file and @domain.ssl_key_file
-
-        if @domain.ssl_certificate_file == @domain.ssl_key_file
-          "SSLCertificateFile #{@domain.ssl_certificate_file}"
+        if defined?(@domain) and @domain.is_a?(Symbiosis::Domain) 
+          @domain.directory
         else
-          "SSLCertificateFile #{@domain.ssl_certificate_file}\n\tSSLCertificateKeyFile #{@domain.ssl_key_file}"
+          nil
         end
       end
 
       #
-      # Returns the bundle filename + the apache directive
+      # Returns the certificate, key, and bundle configuration lines.
       #
-      def bundle
-        return "" unless @domain.ssl_bundle_file
-        
-        "SSLCertificateChainFile "+@domain.ssl_bundle_file
+      def ssl_config
+        ans = []
+        if defined?(@domain) and @domain.is_a?(Symbiosis::Domain) 
+          unless @domain.ssl_certificate_file and @domain.ssl_key_file
+            ans << "SSLCertificateFile #{@domain.ssl_certificate_file}"
+            #
+            # Add the separate key unless the key is in the certificate. 
+            #
+            ans << "SSLCertificateKeyFile #{@domain.ssl_key_file}" unless @domain.ssl_certificate_file == @domain.ssl_key_file
+            #
+            # Add a bundle, if needed.
+            #
+            ans << "SSLCertificateChainFile #{@domain.ssl_bundle_file}" if @domain.ssl_bundle_file
+          end
+        elsif File.exists?("/etc/ssl/ssl.crt")
+          #
+          # TODO: this makes absolutely no checks for the certificate validity
+          # etc., unlike the @domain functions above.
+          #
+          ans << "SSLCertificateFile /etc/ssl/ssl.crt"
+          #
+          # Add the key and bundle, assuming they exist.
+          #
+          ans << "SSLCertificateKeyFile /etc/ssl/ssl.key" if File.exists?("/etc/ssl/ssl.key")
+          ans << "SSLCertificateChainFile /etc/ssl/ssl.bundle" if File.exists?("/etc/ssl/ssl.bundle")
+        end
+
+        ans.join("\n        ")
       end
 
+      #
+      # Checks to see if a domain has mandatory ssl.
+      #
+      # If no domain is set, then this returns false.
+      #
       def mandatory_ssl?
-        @domain.ssl_mandatory?
+        if defined?(@domain) and @domain.is_a?(Symbiosis::Domain) 
+          @domain.ssl_mandatory?
+        else
+          false
+        end
       end
 
     end

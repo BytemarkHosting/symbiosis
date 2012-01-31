@@ -10,9 +10,9 @@
 ##
 ###
 
-<% ips.each do |ip| %>
+% ips.each do |ip|
 NameVirtualHost <%= ip %>:443
-<% end %>
+% end 
 
 <VirtualHost <%= ips.collect{|ip| ip+":443"}.join(" ") %>> 
 
@@ -20,9 +20,7 @@ NameVirtualHost <%= ip %>:443
         #  Ensure that the SSL options are configured.
         #
         SSLEngine On
-        <%= ssl_certificate_file %>
-        <%= ssl_certificate_key_file %>
-        <%= ssl_certificate_chain_file %>
+        <%= ssl_config %>
 
         #
         # Sane SSL ciphers.

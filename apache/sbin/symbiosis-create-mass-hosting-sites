@@ -123,7 +123,7 @@ end
 require 'erb'
 require 'symbiosis/domains'
 require 'symbiosis/domain/ssl'
-require 'symbiosis/config_files/apache_mass_hosting'
+require 'symbiosis/config_files/apache'
 
 #
 # Set the default paths.
@@ -149,7 +149,7 @@ primary_ips = [Symbiosis::Host.primary_ipv4, Symbiosis::Host.primary_ipv6]
     sites_available_file = File.join(apache2_dir, "sites-available","#{tmpl_basename}")
     sites_enabled_file   = File.join(apache2_dir, "sites-enabled","#{tmpl_basename}")
 
-    config          = Symbiosis::ConfigFiles::ApacheMassHosting.new(sites_available_file, "#")
+    config          = Symbiosis::ConfigFiles::Apache.new(sites_available_file, "#")
     config.template = tmpl
 
     #

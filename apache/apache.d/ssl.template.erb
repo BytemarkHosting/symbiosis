@@ -14,10 +14,10 @@
 ##
 ###
 
-<% ips.each do |ip| %>
+% ips.each do |ip|
 NameVirtualHost <%= ip %>:443
 NameVirtualHost <%= ip %>:80
-<% end %>
+% end
 
 <VirtualHost <%= ips.collect{|ip| ip+":443"}.join(" ") %>>
 
@@ -29,8 +29,8 @@ NameVirtualHost <%= ip %>:80
         #
         # The certificate, key, and intermediate bundle (if needed)
         #
-        <%= certificate %>
-        <%= bundle %>
+        <%= ssl_config %>
+
 
         #
         # Sane SSL ciphers.
@@ -92,14 +92,14 @@ NameVirtualHost <%= ip %>:80
 
 <VirtualHost <%= ips.collect{|ip| ip+":80"}.join(" ") %>>
 
-<% if mandatory_ssl? %>
+% if mandatory_ssl?
         #
         #  All accesses redirect to the HTTPS version of
         # the site.
         #
         Redirect / https://<%= domain %>/
 
-<% else %>
+% else
         #
         #  This is the directory people are redirected to
         # if their site is empty.
@@ -145,6 +145,6 @@ NameVirtualHost <%= ip %>:80
         #
         ErrorLog   /var/log/apache2/<%= domain %>.error.log
         CustomLog  /var/log/apache2/<%= domain %>.access.log combined
-<% end %>
+% end
 </VirtualHost>
 
