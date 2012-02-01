@@ -7,8 +7,9 @@ symbiosis-common (2012:0201) stable; urgency=low
   * Fixed symbiosis-configure-ips to work on single-stack hosts.
   * Updated all scripts to specify ruby1.8.
   * Changed ERB parsing to accept "%" in the first column as a marking.
+  * Use the primary IPs for a domain if nothing was specified.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 01 Feb 2012 10:28:23 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 01 Feb 2012 15:53:40 +0000
 
 symbiosis-common (2012:0124) stable; urgency=low
 

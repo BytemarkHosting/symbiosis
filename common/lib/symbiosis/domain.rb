@@ -126,7 +126,7 @@ module Symbiosis
 
     #
     # Return all this domain's IPs (IPv4 and 6) as an array.  If none have been
-    # set, then the host's first primary IPv4 and IPv6 addresses are returned.
+    # set, then the host's primary IPv4 and IPv6 addresses are returned.
     #
     def ips
       param = get_param("ip",self.config_dir)
@@ -143,9 +143,12 @@ module Symbiosis
         end
       end
 
+      #
+      # If no IP addresses were found, use the primary IPs.
+      #
       if @ip_addresses.empty?
-        @ip_addresses << Symbiosis::Host.ipv4_addresses.first
-        @ip_addresses << Symbiosis::Host.ipv6_addresses.first
+        @ip_addresses << Symbiosis::Host.primary_ipv4
+        @ip_addresses << Symbiosis::Host.primary_ipv6
       end
 
       #
