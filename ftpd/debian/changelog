@@ -3,8 +3,10 @@ symbiosis-ftpd (2012:0201) stable; urgency=low
   * Specified ruby1.8 everywhere.
   * Added config files for pure-ftpd for ExtAuth and DisplayDotFiles
   * Tidied packaging.
+  * Updated postinst to set pure_ftpd standalone_or_inetd variable to prevent
+    it being overwritten on pure-ftpd updates.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jan 2012 15:01:23 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 01 Feb 2012 19:57:07 +0000
 
 symbiosis-ftpd (2012:0124) stable; urgency=low
 
