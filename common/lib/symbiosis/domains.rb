@@ -16,7 +16,7 @@ module Symbiosis
   class Domains
 
     #
-    # An iterator for each domain.
+    # Find all domains, and iterate over each one.
     #
     def self.each(prefix="/srv",&block)
       all(prefix).each(&block)
@@ -38,7 +38,7 @@ module Symbiosis
     end
 
     #
-    # Return each domain name
+    # Find all domains in prefix.  Returns an array of Symbiosis::Domain
     #
     def self.all(prefix = "/srv")
       results = Array.new
