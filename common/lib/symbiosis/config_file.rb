@@ -204,5 +204,11 @@ module Symbiosis
 
   end
 
-end
+  #
+  # This module contains all the various ConfigFile child classes.
+  #
+  module ConfigFiles
 
+  end
+
+end
