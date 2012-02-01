@@ -154,7 +154,7 @@ module Symbiosis
       #
       # Remove nils.
       #
-      @ip_addresses.compact
+      @ip_addresses = @ip_addresses.compact
 
       @ip_addresses
     end
