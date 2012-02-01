@@ -6,10 +6,15 @@ module Symbiosis
     class Tinydns < Symbiosis::ConfigFile
 
       ###################################################
-      # TODO: parse the tinydns file and make sure it is sane.
+      #
+      # This method is supposed to use tinydns to check to see if the DNS
+      # syntax is OK.
       #
       def ok?
-        true
+        #
+        # TODO: parse the tinydns file and make sure it is sane.
+        #
+        true 
       end
 
       ###################################################
@@ -52,8 +57,12 @@ module Symbiosis
         !@domain.ipv6.empty?
       end
 
+      #
+      # Checks to see if this domain uses the Bytemark anti-spam service,
+      # described at http://www.bytemark.co.uk/nospam .
+      #
       def bytemark_antispam?
-        @domain.__send__("get_param","bytemark-antispam",@domain.config_dir)
+        @domain.uses_bytemark_antispam?
       end
 
     end
