@@ -1,5 +1,11 @@
 symbiosis-tinydns (2012:0201) stable; urgency=low
 
+  * Updated DNS template to use the neater ERB syntax. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 01 Feb 2012 10:31:17 +0000
+
+symbiosis-tinydns (2012:0201) stable; urgency=low
+
   * Changed packaging not to overwrite template.
   * symbiosis-dns-generate no longer spams cron (fixes #2976)
   * Fixed tinydns.template.erb to define an A record for the mx.domain
