@@ -1,18 +1,25 @@
-#
-#
 module Symbiosis
 
   module Firewall
 
+    #
+    # This class is used to convert names to port numbers using the details
+    # from /etc/services.
+    #
+    # This class only has class methods so that it is accessible globally.
+    #
     class Ports
-      #
-      # This class only has class methods so that it is accessible globally.
-      #
 
       class << self
         #
         # We read the services-file and store the data from within it
         # into a hash for later lookups.
+        #
+        # The hash has the form
+        # 
+        #  {
+        #    name => port
+        #  }
         #
         def load( filename = "/etc/services" )
           #
@@ -33,19 +40,30 @@ module Symbiosis
         end
   
         #
-        # Just return the list of services.
+        # Just return the hash of services, in the form
+        #
+        #  {
+        #   name => port,
+        #  }
         #
         def services
           self.reset unless defined? @services
           @services
         end
 
+        #
+        # Empty the services hash, to force a reload.
+        #
         def reset
           @services = Hash.new
         end
 
         #
         #  Find the TCP/UDP port of the named service.
+        #
+        #  If the name looks like a number, then we convert that to an integer,
+        #  and return.  Otherwise the name is looked up in @services.  If no
+        #  port is found, nil is returned.
         #
         def lookup( name )
           # numeric name is a cheat - we just return that port.
@@ -58,7 +76,7 @@ module Symbiosis
         end
 
         #
-        #  Is the name defined?
+        # Is the name defined in /etc/services?
         #
         def defined?( name )
           lookup(name).nil?
@@ -70,7 +88,6 @@ module Symbiosis
         def empty?
           self.services.empty?
         end
-
 
         private
 

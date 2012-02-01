@@ -1,41 +1,60 @@
 require 'symbiosis/firewall/template'
 require 'resolv-replace'
 
-#
-# A directory, like incoming.d, blacklist.d, local.d.
-#
 module Symbiosis
   module Firewall
+
+    #
+    # This is a superclass that is inherited by
+    # Symbiosis::Firewall::IPListDirectory and
+    # Symbiosis::Firewall::TemplateDirectory.  It represents a directory, like
+    # incoming.d, blacklist.d, etc.
+    #
     class Directory 
 
       attr_reader :direction, :chain, :path, :default
 
       #
-      #  Constructor
-      #
-      #   * path -> directory where the rules are
-      #   * direction -> incoming or outgoing
-      #   * chain -> Specify the rules go in the chain of this name.  This can
-      #              be nil, in which case, INPUT or OUTPUT is chosen based on
-      #              direction.
+      # path::      directory where the rules are
+      # direction:: either _incoming_ or _outgoing_
+      # chain::     Specify the rules go in the chain of this name.  This can
+      #             be nil, in which case, INPUT or OUTPUT is chosen based on
+      #             direction.
       #
       def initialize(path, direction, chain = nil)
         raise Errno::ENOENT,path unless File.directory?(path)
         @path = path
+
+        raise ArgumentError, "direction must be either incoming or outgoing" unless %w(incoming outgoing).include?(direction.to_s)
         @direction = direction
+
         @chain = chain
         @default = "accept"
       end
 
+      #
+      # Set the default template name.  Defaults to "accept".
+      #
       def default=(d)
         @default = d
       end
 
+      #
+      # Reads the directory, and returns an array of templates and hostames,
+      # i.e. 
+      #
+      #  [
+      #    [template, hostnames],
+      #    [another template, other hostnames]
+      #  ]
+      #
       def read
         do_read
       end
 
       #
+      # Return a string that is to be inserted into the firewall script for
+      # execution.
       #
       def to_s
         #
@@ -169,7 +188,29 @@ module Symbiosis
 
 
     #
+    # This class describes a directory containing rule names and ports.
     #
+    # For example the following directory tree will allow ports 22, 33, and
+    # those defined by the "dns" template, in that order.
+    #
+    #  .
+    #  |--- 10-22
+    #  |--- 20-33
+    #  \--- 30-dns
+    #
+    # The order in which the rules are generated is determined by filename.
+    # The part of the filename up to the first dash is used for this, and it
+    # must be numeric.
+    #
+    # Each file can be empty, or contain a list of addresses or hostnames.  In
+    # the case of an emtpy file, no restrictions are placed on which IP can
+    # access that port.  If hostnames or addresses are specified, then only
+    # those hosts can access that port.  If the addresses are IPv4, then
+    # they're added using iptables.  If they are IPv6, they are added using
+    # ip6tables.
+    #
+    # *NB* that hostnames are resolved using A and AAAA lookups when the
+    # firewall is run.
     #
     class TemplateDirectory < Directory
 
@@ -251,18 +292,18 @@ module Symbiosis
     # For example the following directory tree will blacklist all incoming
     # connections from the IP addresses 1.2.3.4, 1.4.4.4, and 10.20.30.40:
     #
-    # .
-    # |--- 10.20.30.40
-    # |---  1.2.3.4
-    # \--   1.4.4.4
+    #  .
+    #  |--- 10.20.30.40
+    #  |--- 1.2.3.4
+    #  \--- 1.4.4.4
     #
     # If the name looks like an IP address and is of the form
     #
-    #  1.2.3.4-24
+    #  1.2.3.4|24
     #
     # or 
     #
-    #  2001:dead:beef:cafe::1-64
+    #  2001:dead:beef:cafe::1|64
     #
     # then these would be mangled to become 1.2.3.4/24 or
     # 2001:dead:beef:cafe::1/64 respectively, before being transformed into

@@ -10,13 +10,18 @@ module Symbiosis
     #
     class Template
 
+      #
+      # Return the array of directories which are used when searching for
+      # templates.
+      #
       def self.directories
         @directories ||= ["."]
       end
 
+      # Set which directories are searched for templates.
       #
-      # If we specify a template directory, prepend it, unless it is an array,
-      # in which case overwrite it.
+      # The argument is a string, prepend it to the array of directries. If it
+      # is an array, overwrite the list. 
       #
       def self.directories=(tds)
 
@@ -31,14 +36,15 @@ module Symbiosis
       end
 
       #
-      # Return which address families have been set.  Defaults to inet inet6
+      # Return an arry showing which address families have been set.  Defaults
+      # to inet inet6
       #
       def self.address_families
         @address_families ||= %w(inet inet6)
       end
 
       #
-      # Specify which address families the templates can be run for,
+      # Specify which address families the templates can be run for.
       #
       def self.address_families=(afs)
         case afs
@@ -53,7 +59,8 @@ module Symbiosis
       end
 
       #
-      # Return a list of suitable iptables commands.
+      # Return a list of suitable iptables commands, given the available
+      # address families.
       #
       def self.iptables_cmds
         iptables_cmds = []
@@ -90,11 +97,30 @@ module Symbiosis
         return path
       end
 
+
+      #
+      # The name of the rule (usually the same as the template filename)
+      #
       attr_reader :name
+      #
+      # The address (if any) this rule is applied to.
+      #
       attr_reader :address
+      #
+      # The port (if any) this rule applies to.
+      #
       attr_reader :port
+      #
+      # The direction of the rule.
+      #
       attr_reader :direction
+      #
+      # The name of the chain this rule will be used in.
+      #
       attr_reader :chain
+      #
+      # The filename of the template used.
+      #
       attr_reader :template_file
 
       #
@@ -113,6 +139,9 @@ module Symbiosis
         @template_file = template_file
       end
 
+      # 
+      # Sets the name of the template
+      #
       def name=( new_name )
         #
         # Guess the port from the name, if it has not already been set.
@@ -122,7 +151,7 @@ module Symbiosis
       end
       
       #
-      #  Set the source/dest
+      # Set the source/dest address.
       #
       def address=( new_address )
         #
@@ -157,12 +186,19 @@ module Symbiosis
         @chain= new_chain
       end
 
-
+      #
+      # Sets the name of the template file.  Returns Errno::ENOENT if the file
+      # cannot be found.
+      #
       def template_file=(tf)
         raise Errno::ENOENT, tf unless File.exists?(tf)
         @template_file = tf
       end
-      
+     
+      #
+      # Sets the direction of the template.  Must be either "incoming" or
+      # "outgoing".
+      #
       def direction=(d)
         case d
           when "incoming"
@@ -175,7 +211,7 @@ module Symbiosis
       end
 
       #
-      #  Set this rule to work against incoming connections.
+      # Set this rule to work against incoming connections.
       #
       def incoming
         self.chain     = "INPUT" if self.chain.nil?
@@ -183,7 +219,7 @@ module Symbiosis
       end
 
       #
-      #  Is this incoming?
+      # Returns true if this is an incoming template.
       #
       def incoming?
         "incoming" == self.direction
@@ -198,18 +234,15 @@ module Symbiosis
       end
 
       #
-      #  Is this an outgoing rule?
+      # Returns true if this is an outgoing template. 
       #
       def outgoing?
         "outgoing" == self.direction
       end
 
       #
-      # Two convenience methods to allow us to use chain/src_or_dst for templates.
-      #
-      
-      #
-      #  Return the iptables src
+      # Return the iptables src address flag or an empty string if no address
+      # has been set.
       #
       def src
         return "" if self.address.nil?
@@ -219,7 +252,8 @@ module Symbiosis
       alias source src
 
       #
-      #  Return the iptables dst 
+      # Return the iptables dst address flag, or an empty string if no address
+      # has been set.
       #
       def dst
         return "" if self.address.nil?
@@ -228,6 +262,10 @@ module Symbiosis
 
       alias destination dst
 
+      #
+      # Returns the src or the dest iptables flags depending on the direction
+      # of the template.
+      #
       def src_or_dst
         case direction
           when "incoming"
@@ -240,7 +278,7 @@ module Symbiosis
       end
 
       #
-      # Is this an IPv6 rule
+      # Returns true if this rule can apply to IPv6 addresses
       #
       def ipv6?
         self.class.address_families.include?("inet6") and
@@ -248,7 +286,7 @@ module Symbiosis
       end
     
       #
-      # Is this an IPv4 rule?
+      # Returns true if this rule can apply to IPv4 addresses
       #
       def ipv4?
         self.class.address_families.include?("inet") and
@@ -256,7 +294,8 @@ module Symbiosis
       end
 
       #
-      # Return the correct iptables command for the protocol
+      # Return the correct iptables command determined if this rule can apply
+      # to IPv4, or IPv6, or both IPv4 and IPv6 addresses.
       #
       def iptables_cmds
         #
@@ -272,6 +311,12 @@ module Symbiosis
       # The meat of the code.  This is designed to return the
       # actual "iptables" command which this rule can be used
       # to generate.
+      #
+      # This can cope with new ERB-based templates, as well as older ones with
+      # perl-style $SRC/$DEST statements.
+      #
+      # For the old-style templates, any substitutions other than $SRC and
+      # $DEST will be removed, and warned about if the verbose flag is set.
       #
       # TODO: this could be neater.
       #

@@ -6,8 +6,24 @@ module Symbiosis
   module Firewall
     class Blacklist
 
-      attr_reader :attempts, :base_dir, :logtail_db
+      #
+      # The number of attempts required for a blacklist entry to be activated.  Defaults to 20.
+      #
+      attr_reader :attempts
 
+      #
+      # Returns the base directory.  Defaults to /etc/symbiosis/firewall.
+      #
+      attr_reader :base_dir
+
+      #
+      # The name of the logtail database,  Defaults to /var/lib/symbiosis/firewall-blacklist-logtail.db.
+      #
+      attr_reader :logtail_db
+
+      #
+      # Sets up a new Symbiosis::Firewall::Blacklist.
+      #
       def initialize()
         @attempts     = 20
         @base_dir     = '/etc/symbiosis/firewall'
@@ -15,21 +31,36 @@ module Symbiosis
         @patterns     = []
       end
 
-      def base_dir=(b)
-        raise Errno::ENOENT, b unless File.directory?(b)
+      #
+      # Sets the base directory.  Raises Errno::ENOENT if the directory doesn't exist.
+      #
+      def base_dir=(dir)
+        raise Errno::ENOENT, dir unless File.directory?(dir)
 
-        @base_dir = b
+        @base_dir = dir
       end
 
+      #
+      # Sets the filename of logtail database. This is where offsets are
+      # recorded for the various logfiles parsed.
+      #
       def logtail_db=(db)
         @logtail_db = db
       end
       
+      #
+      # This generates the blacklist.  It returns a hash with IP addresses as
+      # keys, and arrays of ports as values.
+      #
       def generate
         results = do_read
         do_parse(results)
       end
 
+      #
+      # This sets the number of attempts needed to trigger blacklisting.  Its
+      # argument should be an Integer, and raises an ArgumentError if not.
+      #
       def attempts=(a)
         raise ArgumentError, "#{a.inspect} must be an integer" unless a.is_a?(Integer)
         @attempts = a
