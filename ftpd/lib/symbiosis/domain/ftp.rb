@@ -1,28 +1,43 @@
 
 require 'symbiosis/domain'
 
-#
-# This extends the Symbiois domain class with some FTP methods.
-#
 module Symbiosis
+
   class Domain
 
+    #
+    # Returns the FTP username, i.e. the domain name.
+    #
     def ftp_username
       self.name
     end
 
+    #
+    # Returns the FTP chroot directory.  Currently defaults to
+    # self.directory/public/./
+    #
     def ftp_chroot_dir
       File.join(self.directory, "public", ".", "")
     end
 
+    #
+    # Returns the name of the FTP password file.
+    #
     def ftp_password_file
       File.join(self.config_dir,"ftp-password")
     end
 
+    #
+    # Checks to see if FTP has been enabled for this domain.
+    #
     def ftp_enabled?
       File.readable?(self.ftp_password_file)
     end
 
+    #
+    # Returns the FTP password as a string, or nil if no password could be
+    # found.
+    #
     def ftp_password
       @ftp_password ||= nil
 
@@ -60,7 +75,8 @@ module Symbiosis
     end
     
     #
-    # Handle the quota, in bytes.
+    # Return the FTP quota.  Uses Symbiois::Utils#parse_quota to do the
+    # parsing.  Returns an Integer, or nil if no quota was set.
     #
     def ftp_quota
       if ! defined? @ftp_quota or @ftp_quota.nil?
@@ -85,6 +101,11 @@ module Symbiosis
       @ftp_quota
     end
 
+    #
+    # Sets the quota.  Uses Symbiois::Utils#parse_quota to check it can be
+    # parsed.  Returns the parsed Integer, or nil if no quota was set.
+    #     
+    #
     def ftp_quota=(q)
       if q.nil?
         @ftp_quota = nil
@@ -96,7 +117,15 @@ module Symbiosis
 
       return @ftp_quota
     end
-    
+   
+    #
+    # Check the password, and create the chroot'd directory if the password
+    # check succeeds.
+    #
+    # Raises an ArgumentError if the password is wrong.
+    #
+    # Returns true on success.
+    #
     def ftp_login(password)
       #
       # Do the password check.
