@@ -1,10 +1,11 @@
 
 require "fileutils"
 
-#
-# This module has a number of useful methods that are used everywhere.
-#
 module Symbiosis
+
+  #
+  # This module has a number of useful methods that are used everywhere.
+  #
   module Utils
 
     # 
@@ -55,12 +56,20 @@ module Symbiosis
     end
 
     #
-    # Allow arbitrary settings in /config (or elsewhere) to be retrieved
+    # Allow arbitrary parameters in config_dir to be retrieved.
+    #
+    # * false is returned if the file does not exist, or is not readable
+    # * true is returned if the file exists, but is of zero length
+    # * otherwise the files contents are returned as a string.
+    #
     #
     def get_param(setting, config_dir)
       fn = File.join(config_dir, setting)
 
-      return false unless File.readable?(fn)
+      #
+      # Return false unless we can read the file
+      #
+      return false unless File.exists?(fn) and File.readable?(fn)
 
       #
       # Return true if the file is present and empty
@@ -70,11 +79,19 @@ module Symbiosis
       #
       # Otherwise return the contents
       #
-      return File.open(fn, "r"){|fh| fh.read}
+      return File.open(fn, "r"){|fh| fh.read}.to_s
     end
 
     #
-    # allow setting to be set..
+    # Records a parameter.
+    #
+    #  * true is stored as an empty file
+    #  * false or nil causes the file to be removed, if it exists.
+    #  * Anything else is converted to a string and stored.
+    #
+    # If a file is created, or written to, then the permissions are set such
+    # that the file is owned by the same owner/group as the config_dir, and
+    # readable by everyone, but writable only by the owner (0644).
     #
     def set_param(setting, value, config_dir)
       fn = File.join(config_dir, setting)
@@ -84,24 +101,28 @@ module Symbiosis
       #
       raise "Config directory does not exist." unless File.exists?(config_dir)
 
-      if value.nil?
+      if true == value
         FileUtils.touch(fn)
+      elsif false == value or value.nil?
+        File.unlink(fn) if File.exists?(fn)
       else
         File.open(fn,"w+"){|fh| fh.puts(value.to_s)}
       end
 
-      #
-      # Make sure permissions are OK
-      #
-      fs = File.stat(config_dir)
+      if File.exists?(fn)
+        #
+        # Make sure permissions are OK
+        #
+        fs = File.stat(config_dir)
 
-      #
-      # Set up some verbose output if we're debugging
-      #
-      options = {}
-      options[:verbose] = true if $DEBUG
-      FileUtils::chown  fs.uid.to_s, fs.gid.to_s,  fn, options
-      FileUtils::chmod  0644, fn, options
+        #
+        # Set up some verbose output if we're debugging
+        #
+        options = {}
+        options[:verbose] = true if $DEBUG
+        FileUtils::chown  fs.uid.to_s, fs.gid.to_s,  fn, options
+        FileUtils::chmod  0644, fn, options
+      end
 
       #
       # Return the value we were originally given
@@ -111,13 +132,26 @@ module Symbiosis
 
 
     #
-    # Function to parse quotas
+    # If a numeric argument is given, it is rounded to the nearest whole
+    # number, and returned as an Integer.
     #
-    def parse_quota(str)
-      if str.is_a?(Numeric)
-        return str.round.to_i
+    # If a string is given, the method attempts to parse it.  The quota can be
+    # a decimal, followed optionally by a space, and optionally by a "prefix".
+    # Prefixes it understands are:
+    #
+    #  * k, M, G, T, P as powers of 10
+    #  * ki, Mi, Gi, Ti, Pi as powers of 2.
+    # 
+    # The answer is given as an Integer.
+    #
+    # An argument error is given if the string cannot be parsed, or the
+    # argument is neither a Numeric or String object.
+    #
+    def parse_quota(quota)
+      if quota.is_a?(Numeric)
+        return quota.round.to_i
  
-      elsif str.is_a?(String) and str =~ /^([\d\.]+)\s*([bkMGTP]i?)?/
+      elsif quota.is_a?(String) and quota =~ /^\s*([\d\.]+)\s*([bkMGTP]i?)?/
 
         n = $1.to_f
         m = case $2
@@ -135,8 +169,8 @@ module Symbiosis
         end
 
         return (n*m).round.to_i
-      elsif str.is_a?(String)
-        raise ArgumentError, "Cannot parse quota #{str.inspect}"
+      elsif quota.is_a?(String)
+        raise ArgumentError, "Cannot parse quota #{quota.inspect}"
       else
         raise ArgumentError, "parse_quota requires either a String or Numeric argument"
       end
