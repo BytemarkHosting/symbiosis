@@ -1,12 +1,12 @@
 require 'symbiosis/utils'
 require 'symbiosis/host'
 require 'etc'
-#
-#  Ruby class to model a domain.
-#
 
 module Symbiosis
 
+  #
+  #  Ruby class to model a Symbiosis domain.
+  #
   class Domain
 
     #
@@ -17,7 +17,8 @@ module Symbiosis
     attr_reader :uid, :gid, :user, :group, :name, :prefix, :directory
 
     #
-    # Constructor.
+    # Creates a new domain object.  If no name is set a random domain name is
+    # generated, based on 10 characters in the imaginary <code>.test</code> TLD.
     #
     def initialize( name = nil, prefix = "/srv" )
       #
@@ -77,7 +78,7 @@ module Symbiosis
     end
 
     #
-    # Global config directory
+    # Global config directory.  Defaults to self.directory/config
     #
     def config_dir
       File.join(self.directory,"config")
@@ -124,7 +125,8 @@ module Symbiosis
 
 
     #
-    # Return all this domain's IPs (IPv4 and 6) as an array.
+    # Return all this domain's IPs (IPv4 and 6) as an array.  If none have been
+    # set, then the host's first primary IPv4 and IPv6 addresses are returned.
     #
     def ips
       param = get_param("ip",self.config_dir)
@@ -177,23 +179,38 @@ module Symbiosis
     end
 
     #
-    # Encrypt a password
+    # Encrypt a password, using the cyrpt() function, with MD5 hashing and an 8
+    # character salt.  The function returns the crypt() output, prepended with
+    # <code>{CRYPT}</code>.
     #
     def crypt_password(password)
       raise ArgumentError, "password must be a string" unless password.is_a?(String)
-      salt = "$1$"+random_string(4)+"$"
+      salt = "$1$"+random_string(8)+"$"
       return "{CRYPT}"+password.crypt(salt)
     end
 
     #
-    # Password check
+    # Checks a given password against the real one, which may be hashed using
+    # crypt_password.  An argument error is raised if either password is empty.
     #
-    def check_password(password, real_password)
+    # First the two passwords are compared using crypt(), and if that fails,
+    # then a plain text comparison is made.
+    #
+    # If the real password starts with <code>{CRYPT}</code> or a recognisable
+    # salt, i.e.  something like <code>$1$salt$</code> then only the crypted
+    # comparison is done.
+    #
+    # If the real password contains characters other than those allowed in
+    # crypt()'d hashes, just the plain text comparison is made.
+    #
+    # Returns true or false.
+    #
+    def check_password(given_password, real_password)
       # 
       # Make sure we have a real_password set, and chop whitespace of either end.
       #
       real_password = real_password.to_s.chomp.strip
-      password      = password.to_s
+      given_password      = given_password.to_s
 
       #
       # Check to make sure the password isn't empty.
@@ -203,7 +220,7 @@ module Symbiosis
       #
       # Make sure we have a password set
       #
-      raise ArgumentError, "No password given" if password.empty?
+      raise ArgumentError, "No password given" if given_password.empty?
 
       # 
       # Check the password, crypt first, plaintext second.
@@ -221,7 +238,7 @@ module Symbiosis
         #
         # Do the comparison
         #
-        result = ( password.crypt( crypted_password ) == crypted_password )
+        result = ( given_password.crypt( crypted_password ) == crypted_password )
 
         #
         # If the result was successful, or we know that we have to use crypt,
@@ -233,10 +250,13 @@ module Symbiosis
       #
       # Fall back to a plain text comparison
       #
-      return password == real_password
+      return given_password == real_password
     end
 
-    def to_s ; self.name ; end
+    #
+    # Returns the domain name as a string.
+    # 
+    def to_s ; self.name.to_s ; end
   end
 end
 
