@@ -174,8 +174,11 @@ class Symbiosis
       end
     end
 
-    def grep(time = DateTime.now)
-      @records.select{|record| record.ready?(time)}
+    #
+    # Returns any records that are ready to run now.
+    #
+    def grep(now = DateTime.now)
+      @records.select{|record| record.ready?(now)}
     end
 
     private
@@ -197,14 +200,29 @@ class Symbiosis
 
   end
 
+  #
+  # This is the exception raised if a CrontabRecord could not be interpreted.
+  #
   class CrontabFormatError < StandardError; end
 
+  #
+  # This class represents and individual line of a crontab
+  #
   class CrontabRecord
 
+    #
+    # Weekday names that can be used in records
+    #
     WDAY = %w(sun mon tue wed thu fri sat)
 
+    #
+    # Month names that can be used in records.
+    #
     MON  = %w(jan feb mar apr may jun jul aug sep oct nov dec)
 
+    #
+    # Hash of names that correspond to @ shortcuts.
+    #
     SHORTCUTS = {
        "(?:year|annual)ly"  => "0 0 1 1 *",
        "monthly"            => "0 0 1 * *",
@@ -213,6 +231,10 @@ class Symbiosis
        "hourly"             => "0 * * * *"
     }
 
+    #
+    # Create a new CrontabRecord using a string.  Raises CrontabFormatError if
+    # the string parsing fails.
+    #
     def self.parse(str)
       if str =~ /\A(?:(?:\S+\s+){5}|@(?:#{SHORTCUTS.keys.join("|")})\s+)(.*)\Z$/
 
@@ -243,6 +265,11 @@ class Symbiosis
 
     attr_reader :min, :hour, :mday, :mon, :wday, :command
 
+    #
+    # Create a new CrontabRecord, setting the minute, hour, month-day, month,
+    # week-day and command.  Raises a CrontabFormatError if any of the
+    # arguments fail to parse. 
+    #
     def initialize(min, hour, mday, mon, wday, command)
       @min  = parse_field(min,  0, 59)
       @hour = parse_field(hour, 0, 23)
@@ -256,20 +283,32 @@ class Symbiosis
       self.command = command
     end
 
+    #
+    # Set the command to c.  Accepts a String or Proc.
+    #
     def command=(c)
       raise ArgumentError, "Commands must be a String or a Proc" unless c.is_a?(String) or c.is_a?(Proc)
       @command = c
     end
 
-    def ready?(time = DateTime.now)  
-      min.include?  time.min  and
-      hour.include? time.hour and
-      mday.include? time.mday and
-      mon.include?  time.mon  and
-      wday.include? time.wday
+    #
+    # Returns true if the record should be run at time set by now.
+    #
+    def ready?(now = DateTime.now)  
+      min.include?  now.min  and
+      hour.include? now.hour and
+      mday.include? now.mday and
+      mon.include?  now.mon  and
+      wday.include? now.wday
     end
 
-    def next_due(time = DateTime.now)
+    #
+    # Determines when the record is next due to be run.  Returns a DateTime if
+    # the time could be determined, or nil if the record is not due to run any
+    # time in the 30 years after now.
+    #
+    def next_due(now = DateTime.now)
+      time      = now
       orig_time = time
 
       while !ready?(time)
@@ -342,6 +381,9 @@ class Symbiosis
     end
 
 
+    #
+    # Run the command.  Returns an arry of strings as output.
+    #
     def run
       # OK to run we're just going to run the command in a pipe.
       #
