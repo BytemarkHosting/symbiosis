@@ -31,12 +31,21 @@ require 'net/smtp'
 require 'date'
 require 'time'
 
+#
+# Additional methods for DateTime
+#
 class DateTime
 
+  #
+  # Return a string of self in the standard "YYYY-MM-DD hh:mm" format.
+  #
   def iso8601
     "%04i-%02i-%02i %02i:%02i" % [ year, month, day, hour, min ]
   end
 
+  #
+  # Convert self into a Time.
+  #
   def to_time
     Time.local(year, month, day, hour, min, sec)
   end
@@ -44,20 +53,31 @@ end
 
 class Symbiosis
 
+  #
+  # A class representing a Crontab.
+  # 
   class Crontab
     
+    # 
+    # The array of crontab records
     #
-    # Class variables
+    attr_reader :records
+
     #
-    # * records is an array of crontab records
-    # * filename is the name of the file originally read or "string input" if
-    #   no file was read
-    # * crontab is the original string input to parse.
-    # * mail_output is a flag determining if output should be sent by email
-    # * environment is a hash containing environment variables set in the crontab
-    # * mailcommand 
+    # The name of the file originally read or "string input" if no file was
+    # read
     #
-    attr_reader :records, :filename, :crontab, :environment
+    attr_reader :filename
+    
+    #
+    # The original string input to parse.
+    #
+    attr_reader :crontab
+
+    #
+    # environment is a hash containing environment variables set in the crontab
+    #
+    attr_reader :environment
 
     #
     # This takes an argument of a crontab in a string, or a filename.  If a
