@@ -12,8 +12,9 @@ symbiosis-httpd (2012:0201) stable; urgency=low
   * Merged ApacheMassHosting and ApacheSSL classes into one.
   * Tidied up templates to use neater ERb
   * Fixed postinst to behave better.
+  * Added Symbiosis::Domain#should_have_stats? and Symbiosis::Domain#should_have_stats= 
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 31 Jan 2012 17:26:36 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 01 Feb 2012 10:57:27 +0000
 
 symbiosis-httpd (2012:0124) stable; urgency=low
 
