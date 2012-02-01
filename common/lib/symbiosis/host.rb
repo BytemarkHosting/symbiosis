@@ -5,6 +5,9 @@ require 'symbiosis/ipaddr'
 
 module Symbiosis
 
+  #
+  # This class encompasses functions / data that are set host-wide.
+  #
   class Host 
 
     BYTEMARK_RANGES = %w(80.68.80.0/20 89.16.160.0/19 212.110.160.0/19 46.43.0.0/18 91.223.58.0/24 213.138.96.0/19 2001:41c8::/32).collect{|i| IPAddr.new(i)}
@@ -16,13 +19,6 @@ module Symbiosis
     #
     def self.is_bytemark_ip?(ip)
       BYTEMARK_RANGES.any?{|range| range.include?(IPAddr.new(ip.to_s))}
-    end
-
-    #
-    # Returned a cached netlink socket.
-    #
-    def self.netlink_socket
-      @netlink_socket ||= Linux::Netlink::Route::Socket.new
     end
 
     #
@@ -92,7 +88,7 @@ module Symbiosis
 
     #
     # Returns the "primary" IP of the machine.  This is assumed to be the
-    # address with the smallest prefix.  If there is more than one with the
+    # address with the smallest CIDR prefix.  If there is more than one with the
     # same prefix, then we take the first. 
     #
     def self.primary_ip(conditions = {})
@@ -275,6 +271,16 @@ module Symbiosis
 
       return nil
     end
+    
+    private
+    
+    #
+    # Returned a cached netlink socket.
+    #
+    def self.netlink_socket
+      @netlink_socket ||= Linux::Netlink::Route::Socket.new
+    end
+
 
   end
 
