@@ -10,6 +10,9 @@ module Symbiosis
   
       include Symbiosis::Utils
 
+      #
+      # Check to see if a local part is valid.
+      #
       def self.valid_local_part?(lp)
         #
         # This is defined in exim4.conf too.
@@ -19,6 +22,12 @@ module Symbiosis
 
       attr_reader :local_part, :domain, :mailboxes_dir
 
+
+      #
+      # Set up a new mailbox object.
+      #
+      # This does not actually create it on disc.
+      #
       def initialize(local_part, domain, mailboxes_dir="mailboxes")
 
         raise ArgumentError, "Not a valid local_part" unless Mailbox.valid_local_part?(local_part)
@@ -31,29 +40,58 @@ module Symbiosis
         @password      = nil
       end
 
+      #
+      # Returns the username required for IMAP/POP3/SMTP authentication.
+      #
       def username
         [self.local_part, self.domain.name].join("@")
       end
 
+      #
+      # Returns the directory for the mailbox
+      #
       def directory
         File.join(self.domain.directory, self.mailboxes_dir, self.local_part)
       end
 
+      #
+      # Creates the mailbox.  Returns self.
+      #
       def create
         self.domain.create_dir(self.directory) unless self.exists?
         self
       end 
 
+      #
+      # Returns true if the mailbox already exists.
+      #
       def exists?
         File.readable?( self.directory )
       end
 
-      def quota=(quota)
-        parse_quota(quota)
-        set_param("quota", quota, self.directory)
-        quota
+      #
+      # Sets the individual mailbox quota.  Uses Symbiosis::Utils#parse_quota
+      # to check the argment.  Returns an interpreted quota, i.e. an integer or
+      # nil.  Creates the mailbox if needed.
+      #
+      def quota=(q)
+        self.create
+        
+        unless q.nil?
+          ans = parse_quota(q)
+        else
+          ans = nil
+        end
+
+        set_param("quota", q, self.directory)
+
+        ans
       end
 
+      #
+      # Retuns any quota set.  If nothing has been set for this mailbox, the
+      # domain's quota is used.
+      #
       def quota
         quota = nil
         param = get_param("quota",self.directory)
@@ -62,7 +100,6 @@ module Symbiosis
         unless param.is_a?(String)
           quota = nil
         else
-          quota = param.split.first.strip
           begin
             quota = parse_quota(param)
          rescue ArgumentError
@@ -77,6 +114,10 @@ module Symbiosis
         quota
       end
 
+      #
+      # Returns the mailbox's password, or nil if one has not been set, or the
+      # mailbox doesn't exist.
+      #
       def password
         if self.exists? and @password.nil? 
           #
@@ -93,6 +134,11 @@ module Symbiosis
         @password
       end
 
+      #
+      # Sets the password, creating the mailbox if needed.  If the
+      # encrypt_password flag is set then the password is encrypted using
+      # Symbiosis::Domain#crypt_password
+      #
       def password=(pw)
         @password = pw
         self.create
@@ -106,11 +152,21 @@ module Symbiosis
         return @password
       end
 
-      def encrypt_password=(tf)
-        raise ArgumentError, "Must be true or false" unless [true, false].include?(tf)
-        @encrypt_password = tf
+      #
+      # Sets the encrypt_password flag.  This is set to true by default.
+      #
+      def encrypt_password=(bool)
+        raise ArgumentError, "Must be true or false" unless [true, false].include?(bool)
+        @encrypt_password = bool
       end
 
+      #
+      # Try to login to a mailbox using a password.
+      #
+      # An ArgumentError is raised if login fails.
+      #
+      # Returns true if login succeeds.
+      #
       def login(pw)
         #
         # Do the password check.
@@ -147,23 +203,44 @@ module Symbiosis
       results
     end
 
+    #
+    # Find a mailbox for this domain, based on its local part.
+    #
     def find_mailbox(local_part)
       return nil unless Mailbox.valid_local_part?(local_part)
 
       mailboxes.find{|mailbox| mailbox.local_part == local_part}
     end
 
+    #
+    # Create a new mail box for a local part.
+    # 
     def create_mailbox(local_part, mailboxes_dir = "mailboxes")
       mailbox = Mailbox.new(local_part, self, mailboxes_dir)
       mailbox.create
     end
 
-    def default_mailbox_quota=(quota)
-      parse_quota(quota)
+    #
+    # Set the default mailbox quota for the domain.  Uses
+    # Symbiosis::Utils#parse_quota to check the argment.  Returns an
+    # interpreted quota, i.e. an integer or nil.  
+    #
+    def default_mailbox_quota=(q)
+      unless q.nil?
+        ans = parse_quota(quota)
+      else
+        ans = nil
+      end
+
       set_param("default-mailbox-quota", quota, self.config_dir)
-      quota
+
+      ans
     end
 
+    #
+    # Fetches the default mailbox quota for the domain.  Returns an integer, or
+    # nil if no quota was set or the set quota could not be parsed.
+    #
     def default_mailbox_quota
       quota = nil
       param = get_param("default-mailbox-quota",self.config_dir)
@@ -171,7 +248,6 @@ module Symbiosis
       unless param.is_a?(String)
         quota = nil
       else
-        quota = param.split.first.strip
         begin
           quota = parse_quota(param)
        rescue ArgumentError
@@ -185,7 +261,10 @@ module Symbiosis
   end
 
   class Domains
-    
+   
+    #
+    # Finds and returns a mailbox based on an email address.
+    #  
     def self.find_mailbox(address, prefix="/srv")
       raise ArgumentError, "Address is not a String" unless address.is_a?(String)
       address = address.downcase.split("@")
