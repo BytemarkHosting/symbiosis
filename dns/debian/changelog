@@ -2,8 +2,9 @@ symbiosis-tinydns (2012:0201) stable; urgency=low
 
   * Updated DNS template to use the neater ERB syntax. 
   * Added uses_bytemark_antispam? methods to Symbiosis::Domain.
+  * Required 'symbiosis/domain/dns' in the config file library
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 01 Feb 2012 10:50:51 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 01 Feb 2012 15:56:28 +0000
 
 symbiosis-tinydns (2012:0201) stable; urgency=low
 

@@ -1,4 +1,5 @@
 require 'symbiosis/config_file'
+require 'symbiosis/domain/dns'
 require 'tempfile'
 
 module Symbiosis
