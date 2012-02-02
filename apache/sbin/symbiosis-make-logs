@@ -1,327 +1,173 @@
 #!/usr/bin/ruby1.8
 #
-# This script is designed to generate per-domain statistics for each
-# domain hosted upon the current system.
-#
-# It does this in a multi-step process:
+# NAME
+#   symbiosis-make-logs - Generate statistics for domains.
 #
 #
-#   1.  Split /var/log/apache2/access.log into a number of files,
-#      one for each domain, in a temporary directory
+# SYNOPSIS
+#  symbiosis-make-logs [ -h | --help ] [-m | --manual]
+#       [ -v | --verbose ]
 #
-#   2.  For each split file which has been generated append the contents
-#      to /srv/$domain/logs/access.log - working out the domain name by
-#      examination of the file name.
 #
-#   3.  Once each access.log file has been placed into the logs/ directory
-#      it is resolved into hostnames, via logresolve, and stored at
-#      access.log.resolved
+# OPTIONS
+#  -h, --help              Show a help message, and exit.
 #
-#   4.  If the htdocs/ directory is non-empty, and the file /config/no-stats
-#      is missing then webalizer is run against the resolved file.
+#  -m, --manual            Show this manual, and exit.
 #
-#   5.  Finally the access.log file is removed, the access.log.resolved
-#      file is renamed to be access.log.$date
+#  -v, --verbose           Show verbose errors
 #
-#   6.  At this point "old" logs are removed.
 #
-#   7.  Done.
+# USAGE
 #
-# Steve
-# --
+# This script is designed to be invoked once per day and update the
+# web-visible access statistics for each hosted Symbiosis domain.
+#
+# The script is assumed to be invoked once per day, via /etc/cron.daily/.
+#
+#
+# SEE ALSO
+#
+#
+# AUTHOR
+#
+#   Steve Kemp <steve@bytemark.co.uk>
 #
 
 
-require 'date'
-require 'fileutils'
+#
+# Standard ruby
+#
 require 'getoptlong'
-require 'tmpdir'
+
+#
+# Symbiosis libraries
+#
+require 'symbiosis/domains'
 
 
 
 #
-#  Given a logfile split it in a temporary directory, into one file
-# per domain.
+#  The options set by the command line.
 #
-def split_access_log( filename )
-
-  #
-  #  Create a temporary directory
-  #
-  dir = Dir.mktmpdir
-
-  #
-  #  Now split the logfile in this directory
-  #
-  system( "cd #{dir} && split-logfile < #{filename}" )
-
-  #
-  #  Return the directory name
-  #
-  return( dir );
-
-end
+help         = false
+manual       = false
+$VERBOSE     = false
 
 
-#
-#  Given the name of a logfile, and the directory it appears in
-# try to match that against a domain
-#
-def add_to_domain(dir, file )
-
-  log = "#{dir}/#{file}"
-
-  #
-  #  Find the domain name from the file name
-  #
-  domain = file.gsub(/\.log$/i, '' );
-
-  dest = ""
-  ret = ""
-
-  #
-  #  If the domain exists then we're golden.
-  #
-  if ( File.directory?( "/srv/#{domain}" ) )
-    dest = "/srv/#{domain}/public/logs"
-    ret = domain
-  end
-
-  #
-  #  Now try again without the www. prefix
-  #
-  domain = domain.gsub( /^www\./i, '')
-  if ( File.directory?( "/srv/#{domain}" ) )
-    dest = "/srv/#{domain}/public/logs"
-    ret = domain
-  end
-
-
-  #
-  #  OK at this point we either have an empty destination, or
-  # a valid one.
-  #
-  #  If we have a destination make the logs directory, if missing
-  # and append the file to it.
-  #
-  if ( dest.length > 0 )
-    if ( !File.directory?( dest ) )
-      FileUtils.mkdir_p( dest )
-    end
-    system( "cat #{log} >> #{dest}/access.log" )
-  end
-
-  return ret;
-end
-
-
-#
-#  Does the domain have content?
-#
-def has_content?( domain )
-
-  count = 0
-
-  #
-  #  If the public/htdocs/ folder doesn't exist the domain is empty.
-  #
-  return false if ( !File.directory?( "/srv/#{domain}/public/htdocs" ) )
-
-  #
-  #  Otherwise count the non-dotfile entries
-  #
-  Dir.foreach("/srv/#{domain}/public/htdocs" ) do |entry|
-    next if ( entry =~ /^\./ )
-    count += 1;
-  end
-
-  #
-  #  Did we find something?
-  #
-  return ( count != 0 )
-end
-
-
-#
-#  Are statistics generated for the domain?
-#
-def stats_disabled_for_domain?( domain )
-  return( File.exists?( "/srv/#{domain}/config/no-stats" ) )
-end
-
-
-
-###
-#
-#  Start of code
-##
-####################################
-
-
-#
-# Options parsing
-#
 opts = GetoptLong.new(
-                        [ "--verbose",    "-v", GetoptLong::NO_ARGUMENT ]
+                      [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
+                      [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
+                      [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ]
                       )
 
-opts.each do |opt, arg|
-  case opt
-  when "--verbose"
-    $VERBOSE=1
-  end
-end
 
-#
-#  First of all exit if we don't have a logfile.
-#
-if ( !File.exists?( "/var/log/apache2/access.log" ) )
-  puts( "Missing apache logfile: /var/log/apache2/access.log" ) if $VERBOSE
-  exit( 0 );
-end
-
-#
-#  Split the existing logfile into a number of files, one for each
-# virtual host which has been accessed within the past day
-#
-dir = split_access_log( "/var/log/apache2/access.log" );
-
-
-#
-#  Process the directory of split logfiles
-#
-domains = Hash.new()
-
-Dir.foreach(dir) do |entry|
-
-  #
-  #  If the logfile contains a name.
-  #
-  next if ( entry =~ /^\./ )
-
-  #
-  #  If we can find the domain name for this log then
-  # we'll append it.
-  #
-  domain = add_to_domain( dir, entry );
-
-  domains[domain] = 1 if ( domain.length > 0 )
-end
-
-
-#
-#  OK for each domain we've added logfile entries to
-#
-#
-domains.each_key do |domain|
-
-  puts "Processing log for domain #{domain}" if $VERBOSE
-
-  #
-  #  Resolve the logfile, regardless of whether we're going to make
-  # statistics or not.
-  #
-  system( "logresolve < /srv/#{domain}/public/logs/access.log > /srv/#{domain}/public/logs/access.log.resolved" )
-
-
-  #
-  #  Now if we've got content.
-  #
-  if ( has_content?(domain) )
-
-    #
-    #  Does this domain have stats disabled?
-    #
-    if ( stats_disabled_for_domain?( domain ) )
-
-      puts "\tStats disabled for domain: #{domain}" if $VERBOSE
-
-    else
-
-      #
-      #  Create the output directory
-      #
-      if ( !File.directory?( "/srv/#{domain}/public/htdocs/stats" ) )
-        FileUtils.mkdir_p(  "/srv/#{domain}/public/htdocs/stats" );
-      end
-
-      #
-      #  If the webalizer file isn't present create it
-      #
-      if ( !File.exists?( "/srv/#{domain}/public/htdocs/stats/webalizer.conf" ) )
-
-        puts "\tCreating webalizer configuration file" if $VERBOSE
-
-        File.open( "/srv/#{domain}/public/htdocs/stats/webalizer.conf", "w" ) do |f|
-          f.write <<"EOF"
-
-OutputDir       /srv/#{domain}/public/htdocs/stats/
-Incremental     yes
-ReportTitle     Usage Statistics for
-HostName        #{domain}
-HideSite        #{domain}
-HideReferrer    #{domain}/
-HideReferrer    Direct Request
-HideURL         *.gif
-HideURL         *.GIF
-HideURL         *.jpg
-HideURL         *.JPG
-HideURL         *.ra
-GroupURL        /cgi-bin/*
-MangleAgents    4
-EOF
-                                 end
-
-        puts "\tRunning webalizer" if $VERBOSE
-
-
-        #
-        #  Now run it
-        #
-        system( "cd /srv/#{domain}/public/htdocs/stats/ && webalizer -q /srv/#{domain}/public/logs/access.log.resolved" );
-      end
-    end
-
-  else
-
-      puts "\tDomain has no content: #{domain}"
-
-  end
-
-  #
-  #  Finally for each /srv/*/public/logs/access.log
-  #
-  #  1.  Rename to access.$date
-  #
-  #  2.  Remove "old" entries.
-  #
-  #
-  if ( File.exists?( "/srv/#{domain}/public/logs/access.log" ) )
-    File.unlink( "/srv/#{domain}/public/logs/access.log" )
-  end
-
-  #
-  #  Rename
-  #
-  date = Date.today.to_s
-  File.rename( "/srv/#{domain}/public/logs/access.log.resolved",
-               "/srv/#{domain}/public/logs/access.log.#{date}" )
-
-
-  #
-  #  Now we need to remove the old files in the directory.
-  #
-  Dir.new("/srv/#{domain}/public/logs").each do |name|
-    if File.file?(name)
-      if File.mtime(name) < Time.now - (60 * 60 * 24 * 10)
-        puts "\tCleaning up old logfile: #{name}" if $VERBOSE
-        File.unlink(name)
-      end
+begin
+  opts.each do |opt,arg|
+    case opt
+    when '--help'
+      help = true
+    when '--manual'
+      manual = true
+    when '--verbose'
+      $VERBOSE = true
     end
   end
+rescue
+  # any errors, show the help
+  help = true
 end
 
+
 #
-#  Finally cleanup the temporary directory
+# CAUTION! Here be quality kode.
 #
-system( "rm -rf #{dir}" )
+if manual or help
+
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
+
+  found_synopsis = false
+
+  lines.each do |line|
+
+    line.chomp!
+    break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
+    puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
+  end
+
+  exit 0
+end
+
+
+
+#
+#  Potentially we process each domain.
+#
+Symbiosis::Domains.each do |domain|
+
+  puts "Considering domain: #{domain}" if ( $VERBOSE )
+
+  #
+  # Are statistics disabled for this domain?
+  #
+  disable = File.join( domain.config_dir, "no-stats" )
+
+  if (File.exists?( disable ) )
+    puts "\tSkipping due to existance of #{disable}" if ( $VERBOSE )
+    next
+  end
+
+  #
+  # OK we're going to proceed.
+  #
+  puts "\tProcessing #{domain}"
+
+  #
+  # OK now we need to look for a logfile, or two.
+  #
+  #  access.log     for HTTP accesses.
+  #  access.ssl.log for HTTPS accesses.
+  #
+  process = Array.new()
+
+  process.push( File.join( domain.log_dir, "access.log.1" ) ) if
+    File.exists?( File.join( domain.log_dir, "access.log.1" ) )
+  process.push( File.join( domain.log_dir, "access.ssl.log.1" ) ) if
+    File.exists?( File.join( domain.log_dir, "access.ssl.log.1" ) )
+
+  #
+  # If we have less than one logfile to process we are done.
+  #
+  if ( process.size < 1 )
+    puts "\tSkipping this domain, no suitable logfiles found" if ( $VERBOSE )
+    next
+  end
+
+
+  #
+  # Show the files we're going to process.
+  #
+  puts "\tTo process #{process.join( "," )}" if ( $VERBOSE )
+
+
+  #
+  #  Now process them.
+  #
+  process.each do |file|
+
+    # TODO
+  end
+
+end
+
+
+
