@@ -98,3 +98,26 @@ if manual or help
   exit 0
 end
 
+
+
+
+#
+#  OK we use our common library code to run:
+#
+Symbiosis.domains.each |domain| do
+
+  $verbose && puts "Processing #{domain}"
+
+  next if ( domain.stats_disabled? )
+
+  if we have access.log.1 | access.ssl.log.1
+
+     # create stub webalizer config if missing
+     # run webalizer
+
+   else
+
+     verbose && puts "Skipping domain: no logs"
+  end
+
+end
