@@ -43,7 +43,7 @@ require 'getoptlong'
 # Symbiosis libraries
 #
 require 'symbiosis/domains'
-
+require 'symbiosis/domain/http'
 
 
 
@@ -120,8 +120,7 @@ Symbiosis::Domains.each do |domain|
   #
   # Are statistics disabled for this domain?
   #
-  disable = File.join( domain.config_dir, "no-stats" )
-  if (File.exists?( disable ) )
+  if ( !domain.should_have_stats? )
     puts "\tSkipping due to existance of #{disable}" if ( $VERBOSE )
     next
   end
