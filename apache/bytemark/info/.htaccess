@@ -3,12 +3,18 @@ deny from all
 
 # local system
 allow from 127.0.0.1
+allow from ::1
 
 # Office desktops.
 allow from 89.16.168.152
+allow from 2001:41c8:0:80:59:10:a8:98
 allow from 212.110.163.132
+allow from 2001:41c8:20:379:1::10
 
-# openvpn ranges
+# OpenVPN ranges
 allow from 80.68.83.160/27
 allow from 212.110.162.224/27
+#
+# TODO add OpenVPN IPv6 ranges, when it has IPv6 support :)
+#
 
