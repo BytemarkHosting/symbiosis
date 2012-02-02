@@ -43,6 +43,7 @@ require 'getoptlong'
 # Symbiosis libraries
 #
 require 'symbiosis/domains'
+require 'symbiosis/domain/http'
 
 
 
@@ -113,23 +114,17 @@ end
 #  Potentially we process each domain.
 #
 Symbiosis::Domains.each do |domain|
-
   puts "Considering domain: #{domain}" if ( $VERBOSE )
+
 
   #
   # Are statistics disabled for this domain?
   #
-  disable = File.join( domain.config_dir, "no-stats" )
-
-  if (File.exists?( disable ) )
+  if ( !domain.should_have_stats? )
     puts "\tSkipping due to existance of #{disable}" if ( $VERBOSE )
     next
   end
 
-  #
-  # OK we're going to proceed.
-  #
-  puts "\tProcessing #{domain}"
 
   #
   # OK now we need to look for a logfile, or two.
@@ -139,34 +134,79 @@ Symbiosis::Domains.each do |domain|
   #
   process = Array.new()
 
-  process.push( File.join( domain.log_dir, "access.log.1" ) ) if
-    File.exists?( File.join( domain.log_dir, "access.log.1" ) )
-  process.push( File.join( domain.log_dir, "access.ssl.log.1" ) ) if
-    File.exists?( File.join( domain.log_dir, "access.ssl.log.1" ) )
+  %w( access.log.1 access.ssl.log.1 ).each do |name|
+    process.push( File.join( domain.log_dir, name ) ) if
+      File.exists?( File.join( domain.log_dir, name ) )
+  end
+
 
   #
-  # If we have less than one logfile to process we are done.
+  # If we didn't find a logfile we're done.
   #
-  if ( process.size < 1 )
+  if ( process.empty? )
     puts "\tSkipping this domain, no suitable logfiles found" if ( $VERBOSE )
     next
   end
 
 
   #
-  # Show the files we're going to process.
+  #  Create a configuration file, if one wasn't found.
   #
-  puts "\tTo process #{process.join( "," )}" if ( $VERBOSE )
+  if ( !File.exists?( File.join( domain.log_dir, "webalizer.conf" ) ) )
 
+    puts "\tCreating webalizer configuration file" if $VERBOSE
 
-  #
-  #  Now process them.
-  #
-  process.each do |file|
+    File.open( File.join( domain.log_dir, "webalizer.conf" ), "w" ) do |f|
+      f.write <<"EOF"
 
-    # TODO
+OutputDir       /srv/#{domain}/public/htdocs/stats/
+Incremental     yes
+ReportTitle     Usage Statistics for
+HostName        #{domain}
+HideSite        #{domain}
+HideReferrer    #{domain}/
+HideReferrer    Direct Request
+HideURL         *.gif
+HideURL         *.GIF
+HideURL         *.jpg
+HideURL         *.JPG
+HideURL         *.ra
+GroupURL        /cgi-bin/*
+MangleAgents    4
+EOF
+    end
   end
 
+
+
+  #
+  #  If we don't have a statistics directory then we need to create it,
+  # and we need to create it with the domains' UID/GID
+  #
+  output =  "/srv/#{domain}/public/htdocs/stats/"
+  if( !File.directory?( output ) )
+    domain.create_dir( output )
+  end
+
+
+  #
+  #  Now process each logfile.
+  #
+  process.each do |file|
+    puts "\tRunning webalizer against #{file}" if $VERBOSE
+
+    #
+    #  Now run it
+    #
+    system( "cd #{domain.log_dir} && webalizer -q #{file} >/dev/null 2>/dev/null" )
+  end
+
+  #
+  #  Fixup the permissions on /htdocs/stats, recursively, to match the
+  # owner.
+  #
+  # TODO
+  #
 end
 
 
