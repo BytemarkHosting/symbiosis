@@ -4,8 +4,120 @@ require 'systemexit'
 require 'fcntl'
 
 module Symbiosis
+
     module Monitor
+
+      #
+      # This class is the parent class that can be used by individual service
+      # tests run by symbiosis-monit.
+      #
+      # This class should be inherited by tests to do checks.  Currently this
+      # class can check processes, TCP banners/responses, and can restart a
+      # process if needed.
+      #
+      # An example test:
+      #
+      #  #
+      #  # Inherit the Check class.
+      #  #
+      #  class SshdCheck < Symbiosis::Monitor::Check
+      #   
+      #   #
+      #   # Return the port as needed
+      #   #
+      #   attr_reader :port
+      # 
+      #   #
+      #   # Set up some defailt locations
+      #   # -- the pidfile, initscript, process name and TCP port.
+      #   #
+      #   def initialize
+      #     super
+      #     @process.pidfile = "/var/run/sshd.pid"
+      #     @process.initscript = "/etc/init.d/ssh"
+      #     @name = "sshd"
+      #     @port = 22
+      # 
+      #     #
+      #     # See if the port can be gleaned from the SSH config. 
+      #     #
+      #     if ( File.exists?( "/etc/sshd/sshd_config" ) )
+      # 
+      #       File("file").readlines.each |l|
+      #         @port = $1.to_i if l =~ /^Port\s+(\d+)/
+      #     end
+      #   end
+      # 
+      #   #
+      #   # Run the check -- this overrides the default do_check class in
+      #   # Symbiosis::Monitor::Check
+      #   #
+      #   def do_check
+      #     #
+      #     # Check our initscript, and return a config error if it is wrong.
+      #     #
+      #     return SystemExit::EX_CONFIG unless initscript_ok?
+      #
+      #     #
+      #     # Do the process check
+      #     #
+      #     r = do_process_check
+      #
+      #     #
+      #     # Restart if the process check returns a temporary error.
+      #     #
+      #     self.restart if SystemExit::EX_TEMPFAIL == r
+      #
+      #     #
+      #     # Return if the process check wasn't successful.
+      #     #
+      #     return r unless r.successful?
+      #
+      #     #
+      #     # Set up a TCP connection test.
+      #     #
+      #     tcpconnection = Symbiosis::Monitor::TCPConnection.new(
+      #       "localhost", @port, [nil,"SSH-2.0-OpenSSH-4.3p2\n"]
+      #     )
+      #
+      #     #
+      #     # Run the TCP connection check, 
+      #     #
+      #     r = do_tcpconnection_check(tcpconnection)
+      #
+      #     #
+      #     # Try to restart if the check returned a temporary failure.
+      #     #
+      #     self.restart if SystemExit::EX_TEMPFAIL == r
+      # 
+      #     #
+      #     # Finally return the result from the TCP check.
+      #     #
+      #     return r
+      #   end
+      # 
+      #   #
+      #   # This method is used in the TCP connection test to check the TCP responses.
+      #   #
+      #   def do_response_check(responses)
+      #     raise "Unexpected response '#{responses.first}'" unless responses.first =~ /^SSH/
+      #   end
+      # 
+      #  end
+      # 
+      #  #
+      #  # If this file is called as a script, run the check.
+      #  #
+      #  exit SshdCheck.new.do_check if $0 == __FILE__
+      # 
+      #
+      #
+      #  
       class Check
+
+        #
+        # The name of the process to check.
+        #
         attr_reader :name
 
         def initialize
