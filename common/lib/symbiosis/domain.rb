@@ -85,6 +85,14 @@ module Symbiosis
     end
 
     #
+    # Domains logfile directory.  Defaults to self.directory/public/logs
+    #
+    def log-dir
+      File.join(self.directory,"public/logs")
+    end
+
+
+    #
     # Create the /srv/ directory if we're supposed to.
     #
     def create
