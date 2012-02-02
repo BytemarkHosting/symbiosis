@@ -34,8 +34,17 @@
 #
 
 
+#
+# Standard ruby
+#
 require 'getoptlong'
-require 'fileutils'
+
+#
+# Symbiosis libraries
+#
+require 'symbiosis/domains'
+
+
 
 #
 #  The options set by the command line.
@@ -98,26 +107,74 @@ if manual or help
   exit 0
 end
 
+class Symbiosis::Domain
+  def log_dir
+      File.join(self.directory,"public/logs")
+
+  end
+end
 
 
 
 #
-#  OK we use our common library code to run:
+#  Potentially we process each domain.
 #
-Symbiosis.domains.each |domain| do
+Symbiosis::Domains.each do |domain|
 
-  $verbose && puts "Processing #{domain}"
+  puts "Considering domain: #{domain}" if ( $VERBOSE )
 
-  next if ( domain.stats_disabled? )
+  #
+  # Are statistics disabled for this domain?
+  #
+  disable = File.join( domain.config_dir, "no-stats" )
 
-  if we have access.log.1 | access.ssl.log.1
+  if (File.exists?( disable ) )
+    puts "\tSkipping due to existance of #{disable}" if ( $VERBOSE )
+    next
+  end
 
-     # create stub webalizer config if missing
-     # run webalizer
+  #
+  # OK we're going to proceed.
+  #
+  puts "\tProcessing #{domain}"
 
-   else
+  #
+  # OK now we need to look for a logfile, or two.
+  #
+  #  access.log     for HTTP accesses.
+  #  access.ssl.log for HTTPS accesses.
+  #
+  process = Array.new()
 
-     verbose && puts "Skipping domain: no logs"
+  process.push( File.join( domain.log_dir, "access.log.1" ) ) if
+    File.exists?( File.join( domain.log_dir, "access.log.1" ) )
+  process.push( File.join( domain.log_dir, "access.ssl.log.1" ) ) if
+    File.exists?( File.join( domain.log_dir, "access.ssl.log.1" ) )
+
+  #
+  # If we have less than one logfile to process we are done.
+  #
+  if ( process.size < 1 )
+    puts "\tSkipping this domain, no suitable logfiles found" if ( $VERBOSE )
+    next
+  end
+
+
+  #
+  # Show the files we're going to process.
+  #
+  puts "\tTo process #{process.join( "," )}" if ( $VERBOSE )
+
+
+  #
+  #  Now process them.
+  #
+  process.each do |file|
+
+    # TODO
   end
 
 end
+
+
+
