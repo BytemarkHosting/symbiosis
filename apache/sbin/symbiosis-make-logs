@@ -107,13 +107,6 @@ if manual or help
   exit 0
 end
 
-class Symbiosis::Domain
-  def log_dir
-      File.join(self.directory,"public/logs")
-
-  end
-end
-
 
 
 #
