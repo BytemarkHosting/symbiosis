@@ -1,3 +1,9 @@
+symbiosis-common (2012:0208) stable; urgency=low
+
+  * Symbiosis::Domains now searches for www.domain as well as just domain.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 02 Feb 2012 16:33:30 +0000
+
 symbiosis-common (2012:0201) stable; urgency=low
 
   * Fixed IP address detection on machines with point-to-point links.  Closes
