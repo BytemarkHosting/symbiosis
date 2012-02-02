@@ -1,0 +1,100 @@
+#!/usr/bin/ruby1.8
+#
+# NAME
+#   symbiosis-make-logs - Generate statistics for domains.
+#
+#
+# SYNOPSIS
+#  symbiosis-make-logs [ -h | --help ] [-m | --manual]
+#       [ -v | --verbose ]
+#
+#
+# OPTIONS
+#  -h, --help              Show a help message, and exit.
+#
+#  -m, --manual            Show this manual, and exit.
+#
+#  -v, --verbose           Show verbose errors
+#
+#
+# USAGE
+#
+# This script is designed to be invoked once per day and update the
+# web-visible access statistics for each hosted Symbiosis domain.
+#
+# The script is assumed to be invoked once per day, via /etc/cron.daily/.
+#
+#
+# SEE ALSO
+#
+#
+# AUTHOR
+#
+#   Steve Kemp <steve@bytemark.co.uk>
+#
+
+
+require 'getoptlong'
+require 'fileutils'
+
+#
+#  The options set by the command line.
+#
+help         = false
+manual       = false
+$VERBOSE     = false
+
+
+opts = GetoptLong.new(
+                      [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
+                      [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
+                      [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ]
+                      )
+
+
+begin
+  opts.each do |opt,arg|
+    case opt
+    when '--help'
+      help = true
+    when '--manual'
+      manual = true
+    when '--verbose'
+      $VERBOSE = true
+    end
+  end
+rescue
+  # any errors, show the help
+  help = true
+end
+
+
+#
+# CAUTION! Here be quality kode.
+#
+if manual or help
+
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
+
+  found_synopsis = false
+
+  lines.each do |line|
+
+    line.chomp!
+    break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
+    puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
+  end
+
+  exit 0
+end
+
