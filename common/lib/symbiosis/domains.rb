@@ -33,8 +33,37 @@ module Symbiosis
     # Finds a domain.  Returns either a Domain, or nil if nothing was found.
     #
     def self.find(domain, prefix="/srv")
-      return nil unless domain.to_s =~ /^([a-z0-9\-]+\.?)+$/
-      all(prefix).find{|d| d.name =~ /^#{domain}$/i}
+      #
+      # make capital letters lower-case.
+      #
+      domain = domain.to_s.downcase
+
+      #
+      # Sanity check name.
+      #
+      return nil unless domain =~ /^[a-z0-9-]+\.([a-z0-9-]+\.?)+$/
+     
+      #
+      # Search all domains.  This returns a maximum of two results -- one with
+      # www. and one without, assuming /srv/www.domain and /srv/domain both
+      # exist.
+      #
+      possibles = all(prefix).select{|d| domain =~ /^(www\.)?#{d.name}$/}
+
+      #
+      # Nothing found, return nil
+      #
+      return nil if possibles.length == 0      
+
+      #
+      # Return the one and only result.
+      #
+      return possibles.first if possibles.length == 1
+
+      #
+      # Return the domain with the exact-matching name
+      #
+      return possibles.find{|d| d.name == domain}
     end
 
     #
