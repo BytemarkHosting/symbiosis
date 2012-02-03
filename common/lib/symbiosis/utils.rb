@@ -296,7 +296,7 @@ module Symbiosis
       end
     end
 
-    module_function :mkdir_p, :set_param, :get_param, :random_string, :parse_quota
+    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota
 
   end
 
