@@ -41,12 +41,12 @@ module Symbiosis
 
     # 
     # This function generates a string of random numbers and letters from the
-    # sequence A-Z, a-z, 0-9 minus 0, O, o, 1, I, l.
+    # sequence A-Z, a-z, 0-9 minus 0, O, o, 1, I, i, l.
     #
     def random_string( len = 10 )
       raise ArgumentError, "length must be an integer" unless len.is_a?(Integer)
 
-      randchars = "23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
+      randchars = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
 
       name=""
 
@@ -135,7 +135,7 @@ module Symbiosis
           #
           # Record the value
           #
-          fh.puts(value.to_s) unless true == value
+          fh.write(value.to_s) unless true == value
         end
 
       end
@@ -191,7 +191,7 @@ module Symbiosis
         #
         # This will raise an error if we can't open the file
         #
-        fh = File.open(file, mode)
+        fh = File.open(file, mode, opts[:mode])
 
         #
         # Check to see if we've opened a symlink.
@@ -209,22 +209,23 @@ module Symbiosis
         #
         # Change the uid/gid as needed.
         #
-        if (opts[:uid] and file_stat.uid != opts[:uid]) or 
-         (opts[:gid] and file_stat.gid != opts[:gid])
+        if ((opts[:uid] and file_stat.uid != opts[:uid]) or 
+         (opts[:gid] and file_stat.gid != opts[:gid]))
           #
           # Change the owner if not already correct
           #
-          fh.lchown(opts(:uid), opts(:gid)) 
+          fh.chown(opts[:uid], opts[:gid]) unless link_stat.symlink?
         end
 
-        if (opts[:mode] and 
+        if opts[:mode] 
           #
           # Fix any permissions.
           #
-          fh.lchmod(0644)
+          fh.chmod(opts[:mode]) unless link_stat.symlink?
         end
 
       rescue ArgumentError, IOError, SystemCallError => err
+
         fh.close unless fh.nil? or fh.closed?
         raise err
       end
@@ -234,7 +235,7 @@ module Symbiosis
           #
           # Yield the block, and then close the file.
           #
-          return yield block
+          yield fh
         ensure
           #
           # Close the file, if possible.
