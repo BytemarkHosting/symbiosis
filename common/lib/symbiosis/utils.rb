@@ -56,15 +56,15 @@ module Symbiosis
     end
 
     #
-    # Allow arbitrary parameters in config_dir to be retrieved.
+    # Allow arbitrary parameters in parent_dir to be retrieved.
     #
     # * false is returned if the file does not exist, or is not readable
     # * true is returned if the file exists, but is of zero length
     # * otherwise the files contents are returned as a string.
     #
     #
-    def get_param(setting, config_dir)
-      fn = File.join(config_dir, setting)
+    def get_param(setting, parent_dir)
+      fn = File.join(parent_dir, setting)
 
       #
       # Return false unless we can read the file
@@ -85,43 +85,59 @@ module Symbiosis
     #
     # Records a parameter.
     #
-    #  * true is stored as an empty file
-    #  * false or nil causes the file to be removed, if it exists.
-    #  * Anything else is converted to a string and stored.
+    # * true is stored as an empty file
+    # * false or nil causes the file to be removed, if it exists.
+    # * Anything else is converted to a string and stored.
     #
     # If a file is created, or written to, then the permissions are set such
-    # that the file is owned by the same owner/group as the config_dir, and
+    # that the file is owned by the same owner/group as the parent_dir, and
     # readable by everyone, but writable only by the owner (0644).
     #
-    def set_param(setting, value, config_dir)
-      fn = File.join(config_dir, setting)
+    # Directories owned by system users/groups will not be written to.
+    #
+    def set_param(setting, value, parent_dir)
+      fn = File.join(parent_dir, setting)
 
       #
       # Make sure the directory exists first
       #
-      raise "Config directory does not exist." unless File.exists?(config_dir)
+      raise "Config directory does not exist." unless File.exists?(parent_dir)
 
-      if true == value
-        FileUtils.touch(fn)
-      elsif false == value or value.nil?
+      #
+      # Check the parent directory.
+      #
+      parent_dir_stat = File.stat(parent_dir)
+
+      #
+      # Refuse to write to directories owned by UIDs/GIDs < 1000.
+      #
+      raise ArgumentError, "Parent directory #{parent_dir} is owned by a system user." unless parent_dir_stat.uid >= 1000
+      raise ArgumentError, "Parent directory #{parent_dir} is owned by a system group." unless parent_dir_stat.gid >= 1000
+
+
+      if false == value or value.nil?
+        #
+        # This doesn't follow symlinks.
+        #
         File.unlink(fn) if File.exists?(fn)
+
       else
-        File.open(fn,"w+"){|fh| fh.puts(value.to_s)}
-      end
+        #
+        # Create the file/
+        #
 
-      if File.exists?(fn)
-        #
-        # Make sure permissions are OK
-        #
-        fs = File.stat(config_dir)
+        safe_open(fn, File::WRONLY|File::CREAT, :mode => 0644, :uid => parent_dir_stat.uid, :gid => parent_dir_stat.gid) do |fh|
+          #
+          # We're good to go.
+          #
+          fh.truncate(0)
+          
+          #
+          # Record the value
+          #
+          fh.puts(value.to_s) unless true == value
+        end
 
-        #
-        # Set up some verbose output if we're debugging
-        #
-        options = {}
-        options[:verbose] = true if $DEBUG
-        FileUtils::chown  fs.uid.to_s, fs.gid.to_s,  fn, options
-        FileUtils::chmod  0644, fn, options
       end
 
       #
@@ -130,6 +146,109 @@ module Symbiosis
       value
     end
 
+    #
+    # This method opens a file in a safe manner, avoiding symlink attacks and
+    # TOCTOU race conditions.
+    #
+    # The mode can be a string or an integer, but must not be "w" or "w+", or
+    # have File::TRUNC set, to avoid truncating the file on opening.
+    #
+    # +opts+ is an options hash in which the uid, gid, and mode file bits can
+    # be specified.
+    # 
+    # * :uid is the User ID, e.g. 1000.
+    # * :gid is the Group ID, e.g. 1000.
+    # * :mode is the permissions, e.g. 0644.
+    #
+    # By default mode is set using the current umask.  
+    #
+    def safe_open(file, mode = File::RDONLY, opts = {}, &block)
+      #
+      # Make sure the mode doesn't automatically truncate the file
+      #
+      if mode.is_a?(String)
+        raise Errno::EPERM, "Bad mode string #{mode.inspect} for opening a file safely." if %w(w w+).include?(mode)
+
+      elsif mode.is_a?(Integer)
+        raise Errno::EPERM, "Bad mode string #{mode.inspect} for opening a file safely." if (File::TRUNC == (mode & File::TRUNC))
+
+      else
+        raise ArgumentError, "Bad mode #{mode.inspect}"
+
+      end
+
+      #
+      # set some default options
+      #
+      opts = {:uid => nil, :gid => nil, :mode => (0666 - File.umask)}.merge(opts)
+
+      #
+      # Set up our filehandle object.
+      #
+      fh = nil
+
+      begin  
+        #
+        # This will raise an error if we can't open the file
+        #
+        fh = File.open(file, mode)
+
+        #
+        # Check to see if we've opened a symlink.
+        #
+        link_stat = fh.lstat
+        file_stat = fh.stat
+  
+        if link_stat.symlink? and file_stat.uid != link_stat.uid
+          #
+          # uh-oh .. symlink pointing at a file owned by someone else?
+          #
+          raise Errno::EPERM, file
+        end
+
+        #
+        # Change the uid/gid as needed.
+        #
+        if (opts[:uid] and file_stat.uid != opts[:uid]) or 
+         (opts[:gid] and file_stat.gid != opts[:gid])
+          #
+          # Change the owner if not already correct
+          #
+          fh.lchown(opts(:uid), opts(:gid)) 
+        end
+
+        if (opts[:mode] and 
+          #
+          # Fix any permissions.
+          #
+          fh.lchmod(0644)
+        end
+
+      rescue ArgumentError, IOError, SystemCallError => err
+        fh.close unless fh.nil? or fh.closed?
+        raise err
+      end
+
+      if block_given?
+        begin
+          #
+          # Yield the block, and then close the file.
+          #
+          return yield block
+        ensure
+          #
+          # Close the file, if possible.
+          #
+          fh.close unless fh.nil? or fh.closed?
+        end
+      else
+        #
+        # Just return the file handle.
+        #
+        return fh
+      end
+      
+    end
 
     #
     # If a numeric argument is given, it is rounded to the nearest whole

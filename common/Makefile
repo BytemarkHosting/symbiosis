@@ -16,7 +16,7 @@ clean:
 	$(RM) -r man
 
 test:
-	cd test ; for i in t*.rb ; do [ -x $$i ] && ruby1.8 -I ../lib $$i ; true ; done
+	cd test.d ; for i in t*.rb ; do ruby1.8 -I ../lib $$i ; true ; done
 
 .PHONY: test clean all docs
  
