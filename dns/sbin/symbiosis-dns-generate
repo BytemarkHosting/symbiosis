@@ -185,7 +185,8 @@ Symbiosis::Domains.each do |domain|
       new_filename = File.join(bytemarkdns_data_dir, File.basename(file))
 
       verbose "\tWriting data to #{new_filename}"
-      File.open(new_filename,"w") do |fh|
+      Symbiosis::Utils.safe_open(new_filename,File::WRONLY|File::CREAT) do |fh|
+        fh.truncate(0)
 
         fh.puts <<EOF
 #
@@ -261,7 +262,7 @@ begin
     #
     # Finally record the new hash
     #
-    File.open(hash_file, "w"){|fh| fh.puts new_hash }
+    Symbiosis::Utils.safe_open(hash_file, "a"){|fh| fh.truncate(0) ; fh.puts new_hash }
   else
     verbose "No need to upload as no changes in the data have been detected."
   end
