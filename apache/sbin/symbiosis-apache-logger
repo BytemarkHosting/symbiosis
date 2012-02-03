@@ -1,0 +1,317 @@
+#!/usr/bin/ruby1.8 -w
+#
+# NAME
+#   symbiosis-apache-logger - Log access requests on a per-domain basis.
+#
+# SYNOPSIS
+#  symbiosis-apache-logger [ --max-files | -f <n> ]
+#                          [ --default-log | -d <filename> ] [ -h | --help ]
+#                          [-m | --manual] [ -v | --verbose ] <filename>
+#
+#
+# OPTIONS
+#
+#  -f, --max-files <n>     Maxium number of log files to hold open. Defaults to
+#                          50.
+#
+#  -d, --default-log <filename>  The name of the logfile where hosts that are
+#                                not Symbiosis hosts get their logs recorded.
+#
+#  -s, --sync              Open the file in sync mode, i.e. all data are
+#                          immediately flushed to the OS and not buffered by
+#                          the script.
+#
+#  -h, --help              Show a help message, and exit.
+#
+#  -m, --manual            Show this manual, and exit.
+#
+#  -v, --verbose           Show verbose errors
+#
+# USAGE
+#
+#  In haste.
+#
+# AUTHOR
+#
+#  Patrick J Cherry <patrick@bytemark.co.uk> 
+#
+
+require 'getoptlong'
+
+
+#
+#  The options set by the command line.
+#
+help         = false
+manual       = false
+$VERBOSE     = false
+max_files    = 50
+default_log  = "/var/log/apache2/zz-mass-hosting.log"
+sync         = false
+
+opts = GetoptLong.new(
+  [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
+  [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
+  [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ],
+  [ '--max-files',  '-f', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--default-log','-d', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--sync'       ,'-s', GetoptLong::NO_ARGUMENT ]
+)
+
+begin
+  opts.each do |opt,arg|
+    case opt
+    when '--help'
+      help = true
+    when '--manual'
+      manual = true
+    when '--verbose'
+      $VERBOSE = true
+    when "--sync"
+      sync = true
+    when "--max-files"
+      max_files = arg.to_i
+    when "--default-log"
+      default_log = File.expand_path(arg)
+    end
+  end
+rescue
+  # any errors, show the help
+  help = true
+end
+
+access_log_filename = ARGV.pop if ARGV.size > 0
+
+#
+# CAUTION! Here be quality kode.
+#
+if manual or help
+
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
+
+  found_synopsis = false
+
+  lines.each do |line|
+
+    line.chomp!
+    break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
+    puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
+  end
+
+  exit 0
+end
+
+
+require 'symbiosis/domains'
+require 'symbiosis/utils'
+
+
+#
+# Our filehandle store is an array of File objects.
+#
+$filehandles = []
+
+#
+# Open a default file for all non-matching domains.
+#
+$default_filehandle = Symbiosis::Utils.safe_open(default_log,'a+')
+$default_filehandle.sync = sync
+
+#
+# These two flags are supposed to help avoid race conditions -- we don't want
+# to find a file handle to write to, and then find it closed when we want to
+# use it.
+#
+$closing_logs  = false
+$write_lock    = false
+
+#
+# Takes an array of filehandles and closes them all.
+#
+def do_close_all(fhs)
+  warn "Closing all files" if $VERBOSE
+  $closing_logs = true
+
+  #
+  # Sleep for 10 seconds if the write lock is true.
+  #
+  10.times do
+    break unless $write_lock
+    sleep 1
+  end
+  
+  warn "Waited 10 seconds for the loop to finish.  Closing anyway." if $VERBOSE
+
+  fhs.flatten.each do |fh|
+    begin
+      #
+      # Flush to disc!
+      #
+      fh.flush
+      fh.close
+    rescue IOError
+      # ignore
+    end
+  end
+end
+
+#
+# trap HUP -- reopen all files.
+#
+%w(HUP USR1).each do |sig|
+  trap(sig) do
+    do_close_all($filehandles + [$default_filehandle])
+  end
+end
+
+#
+# term INT, TERM -- close all files and exit.
+#
+%w(QUIT TERM INT).each do |sig|
+  trap(sig) do
+    do_close_all($filehandles + [$default_filehandle])
+    exit 0
+  end
+end
+
+while (line = STDIN.gets) do
+  #
+  # gets returns nil if called at EOF, so we probably won't get his far, as
+  #
+  break if line.nil?
+
+  #
+  # Here is where we sleep until told otherwise.
+  #
+  10.times do
+    break unless $closing_logs
+    sleep 1
+  end
+  
+  #
+  # This is our little flag to say that we've got a line and we're going to write to disc.
+  #
+  $write_lock = true
+
+  #
+  # Split the line into a domain name, and the rest of the line.  The domain is
+  # always the first field.  This is supplied by the REMOTE USER so suitable
+  # sanity checks have to be made.
+  #
+  # This "split" splits the line into two at the first group of spaces.
+  #
+  # irb(main):030:0> "a  b c".split(" ",2)
+  # => ["a", " b   c"]
+  #
+  domain_name, line_without_domain_name = line.to_s.split(" ",2)
+
+  #
+  # Set up the filehandle as nil to force us to find it each time.
+  #
+  filehandle = nil
+
+  #
+  # Find our domain.  This finds www and non-www prefixes, and returns nil
+  # unless the domain is sane.
+  #
+  if (domain = Symbiosis::Domains.find(domain_name))
+    #
+    # Change the domain name to the correct one.
+    # 
+    domain_name = domain.name
+
+    #
+    # Fetch the log filename
+    #
+    log_filename = File.expand_path(File.join(domain.log_dir, access_log_filename))
+
+    #
+    # Fetch the file handle, or open the logfile, as needed.
+    #
+    filehandle = $filehandles.find{|fh| fh.is_a?(File) and fh.path == log_filename}
+
+    #
+    # Remove the filehandle from the arry (we'll add it back later)
+    #
+    $filehandles.delete(filehandle) 
+
+    #
+    # If no filehandle was found, or the filehandle we've found is duff,
+    # (re)-open it.
+    #
+    unless filehandle.is_a?(File) and not filehandle.closed?
+      #
+      # Make sure we don't open more than 50 file handles.
+      #
+      if $filehandles.length >= max_files
+        other_filehandle = $filehandles.pop
+        other_filehandle.close
+      end
+
+      begin
+        #
+        # Set up a couple of things before we open the file.  This will make
+        # sure the ownerships are correct.
+        #
+        Symbiosis::Utils.mkdir_p(File.dirname(domain.log_dir))
+
+        filehandle = Symbiosis::Utils.safe_open(log_filename, "a+", :mode => 0644, :uid => domain.uid, :gid => domain.gid )
+        filehandle.sync = sync
+
+      rescue StandardError => err
+        filehandle = nil
+        warn "Caught #{err}" if $VERBOSE
+      end
+
+    end
+
+  end
+
+  if filehandle.nil? 
+    warn "No file handle found -- logging to default file for #{domain_name.inspect}" if $VERBOSE
+
+    #
+    # Make sure the default filehandle is open.
+    #
+    if $default_filehandle.nil? or $default_filehandle.closed?
+      $default_filehandle = Symbiosis::Utils.safe_open(default_log,'a+')
+      $default_filehandle.sync = sync
+    end
+    #
+    # Write the unadulterated line to the default log.
+    #
+    $default_filehandle.write(line)
+  else
+    #
+    # Add the filehandle onto our array.
+    #
+    $filehandles << filehandle
+    #
+    # Write the log, but without the domain on the front.
+    #
+    filehandle.write(line_without_domain_name)
+  end
+
+  #
+  # This is our flag to say we've stopped writing.
+  #
+  $write_lock = false
+end
+
+
+#
+# If we get down here, then STDIN has been closed.
+#
+#
+do_close_all($filehandles + [$default_filehandle])
+

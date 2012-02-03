@@ -96,6 +96,6 @@ NameVirtualHost <%= ip %>:443
         # made against, so that the cron-job in /etc/cron.daily may generate
         # statistics for each domain.
         #
-        CustomLog /var/log/apache2/access.log "%V %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\""
+        CustomLog "| /usr/sbin/symbiosis-apache-logger" "%V %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\""
 </VirtualHost>
 
