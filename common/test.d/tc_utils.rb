@@ -22,6 +22,52 @@ class TestUtils < Test::Unit::TestCase
   end
 
   def test_mkdir_p
+    dir = File.join(@prefix,"a","b")
+    uid = Process.euid
+    gid = Process.groups.first
+
+    assert_nothing_raised{ mkdir_p(dir, :uid => uid, :gid => gid, :mode => 0700) }
+    assert(File.directory?(dir),"mkdir_p did not create the directroy #{dir}")
+    assert_equal(uid, File.stat(dir).uid, "mkdir_p did not set the uid correctly")
+    assert_equal(gid, File.stat(dir).gid, "mkdir_p did not set the gid correctly")
+    assert_equal(0700, File.stat(dir).mode & 0700, "Permissions on #{dir} are not what were set.")
+
+    #
+    # Make sure we can't create a directory on top of a file
+    #
+    file = File.join(dir,"c")
+    FileUtils.touch(file)
+    assert(File.file?(file), "#{file} is not a file when it should be")
+
+    assert_raise(Errno::EEXIST) { mkdir_p(file) }
+
+    #
+    # Make sure we can't create a directory under a file.
+    #
+    filedir = File.join(file,"d")
+    assert(!File.exist?(filedir),"#{filedir} exists when it hasn't been created yet.")
+
+    assert_raise(Errno::ENOTDIR) { mkdir_p(filedir) }
+
+
+    # 
+    # Make sure we can't overwrite a symlink
+    #
+    syml = File.expand_path(File.join(dir,"..","bb"))
+    File.symlink(dir, syml)
+    assert(File.symlink?(syml),"#{syml} is not a symlink when it should be")
+
+    assert_raise(Errno::EEXIST) { mkdir_p(syml) }
+
+    #
+    # Make sure we can create a directory the other side of a symlink
+    # 
+    symldir = File.join(syml,"cc")
+
+    assert_nothing_raised { mkdir_p(symldir) }
+    
+    assert(File.directory?(File.join(dir,"cc")))    
+
   end
 
   def test_random_string

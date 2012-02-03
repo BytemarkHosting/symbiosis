@@ -10,33 +10,84 @@ module Symbiosis
 
     # 
     # This function uses the FileUtils mkdir_p command to make a directory.
-    # It adds the extra options of :user and :group to allow these to be set
-    # in one fell swoop.
+    # It adds the extra options of :uid and :gid to allow these to be set in
+    # one fell swoop.
+    #
+    # This has been written to avoid the TOCTTOU race conditions between
+    # creating a directory, and chowning it, to make sure that we don't
+    # accidentally chown a file on the end of a symlink
     #
     def mkdir_p(dir, options = {})
       # Switch on verbosity..
       options[:verbose] = true if $DEBUG
 
-      
       # Find the first directory that exists, and the first non-existent one.
       parent = File.expand_path(dir)
-      parent, child = File.split(parent) while !File.exists?(parent) 
-      # Then set the options such that the uid/gid of the parent dir can be propagated.
-      parent_s = File.stat(parent)
-      options[:user]  = parent_s.uid.to_s if options[:user].nil?
-      options[:group] = parent_s.gid.to_s if options[:group].nil?
 
-      # Make the directory
-      fu_mkdir_opts = [:noop, :verbose, :mode]
-      fu_opts = {}
-      options.find_all{|k,v| fu_mkdir_opts.include?(k)}.each{|k,v| fu_opts[k] = v}
-      FileUtils::mkdir_p dir, fu_opts
+      #
+      # Break down the directory until we find one that exists.
+      #
+      stack = []
+      while !File.exists?(parent)
+        stack.unshift parent
+        parent = File.dirname(parent)
+      end
 
-      # Set the permissions
-      fu_chown_opts = [:noop, :verbose]
-      fu_opts = {}
-      options.find_all{|k,v| fu_chown_opts.include?(k)}.each{|k,v| fu_opts[k] = v}
-      FileUtils::chown_R options[:user], options[:group], File.join(parent.to_s,child.to_s), fu_opts
+      #
+      # Raise an error if the directory exists.
+      #
+      raise Errno::EEXIST, parent if stack.empty?
+
+      # 
+      # Then set the options such that the uid/gid of the parent dir can be
+      # propagated, but only if we're root.
+      #
+      if (options[:uid].nil? or options[:gid].nil?) and 0 == Process.euid
+        parent_s = File.stat(parent)
+        options[:gid] = parent_s.gid if options[:gid].nil?
+        options[:uid] = parent_s.uid if options[:uid].nil?
+      end
+
+      #
+      # Set up a sensible mode
+      #
+      unless options[:mode].is_a?(Integer)
+        options[:mode] = (0777 - File.umask)
+      end
+
+      #
+      # Create our stack of directories in real life.
+      #
+      stack.each do |dir|
+        begin
+          #
+          # If a symlink (or anything else) is in the way, an EEXIST exception
+          # is raised.
+          #
+          Dir.mkdir(dir, options[:mode])
+        rescue Errno::EEXIST => err
+          #
+          # If there is a directory in our way, skip and move on.  This could
+          # be a TOCTTOU problem.
+          #
+          next if File.directory?(dir)
+
+          #
+          # Otherwise barf.
+          #
+          raise err
+        end
+
+        #
+        # Use lchown to prevent accidentally chowning the target of a symlink,
+        # instead chowning the symlink itself.  This mitigates a TOCTTOU race
+        # condition where the attacker replaces our new directory with a
+        # symlink to a file he can't read, only to have us chown it.
+        #
+        File.lchown (dir, options[:uid], options[:gid])
+      end
+
+      return nil
     end
 
     # 
@@ -148,7 +199,7 @@ module Symbiosis
 
     #
     # This method opens a file in a safe manner, avoiding symlink attacks and
-    # TOCTOU race conditions.
+    # TOCTTOU race conditions.
     #
     # The mode can be a string or an integer, but must not be "w" or "w+", or
     # have File::TRUNC set, to avoid truncating the file on opening.
