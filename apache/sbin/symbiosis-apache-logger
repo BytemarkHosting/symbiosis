@@ -48,6 +48,7 @@ $VERBOSE     = false
 max_files    = 50
 default_log  = "/var/log/apache2/zz-mass-hosting.log"
 sync         = false
+access_log_filename = "access.log"
 
 opts = GetoptLong.new(
   [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
@@ -263,7 +264,11 @@ while (line = STDIN.gets) do
         # Set up a couple of things before we open the file.  This will make
         # sure the ownerships are correct.
         #
-        Symbiosis::Utils.mkdir_p(File.dirname(domain.log_dir))
+        begin
+          Symbiosis::Utils.mkdir_p(File.dirname(log_filename), :uid => domain.uid, :gid => domain.gid, :mode => 0755)
+        rescue Errno::EEXIST
+          # ignore
+        end
 
         filehandle = Symbiosis::Utils.safe_open(log_filename, "a+", :mode => 0644, :uid => domain.uid, :gid => domain.gid )
         filehandle.sync = sync
