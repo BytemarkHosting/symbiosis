@@ -74,7 +74,8 @@ module Symbiosis
     # the constructor.
     #
     def write(config = self.generate_config)
-      File.open(self.filename,"w+") do |fn|
+      Symbiosis::Utils.safe_open(self.filename,"a+") do |fn|
+        fn.truncate(0)
         fn.write(config)
       end
 
