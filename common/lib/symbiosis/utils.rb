@@ -84,7 +84,7 @@ module Symbiosis
         # condition where the attacker replaces our new directory with a
         # symlink to a file he can't read, only to have us chown it.
         #
-        File.lchown (dir, options[:uid], options[:gid])
+        File.lchown(dir, options[:uid], options[:gid])
       end
 
       return nil
