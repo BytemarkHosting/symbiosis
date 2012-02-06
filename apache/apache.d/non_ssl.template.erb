@@ -17,6 +17,16 @@ NameVirtualHost <%= ip %>:80
 <VirtualHost <%= ips.collect{|ip| ip+":80"}.join(" ") %>>
 
         #
+        # Put our server name
+        #
+        ServerName  <%= domain %>
+
+        #
+        # And server alias in place
+        #
+        ServerAlias www.<%= domain %>
+
+        #
         #  This is the directory people are redirected to
         # if their site is empty.
         #

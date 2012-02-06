@@ -21,8 +21,16 @@ NameVirtualHost <%= ip %>:80
 
 <VirtualHost <%= ips.collect{|ip| ip+":443"}.join(" ") %>>
 
+        #
+        # Put our server name 
+        #
         ServerName  <%= domain %>
+
+        #
+        # And server alias in place
+        #
         ServerAlias www.<%= domain %>
+
 
         SSLEngine On
 
@@ -91,6 +99,16 @@ NameVirtualHost <%= ip %>:80
 </VirtualHost>
 
 <VirtualHost <%= ips.collect{|ip| ip+":80"}.join(" ") %>>
+
+        #
+        # Put our server name 
+        #
+        ServerName  <%= domain %>
+
+        #
+        # And server alias in place
+        #
+        ServerAlias www.<%= domain %>
 
 % if mandatory_ssl?
         #
