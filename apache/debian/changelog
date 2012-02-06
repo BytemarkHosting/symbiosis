@@ -1,9 +1,10 @@
-symbiosis-httpd (2012:0208) lucid; urgency=low
+symbiosis-httpd (2012:0208) stable; urgency=low
 
   * Added Symbiosis::Domain#log_dir
   * Consolidated SSL and non-SSL log-processing into a single script.
   * Added symbiosis-apache-logger to log straight from Apache for the
     zz-mass-hosts stuff.
+  * Install the Bytemark logo.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 03 Feb 2012 13:41:10 +0000
 
