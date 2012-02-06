@@ -59,7 +59,7 @@ NameVirtualHost <%= ip %>:80
         # made against, so that the cron-job in /etc/cron.daily may generate
         # statistics for each domain.
         #
-        ErrorLog   /var/log/apache2/<%= domain %>.error.log
-        CustomLog  /var/log/apache2/<%= domain %>.access.log combined
+        ErrorLog   "|| /usr/sbin/symbiosis-apache-logger -s -u <%= domain.uid %> -g <%= domain.gid %> <%= domain.log_dir %>/error.log"
+        CustomLog  "|| /usr/sbin/symbiosis-apache-logger -s -u <%= domain.uid %> -g <%= domain.gid %> <%= domain.log_dir %>/access.log" combined
 </VirtualHost>
 

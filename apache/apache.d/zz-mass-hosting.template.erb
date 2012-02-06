@@ -80,7 +80,9 @@ NameVirtualHost <%= ip %>:80
         # made against, so that the cron-job in /etc/cron.daily may generate
         # statistics for each domain.
         #
-        CustomLog "| /usr/sbin/symbiosis-apache-logger" "%V %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\""
+        LogFormat "%V %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" zz_mass_hosting_combined
+        CustomLog "|| /usr/sbin/symbiosis-apache-logger -s -l access.log /var/log/apache2/zz-mass-hosting.access.log" zz_mass_hosting_combined
+        ErrorLog  /var/log/apache2/zz-mass-hosting.error.log
 
 </VirtualHost>
 
