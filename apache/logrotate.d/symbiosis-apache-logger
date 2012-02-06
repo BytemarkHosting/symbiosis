@@ -1,0 +1,17 @@
+#
+# This rotates all logs for Symbiosis domains, the same way as apache2 does its
+# own logrotation.
+#
+/srv/*/public/logs/*.log {
+  weekly
+  missingok
+  rotate 52
+  compress
+  delaycompress
+  notifempty
+  sharedscripts
+  postrotate
+    killall -HUP symbiosis-apache-logger
+  endscript
+}
+
