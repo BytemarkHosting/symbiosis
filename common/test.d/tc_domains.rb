@@ -9,6 +9,7 @@ class TestDomain < Test::Unit::TestCase
 
   def setup
     @prefix = Dir.mktmpdir("srv")
+    File.lchown(1000,1000,@prefix) if 0 == Process.uid
     @prefix.freeze
   end
 

@@ -17,12 +17,30 @@ module Symbiosis
     # creating a directory, and chowning it, to make sure that we don't
     # accidentally chown a file on the end of a symlink
     #
+    # It returns the name of the directory created.
+    #
     def mkdir_p(dir, options = {})
       # Switch on verbosity..
       options[:verbose] = true if $DEBUG
 
       # Find the first directory that exists, and the first non-existent one.
       parent = File.expand_path(dir)
+
+      begin
+        #
+        # Check the parent.
+        #
+        lstat_parent = File.lstat(parent)
+      rescue Errno::ENOENT
+        lstat_parent = nil
+      end
+
+      return parent if !lstat_parent.nil? and lstat_parent.directory?
+
+      #
+      # Awooga, something already in the way.
+      #
+      raise Errno::EEXIST, parent unless lstat_parent.nil?
 
       #
       # Break down the directory until we find one that exists.
@@ -32,11 +50,6 @@ module Symbiosis
         stack.unshift parent
         parent = File.dirname(parent)
       end
-
-      #
-      # Raise an error if the directory exists.
-      #
-      raise Errno::EEXIST, parent if stack.empty?
 
       # 
       # Then set the options such that the uid/gid of the parent dir can be
@@ -87,7 +100,7 @@ module Symbiosis
         File.lchown(options[:uid], options[:gid], dir)
       end
 
-      return nil
+      return dir
     end
 
     # 
