@@ -8,7 +8,7 @@ Standards-Version: 3.9.1
 
 Package: symbiosis-pam
 Architecture: all
-Depends: libpam-tmpdir, wordlist | wbritish, libpam-cracklib, ${misc:Depends}
+Depends: libpam-tmpdir, wbritish | wordlist, libpam-cracklib, ${misc:Depends}
 Replaces: bytemark-vhost-pam
 Conflicts: bytemark-vhost-pam
 Provides: bytemark-vhost-pam
