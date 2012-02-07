@@ -28,9 +28,3 @@ build/libapache2-mod-vhost-bytemark::
 cleanbuilddir/libapache2-mod-vhost-bytemark::
 	cd vhost-alias && make clean
 
-build/libapache2-mod-ruid::
-	cd ruid && make
-
-cleanbuilddir/libapache2-mod-ruid::
-	cd ruid && make clean
-

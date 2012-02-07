@@ -5,8 +5,9 @@ symbiosis-httpd (2012:0208) stable; urgency=low
   * Added symbiosis-apache-logger to log straight from Apache for the
     zz-mass-hosts stuff.
   * Install the Bytemark logo.
+  * Removed mod_ruid since this is now available in Debian unstable.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 03 Feb 2012 13:41:10 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 11:10:42 +0000
 
 symbiosis-httpd (2012:0202) stable; urgency=low
 
