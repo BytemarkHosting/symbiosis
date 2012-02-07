@@ -1,3 +1,10 @@
+symbiosis-crack (2012:0208) stable; urgency=low
+
+  * Updated debian control files to use relationships properly, as per section
+    7.6 of the Debian Policy Manual.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 13:52:14 +0000
+
 symbiosis-crack (2012:0124) stable; urgency=low
 
   * Updated Patrick's email address to avoid NMU warnings, since his
