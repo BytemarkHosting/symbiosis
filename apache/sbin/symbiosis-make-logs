@@ -72,7 +72,7 @@ begin
     when '--verbose'
       $VERBOSE = true
     when '--force'
-      $FORCE = false
+      $FORCE = true
     when '--template'
       template = arg
     end
