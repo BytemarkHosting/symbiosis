@@ -1,5 +1,7 @@
 symbiosis-mysql (2012:0208) stable; urgency=low
 
+  * Updated debian control files to use relationships properly, as per section
+    7.6 of the Debian Policy Manual. 
   * Removed prompt for MySQL root password if none is set -- mysql-server-5.1
     handles this for us.
 
