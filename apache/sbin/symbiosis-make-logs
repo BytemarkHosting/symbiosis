@@ -5,11 +5,14 @@
 #
 #
 # SYNOPSIS
-#  symbiosis-make-logs [ -h | --help ] [-m | --manual]
-#       [ -v | --verbose ]
+#  symbiosis-make-logs [ --template | -t <filename> ] 
+#       [ -h | --help ] [-m | --manual] [ -v | --verbose ]
 #
 #
 # OPTIONS
+#  -t, --template <file>   Set the template file.  Defaults to
+#                          /etc/symbiosis/apache.d/webalizer.conf.erb.
+#
 #  -h, --help              Show a help message, and exit.
 #
 #  -m, --manual            Show this manual, and exit.
@@ -23,10 +26,6 @@
 # web-visible access statistics for each hosted Symbiosis domain.
 #
 # The script is assumed to be invoked once per day, via /etc/cron.daily/.
-#
-#
-# SEE ALSO
-#
 #
 # AUTHOR
 #
@@ -44,6 +43,7 @@ require 'getoptlong'
 #
 #  The options set by the command line.
 #
+template     = '/etc/symbiosis/apache.d/webalizer.conf.erb'
 help         = false
 manual       = false
 $VERBOSE     = false
@@ -52,7 +52,8 @@ $VERBOSE     = false
 opts = GetoptLong.new(
                       [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
                       [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
-                      [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ]
+                      [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ],
+                      [ '--template',   '-t', GetoptLong::REQUIRED_ARGUMENT ]
                       )
 
 
@@ -65,6 +66,8 @@ begin
       manual = true
     when '--verbose'
       $VERBOSE = true
+    when '--template'
+      template = arg
     end
   end
 rescue
@@ -108,18 +111,21 @@ end
 #
 require 'symbiosis/domains'
 require 'symbiosis/domain/http'
+require 'symbiosis/config_files/webalizer'
+
+def verbose(s) ; puts s if $VERBOSE ; end
 
 #
 #  Potentially we process each domain.
 #
 Symbiosis::Domains.each do |domain|
-  puts "Considering domain: #{domain}" if ( $VERBOSE )
+  verbose "Considering domain: #{domain}"
 
   #
   # Are statistics disabled for this domain?
   #
   unless ( domain.should_have_stats? )
-    puts "\tSkipping as stats have been disabled." if ( $VERBOSE )
+    verbose "\tSkipping as stats have been disabled."
     next
   end
 
@@ -136,12 +142,11 @@ Symbiosis::Domains.each do |domain|
     process.push(log) if File.exists?(log) 
   end
 
-
   #
   # If we didn't find a logfile we're done.
   #
   if ( process.empty? )
-    puts "\tSkipping this domain, no suitable logfiles found" if ( $VERBOSE )
+    verbose "\tSkipping this domain, no suitable logfiles found"
     next
   end
 
@@ -152,7 +157,8 @@ Symbiosis::Domains.each do |domain|
   webalizer_conf = File.join( domain.log_dir, "webalizer.conf" )
 
   config        = Symbiosis::ConfigFiles::Webalizer.new(webalizer_conf, "#")
-  config.domain = domain
+  config.template = template 
+  config.domain   = domain
 
   write_config = false
 
@@ -193,10 +199,10 @@ Symbiosis::Domains.each do |domain|
 
   #
   #  If we don't have a statistics directory then we need to create it,
-  # and we need to create it with the domains' UID/GID
+  # and we need to create it with the domains' UID/GID.  This method will not
+  # error if the directory already exists.
   #
-  output =  "/srv/#{domain}/public/htdocs/stats/"
-  domain.create_dir( output ) if( !File.directory?( output ) )
+  domain.create_dir( domain.stats_dir )
 
 
   #
@@ -206,9 +212,9 @@ Symbiosis::Domains.each do |domain|
     puts "\tRunning webalizer against #{file}" if $VERBOSE
 
     #
-    #  Now run it
+    #  Now run it under sudo, as the user ID of the domain.
     #
-    system( "cd #{domain.log_dir} && sudo -u #{domain.uid} -g #{domain.gid} -- webalizer -q #{file} >/dev/null 2>/dev/null" )
+    system( "cd #{domain.log_dir} && sudo -u '\##{domain.uid}' -- webalizer -q #{file} >/dev/null 2>/dev/null" )
   end
 
 end

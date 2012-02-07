@@ -40,6 +40,14 @@ module Symbiosis
       return bool
     end
 
+    #
+    # Returns the directory where stats files should be kept.  Defaults to
+    # public/htdocs/stats.
+    #
+    def stats_dir
+      File.join(domain.directory, "public", "htdocs", "stats")
+    end
+
   end
 
 end
