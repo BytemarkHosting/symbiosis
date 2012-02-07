@@ -87,7 +87,7 @@ opts.each do |opt, arg|
   when '--help'
     help = true
   when '--manual'
-    $manual = true
+    manual = true
   when '--verbose'
     $VERBOSE = true
   when '--template'
@@ -110,7 +110,7 @@ end
 #
 # CAUTION! Here be quality kode.
 #
-if $manual or help
+if manual or help
 
   # Open the file, stripping the shebang line
   lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
