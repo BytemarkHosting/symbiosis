@@ -136,6 +136,8 @@ if manual or help
   exit 0
 end
 
+def verbose(s) ; puts s if $VERBOSE ; end
+
 
 #
 # Requirements after the help clause has finished.

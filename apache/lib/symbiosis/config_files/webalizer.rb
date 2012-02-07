@@ -12,7 +12,7 @@ module Symbiosis
         true
       end
 
-      def write(config = self.generate_config, opts => {})
+      def write(config = self.generate_config, opts = {})
         #
         # Set the UID/GID when writing the file.
         #

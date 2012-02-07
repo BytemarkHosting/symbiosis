@@ -5,13 +5,16 @@
 #
 #
 # SYNOPSIS
-#  symbiosis-make-logs [ --template | -t <filename> ] 
+#  symbiosis-make-logs [ --template | -t <filename> ] [ --force | -f ]
 #       [ -h | --help ] [-m | --manual] [ -v | --verbose ]
 #
 #
 # OPTIONS
-#  -t, --template <file>   Set the template file.  Defaults to
+#  -t, --template <file>   Set the webalizer config template file. Defaults to
 #                          /etc/symbiosis/apache.d/webalizer.conf.erb.
+#
+#  -f, --force             Force regeneration of the webalizer configuration
+#                          snippet for all domains.
 #
 #  -h, --help              Show a help message, and exit.
 #
@@ -47,12 +50,14 @@ template     = '/etc/symbiosis/apache.d/webalizer.conf.erb'
 help         = false
 manual       = false
 $VERBOSE     = false
+$FORCE       = false
 
 
 opts = GetoptLong.new(
                       [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
                       [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
                       [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ],
+                      [ '--force',      '-f', GetoptLong::NO_ARGUMENT ],
                       [ '--template',   '-t', GetoptLong::REQUIRED_ARGUMENT ]
                       )
 
@@ -66,6 +71,8 @@ begin
       manual = true
     when '--verbose'
       $VERBOSE = true
+    when '--force'
+      $FORCE = false
     when '--template'
       template = arg
     end
