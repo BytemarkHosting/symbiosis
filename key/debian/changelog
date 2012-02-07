@@ -1,3 +1,10 @@
+symbiosis-key (2012:0208) stable; urgency=low
+
+  * Updated debian control files to use relationships properly, as per section
+    7.6 of the Debian policy.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 13:50:38 +0000
+
 symbiosis-key (2012:0124) stable; urgency=low
 
   * Fixed up descriptions in control file.
