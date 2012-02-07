@@ -1,3 +1,13 @@
+symbiosis-ftpd (2012:0208) stable; urgency=low
+
+  * Updated debian control files to use relationships properly, as per section
+    7.6 of the Debian Policy Manual. 
+  * Updated test scripts not to have executable bit set, or a shebang.
+  * Fixed postinst and postrm not to fiddle with pure-ftpd initscript. 
+  * Fixed lintian errors in control file.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 14:10:52 +0000
+
 symbiosis-ftpd (2012:0201) stable; urgency=low
 
   * Specified ruby1.8 everywhere.
