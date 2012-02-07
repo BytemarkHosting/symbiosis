@@ -57,10 +57,6 @@ if [ -x "/etc/init.d/pure-authd" ]; then
   update-rc.d pure-authd defaults >/dev/null
 fi
 
-if [ -x "/etc/init.d/pure-ftpd" ]; then
-  update-rc.d pure-ftpd defaults >/dev/null
-fi
-
 #
 #  Restart (or start)
 #
