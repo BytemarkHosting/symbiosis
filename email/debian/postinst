@@ -50,6 +50,12 @@ if [ -d /etc/exim4/bytemark-vhost.d ] ; then
   rm -rf /etc/exim4/bytemark-vhost.d
 fi
 
+#
+# Remove the old dovecot test.
+#
+if [ -e /etc/symbiosis/test.d/tc_dovecot_.rb ] ; then
+  rm -f /etc/symbiosis/test.d/tc_dovecot_.rb
+fi
 
 #
 #  Rebuild exim4

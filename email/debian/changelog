@@ -3,8 +3,9 @@ symbiosis-email (2012:0208) stable; urgency=low
   * Updated test scripts not to have executable bit set, or a shebang line.
   * Updated debian control files to use relationships properly, as per section
     7.6 of the Debian Policy Manual. 
+  * Updated postinst to remove old dovecot test.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 14:14:34 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 17:22:13 +0000
 
 symbiosis-email (2012:0201) stable; urgency=low
 
