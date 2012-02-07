@@ -198,5 +198,12 @@ for i in www-data bytemark-firewall ; do
   fi
 done
 
+#
+# Remove old cron test
+#
+if [ -e /etc/cron.hourly/firewall-test ] ; then
+  rm -f /etc/cron.hourly/firewall-test
+fi
+
 #DEBHELPER#
 exit 0

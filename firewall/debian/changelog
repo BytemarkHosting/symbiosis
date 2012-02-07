@@ -4,8 +4,9 @@ symbiosis-firewall (2012:0208) stable; urgency=low
   * Updated debian control files to use relationships properly, as per section 7.6
   * Updated Symbiosis::Firewall API docs.
   * Specified ruby1.8 for firewall package
+  * Removed old cron firewall-test if present.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 13:49:02 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 17:16:05 +0000
 
 symbiosis-firewall (2012:0201) stable; urgency=low
 
