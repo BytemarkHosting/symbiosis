@@ -3,8 +3,11 @@ symbiosis-common (2012:0208) stable; urgency=low
   * Symbiosis::Domains now searches for www.domain as well as just domain.
   * Added Symbiosis::Utils#safe_open to use for opening files as root.
   * Rewrote Symbiosis::Utils#mkdir_p to be safer. 
+  * Removed test task from rules
+  * Updated debian control files to use relationships properly, as per section
+    7.6 of the Debian Policy Manual. 
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 03 Feb 2012 22:40:13 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 14:06:57 +0000
 
 symbiosis-common (2012:0201) stable; urgency=low
 
