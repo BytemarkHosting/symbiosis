@@ -1,3 +1,11 @@
+symbiosis-monit (2012:0208) stable; urgency=low
+
+  * Updated docs for Symbiosis::Monitor::Check.
+  * Updated debian control files to use relationships properly, as per section
+    7.6 of the Debian Policy Manual. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 14:08:47 +0000
+
 symbiosis-monit (2012:0201) stable; urgency=low
 
   * Updated all scripts to specify ruby1.8
