@@ -6,8 +6,9 @@ symbiosis-httpd (2012:0208) stable; urgency=low
     zz-mass-hosts stuff.
   * Install the Bytemark logo.
   * Removed mod_ruid since this is now available in Debian unstable.
+  * Templated the webalizer config.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 11:10:42 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 16:12:54 +0000
 
 symbiosis-httpd (2012:0202) stable; urgency=low
 
