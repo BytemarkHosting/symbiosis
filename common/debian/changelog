@@ -6,8 +6,9 @@ symbiosis-common (2012:0208) stable; urgency=low
   * Removed test task from rules
   * Updated debian control files to use relationships properly, as per section
     7.6 of the Debian Policy Manual. 
+  * Updated config file generation to make use of the opts arg for Utils#safe_open
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 14:06:57 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 16:13:51 +0000
 
 symbiosis-common (2012:0201) stable; urgency=low
 

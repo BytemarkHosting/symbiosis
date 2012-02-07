@@ -71,10 +71,11 @@ module Symbiosis
 
     #
     # Writes the configuration specified by config to the filename specified in
-    # the constructor.
+    # the constructor.  The opts has takes options for the
+    # Symbiosis::Utils#safe_open method.
     #
-    def write(config = self.generate_config)
-      Symbiosis::Utils.safe_open(self.filename,"a+") do |fn|
+    def write(config = self.generate_config, opts => {})
+      Symbiosis::Utils.safe_open(self.filename,"a+", opts) do |fn|
         fn.truncate(0)
         fn.write(config)
       end
