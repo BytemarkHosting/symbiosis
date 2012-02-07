@@ -8,6 +8,7 @@
 #                          [ --uid | -u <n> ] | [ --gid | -g <n> ]
 #                          [ --log-name | -l <filename> ] [ -h | --help ]
 #                          [-m | --manual] [ -v | --verbose ] <default_filename>
+#
 # OPTIONS
 #
 #  -f, --max-files <n>     Maxium number of log files to hold open. Defaults to

@@ -39,12 +39,6 @@
 #
 require 'getoptlong'
 
-#
-# Symbiosis libraries
-#
-require 'symbiosis/domains'
-require 'symbiosis/domain/http'
-
 
 
 #
@@ -108,7 +102,12 @@ if manual or help
   exit 0
 end
 
-
+#
+# Symbiosis libraries -- required here so they're not needed during the build
+# process for manpage generation.
+#
+require 'symbiosis/domains'
+require 'symbiosis/domain/http'
 
 #
 #  Potentially we process each domain.

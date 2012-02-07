@@ -4,6 +4,14 @@
 #
 #  symbiosis-create-sites -- Auto-configure Apache2 sites with specified IPs
 #
+# SYNOPSIS
+#
+#  symbiosis-create-sites [ --ssl-template | -s <file> ] 
+#                         [ --non-ssl-template | -t <file> ] 
+#                         [ --apache2-dir | -a <directory> ] 
+#                         [ --force | -f ] [ --no-restart | -r ]
+#                         [ --help | -h ] [ --manual | -m ] [ --verbose | -v ]
+#
 # OPTIONS
 #
 # --ssl-template, -s <file>      Specify the template file for SSL sites.
@@ -22,7 +30,9 @@
 #
 # --no-restart, -r  Do not restart apache2 even if changes have taken place.
 #
-# --help, -h        Show the help information for this script.
+# --manual, -m      Show the manual for this script.
+#
+# --help, -h        Show brief usage instructions for this script.
 #
 # --verbose, -v     Show debugging information.
 #
@@ -44,8 +54,9 @@ require 'getoptlong'
 #  Entry point to the code
 #
 $FORCE    = false
-$HELP     = false
 $VERBOSE  = false
+help      = false
+manual    = false
 
 #
 #  Do we need to restart apache?
@@ -63,6 +74,7 @@ no_restart       = false
 
 opts = GetoptLong.new(
          [ '--help',             '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--manual',           '-m', GetoptLong::NO_ARGUMENT ],
          [ '--verbose',          '-v', GetoptLong::NO_ARGUMENT ],
          [ '--force',            '-f', GetoptLong::NO_ARGUMENT ],
          [ '--no-restart',       '-n', GetoptLong::NO_ARGUMENT],
@@ -85,7 +97,9 @@ opts.each do |opt, arg|
   when '--no-restart'
     no_restart = true
   when '--help'
-    $HELP = true
+    help = true
+  when '--manual'
+    manual = true
   when '--verbose'
     $VERBOSE = true
   when '--force'
@@ -96,14 +110,27 @@ end
 #
 # CAUTION! Here be quality kode.
 #
-if $HELP
+if manual or help
+
   # Open the file, stripping the shebang line
-  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
+
+  found_synopsis = false
 
   lines.each do |line|
+
     line.chomp!
     break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
     puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
   end
 
   exit 0
