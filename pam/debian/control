@@ -1,0 +1,17 @@
+Source: symbiosis-pam
+Section: admin
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
+Build-Depends: debhelper (>= 7.0.0), cdbs
+Standards-Version: 3.9.1
+
+Package: symbiosis-pam
+Architecture: all
+Depends: libpam-tmpdir, wbritish | wordlist, libpam-cracklib, ${misc:Depends}
+Replaces: bytemark-vhost-pam
+Conflicts: bytemark-vhost-pam
+Provides: bytemark-vhost-pam
+Description: PAM configuration metapackage
+ This package is a metapackage which depends on the various PAM modules to help
+ maintain your machine's security.
