@@ -8,11 +8,12 @@ Standards-Version: 3.9.1
 
 Package: symbiosis-email
 Architecture: all
-Depends: exim4-daemon-heavy, spamassassin, dovecot-imapd, dovecot-pop3d, clamav-daemon, ruby1.8, adduser, make, ${misc:Depends}
-Pre-Depends: symbiosis-common
-Replaces: bytemark-vhost-email
-Recommends: symbiosis-webmail-roundcube | symbiosis-webmail-squirrelmail
-Conflicts: bytemark-vhost-email, symbiosis-monit (<< 2011:1206), symbiosis-test
+Depends: symbiosis-common (>> 2012:0101), exim4-daemon-heavy, spamassassin, dovecot-imapd, dovecot-pop3d, clamav-daemon, ruby1.8, adduser, make, ${misc:Depends}
+Recommends: symbiosis-webmail
+Replaces: bytemark-vhost-email,  symbiosis-monit (<< 2011:1206), symbiosis-test
+Breaks:  symbiosis-monit (<< 2011:1206), symbiosis-test
+Provides: bytemark-vhost-email
+Conflicts: bytemark-vhost-email
 Description: A complete virtual hosting solution for email
  This package contains the infrastructure and configuration for a
  virtual hosting setup with full support for:

@@ -10,8 +10,10 @@ Bugs: https://projects.bytemark.co.uk/projects/symbiosis/issues
 Package: symbiosis-phpmyadmin
 Architecture: all
 Depends: phpmyadmin, symbiosis-mysql, ruby, ${misc:Depends}
-Conflicts: bytemark-vhost-phpmyadmin, symbiosis-test, symbiosis-monit (<< 2011:1206)
-Replaces: bytemark-vhost-phpmyadmin
+Replaces: bytemark-vhost-phpmyadmin, symbiosis-test, symbiosis-monit (<< 2011:1206)
+Breaks: symbiosis-test, symbiosis-monit (<< 2011:1206)
+Conflicts: bytemark-vhost-phpmyadmin
+Provides: bytemark-vhost-phpmyadmin
 Description: This package gives remote database access
  This package will enable a global MySQL administrative interface
  which may be used remotely.

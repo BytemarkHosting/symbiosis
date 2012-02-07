@@ -7,8 +7,9 @@ Build-Depends: debhelper (>= 7.0.0), cdbs
 Standards-Version: 3.9.1
 
 Package: symbiosis-updater
-Replaces: bytemark-vhost-updater, cron-apt
+Replaces: bytemark-vhost-updater
 Conflicts: bytemark-vhost-updater, cron-apt
+Provides: bytemark-vhost-updater
 Architecture: all
 Depends: ${misc:Depends}
 Description: Automatic package upgrades

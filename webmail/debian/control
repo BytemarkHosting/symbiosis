@@ -8,10 +8,11 @@ Standards-Version: 3.9.1
 Bugs: https://projects.bytemark.co.uk/projects/symbiosis/issues
 
 Package: symbiosis-webmail
-Replaces: bytemark-vhost-webmail
-Conflicts: bytemark-vhost-webmail
 Architecture: all
 Depends: symbiosis-webmail-squirrelmail | symbiosis-webmail-roundcube, ${misc:Depends}
+Replaces: bytemark-vhost-webmail
+Provides: bytemark-vhost-webmail
+Conflicts: bytemark-vhost-webmail
 Description: This package gives webmail access to a Symbiosis system
  This package will enable a global webmail system for all domains hosted
  using the Bytemark Symbiosis system.

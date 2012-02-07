@@ -7,10 +7,12 @@ Build-Depends: debhelper (>= 7.0.0), cdbs, config-package-dev, mysql-common
 Standards-Version: 3.9.1
 
 Package: symbiosis-mysql
-Replaces: bytemark-vhost-mysql
-Conflicts: bytemark-vhost-mysql, symbiosis-monit (<< 2011:1206)
 Architecture: all
 Depends: mysql-server-5.1, ruby1.8, symbiosis-common, ${misc:Depends}
+Replaces: bytemark-vhost-mysql, symbiosis-monit (<< 2011:1206)
+Provides: bytemark-vhost-mysql
+Conflicts: bytemark-vhost-mysql
+Breaks: symbiosis-monit (<< 2011:1206)
 Description: A metapackage for MySQL
  This package ensures that the MySQL database will have a password setup.
  .

@@ -9,6 +9,7 @@ Standards-Version: 3.9.1
 Package: symbiosis-backup
 Replaces: bytemark-vhost-simple-backup
 Conflicts: bytemark-vhost-simple-backup
+Provides: bytemark-vhost-simple-backup
 Architecture: all
 Depends: backup2l, ruby1.8, symbiosis-common (>>2011:1216), ${misc:Depends}
 Description: Automatically backup your files

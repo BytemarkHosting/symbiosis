@@ -9,6 +9,7 @@ Standards-Version: 3.9.1
 Package: symbiosis-key
 Replaces: bytemark-vhost-key
 Conflicts: bytemark-vhost-key
+Provides: bytemark-vhost-key
 Architecture: all
 Depends: gnupg, ${misc:Depends}
 Description: The Bytemark Debian package-signing key

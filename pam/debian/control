@@ -7,10 +7,11 @@ Build-Depends: debhelper (>= 7.0.0), cdbs
 Standards-Version: 3.9.1
 
 Package: symbiosis-pam
+Architecture: all
+Depends: libpam-tmpdir, wordlist, libpam-cracklib, ${misc:Depends}
 Replaces: bytemark-vhost-pam
 Conflicts: bytemark-vhost-pam
-Architecture: all
-Depends: libpam-tmpdir, wbritish, libpam-cracklib, ${misc:Depends}
+Provides: bytemark-vhost-pam
 Description: PAM configuration metapackage
  This package is a metapackage which will configure and control the
  basic PAM setup of your machine.

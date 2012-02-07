@@ -9,6 +9,7 @@ Standards-Version: 3.9.1
 Package: symbiosis-crack
 Replaces: bytemark-vhost-crack
 Conflicts: bytemark-vhost-crack
+Provides: bytemark-vhost-crack
 Architecture: any
 Depends: libcrack2, ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}
 Description: Test the strength passwords for virtual hosts
