@@ -1,2 +1,0 @@
-DPkg::Pre-Invoke{ "touch /tmp/dpkg.running"; }; 
-DPkg::Post-Invoke{ "/bin/rm /tmp/dpkg.running"; };
