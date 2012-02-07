@@ -1,3 +1,12 @@
+symbiosis-updater (2012:0208) stable; urgency=low
+
+  * Updated debian control files to use relationships properly, as per section
+    7.6 of the Debian Policy Manual. 
+  * Sources security list now points at the RC3 repo.
+  * Script no longer just exits if /etc/symbiosis/updater isn't present.
+
+ - Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 14:04:58 +0000
+
 symbiosis-updater (2012:0124) stable; urgency=low
 
   * Fixed install locations for updater.
