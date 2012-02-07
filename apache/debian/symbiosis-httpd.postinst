@@ -85,6 +85,13 @@ if [ -e /etc/cron.daily/make-logs ] ; then
   rm -f /etc/cron.daily/make-logs
 fi
 
+#
+# Remove the old tc_ssl_configuration.rb script
+#
+if [ -e /etc/symbiosis/test.d/tc_ssl_configuration.rb ] ; then
+  rm -f /etc/symbiosis/test.d/tc_ssl_configuration.rb
+fi
+
 #DEBHELPER#
 
 #

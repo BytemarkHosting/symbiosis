@@ -9,8 +9,9 @@ symbiosis-httpd (2012:0208) stable; urgency=low
   * Templated the webalizer config.
   * Fixed verbose logging in symbiosis-create-mass-hosting-sites
   * Fixed force recreate in symbiosis-make-logs 
+  * Postinst now removes old SSL configuration test if present.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 17:06:07 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 17:10:47 +0000
 
 symbiosis-httpd (2012:0202) stable; urgency=low
 
