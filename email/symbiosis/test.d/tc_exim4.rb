@@ -1,5 +1,3 @@
-#!/usr/bin/ruby1.8
-
 $: << "../.."
 
 exit 0 if Process.euid != 0

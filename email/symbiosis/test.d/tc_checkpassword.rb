@@ -1,5 +1,3 @@
-#!/usr/bin/ruby1.8
-
 require 'test/unit'
 require 'symbiosis/domain'
 require 'symbiosis/domain/mailbox'
