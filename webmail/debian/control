@@ -25,7 +25,7 @@ Description: This package gives webmail access to Symbiosis using Squirrelmail
  This package will enable a global webmail system for all domains hosted
  using the Bytemark system.
  .
- This package implements webmail using the Squirrelmail system.
+ This is a metapackage that implements webmail using the Squirrelmail system.
 
 
 Package: symbiosis-webmail-roundcube
@@ -36,7 +36,7 @@ Description: This package gives webmail access to Symbiosis using Roundcube
  This package will enable a global webmail system for all domains hosted
  using the Bytemark system.
  .
- This package implements webmail using the Roundcube system.
+ This is a metapackage that implements webmail using the Roundcube system.
 
 
 
