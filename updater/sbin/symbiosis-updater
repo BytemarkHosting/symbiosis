@@ -61,9 +61,7 @@ METHOD="dist-upgrade"
 # the settings above to be overridden.
 #
 if [ -e /etc/symbiosis/updater ]; then
-    . /etc/symbiosis/updater
-else
-    exit
+  . /etc/symbiosis/updater
 fi
 
 
