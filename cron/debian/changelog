@@ -1,3 +1,9 @@
+symbiosis-cron (2012:0208) stable; urgency=low
+
+  * Updated Symbiosis::Crontab API docs. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 13:47:53 +0000
+
 symbiosis-cron (2012:0201) stable; urgency=low
 
   * Updated scripts to specify ruby1.8
