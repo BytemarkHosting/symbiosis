@@ -8,7 +8,7 @@ symbiosis-httpd (2012:0208) stable; urgency=low
   * Removed mod_ruid since this is now available in Debian unstable.
   * Templated the webalizer config.
   * Fixed verbose logging in symbiosis-create-mass-hosting-sites
-  * Fixed force recreate in symbiosis-make-logs 
+  * Fixed force recreate in symbiosis-make-logs.
   * Postinst now removes old SSL configuration test if present.
   * ServerAliases are now added when they actually exist as symlinks.
   * Symlinks are handled better by logging -- extra filehandles are not
@@ -17,7 +17,7 @@ symbiosis-httpd (2012:0208) stable; urgency=low
     is used if verification fails.
   * Fixed bug where SSL certs were not returned for a domain.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Feb 2012 16:49:26 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Feb 2012 16:58:12 +0000
 
 symbiosis-httpd (2012:0202) stable; urgency=low
 
