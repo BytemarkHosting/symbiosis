@@ -10,8 +10,11 @@ symbiosis-httpd (2012:0208) stable; urgency=low
   * Fixed verbose logging in symbiosis-create-mass-hosting-sites
   * Fixed force recreate in symbiosis-make-logs 
   * Postinst now removes old SSL configuration test if present.
+  * ServerAliases are now added when they actually exist as symlinks.
+  * Symlinks are handled better by logging -- extra filehandles are not
+    opened.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 17:10:47 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Feb 2012 15:23:32 +0000
 
 symbiosis-httpd (2012:0202) stable; urgency=low
 

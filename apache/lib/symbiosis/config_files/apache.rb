@@ -195,6 +195,14 @@ module Symbiosis
       end
 
       #
+      #
+      # Return a ServerAlias snippet for all server aliases for a domain.
+      #
+      def server_aliases
+        domain.aliases.collect{|a| "ServerAlias #{a}"}.join("\n        ")
+      end
+
+      #
       # Returns the certificate, key, and bundle configuration lines.
       #
       def ssl_config

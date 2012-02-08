@@ -21,10 +21,12 @@ NameVirtualHost <%= ip %>:80
         #
         ServerName  <%= domain %>
 
+
         #
         # And server alias in place
         #
-        ServerAlias www.<%= domain %>
+        <%= server_aliases %>
+
 
         #
         #  Allow users to override settings via .htaccess

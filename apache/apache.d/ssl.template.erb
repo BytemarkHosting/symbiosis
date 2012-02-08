@@ -26,10 +26,11 @@ NameVirtualHost <%= ip %>:80
         #
         ServerName  <%= domain %>
 
+
         #
         # And server alias in place
         #
-        ServerAlias www.<%= domain %>
+        <%= server_aliases %>
 
 
         SSLEngine On
@@ -87,10 +88,12 @@ NameVirtualHost <%= ip %>:80
         #
         ServerName  <%= domain %>
 
+
         #
         # And server alias in place
         #
-        ServerAlias www.<%= domain %>
+        <%= server_aliases %>
+
 
 % if mandatory_ssl?
         #

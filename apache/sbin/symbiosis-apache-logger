@@ -279,11 +279,6 @@ processing_thread = Thread.new do
     #
     if 0 == Process.uid and (domain = Symbiosis::Domains.find(domain_name))
       #
-      # Change the domain name to the correct one.
-      # 
-      domain_name = domain.name
-
-      #
       # Fetch the log filename
       #
       log_filename = File.expand_path(File.join(domain.log_dir, $log_filename))

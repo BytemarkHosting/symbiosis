@@ -171,6 +171,11 @@ Symbiosis::Domains.each do |domain|
 
   next unless domains_to_configure.empty? or domains_to_configure.include?(domain.name)
 
+  if domain.is_alias?
+    verbose "\tSkipping as #{domain.symlink} is a link to #{domain.directory}."
+    next
+  end
+
   begin
     sites_available_file = File.join(apache2_dir, "sites-available","#{domain.name}.conf")
     sites_enabled_file   = File.join(apache2_dir, "sites-enabled","#{domain.name}.conf")

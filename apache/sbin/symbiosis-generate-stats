@@ -139,8 +139,8 @@ Symbiosis::Domains.each do |domain|
   #
   # Skip symlinks
   #
-  if ( File.symlink?(domain.directory) )
-    verbose "\tSkipping as it is a symlink elsewhere."
+  if ( domain.is_alias? )
+    verbose "\tSkipping as it is an symlink to #{domain.directory}."
     next
   end
 

@@ -192,7 +192,7 @@ PageType	php
 # "yes" or "no".  Default is "no".  Note: this does not suppress
 # warnings and errors (which are printed to stderr).
 
-#Quiet		no
+Quiet		yes
 
 # ReallyQuiet will supress all messages including errors and
 # warnings.  Values can be 'yes' or 'no' with 'no' being the
@@ -377,13 +377,16 @@ PageType	php
 # "*mama.com" and "www.your*" will all match.
 
 # Your own site should be hidden
-HideSite	<%= domain %> 
-HideSite  www.<%= domain %> 
-HideSite	localhost
+% domain.aliases.each do |domain_alias|
+HideSite	<%= domain_alias %>
 
-# Your own site gives most referrals
-HideReferrer <%= domain %>/
-HideReferrer www.<%= domain %>/
+HideReferrer <%= domain_alias  %>/
+
+% end
+
+#
+# Also hide localhost.
+HideSite	localhost
 
 # This one hides non-referrers ("-" Direct requests)
 HideReferrer	Direct Request
