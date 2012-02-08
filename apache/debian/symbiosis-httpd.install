@@ -3,5 +3,4 @@ test.d                    etc/symbiosis/
 apache.d                  etc/symbiosis/
 lib/*                     usr/lib/ruby/1.8/
 monit.d/*                 etc/symbiosis/monit.d/
-logrotate.d/*             etc/logrotate.d/
 bytemark/*                usr/share/symbiosis/static/
