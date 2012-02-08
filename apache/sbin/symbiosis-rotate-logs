@@ -105,7 +105,8 @@ end
 #
 require 'symbiosis/domains'
 require 'symbiosis/domain/http'
-require 'symbiosis/config_files/webalizer'
+
+
 
 def verbose(s) ; puts s if $VERBOSE ; end
 
@@ -127,22 +128,72 @@ Symbiosis::Domains.each do |domain|
   #
   # OK now we need to look for a logfile, or two.
   #
-  #  access.log     for HTTP accesses.
-  #  ssl_access.log for HTTPS accesses.
+  # We will find files of the form:
   #
-  process = Array.new()
+  #  access.log
+  #  access.log.0
+  #  access.log.1
+  #
+  # We want to increment the version of each file.  We do that by
+  # sorting asci-betically
+  #
+  results = Array.new()
 
-  %w( access.log.1 ssl_access.log.1 ).each do |name|
-    log = File.join( domain.log_dir, name )
-    process.push(log) if File.exists?(log)
+  Dir.foreach( File.join( domain.directory, "public/logs" ) ) do |entry|
+
+    # skip dotfiles
+    next if entry == '.' or entry == '..'
+
+    # skip files that don't match access-ssl
+    next if ( entry !~ /^(access|ssl_access)/ )
+
+    # save the file
+    results.push( entry )
   end
 
   #
-  # If we didn't find a logfile we're done.
+  # If we didn't find any logfiles we're done.
   #
-  if ( process.empty? )
+  if ( results.empty? )
     verbose "\tSkipping this domain, no suitable logfiles found"
     next
+  end
+
+  #
+  #  OK sort the array by the trailng digit to give us:
+  #
+  #  access.log.1
+  #  ...
+  #  access.log.10
+  #  access.log.11
+  #  ..
+  #
+  a = results.sort_by do |x|
+    x.split(".").map {|i| i.to_i}
+  end
+
+
+  #
+  #  Process these files backward so we don't over-write anything.
+  #
+  a.reverse.each do |file|
+
+    dest = file
+
+    if ( dest =~ /^(.*?)([0-9]*)$/ )
+      before = $1.dup
+      num    = $2.dup
+
+      dest = "#{before}#{num.to_i+1}"
+
+      if ( num.to_i > 14 )
+        puts "rm #{file}"
+      else
+        puts "mv #{file} #{dest}"
+      end
+    else
+        puts "mv #{file} #{file}.0"
+    end
   end
 
 end
