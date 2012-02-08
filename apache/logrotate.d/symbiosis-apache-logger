@@ -12,6 +12,7 @@
   sharedscripts
   postrotate
     killall -HUP symbiosis-apache-logger
+    /usr/sbin/symbiosis-generate-stats
   endscript
 }
 

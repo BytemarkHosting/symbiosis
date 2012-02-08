@@ -1,4 +1,4 @@
 man/symbiosis-create-sites.man
 man/symbiosis-create-mass-hosting-sites.man
 man/symbiosis-apache-logger.man
-man/symbiosis-make-logs.man
+man/symbiosis-generate-stats.man

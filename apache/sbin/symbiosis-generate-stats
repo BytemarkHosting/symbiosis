@@ -1,11 +1,11 @@
 #!/usr/bin/ruby1.8
 #
 # NAME
-#   symbiosis-make-logs - Generate statistics for domains.
+#   symbiosis-generate-stats - Generate statistics for domains.
 #
 #
 # SYNOPSIS
-#  symbiosis-make-logs [ --template | -t <filename> ] [ --force | -f ]
+#  symbiosis-generate-stats [ --template | -t <filename> ] [ --force | -f ]
 #       [ -h | --help ] [-m | --manual] [ -v | --verbose ]
 #
 #
