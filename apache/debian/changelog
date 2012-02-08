@@ -15,8 +15,9 @@ symbiosis-httpd (2012:0208) stable; urgency=low
     opened.
   * SSL checks are now enforced by symbiosis-create-sites.  Non-SSL template
     is used if verification fails.
+  * Fixed bug where SSL certs were not returned for a domain.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Feb 2012 16:27:18 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Feb 2012 16:49:26 +0000
 
 symbiosis-httpd (2012:0202) stable; urgency=low
 

@@ -208,7 +208,7 @@ module Symbiosis
       def ssl_config
         ans = []
         if defined?(@domain) and @domain.is_a?(Symbiosis::Domain) 
-          unless @domain.ssl_certificate_file and @domain.ssl_key_file
+          if @domain.ssl_certificate_file and @domain.ssl_key_file
             ans << "SSLCertificateFile #{@domain.ssl_certificate_file}"
             #
             # Add the separate key unless the key is in the certificate. 
