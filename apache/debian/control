@@ -23,9 +23,9 @@ Package: symbiosis-httpd
 Architecture: all
 Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static, symbiosis-common (>= 2012:0208), ruby1.8
 Replaces: bytemark-vhost-httpd, symbiosis-test, symbiosis-monit (<< 2011:1206), symbiosis-httpd-static
-Breaks: symbiosis-test, symbiosis-monit (<< 2011:1206)
+Breaks: symbiosis-monit (<< 2011:1206)
 Provides: bytemark-vhost-httpd, symbiosis-httpd-static
-Conflicts: bytemark-vhost-httpd, symbiosis-httpd-static
+Conflicts: bytemark-vhost-httpd, symbiosis-httpd-static, symbiosis-test
 Description: Tools to manage Apache virtual hosting in Symbiosis
  This package contains tools to manage the virtual hosting of websites
  with Apache2.

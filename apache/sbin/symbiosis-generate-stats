@@ -157,13 +157,12 @@ Symbiosis::Domains.each do |domain|
     next
   end
 
-
   #
   #  Create a configuration file, if one wasn't found.
   #
-  webalizer_conf = File.join( domain.log_dir, "webalizer.conf" )
+  webalizer_conf = File.join( domain.config_dir, "webalizer.conf" )
 
-  config        = Symbiosis::ConfigFiles::Webalizer.new(webalizer_conf, "#")
+  config          = Symbiosis::ConfigFiles::Webalizer.new(webalizer_conf, "#")
   config.template = template 
   config.domain   = domain
 
@@ -211,18 +210,15 @@ Symbiosis::Domains.each do |domain|
   #
   domain.create_dir( domain.stats_dir )
 
-
   #
   #  Now process each logfile.
   #
-  process.each do |file|
-    puts "\tRunning webalizer against #{file}" if $VERBOSE
+  puts "\tRunning webalizer against #{process.join(" ")}" if $VERBOSE
 
-    #
-    #  Now run it under sudo, as the user ID of the domain.
-    #
-    system( "cd #{domain.log_dir} && sudo -u '\##{domain.uid}' -- webalizer -q #{file} >/dev/null 2>/dev/null" )
-  end
+  #
+  #  Now run it under sudo, as the user ID of the domain.
+  #
+  system( "cd #{domain.config_dir} && sudo -u '\##{domain.uid}' -- webalizer -q #{process.join(" ")} >/dev/null 2>/dev/null" )
 
 end
 
