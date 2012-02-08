@@ -36,9 +36,9 @@ NameVirtualHost <%= ip %>:443
         #  This is the directory people are redirected to
         # if their site is empty.
         #
-        Alias /bytemark/ "/usr/share/symbiosis-static/"
-        <Directory "/usr/share/symbiosis-static/">
-                DirectoryIndex index.html index.php
+        Alias /bytemark/ "/usr/share/symbiosis/static/"
+        <Directory "/usr/share/symbiosis/static/">
+                DirectoryIndex index.html
                 AllowOverride All
         </Directory>
 

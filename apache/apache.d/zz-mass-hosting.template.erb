@@ -19,8 +19,8 @@ NameVirtualHost <%= ip %>:80
         #  This is the directory people are redirected to
         # if their site is empty.
         #
-        Alias /bytemark/ "/usr/share/symbiosis-static/"
-        <Directory "/usr/share/symbiosis-static/">
+        Alias /bytemark/ "/usr/share/symbiosis/static/"
+        <Directory "/usr/share/symbiosis/static/">
                 DirectoryIndex index.html index.php
                 AllowOverride All
         </Directory>

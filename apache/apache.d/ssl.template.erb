@@ -52,29 +52,11 @@ NameVirtualHost <%= ip %>:80
 
 
         #
-        #  This is the directory people are redirected to
-        # if their site is empty.
-        #
-        Alias /bytemark/ "/usr/share/symbiosis-static/"
-        <Directory "/usr/share/symbiosis-static/">
-                DirectoryIndex index.html
-                AllowOverride None
-        </Directory>
-
-        #
         #  Allow users to override settings via .htaccess
         #
         <Directory <%=domain_directory%> >
                 AllowOverride all
         </Directory>
-
-        #
-        #  And this makes that redirection happen.
-        #
-        <LocationMatch "^/+$">
-                Options -Indexes
-                ErrorDocument 403 /bytemark/
-        </LocationMatch>
 
         #
         #  The document root
@@ -118,15 +100,6 @@ NameVirtualHost <%= ip %>:80
         Redirect / https://<%= domain %>/
 
 % else
-        #
-        #  This is the directory people are redirected to
-        # if their site is empty.
-        #
-        Alias /bytemark/ "/usr/share/symbiosis-static/"
-        <Directory "/usr/share/symbiosis-static/">
-                DirectoryIndex index.html
-                AllowOverride None
-        </Directory>
 
         #
         #  Allow users to override settings via .htaccess
@@ -134,14 +107,6 @@ NameVirtualHost <%= ip %>:80
         <Directory <%=domain_directory%> >
                 AllowOverride all
         </Directory>
-
-        #
-        #  And this makes that redirection happen.
-        #
-        <LocationMatch "^/+$">
-                Options -Indexes
-                ErrorDocument 403 /bytemark/
-        </LocationMatch>
 
         #
         #  The document root
