@@ -14,7 +14,7 @@ module Symbiosis
     #
     include Utils
 
-    attr_reader :uid, :gid, :user, :group, :name, :prefix, :directory
+    attr_reader :uid, :gid, :user, :group, :name, :prefix, :directory, :symlink
 
     #
     # Creates a new domain object.  If no name is set a random domain name is
@@ -42,17 +42,52 @@ module Symbiosis
       @directory = File.join(@prefix, @name)
 
       #
-      # Redirect elsewhere if we have a symlink.  Expand it up relative to
-      # @prefix.
+      # If @directory (above) is a symlink, its original location is recorded
+      # in @symlink.
       #
-      if File.symlink?@directory)
-        @directory = File.expand_path(File.readlink(@directory), @prefix)
-      end
+      @symlink   = nil
 
+      #
+      # If the directoy exists, then check that we're not following a symlink.
+      #
       if File.directory?(@directory)
         #
-        # If the directoy exists, then work out our uid/gid 
+        # Redirect elsewhere if we have a symlink.  Expand it up relative to
+        # @prefix.
         #
+        if File.lstat(@directory).ino != File.stat(@directory).ino
+          #
+          # Deal with multiple layers of indirection with an inode comparison
+          # would work better.  This will only work within the prefix
+          # directory!
+          #
+          #
+          # Work out which inode we're pointed at.  Use stat so we follow the link.
+          #
+          target_inode = File.stat(@directory).ino
+
+          #
+          # Now find a matching entry inode.
+          #
+          new_directory = Dir.glob( File.join(@prefix,"*") ).find do |entry|
+            #
+            # Check the inodes -- use lstat so we stat actual links without
+            # following.
+            #
+            File.lstat(entry).ino == target_inode
+          end
+
+          #
+          # If we've found a directory, record it.
+          #
+          unless new_directory.nil?
+            #
+            # Seems OK :)  Record our results.
+            #
+            @symlink   = @directory
+            @directory = new_directory
+          end
+        end
 
         @uid  = File.stat(@directory).uid
         @user = Etc.getpwuid(@uid).name
@@ -61,7 +96,6 @@ module Symbiosis
         @gid = File.stat(@directory).gid
         @group = Etc.getgrgid(@gid).name
         raise ArgumentError, "#{@directory} owned by a system group (GID less than 1000)" if @gid < 1000
-
       else
         #
         # Otherwise assume admin.
@@ -270,6 +304,54 @@ module Symbiosis
       # Fall back to a plain text comparison
       #
       return given_password == real_password
+    end
+
+    def aliases
+      results = []
+      results << "www.#{self.name}" unless self.name =~ /^www\./
+
+      self_stat = File.stat(self.directory)
+      #
+      #  For each domain.
+      #
+      Dir.glob( File.join(self.prefix,"*") ) do |entry|
+        #
+        # Check the inodes.
+        #
+        target_stat = File.stat(entry)
+        target_lstat = File.lstat(entry)
+
+        #
+        # Skip unless the target is a link (i.e. stat and lstat inodes differ)
+        # and the stat inode matches our own stat inode.
+        #
+        next unless target_lstat.ino != target_stat.ino and target_stat.ino == self_stat.ino 
+
+        #
+        # Split
+        #
+        this_prefix, this_domain = File.split(entry)
+
+        #
+        # Don't want dotfiles.
+        #
+        next if this_domain =~ /^\./ 
+    
+        #
+        # And record.
+        #
+        results << this_domain
+        results << "www.#{this_domain}" unless this_domain =~ /^www\./
+      end
+
+      results.sort.uniq
+    end
+
+    #
+    # Returns if this domain is in fact a symlink to another.
+    #
+    def is_alias?
+      not self.symlink.nil?
     end
 
     #
