@@ -34,7 +34,7 @@
 # Standard ruby
 #
 require 'getoptlong'
-
+require 'fileutils'
 
 
 #
@@ -187,12 +187,15 @@ Symbiosis::Domains.each do |domain|
       dest = "#{before}#{num.to_i+1}"
 
       if ( num.to_i > 14 )
-        puts "rm #{file}"
+        verbose( "rm #{file}" )
+        File.unlink( file )
       else
-        puts "mv #{file} #{dest}"
+        verbose( "cp #{file} #{dest}" )
+        Fileutils.cp file, dest
       end
     else
-        puts "mv #{file} #{file}.0"
+      verbose( "cp #{file} #{file}.0" )
+      Fileutils.cp file, "#{file}.0"
     end
   end
 
