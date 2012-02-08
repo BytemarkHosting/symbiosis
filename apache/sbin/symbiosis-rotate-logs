@@ -191,11 +191,11 @@ Symbiosis::Domains.each do |domain|
         File.unlink( file )
       else
         verbose( "cp #{file} #{dest}" )
-        Fileutils.cp file, dest
+        FileUtils.mv file, dest
       end
     else
       verbose( "cp #{file} #{file}.0" )
-      Fileutils.cp file, "#{file}.0"
+      FileUtils.mv file, "#{file}.0"
     end
   end
 
