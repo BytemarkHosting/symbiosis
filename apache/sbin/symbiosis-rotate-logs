@@ -176,6 +176,8 @@ Symbiosis::Domains.each do |domain|
   #
   #  Process these files backward so we don't over-write anything.
   #
+  rotated = false
+
   a.reverse.each do |file|
 
     dest = file
@@ -197,13 +199,24 @@ Symbiosis::Domains.each do |domain|
     if ( rm )
       verbose( "rm #{file}" )
       File.unlink( file )
+      rotated = true
     else
       verbose( "cp #{file} #{dest}" )
 
       FileUtils.mv file, dest
       File.chown( domain.uid, domain.gid, dest )
       File.chmod( 0644, dest )
+      rotated = true
     end
+  end
+
+
+  # If we did anything then we need to reload
+  if ( rotated )
+      verbose( "Since we rotated we now restart the apache logger")
+      Kernel.system( "killall -HUP symbiosis-apache-logger" )
+      verbose( "Since we rotated we now generate statistics" )
+      Kernel.system( "/usr/sbin/symbiosis-generate-stats" ) 
   end
 
 end
