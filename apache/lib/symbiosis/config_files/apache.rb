@@ -205,20 +205,24 @@ module Symbiosis
       #
       # Returns the certificate, key, and bundle configuration lines.
       #
+      # This does not have an explicit validation step.  That should be handled
+      # elsewhere.
+      #
       def ssl_config
         ans = []
-        if defined?(@domain) and @domain.is_a?(Symbiosis::Domain) 
-          if @domain.ssl_certificate_file and @domain.ssl_key_file
-            ans << "SSLCertificateFile #{@domain.ssl_certificate_file}"
-            #
-            # Add the separate key unless the key is in the certificate. 
-            #
-            ans << "SSLCertificateKeyFile #{@domain.ssl_key_file}" unless @domain.ssl_certificate_file == @domain.ssl_key_file
-            #
-            # Add a bundle, if needed.
-            #
-            ans << "SSLCertificateChainFile #{@domain.ssl_bundle_file}" if @domain.ssl_bundle_file
-          end
+        if defined?(@domain) and @domain.is_a?(Symbiosis::Domain)
+          #
+          # 
+          #
+          ans << "SSLCertificateFile #{@domain.ssl_certificate_file}"
+          #
+          # Add the separate key unless the key is in the certificate. 
+          #
+          ans << "SSLCertificateKeyFile #{@domain.ssl_key_file}" unless @domain.ssl_certificate_file == @domain.ssl_key_file
+          #
+          # Add a bundle, if needed.
+          #
+          ans << "SSLCertificateChainFile #{@domain.ssl_bundle_file}" if @domain.ssl_bundle_file
         elsif File.exists?("/etc/ssl/ssl.crt")
           #
           # TODO: this makes absolutely no checks for the certificate validity
