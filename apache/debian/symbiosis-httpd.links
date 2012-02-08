@@ -1,3 +1,4 @@
-usr/sbin/symbiosis-create-sites usr/sbin/symbiosis-create-ssl
-usr/sbin/symbiosis-create-sites etc/cron.hourly/symbiosis-create-sites
-usr/share/man/man1/symbiosis-create-sites.1.gz usr/share/man/man1/symbiosis-create-ssl.1.gz
+usr/sbin/symbiosis-create-sites                  usr/sbin/symbiosis-create-ssl
+usr/sbin/symbiosis-create-sites                  etc/cron.hourly/symbiosis-create-sites
+usr/sbin/symbiosis-rotate-logs                   etc/cron.daily/symbiosis-rotate-logs
+usr/share/man/man1/symbiosis-create-sites.1.gz   usr/share/man/man1/symbiosis-create-ssl.1.gz
