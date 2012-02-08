@@ -41,6 +41,14 @@ module Symbiosis
       #
       @directory = File.join(@prefix, @name)
 
+      #
+      # Redirect elsewhere if we have a symlink.  Expand it up relative to
+      # @prefix.
+      #
+      if File.symlink?@directory)
+        @directory = File.expand_path(File.readlink(@directory), @prefix)
+      end
+
       if File.directory?(@directory)
         #
         # If the directoy exists, then work out our uid/gid 
@@ -53,6 +61,7 @@ module Symbiosis
         @gid = File.stat(@directory).gid
         @group = Etc.getgrgid(@gid).name
         raise ArgumentError, "#{@directory} owned by a system group (GID less than 1000)" if @gid < 1000
+
       else
         #
         # Otherwise assume admin.
