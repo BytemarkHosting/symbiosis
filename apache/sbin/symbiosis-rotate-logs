@@ -1,0 +1,151 @@
+#!/usr/bin/ruby1.8
+#
+# NAME
+#   symbiosis-rotate-logs - Rotate and prune Apache logs.
+#
+#
+# SYNOPSIS
+#  symbiosis-rotate-logs [ -h | --help ] [-m | --manual] [ -v | --verbose ]
+#
+#
+# OPTIONS
+#
+#  -h, --help              Show a help message, and exit.
+#
+#  -m, --manual            Show this manual, and exit.
+#
+#  -v, --verbose           Show verbose errors
+#
+#
+# USAGE
+#
+# This script is designed to be invoked once per day and rotate the current
+# apache logfile beneath each domains public directory.
+#
+# Logs older than 14 days will also be pruned.
+#
+# AUTHOR
+#
+#   Steve Kemp <steve@bytemark.co.uk>
+#
+
+
+#
+# Standard ruby
+#
+require 'getoptlong'
+
+
+
+#
+#  The options set by the command line.
+#
+help         = false
+manual       = false
+$VERBOSE     = false
+$FORCE       = false
+
+
+opts = GetoptLong.new(
+                      [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
+                      [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
+                      [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ]
+                      )
+
+
+begin
+  opts.each do |opt,arg|
+    case opt
+    when '--help'
+      help = true
+    when '--manual'
+      manual = true
+    when '--verbose'
+      $VERBOSE = true
+    end
+  end
+rescue
+  # any errors, show the help
+  help = true
+end
+
+
+#
+# CAUTION! Here be quality kode.
+#
+if manual or help
+
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
+
+  found_synopsis = false
+
+  lines.each do |line|
+
+    line.chomp!
+    break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
+    puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
+  end
+
+  exit 0
+end
+
+#
+# Symbiosis libraries -- required here so they're not needed during the build
+# process for manpage generation.
+#
+require 'symbiosis/domains'
+require 'symbiosis/domain/http'
+require 'symbiosis/config_files/webalizer'
+
+def verbose(s) ; puts s if $VERBOSE ; end
+
+
+#
+#  Potentially we process each domain.
+#
+Symbiosis::Domains.each do |domain|
+  verbose "Considering domain: #{domain}"
+
+  #
+  # Skip symlinks
+  #
+  if ( domain.is_alias? )
+    verbose "\tSkipping as it is an symlink to #{domain.directory}."
+    next
+  end
+
+  #
+  # OK now we need to look for a logfile, or two.
+  #
+  #  access.log     for HTTP accesses.
+  #  ssl_access.log for HTTPS accesses.
+  #
+  process = Array.new()
+
+  %w( access.log.1 ssl_access.log.1 ).each do |name|
+    log = File.join( domain.log_dir, name )
+    process.push(log) if File.exists?(log)
+  end
+
+  #
+  # If we didn't find a logfile we're done.
+  #
+  if ( process.empty? )
+    verbose "\tSkipping this domain, no suitable logfiles found"
+    next
+  end
+
+end
+
+
+
