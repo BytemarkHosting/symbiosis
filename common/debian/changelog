@@ -10,8 +10,10 @@ symbiosis-common (2012:0208) stable; urgency=low
   * Domains which are just symlinks have their directory set correctly, i.e
     not the symlinked one, but the resolved one.
   * Domain aliases (symlinks) can be listed.
+  * SSL checks relaxed.  Execeptions only raised when SSL config is actually
+    broken. 
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Feb 2012 15:25:42 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Feb 2012 16:28:19 +0000
 
 symbiosis-common (2012:0201) stable; urgency=low
 

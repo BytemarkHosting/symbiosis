@@ -268,35 +268,36 @@ module Symbiosis
     #
     # This method performs a variety of checks on an SSL certificate and key:
     #
-    # * Is the certificate valid for this domain name, or this domain with
-    #   "www." prepended.
+    # * Is the certificate valid for this domain name or any of its aliases
     # * Has the certificate started yet?
     # * Has the certificate expired?
+    # 
+    # If any of these checks fail, a warning is raised.
+    #
     # * Does the key match the certificate?
     # * If the certificate is not self-signed, does it need a bundle?
     #
-    # If any of these checks fail, a OpenSSL::X509::CertificateError is raised.
+    # If either of these last two checks fail, a
+    # OpenSSL::X509::CertificateError is raised.
     #
     def ssl_verify(certificate = self.ssl_x509_certificate, key = self.ssl_key, store = self.ssl_certificate_store)
 
       #
-      # Firstly check that the certificate is valid for the domain.
+      # Firstly check that the certificate is valid for the domain or one of its aliases.
       #
-      unless OpenSSL::SSL.verify_certificate_identity(certificate, self.name) or
-             OpenSSL::SSL.verify_certificate_identity(certificate, "www.#{self.name}")
-
-        raise OpenSSL::X509::CertificateError, "The certificate subject is not valid for this domain."
+      unless self.aliases.any? { |domain_alias| OpenSSL::SSL.verify_certificate_identity(certificate, domain_alias) }
+        warn "\tThe certificate subject is not valid for this domain." if $VERBOSE
       end
 
       # Check that the certificate is current
       # 
       #
       if certificate.not_before > Time.now 
-        raise OpenSSL::X509::CertificateError, "The certificate is not valid yet."
+        warn "\tThe certificate is not valid yet." if $VERBOSE
       end
 
       if certificate.not_after < Time.now 
-        raise OpenSSL::X509::CertificateError, "The certificate has expired."
+        warn "\tThe certificate has expired." if $VERBOSE
       end
 
       # Next check that the key matches the certificate.
