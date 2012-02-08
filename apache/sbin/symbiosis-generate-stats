@@ -137,6 +137,14 @@ Symbiosis::Domains.each do |domain|
   end
 
   #
+  # Skip symlinks
+  #
+  if ( File.symlink?(domain.directory) )
+    verbose "\tSkipping as it is a symlink elsewhere."
+    next
+  end
+
+  #
   # OK now we need to look for a logfile, or two.
   #
   #  access.log     for HTTP accesses.
