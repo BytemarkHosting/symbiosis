@@ -192,9 +192,16 @@ Symbiosis::Domains.each do |domain|
     #  If SSL is not enabled then we can skip
     #
     if ( domain.ssl_enabled? )
-      config.template = ssl_template
+      begin domain.ssl_verify
+        config.template = ssl_template
 
-      verbose "\tSSL is enabled -- using SSL template"
+        verbose "\tSSL is enabled -- using SSL template"
+      rescue OpenSSL::X509::CertificateError => err
+        config.template = non_ssl_template
+
+        warn "SSL configuration for #{domain.name} is broken -- #{err.to_s}"
+        verbose "\tSSL is enabled but mis-configured -- using non-SSL template"
+      end
     else
       config.template = non_ssl_template
     
