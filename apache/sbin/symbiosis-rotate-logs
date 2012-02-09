@@ -110,6 +110,10 @@ require 'symbiosis/domain/http'
 
 def verbose(s) ; puts s if $VERBOSE ; end
 
+#
+# This flag determines if we need to rotate
+#
+rotated = false
 
 #
 #  Potentially we process each domain.
@@ -122,6 +126,14 @@ Symbiosis::Domains.each do |domain|
   #
   if ( domain.is_alias? )
     verbose "\tSkipping as it is an symlink to #{domain.directory}."
+    next
+  end
+
+  #
+  # Check the log directory exists.
+  #
+  unless ( File.exists?(domain.log_dir) )
+    verbose "\tSkipping as #{domain.log_dir} doesn't exist."
     next
   end
 
@@ -139,13 +151,12 @@ Symbiosis::Domains.each do |domain|
   #
   results = Array.new()
 
-  Dir.foreach( File.join( domain.directory, "public/logs" ) ) do |entry|
-
+  Dir.foreach( domain.log_dir ) do |entry|
     # skip dotfiles
     next if entry == '.' or entry == '..'
 
-    # skip files that don't match access-ssl
-    next if ( entry !~ /^(access|ssl_access)/ )
+    # skip files that don't match our expected pattern.
+    next unless ( entry =~ /^(ssl_)?access\.log(\.\d+)$/ )
 
     # save the file
     results.push( entry )
@@ -172,54 +183,62 @@ Symbiosis::Domains.each do |domain|
     x.split(".").map {|i| i.to_i}
   end
 
+  #
+  # If we've got this far, rotation has happened.
+  #
+  rotated = true
 
   #
   #  Process these files backward so we don't over-write anything.
   #
-  rotated = false
-
   a.reverse.each do |file|
 
-    dest = file
+    file = File.join( domain.log_dir, file )
+    dest = nil
     rm   = false
 
-    if ( dest =~ /^(.*?)([0-9]*)$/ )
+    if ( file =~ /(.*)\.(\d+)$/ )
       before = $1.dup
-      num    = $2.dup
+      num    = $2.to_i + 1
 
-      dest = "#{before}#{num.to_i+1}"
+      dest = "#{before}.#{num}"
 
-      if ( num.to_i > 14 )
+      if ( num > 14 )
         rm = true
       end
     else
       dest = "#{file}.0"
     end
 
+    next if dest.nil?
+
     if ( rm )
       verbose( "rm #{file}" )
       File.unlink( file )
-      rotated = true
     else
       verbose( "cp #{file} #{dest}" )
 
-      FileUtils.mv file, dest
-      File.chown( domain.uid, domain.gid, dest )
-      File.chmod( 0644, dest )
-      rotated = true
+      #
+      # Move the file by reading the old one, and writing to the new one.
+      #
+      Symbiosis::Utils.safe_open(file, "r") do |fh|
+        Symbiosis::Utils.safe_open(dest,"a+", :uid => domain.uid, :gid => domain.gid, :mode => 0644) do |dh|
+          dh.truncate(0)
+          dh.write(fh.read)
+        end
+      end
     end
   end
-
-
-  # If we did anything then we need to reload
-  if ( rotated )
-      verbose( "Since we rotated we now restart the apache logger")
-      Kernel.system( "killall -HUP symbiosis-apache-logger" )
-      verbose( "Since we rotated we now generate statistics" )
-      Kernel.system( "/usr/sbin/symbiosis-generate-stats" ) 
-  end
-
 end
 
+#
+# If we did anything then we need to reload
+#
+if ( rotated )
+  verbose( "Since we rotated we now restart the apache logger")
+  Kernel.system( "killall -HUP symbiosis-apache-logger" )
+  verbose( "Since we rotated we now generate statistics" )
+  Kernel.system( "/usr/sbin/symbiosis-generate-stats" ) 
+end
 
 
