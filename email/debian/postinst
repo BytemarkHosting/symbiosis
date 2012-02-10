@@ -11,14 +11,20 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
-#  Previous mistake
+#  Previous mistakes
 #
 if [ -e /etc/cron.d/exim_rewrite_scan ]; then
-    rm -rf /etc/cron.d/exim_rewrite_scan
+    rm -f /etc/cron.d/exim_rewrite_scan
 fi
+
 if [ -e /etc/cron.d/bytemark-vhost-email ]; then
-    rm -rf /etc/cron.d/bytemark-vhost-email
+    rm -f /etc/cron.d/bytemark-vhost-email
 fi
+
+if [ -e /etc/cron.d/symbiosis-email ]; then
+    rm -f /etc/cron.d/symbiosis-email
+fi
+
 
 #
 #  Add the user
