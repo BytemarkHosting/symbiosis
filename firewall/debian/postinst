@@ -178,7 +178,7 @@ fi
 #
 if [ -e $PREFIX/outgoing.d/10-match-uid-not-www-data -a -e $PREFIX/outgoing.d/99-reject ] ; then
   mv $PREFIX/outgoing.d/10-match-uid-not-www-data $PREFIX/outgoing.d/10-reject-www-data
-  rm $PREFIX/incoming.d/99-reject
+  rm $PREFIX/outgoing.d/99-reject
 fi
 
 #
