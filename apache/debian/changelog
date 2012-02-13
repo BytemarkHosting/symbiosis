@@ -1,3 +1,10 @@
+symbiosis-httpd (2012:0215) stable; urgency=low
+
+  * Added symbiosis-rotate-logs to mimic the behaviour of logrotate, but
+    treats the symlinked domains sanely, so logs aren't rotated twice.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Feb 2012 13:16:46 +0000
+
 symbiosis-httpd (2012:0208) stable; urgency=low
 
   * Added Symbiosis::Domain#log_dir
