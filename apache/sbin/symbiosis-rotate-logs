@@ -3,26 +3,31 @@
 # NAME
 #   symbiosis-rotate-logs - Rotate and prune Apache logs.
 #
-#
 # SYNOPSIS
-#  symbiosis-rotate-logs [ -h | --help ] [-m | --manual] [ -v | --verbose ]
-#
+#  symbiosis-rotate-logs [ -n | --max-rotations <n> ] [ -c | --compress-at <n> ] 
+#                        [ --prefix | -p <directory> ] [ -h | --help ]
+#                        [-m | --manual] [ -v | --verbose ]
 #
 # OPTIONS
 #
-#  -h, --help              Show a help message, and exit.
+#  -n, --max-rotations <n>   Maximum number of rotations to keep, defaults to
+#                            15.
 #
-#  -m, --manual            Show this manual, and exit.
+#  -c, --compress-at <n>     Rotation at which the log file should be
+#                            compressed, defaults to 2.
 #
-#  -v, --verbose           Show verbose errors
+#  -p, --prefix <directory>  Prefix directory, defaults to /srv.
 #
+#  -h, --help                Show a help message, and exit.
+#
+#  -m, --manual              Show this manual, and exit.
+#
+#  -v, --verbose             Show verbose errors
 #
 # USAGE
 #
 # This script is designed to be invoked once per day and rotate the current
 # apache logfile beneath each domains public directory.
-#
-# Logs older than 14 days will also be pruned.
 #
 # AUTHOR
 #
@@ -43,10 +48,14 @@ require 'fileutils'
 help         = false
 manual       = false
 $VERBOSE     = false
-$FORCE       = false
-
+max_rotations = 15
+prefix       = '/srv'
+compress_at  = 2
 
 opts = GetoptLong.new(
+                      [ '--max-rotations', '-n', GetoptLong::REQUIRED_ARGUMENT],
+                      [ '--compress-at', '-c', GetoptLong::REQUIRED_ARGUMENT],
+                      [ '--prefix',     '-p', GetoptLong::REQUIRED_ARGUMENT],
                       [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
                       [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
                       [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ]
@@ -56,6 +65,12 @@ opts = GetoptLong.new(
 begin
   opts.each do |opt,arg|
     case opt
+    when '--max-rotations'
+      max_rotations = arg.to_i
+    when '--compress-at'
+      compress_at = arg.to_i
+    when '--prefix'
+      prefix = arg
     when '--help'
       help = true
     when '--manual'
@@ -106,8 +121,6 @@ end
 require 'symbiosis/domains'
 require 'symbiosis/domain/http'
 
-
-
 def verbose(s) ; puts s if $VERBOSE ; end
 
 #
@@ -116,9 +129,18 @@ def verbose(s) ; puts s if $VERBOSE ; end
 rotated = false
 
 #
+# This matches our filenames such that
+#
+# $1 = ssl_access.log or access.log
+# $2 = a number
+# $3 = .gz, if the file is compressed.
+#
+FILENAME_REGEXP = /\b((?:ssl_)?access\.log)(?:\.(\d+))?(\.gz)?$/
+
+#
 #  Potentially we process each domain.
 #
-Symbiosis::Domains.each do |domain|
+Symbiosis::Domains.each(prefix) do |domain|
   verbose "Considering domain: #{domain}"
 
   #
@@ -143,8 +165,8 @@ Symbiosis::Domains.each do |domain|
   # We will find files of the form:
   #
   #  access.log
-  #  access.log.0
   #  access.log.1
+  #  access.log.2.gz
   #
   # We want to increment the version of each file.  We do that by
   # sorting asci-betically
@@ -156,7 +178,7 @@ Symbiosis::Domains.each do |domain|
     next if entry == '.' or entry == '..'
 
     # skip files that don't match our expected pattern.
-    next unless ( entry =~ /^(ssl_)?access\.log(\.\d+)$/ )
+    next unless ( entry =~ FILENAME_REGEXP ) 
 
     # save the file
     results.push( entry )
@@ -173,14 +195,24 @@ Symbiosis::Domains.each do |domain|
   #
   #  OK sort the array by the trailng digit to give us:
   #
+  #  access.log
+  #  ssl_access.log
   #  access.log.1
+  #  ssl_access.log.1
+  #  access.log.2.gz
+  #  ssl_access.log.2.gz
   #  ...
-  #  access.log.10
-  #  access.log.11
-  #  ..
+  #  access.log.10.gz
+  #  access.log.11.gz
+  #
+  # It doesn't matter that the filenames are interspersed, since we create the
+  # destination name from the filename itself, not the next one in the array.
   #
   a = results.sort_by do |x|
-    x.split(".").map {|i| i.to_i}
+    #
+    # This returns the numeric extension, or zero if none exists.
+    #
+    x.split(".")[2].to_i
   end
 
   #
@@ -189,45 +221,57 @@ Symbiosis::Domains.each do |domain|
   rotated = true
 
   #
+  # Drop privileges
+  #
+  if 0 == Process.uid
+    Process::Sys.setegid(domain.gid)
+    Process::Sys.seteuid(domain.uid)
+  end
+
+  #
   #  Process these files backward so we don't over-write anything.
   #
   a.reverse.each do |file|
-
     file = File.join( domain.log_dir, file )
-    dest = nil
-    rm   = false
+    num = 0
+    #
+    # This next bit relies on the fact that nil.to_i returns zero.
+    #
+    dest = file.sub(FILENAME_REGEXP){|s| num = $2.to_i+1 ;  "#{$1}.#{num}#{$3.to_s}" }
 
-    if ( file =~ /(.*)\.(\d+)$/ )
-      before = $1.dup
-      num    = $2.to_i + 1
+    #
+    # Don't move if the destination would exist
+    #
+    next if num > max_rotations
 
-      dest = "#{before}.#{num}"
-
-      if ( num > 14 )
-        rm = true
-      end
-    else
-      dest = "#{file}.0"
-    end
-
-    next if dest.nil?
-
-    if ( rm )
-      verbose( "rm #{file}" )
-      File.unlink( file )
-    else
-      verbose( "cp #{file} #{dest}" )
-
+    #
+    # Move the file by reading the old one, and writing to the new one. We
+    # always want to overwrite what is in the way.
+    #
+    verbose("\tMoving #{file} -> #{dest}")
+    begin
+      FileUtils.mv(file, dest, :force => true)
       #
-      # Move the file by reading the old one, and writing to the new one.
+      # Compress the file, if needed.
       #
-      Symbiosis::Utils.safe_open(file, "r") do |fh|
-        Symbiosis::Utils.safe_open(dest,"a+", :uid => domain.uid, :gid => domain.gid, :mode => 0644) do |dh|
-          dh.truncate(0)
-          dh.write(fh.read)
-        end
+      if compress_at == num
+       system("gzip -9 #{dest}") or warn "Failed to compress #{dest}" 
       end
+    rescue Errno::EPERM => err
+      warn "** Failed to rotate #{file} -- #{err.to_s}"
+      #
+      # Don't rotate any further.
+      #
+      break
     end
+  end
+  
+  #
+  # Restore back to root.
+  #
+  if 0 == Process.uid
+    Process::Sys.seteuid(0)
+    Process::Sys.setegid(0)
   end
 end
 
