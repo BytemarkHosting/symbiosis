@@ -2,8 +2,9 @@ symbiosis-firewall (2012:0215) stable; urgency=low
 
   * Renamed match-uid-not-www-data to reject-www-data for sanity.
   * Removed default 99-reject rule for outgoing.
+  * Added --flush flag which sets the action to "flush".
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 09 Feb 2012 14:09:10 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Feb 2012 14:28:43 +0000
 
 symbiosis-firewall (2012:0208) stable; urgency=low
 

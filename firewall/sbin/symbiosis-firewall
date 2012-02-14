@@ -23,6 +23,9 @@
 #
 #  -d, --no-delete       Do not delete the generated script
 #
+#  -f, --flush           Set the action to "flush".  This will overwrite any
+#                        action specified.
+#
 #  <action>              The action to run. This defaults to "load".
 #
 # USAGE
@@ -141,6 +144,7 @@ execute  = delete = (Process.uid == 0)
 base_dir     = '/etc/symbiosis/firewall'
 template_dir = '/usr/share/symbiosis/firewall/rule.d'
 address_families = %w(inet inet6)
+action = nil
 
 opts = GetoptLong.new(
          [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
@@ -150,6 +154,7 @@ opts = GetoptLong.new(
          [ '--ipv6-only',  '-6', GetoptLong::NO_ARGUMENT ],
          [ '--no-execute', '-x', GetoptLong::NO_ARGUMENT ],
          [ '--no-delete',  '-d', GetoptLong::NO_ARGUMENT ],
+         [ '--flush',      '-f', GetoptLong::NO_ARGUMENT ],
          [ '--prefix',     '-p', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--template-d', '-t', GetoptLong::REQUIRED_ARGUMENT ]
        )
@@ -177,6 +182,8 @@ begin
       base_dir     = File.expand_path(arg)
     when '--template-d'
       template_dir = File.expand_path(arg)
+    when '--flush'
+      action = "flush"
     end
   end
 rescue
@@ -230,7 +237,10 @@ require 'symbiosis/host'
 #
 # Set the action
 #
-action = ARGV.first || "load"
+if action.nil?
+  action = ARGV.first || "load"
+end
+
 
 # DONE parseCommandLineArguments
 # TODO sanityCheck
