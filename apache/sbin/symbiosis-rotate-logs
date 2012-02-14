@@ -11,7 +11,7 @@
 # OPTIONS
 #
 #  -n, --max-rotations <n>   Maximum number of rotations to keep, defaults to
-#                            15.
+#                            30.
 #
 #  -c, --compress-at <n>     Rotation at which the log file should be
 #                            compressed, defaults to 2.
@@ -27,7 +27,7 @@
 # USAGE
 #
 # This script is designed to be invoked once per day and rotate the current
-# apache logfile beneath each domains public directory.
+# apache access and error logfiles beneath each domains public directory.
 #
 # AUTHOR
 #
@@ -48,7 +48,7 @@ require 'fileutils'
 help         = false
 manual       = false
 $VERBOSE     = false
-max_rotations = 15
+max_rotations = 30
 prefix       = '/srv'
 compress_at  = 2
 
@@ -131,11 +131,11 @@ rotated = false
 #
 # This matches our filenames such that
 #
-# $1 = ssl_access.log or access.log
+# $1 = ssl_access.log, access.log, ssl_error.log or error.log
 # $2 = a number
 # $3 = .gz, if the file is compressed.
 #
-FILENAME_REGEXP = /\b((?:ssl_)?access\.log)(?:\.(\d+))?(\.gz)?$/
+FILENAME_REGEXP = /\b((?:ssl_)?(?:access|error)\.log)(?:\.(\d+))?(\.gz)?$/
 
 #
 #  Potentially we process each domain.
