@@ -1,3 +1,10 @@
+symbiosis-tinydns (2012:0215) stable; urgency=low
+
+  * Added an --upload flag to symbiosis-dns-generate.
+  * Fixed cron.d not to forcibly recreate all DNS data at midnight everyday.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Feb 2012 14:28:05 +0000
+
 symbiosis-tinydns (2012:0208) stable; urgency=low
 
   * Updated DNS template to use the neater ERB syntax. 
