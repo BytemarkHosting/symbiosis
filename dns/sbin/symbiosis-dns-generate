@@ -6,7 +6,8 @@
 #
 # SYNOPSIS
 #
-#   --force       Force the re-creation of all SSL sites.
+#   --force       Force the re-creation of all DNS data.
+#   --upload      Force the upload of all DNS data.
 #   --template    Specify an alternative template file to read.
 #   --help        Show the help information for this script.
 #   --verbose     Show debugging information.
@@ -33,7 +34,7 @@ $HELP     = false
 $VERBOSE  = false
 
 #
-#  Do we need to restart apache?
+# Do we need to re-upload the data?
 #
 $UPLOAD=false
 
@@ -65,6 +66,8 @@ opts.each do |opt, arg|
     root = arg
   when '--force'
     $FORCE = true
+  when '--upload'
+    $UPLOAD = true
   end
 end
 
@@ -232,12 +235,10 @@ begin
   end
 
   #
-  # Set our upload flag if there is no old hash, or the new hash doesn't match
-  # the old one.
+  # Upload if the flag was set in the options, if there is no old hash, or the
+  # new hash doesn't match the old one.
   #
-  $UPLOAD = ( old_hash.nil? or new_hash != old_hash )
-
-  if $UPLOAD
+  if $UPLOAD or (old_hash.nil? or new_hash != old_hash )
     upload_script = File.expand_path(File.join(bytemarkdns_data_dir,"../upload"))
 
     verbose "Uploading using #{upload_script}"
