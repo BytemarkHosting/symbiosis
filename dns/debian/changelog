@@ -2,8 +2,10 @@ symbiosis-tinydns (2012:0215) stable; urgency=low
 
   * Added an --upload flag to symbiosis-dns-generate.
   * Fixed cron.d not to forcibly recreate all DNS data at midnight everyday.
+  * Fixed symbiosis-dns-generate to upload data when changes to files other
+    than dns/domain.txt have been made.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Feb 2012 14:28:05 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 15 Feb 2012 09:40:52 +0000
 
 symbiosis-tinydns (2012:0208) stable; urgency=low
 

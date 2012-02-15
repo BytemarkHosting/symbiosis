@@ -124,26 +124,32 @@ Symbiosis::Domains.each do |domain|
     config.domain   = domain
     config.template = dns_template
 
+    #
+    # Should the snippet be created?
+    #
+    do_create = false
+
     if ( $FORCE )
       verbose "\tForcing re-creation of snippet due to --force."
+      do_create = true
 
     elsif config.exists?
 
       if config.changed?
         verbose "\tNot updating snippet, as it has been edited by hand."
-        next
 
       elsif config.outdated?
         verbose "\tRe-creating snippet as it is out of date."
+        do_create = true
 
       else
         verbose "\tDomain already present and up-to date."
-        next
 
       end
 
     else
       verbose "\tConfiguring site for the first time"
+      do_create = true
 
     end
 
@@ -151,27 +157,29 @@ Symbiosis::Domains.each do |domain|
     #
     # Check the TinyDNS syntax.. TODO!
     #
-    if config.ok?
+    if do_create 
+      if config.ok?
 
-      verbose "\tWriting snippet to #{output}"
+        verbose "\tWriting snippet to #{output}"
 
-      #
-      # Create directory with the same ownership as the parent
-      #
-      domain.create_dir(output_dir) unless File.exists?(output_dir)
-      
-      #
-      # Write the snippet
-      #
-      config.write
+        #
+        # Create directory with the same ownership as the parent
+        #
+        domain.create_dir(output_dir) unless File.exists?(output_dir)
+        
+        #
+        # Write the snippet
+        #
+        config.write
   
-      #
-      # Make sure the ownership is correct.
-      #
-      File.chown(domain.uid, domain.gid, config.filename)
+        #
+        # Make sure the ownership is correct.
+        #
+        File.chown(domain.uid, domain.gid, config.filename)
 
-    else
-      verbose "\tThe new DNS snippet is invalid -- no changes have been made."
+      else
+        verbose "\tThe new DNS snippet is invalid -- no changes have been made."
+      end
     end
  
     #
