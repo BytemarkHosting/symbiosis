@@ -286,25 +286,25 @@ module Symbiosis
       # Firstly check that the certificate is valid for the domain or one of its aliases.
       #
       unless self.aliases.any? { |domain_alias| OpenSSL::SSL.verify_certificate_identity(certificate, domain_alias) }
-        warn "\tThe certificate subject is not valid for this domain." if $VERBOSE
+        warn "\tThe certificate subject is not valid for this domain #{self.name}." if $VERBOSE
       end
 
       # Check that the certificate is current
       # 
       #
       if certificate.not_before > Time.now 
-        warn "\tThe certificate is not valid yet." if $VERBOSE
+        warn "\tThe certificate for #{self.name} is not valid yet." if $VERBOSE
       end
 
       if certificate.not_after < Time.now 
-        warn "\tThe certificate has expired." if $VERBOSE
+        warn "\tThe certificate for #{self.name} has expired." if $VERBOSE
       end
 
       # Next check that the key matches the certificate.
       #
       #
       unless certificate.check_private_key(key)
-        raise OpenSSL::X509::CertificateError, "The certificate's public key does not match the supplied private key."
+        raise OpenSSL::X509::CertificateError, "The certificate's public key does not match the supplied private key for #{self.name}."
       end
      
       # 
@@ -314,20 +314,20 @@ module Symbiosis
       # certificate is self-signed.
       #
       if certificate.verify(key)
-        puts "\tUsing a self-signed certificate." if $VERBOSE
+        puts "\tUsing a self-signed certificate for #{self.name}." if $VERBOSE
 
       #
       # Otherwise see if we can verify it using the certificate store,
       # including any bundle that has been uploaded.
       #
-      elsif store.verify(certificate)
-        puts "\tUsing certificate signed by #{certificate.issuer.to_s}" if $VERBOSE
+      elsif store.is_a?(OpenSSL::X509::Store) and store.verify(certificate)
+        puts "\tUsing certificate signed by #{certificate.issuer.to_s} for #{self.name}" if $VERBOSE
 
       #
       # If we can't verify -- raise an error.
       #
       else
-        raise OpenSSL::X509::CertificateError, "Certificate signature does not verify -- maybe a bundle is missing?" 
+        raise OpenSSL::X509::CertificateError, "Certificate signature does not verify for #{self.name} -- maybe a bundle is missing?" 
       end
 
       true

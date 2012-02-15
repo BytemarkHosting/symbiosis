@@ -1,6 +1,7 @@
 $:.unshift  "../lib/" if File.directory?("../lib")
 
 require 'test/unit'
+require 'tmpdir'
 require 'symbiosis/domain/ssl'
 
 class SSLTest < Test::Unit::TestCase
@@ -8,12 +9,17 @@ class SSLTest < Test::Unit::TestCase
   @@serial=0
 
   def setup
-    @domain = Symbiosis::Domain.new()
+    @prefix = Dir.mktmpdir("srv")
+    @prefix.freeze
+    @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
   end
 
   def teardown
-    @domain.destroy unless $DEBUG
+    unless $DEBUG
+      @domain.destroy  if @domain.is_a?( Symbiosis::Domain)
+      FileUtils.rm_rf(@prefix) if File.directory?(@prefix)
+    end  
   end
 
   #####
@@ -21,6 +27,51 @@ class SSLTest < Test::Unit::TestCase
   # Helper methods
   #
   #####
+
+  #
+  # Checks to make sure our Root CA is set up.
+  #
+  def do_check_root_ca
+    #
+    # Our root CA.
+    #
+    root_ca_path = File.expand_path(File.join(File.dirname(__FILE__), "RootCA"))
+    unless File.exists?(root_ca_path)
+      warn "\n#{root_ca_path} missing"
+      return nil
+    end
+
+    root_ca_cert_file = File.join(root_ca_path, "RootCA.crt") 
+    unless File.exists?(root_ca_cert_file)
+      warn "\n#{root_ca_cert_file} missing"
+      return nil
+    end
+
+    root_ca_key_file  = File.join(root_ca_path, "RootCA.key") 
+    unless File.exists?(root_ca_key_file)
+      warn "\n#{root_ca_key_file} missing"
+      return nil
+    end
+
+    root_ca_cert = OpenSSL::X509::Certificate.new(File.read(root_ca_cert_file))
+
+    #
+    # Make sure a symlink is in place so the root cert can be found.
+    #
+    root_ca_cert_symlink = File.join(root_ca_path, root_ca_cert.subject.hash.to_s(16)+ ".0")
+
+    unless File.exists?(root_ca_cert_symlink)
+      if File.writable?(root_ca_path)
+        warn "\nCreating symlink to from #{root_ca_cert_file} to #{root_ca_cert_symlink}" 
+        File.symlink(File.basename(root_ca_cert_file),root_ca_cert_symlink)
+        return root_ca_path
+      else
+        return nil
+      end
+    end
+
+    return root_ca_path
+  end
 
   #
   # Returns a private key
@@ -396,15 +447,20 @@ class SSLTest < Test::Unit::TestCase
 
   def test_ssl_verify_with_root_ca
     #
-    # Use our intermediate CA.
-    #
-    ca_cert = OpenSSL::X509::Certificate.new(File.read("RootCA/RootCA.crt"))
-    ca_key  = OpenSSL::PKey::RSA.new(File.read("RootCA/RootCA.key"))
-
-    #
     # Add the Root CA path
     # 
-    @domain.ssl_add_ca_path("./RootCA/")
+    root_ca_path = do_check_root_ca
+    if root_ca_path.nil?
+      warn "\nRootCA could not be found"
+      return
+    end
+    @domain.ssl_add_ca_path(root_ca_path)
+
+    #
+    # Get our Root cert and key
+    #
+    ca_cert = OpenSSL::X509::Certificate.new(File.read("#{root_ca_path}/RootCA.crt"))
+    ca_key  = OpenSSL::PKey::RSA.new(File.read("#{root_ca_path}/RootCA.key"))
 
     #
     # Generate a key and cert
@@ -429,13 +485,16 @@ class SSLTest < Test::Unit::TestCase
     #
     # Use our intermediate CA.
     #
-    ca_cert = OpenSSL::X509::Certificate.new(File.read("IntermediateCA/IntermediateCA.crt"))
-    ca_key  = OpenSSL::PKey::RSA.new(File.read("IntermediateCA/IntermediateCA.key"))
+    int_ca_path = File.expand_path(File.join(File.dirname(__FILE__), "IntermediateCA"))
+    ca_cert = OpenSSL::X509::Certificate.new(File.read("#{int_ca_path}/IntermediateCA.crt"))
+    ca_key  = OpenSSL::PKey::RSA.new(File.read("#{int_ca_path}/IntermediateCA.key"))
 
     #
     # Add the Root CA path
     # 
-    @domain.ssl_add_ca_path("./RootCA/")
+    do_check_root_ca
+    root_ca_path = File.expand_path(File.join(File.dirname(__FILE__), "RootCA"))
+    @domain.ssl_add_ca_path(root_ca_path)
 
     #
     # Generate a key and cert
@@ -458,7 +517,7 @@ class SSLTest < Test::Unit::TestCase
     #
     # Now copy the bundle in place
     #
-    FileUtils.cp("IntermediateCA/IntermediateCA.crt",@domain.directory+"/config/ssl.bundle")
+    FileUtils.cp("#{int_ca_path}/IntermediateCA.crt",@domain.directory+"/config/ssl.bundle")
 
     #
     # Now it should verify just fine.
