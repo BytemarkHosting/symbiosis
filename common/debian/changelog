@@ -1,3 +1,10 @@
+symbiosis-common (2012:0215) stable; urgency=low
+
+  * Symbiosis::Domains#find now works for wildcarded domains.
+  * SSL tests now work if run as a non-root user.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 15 Feb 2012 13:58:48 +0000
+
 symbiosis-common (2012:0208) stable; urgency=low
 
   * Symbiosis::Domains now searches for www.domain as well as just domain.

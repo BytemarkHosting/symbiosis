@@ -48,12 +48,12 @@ module Symbiosis
       # www. and one without, assuming /srv/www.domain and /srv/domain both
       # exist.
       #
-      possibles = all(prefix).select{|d| domain =~ /^(www\.)?#{d.name}$/}
+      possibles = all(prefix).select{|d| domain == d.name or domain =~ /\.#{d.name}$/}
 
       #
       # Nothing found, return nil
       #
-      return nil if possibles.length == 0      
+      return nil if possibles.length == 0
 
       #
       # Return the one and only result.
@@ -61,9 +61,18 @@ module Symbiosis
       return possibles.first if possibles.length == 1
 
       #
-      # Return the domain with the exact-matching name
+      # OK now match the nearest domain, breaking the domain down by dots.
       #
-      return possibles.find{|d| d.name == domain}
+      until domain.nil?
+        match = possibles.find{|d| d.name == domain}
+        return match unless match.nil?
+        #
+        # Split the domain into a prefix, and the remainder.
+        #
+        prefix, domain = domain.split(".",2)
+      end
+
+      return nil
     end
 
     #

@@ -38,6 +38,8 @@ class TestDomain < Test::Unit::TestCase
     found = Domains.find("does-not-exist.org")
     assert_nil(found, "Domains#find found a domain when nothing should exist.")
 
+    found = Domains.find(".")
+    assert_nil(found, "Domains#find found a domain when nothing should exist.")
     #
     # Test finding evil domains
     #
@@ -83,6 +85,22 @@ class TestDomain < Test::Unit::TestCase
     found = Domains.find(domain.name, @prefix)
     assert_kind_of(Domain, found, "Domains#find returned the wrong class")
     assert_equal(domain.name, found.name, "Domains#find found a domain other than the one were were looking for.")
+
+
+    #
+    # Try to find a domain with a random prefix.
+    #
+    random_prefix = Symbiosis::Utils.random_string(5).downcase
+    random_www_domain = ((random_prefix+".")*10)+www_domain.name
+    random_www_found = Domains.find(random_www_domain, @prefix)
+
+    #
+    # We should get the same answers as before
+    #
+    assert_equal(2, Symbiosis::Domains.all(@prefix).length, "Wrong number of domains returned by Domains#all)")
+
+    assert_kind_of(Domain, random_www_found, "Domains#find returned the wrong class")
+    assert_equal(www_domain.name, www_found.name, "Domains#find found a domain other than the one were were looking for.")
   end
 
   def test_include?
