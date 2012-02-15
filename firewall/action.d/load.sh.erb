@@ -67,7 +67,7 @@ for cmd in <%= iptables_cmds.join(" ") %> ; do
   #
   # See if the chain exists, create if not.
   #
-  $cmd  -L <%= chain %> > /dev/null 2>&1 || $cmd -N <%= chain%> 
+  $cmd -n -L <%= chain %> > /dev/null 2>&1 || $cmd -N <%= chain%> 
 
   # 
   # Flush the chain, just in case it already existed.
