@@ -115,7 +115,7 @@ module Symbiosis
         #
         # Now, for each address create a template and add it to our rules.
         #
-        addresses.each do |address|
+        addresses.uniq.each do |address|
           begin
             #
             # Create a new rule
@@ -181,7 +181,7 @@ module Symbiosis
           end
         end
 
-        ips.uniq
+        ips
       end
 
     end
