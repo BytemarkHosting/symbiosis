@@ -9,7 +9,7 @@ Standards-Version: 3.9.1
 Package: bytemark-symbiosis
 Architecture: all
 Depends: symbiosis-updater (>= 2012:0208), symbiosis-key (>= 2012:0208), symbiosis-pam (>= 2012:0208), ${misc:Depends}
-Recommends: symbiosis-httpd (>= 2012:0208), symbiosis-backup (>= 2012:0208), symbiosis-common (>= 2012:0208), symbiosis-crack (>= 2012:0208), symbiosis-cron (>= 2012:0208), symbiosis-tinydns (>= 2012:0208), symbiosis-email (>= 2012:0208), symbiosis-firewall (>= 2012:0208), symbiosis-ftpd (>= 2012:0208), symbiosis-monit (>= 2012:0208), symbiosis-mysql (>= 2012:0208), symbiosis-phpmyadmin (>= 2012:0208), symbiosis-webmail (>= 2012:0208)
+Recommends: symbiosis-httpd (>= 2012:0208), symbiosis-backup (>= 2012:0208), symbiosis-common (>= 2012:0208), symbiosis-cron (>= 2012:0208), symbiosis-tinydns (>= 2012:0208), symbiosis-email (>= 2012:0208), symbiosis-firewall (>= 2012:0208), symbiosis-ftpd (>= 2012:0208), symbiosis-monit (>= 2012:0208), symbiosis-mysql (>= 2012:0208), symbiosis-phpmyadmin (>= 2012:0208), symbiosis-webmail (>= 2012:0208)
 Replaces: bytemark-vhost
 Conflicts: bytemark-vhost
 Provides: bytemark-vhost
