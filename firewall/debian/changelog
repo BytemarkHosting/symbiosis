@@ -4,8 +4,10 @@ symbiosis-firewall (2012:0215) stable; urgency=low
   * Removed default 99-reject rule for outgoing.
   * Added --flush flag which sets the action to "flush".
   * Made sure that there are no duplicate addresses passed to templates.
+  * Made sure that DNS lookups are not done when checking to see if
+    white/blacklists exist -- this speeds things up.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 15 Feb 2012 09:45:02 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 15 Feb 2012 21:51:05 +0000
 
 symbiosis-firewall (2012:0208) stable; urgency=low
 
