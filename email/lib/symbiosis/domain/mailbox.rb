@@ -115,6 +115,13 @@ module Symbiosis
       end
 
       #
+      # Returns the name of the mailbox password file.
+      #
+      def password_file
+        File.join(self.directory,"password")
+      end
+
+      #
       # Returns the mailbox's password, or nil if one has not been set, or the
       # mailbox doesn't exist.
       #

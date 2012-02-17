@@ -1,6 +1,7 @@
 symbiosis-email (2012:0215) stable; urgency=low
 
   * Remove old cron-jobs in postinst.
+  * Added Domain::Mailbox#password_file method.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 10 Feb 2012 10:21:44 +0000
 
