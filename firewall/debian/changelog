@@ -6,9 +6,9 @@ symbiosis-firewall (2012:0215) stable; urgency=low
   * Made sure that there are no duplicate addresses passed to templates.
   * Made sure that DNS lookups are not done when checking to see if
     white/blacklists exist -- this speeds things up.
-  * Now use incrond to process firewall changes.
+  * Now use incron to process firewall changes.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 17 Feb 2012 13:34:00 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 17 Feb 2012 14:37:18 +0000
 
 symbiosis-firewall (2012:0208) stable; urgency=low
 
