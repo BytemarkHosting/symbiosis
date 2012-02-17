@@ -3,3 +3,4 @@ patterns.d/           etc/symbiosis/firewall
 rule.d                usr/share/symbiosis/firewall
 action.d              usr/share/symbiosis/firewall
 test.d                etc/symbiosis
+incron.d/             etc/

@@ -7,7 +7,7 @@
 #  symbiosis-firewall-blacklist [ -h | --help ] [-m | --manual]
 #       [ -v | --verbose ] [ -x | --no-exec] [ -d | --no-delete ]
 #       [ -a | --attempts <n> ] [ -e | --expire-after <n> ]
-#       [ -p | --prefix <dir> ] [ -t | --template-d <dir> ] 
+#       [ -p | --prefix <dir> ] 
 #
 # OPTIONS
 #  -h, --help              Show a help message, and exit.
@@ -28,8 +28,6 @@
 #
 #  -p, --prefix <dir>      Directory where incoming.d, outgoing.d etc are
 #                          located. Defaults to /etc/symbiosis/firewall.
-#
-#  -t, --template-d <dir>  Additional directory to search for templates.
 #
 # USAGE
 #
@@ -79,7 +77,6 @@ $VERBOSE     = false
 base_dir     = "/etc/symbiosis/firewall/"
 delete       = true
 execute      = true
-template_dir = nil
 force        = false
 attempts     = 20
 expire_after = 2
@@ -92,7 +89,6 @@ opts = GetoptLong.new(
          [ '--no-delete',  '-d', GetoptLong::NO_ARGUMENT ],
          [ '--force',      '-f', GetoptLong::NO_ARGUMENT ],
          [ '--prefix',     '-p', GetoptLong::REQUIRED_ARGUMENT ],
-         [ '--template-d', '-t', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--attempts',   '-a', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--expire-after', '-e', GetoptLong::REQUIRED_ARGUMENT ]
        )
@@ -116,8 +112,6 @@ begin
       force = true
     when '--prefix'
       base_dir     = File.expand_path(arg)
-    when '--template-d'
-      template_dir = File.expand_path(arg)
     when '--expire-after'
       expire_after = arg.to_i
     when '--attempts'
@@ -311,17 +305,5 @@ end
 puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
 
 #
-# Re-generate the blacklist chain
+# Updating the firewall is now done by the inotify cronjob
 #
-if ( updated || expired > 0 || force )
-  cmd = %w(/usr/sbin/symbiosis-firewall)
-  cmd << "--verbose" if $VERBOSE
-  cmd << "--no-execute" unless execute
-  cmd << "--no-delete"  unless delete
-  cmd += ["--prefix", base_dir] 
-  cmd += ["--template-d", template_dir] unless template_dir.nil?
-  cmd << "reload-blacklist"
-  puts "Running #{cmd.join(" ")}" if $VERBOSE
-  exec(*cmd)
-end
-
