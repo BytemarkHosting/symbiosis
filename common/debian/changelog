@@ -2,8 +2,9 @@ symbiosis-common (2012:0215) stable; urgency=low
 
   * Symbiosis::Domains#find now works for wildcarded domains.
   * SSL tests now work if run as a non-root user.
+  * Use safe_open to read params as well as write. 
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 15 Feb 2012 13:58:48 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 20 Feb 2012 21:13:04 +0000
 
 symbiosis-common (2012:0208) stable; urgency=low
 

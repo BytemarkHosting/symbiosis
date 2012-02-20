@@ -127,7 +127,7 @@ module Symbiosis
     # * otherwise the files contents are returned as a string.
     #
     #
-    def get_param(setting, parent_dir)
+    def get_param(setting, parent_dir, opts = {})
       fn = File.join(parent_dir, setting)
 
       #
@@ -143,7 +143,7 @@ module Symbiosis
       #
       # Otherwise return the contents
       #
-      return File.open(fn, "r"){|fh| fh.read}.to_s
+      return safe_open(fn, File::RDONLY, opts){|fh| fh.read}.to_s
     end
 
     #
@@ -159,7 +159,7 @@ module Symbiosis
     #
     # Directories owned by system users/groups will not be written to.
     #
-    def set_param(setting, value, parent_dir)
+    def set_param(setting, value, parent_dir, opts = {})
       fn = File.join(parent_dir, setting)
 
       #
@@ -173,10 +173,9 @@ module Symbiosis
       parent_dir_stat = File.stat(parent_dir)
 
       #
-      # Refuse to write to directories owned by UIDs/GIDs < 1000.
+      # Refuse to write to directories owned by UIDs < 1000.
       #
       raise ArgumentError, "Parent directory #{parent_dir} is owned by a system user." unless parent_dir_stat.uid >= 1000
-      raise ArgumentError, "Parent directory #{parent_dir} is owned by a system group." unless parent_dir_stat.gid >= 1000
 
 
       if false == value or value.nil?
@@ -187,9 +186,13 @@ module Symbiosis
 
       else
         #
-        # Create the file/
+        # Merge in our options
         #
+        opts = opts.merge({:mode => 0644, :uid => parent_dir_stat.uid, :gid => parent_dir_stat.gid})
 
+        #
+        # Create the file
+        #
         safe_open(fn, File::WRONLY|File::CREAT, :mode => 0644, :uid => parent_dir_stat.uid, :gid => parent_dir_stat.gid) do |fh|
           #
           # We're good to go.
@@ -273,15 +276,16 @@ module Symbiosis
         #
         # Change the uid/gid as needed.
         #
-        if ((opts[:uid] and file_stat.uid != opts[:uid]) or 
-         (opts[:gid] and file_stat.gid != opts[:gid]))
+        if link_stat.writable? and
+         ((opts[:uid] and file_stat.uid != opts[:uid]) or 
+          (opts[:gid] and file_stat.gid != opts[:gid]))
           #
           # Change the owner if not already correct
           #
           fh.chown(opts[:uid], opts[:gid]) unless link_stat.symlink?
         end
 
-        if opts[:mode] 
+        if link_stat.writable? and opts[:mode]
           #
           # Fix any permissions.
           #
