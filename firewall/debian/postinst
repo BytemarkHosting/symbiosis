@@ -130,6 +130,16 @@ for dir in incoming outgoing ; do
   touch $PREFIX/$dir.d/05-essential-icmpv6
 done
 
+#
+# Create a few more needed directories.
+#
+for dir in local whitelist blacklist ; do
+  if  [ ! -d $PREFIX/$dir.d/ ]; then
+      mkdir -p $PREFIX/$dir.d/
+      touch  $PREFIX/$dir.d/.empty
+  fi
+done
+
 
 #
 # Create some default rules.
@@ -195,7 +205,6 @@ if [ -z "$CHROOT" ]; then
 else
     echo "I: In a chroot - not flushing / running firewall"
 fi
-
 
 #
 #  Cleanup old ifup/down scripts
