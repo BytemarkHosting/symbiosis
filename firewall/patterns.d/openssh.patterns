@@ -22,8 +22,6 @@ ports = 22
 #
 #  Patterns we'll match upon.
 #
-Did not receive identification string from __IP__
-Failed password for invalid user [^ ]+ from __IP__ port
-Failed none for invalid user [^ ]+ from __IP__
-Invalid user [^ ]+ from __IP__
+Failed password for invalid user [^ ]+ from __IP__ port \d+ ssh2
+Failed password for [^ ]+ from __IP__ port \d+ ssh2
 
