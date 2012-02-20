@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+#  This script is designed to dump all the postgresql databases upon
+# the local system.
+#
+
+
+#
+#  If we don't have postgresql installed exit.
+#
+test -x /etc/init.d/postgresql      || exit 0
+test -x /usr/bin/pg_dumpall         || exit 0
+id postgres  >/dev/null 2>/dev/null || exit 0
+
+
+
+#
+#  If we don't have a backup directory then create it.
+#
+if [ ! -d /var/backups/postgresql ]; then
+    mkdir -p /var/backups/postgresql
+fi
+
+
+#
+#  Dump all databases - become the correct user to avoid authentication
+# problems or issues.
+#
+su - postgres -c '/usr/bin/pg_dumpall >/var/backups/postgresql/all.sql'
+
+
+#
+# Exit sanely.
+#
+exit 0
