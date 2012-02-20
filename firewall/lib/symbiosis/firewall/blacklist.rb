@@ -1,6 +1,6 @@
 require 'symbiosis/firewall/pattern'
 require 'symbiosis/firewall/directory'
-require 'symbiosis/firewall/blacklistdb'
+require 'symbiosis/firewall/blacklist_db'
 require 'symbiosis/firewall/logtail'
 
 module Symbiosis
