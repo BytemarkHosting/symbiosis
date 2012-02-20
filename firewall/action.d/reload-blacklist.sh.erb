@@ -37,6 +37,7 @@ done
 
 %   dir  = File.join(base_dir, "#{chain}.d")
 %   next unless File.directory?(dir)
+%   next if File.exists?(File.join(dir,"disabled.#{chain}")) or File.exists?(File.join(dir,"disabled"))
 %   list = IPListDirectory.new(dir, "incoming", chain)
 %   list.default = chain
 <%=  list.to_s %>
