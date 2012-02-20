@@ -130,7 +130,7 @@ module Symbiosis
           #
           # Read the password
           #
-          param = get_param("password", self.directory, :mode => "0600")
+          param = get_param("password", self.directory, :mode => 0600)
 
           unless param.is_a?(String)
             @password = nil
