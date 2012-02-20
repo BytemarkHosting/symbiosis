@@ -14,10 +14,10 @@
 # Whitelist valid IP addresses every hour, but outside the scope of the
 # firewall test.
 #
-30   * * * * root [ -x /usr/sbin/symbiosis-firewall-whitelist ] && /usr/sbin/symbiosis-firewall-whitelist
+10,25,40,55 * * * * root [ -x /usr/sbin/symbiosis-firewall-whitelist ] && /usr/sbin/symbiosis-firewall-whitelist
 
 #
-# TODO: Check the firewall works every hour.
+# Reload the firewall every hour.
 #
-# 55   * * * * root [ -x /usr/sbin/symbiosis-firewall ] && /usr/sbin/symbiosis-firewall --test
+@hourly root [ -x /usr/sbin/symbiosis-firewall ] && /usr/sbin/symbiosis-firewall 
 
