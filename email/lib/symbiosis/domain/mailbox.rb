@@ -130,7 +130,7 @@ module Symbiosis
           #
           # Read the password
           #
-          param = get_param("password",self.directory)
+          param = get_param("password", self.directory, :mode => "0600")
 
           unless param.is_a?(String)
             @password = nil
@@ -152,9 +152,9 @@ module Symbiosis
         self.create
 
         if @encrypt_password
-          set_param("password", self.domain.crypt_password(@password), self.directory)
+          set_param("password", self.domain.crypt_password(@password), self.directory, :mode => 0600)
         else
-          set_param("password", @password, self.directory)
+          set_param("password", @password, self.directory, :mode => 0600)
         end
     
         return @password
