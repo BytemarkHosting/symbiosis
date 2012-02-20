@@ -115,6 +115,13 @@ module Symbiosis
       end
 
       #
+      # Returns the name of the mailbox password file.
+      #
+      def password_file
+        File.join(self.directory,"password")
+      end
+
+      #
       # Returns the mailbox's password, or nil if one has not been set, or the
       # mailbox doesn't exist.
       #
@@ -181,10 +188,12 @@ module Symbiosis
     #
     # return all the mailboxes for this domain
     #
-    def mailboxes(mailboxes_dir = "mailboxes" )
+    def mailboxes(mailboxes_dir = "mailboxes")
       results = []
 
-      Dir.glob(File.join(self.directory, mailboxes_dir, "*")).each do |entry|
+      mboxes_dir = File.join(self.directory, mailboxes_dir)
+
+      Dir.glob(File.join(mboxes_dir, "*")).each do |entry|
         #
         # Only looking for directories
         #
@@ -198,6 +207,15 @@ module Symbiosis
         next unless Mailbox.valid_local_part?(local_part)
 
         results << Mailbox.new(local_part, self, mailboxes_dir)
+      end
+      
+      if results.length > 0
+        mbox_stat = File.lstat(mboxes_dir)
+
+        #
+        # Make sure the mailbox directory is not world-read/write/executable
+        #
+        File.chmod((mbox_stat.mode & 0770), mboxes_dir) if mbox_stat.writable?
       end
 
       results

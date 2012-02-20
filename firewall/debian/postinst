@@ -130,6 +130,16 @@ for dir in incoming outgoing ; do
   touch $PREFIX/$dir.d/05-essential-icmpv6
 done
 
+#
+# Create a few more needed directories.
+#
+for dir in local whitelist blacklist ; do
+  if  [ ! -d $PREFIX/$dir.d/ ]; then
+      mkdir -p $PREFIX/$dir.d/
+      touch  $PREFIX/$dir.d/.empty
+  fi
+done
+
 
 #
 # Create some default rules.
@@ -159,9 +169,12 @@ if [ "$incoming" = "0" ]; then
     #
     #  Default outgoing rules.
     #
-    touch $PREFIX/outgoing.d/10-reject-www-data
+    touch $PREFIX/outgoing.d/50-reject-www-data
 fi
 
+#
+# Make sure an HTTPS rule exists.
+#
 if [ -e $PREFIX/incoming.d/*-http -a ! -e $PREFIX/incoming.d/*-https ] ; then
     touch $PREFIX/incoming.d/10-https
 fi
@@ -170,14 +183,14 @@ fi
 # This rule forbade outgoing connections by www-data.  It has been renamed.
 #
 if [ -e $PREFIX/outgoing.d/50-www-data ] ; then
-    mv $PREFIX/outgoing.d/50-www-data $PREFIX/outgoing.d/10-reject-www-data
+    mv $PREFIX/outgoing.d/50-www-data $PREFIX/outgoing.d/50-reject-www-data
 fi
 
 #
 # Remove the match-not-uid-www-data rule if it exists -- left over from RC1/2.
 #
 if [ -e $PREFIX/outgoing.d/10-match-uid-not-www-data -a -e $PREFIX/outgoing.d/99-reject ] ; then
-  mv $PREFIX/outgoing.d/10-match-uid-not-www-data $PREFIX/outgoing.d/10-reject-www-data
+  mv $PREFIX/outgoing.d/10-match-uid-not-www-data $PREFIX/outgoing.d/50-reject-www-data
   rm $PREFIX/outgoing.d/99-reject
 fi
 
@@ -192,7 +205,6 @@ if [ -z "$CHROOT" ]; then
 else
     echo "I: In a chroot - not flushing / running firewall"
 fi
-
 
 #
 #  Cleanup old ifup/down scripts

@@ -7,7 +7,7 @@
 #  symbiosis-firewall-whitelist [ -h | --help ] [-m | --manual]
 #       [ -v | --verbose ] [ -x | --no-exec] [ -d | --no-delete ]
 #       [ -e | --expire-after <n> ] [ -w | --wtmp-file <file> ]
-#       [ -p | --prefix <dir> ] [ -t | --template-d <dir> ] 
+#       [ -p | --prefix <dir> ] 
 #
 # OPTIONS
 #  -h, --help              Show a help message, and exit.
@@ -29,8 +29,6 @@
 #
 #  -p, --prefix <dir>      Directory where action.d, incoming.d, outgoing.d etc.
 #                          are located. Defaults to /etc/symbiosis/firewall.
-#
-#  -t, --template-d <dir>  Additional directory to search for templates.
 #
 # USAGE
 #
@@ -73,7 +71,6 @@ base_dir     = "/etc/symbiosis/firewall/"
 wtmp_file    = "/var/log/wtmp"
 delete       = true
 execute      = true
-template_dir = nil
 force        = false
 expire_after = 8
 
@@ -85,7 +82,6 @@ opts = GetoptLong.new(
          [ '--no-delete',  '-d', GetoptLong::NO_ARGUMENT ],
          [ '--force',      '-f', GetoptLong::NO_ARGUMENT ],
          [ '--prefix',     '-p', GetoptLong::REQUIRED_ARGUMENT ],
-         [ '--template-d', '-t', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--wtmp-file',  '-w', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--expire-after', '-e', GetoptLong::REQUIRED_ARGUMENT ]
        )
@@ -109,8 +105,6 @@ begin
       force = true
     when '--prefix'
       base_dir     = File.expand_path(arg)
-    when '--template-d'
-      template_dir = File.expand_path(arg)
     when '--expire-after'
       expire_after = arg.to_i
     when '--wtmp-file'
@@ -298,16 +292,6 @@ end
 puts "Expiring done - removed #{expired} file(s)" if ( $VERBOSE )
 
 #
-# Re-generate the whitelist chain
+# Updating the firewall is now done by the inotify cronjob.
 #
-if ( updated || expired > 0 || force )
-  cmd = %w(/usr/sbin/symbiosis-firewall)
-  cmd << "--verbose" if $VERBOSE
-  cmd << "--no-execute" unless execute
-  cmd << "--no-delete"  unless delete
-  cmd += ["--prefix", base_dir]
-  cmd += ["--template-d", template_dir] unless template_dir.nil?
-  cmd << "reload-whitelist"
-  puts "Executing #{cmd.join(" ")}" if $VERBOSE
-  exec(*cmd)
-end
+

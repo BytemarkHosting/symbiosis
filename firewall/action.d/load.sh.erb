@@ -62,8 +62,18 @@ done
 # Create black/whitelist rules
 #
 % %w(whitelist blacklist).each do |chain|
+%   dir  = File.join(base_dir, "#{chain}.d")
+%   disabled = (!File.directory?(dir) or  File.exists?(File.join(dir,"disabled.#{chain}")) or File.exists?(File.join(dir,"disabled")))
 #######################################################################
 for cmd in <%= iptables_cmds.join(" ") %> ; do
+%   if disabled
+
+  #
+  # See if the chain exists, flush, and remove if it does.
+  #
+  $cmd -n -L <%= chain %> > /dev/null 2>&1 && $cmd  -F <%= chain %> && $cmd -X <%= chain%> 
+%   else
+
   #
   # See if the chain exists, create if not.
   #
@@ -73,10 +83,11 @@ for cmd in <%= iptables_cmds.join(" ") %> ; do
   # Flush the chain, just in case it already existed.
   #
   $cmd  -F <%= chain %> 
+%  end
+
 done
 
-%   dir  = File.join(base_dir, "#{chain}.d")
-%   next unless File.directory?(dir)
+%   next if disabled
 %   list = IPListDirectory.new(dir, "incoming", chain)
 %   list.default = chain
 <%=  list.to_s %>
