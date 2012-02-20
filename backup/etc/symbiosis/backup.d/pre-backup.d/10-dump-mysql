@@ -4,6 +4,18 @@
 # the local system.
 #
 
+
+#
+#  If we don't have mysqld installed exit.
+#
+test -x /usr/sbin/mysqld      || exit 0
+test -x /etc/init.d/mysql     || exit 0
+test -e /etc/mysql/debian.cnf || exit 0
+
+
+#
+#  If we don't have a backup directory then create it.
+#
 if [ ! -d /var/backups/mysql ]; then
     mkdir -p /var/backups/mysql
 fi
