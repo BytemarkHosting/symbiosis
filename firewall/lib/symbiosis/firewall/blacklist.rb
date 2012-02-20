@@ -26,7 +26,7 @@ module Symbiosis
       #
       def initialize()
         @block_after     = 10
-        @block_all_ports_after = 25
+        @block_all_after = 25
         @base_dir     = '/etc/symbiosis/firewall'
         @logtail_db   = '/var/lib/symbiosis/firewall-blacklist-logtail.db'
         @patterns     = []
@@ -67,9 +67,9 @@ module Symbiosis
         @block_after = a
       end
 
-      def block_all_ports_after=(a)
+      def block_all_after=(a)
         raise ArgumentError, "#{a.inspect} must be an integer" unless a.is_a?(Integer)
-        @block_all_ports_after = a
+        @block_all_after = a
       end
 
       private
@@ -151,7 +151,7 @@ module Symbiosis
           #
           # If an IP has exceeded the number of matches, block it from all ports.
           #
-          if total_for_ip > @block_all_ports_after
+          if total_for_ip > @block_all_after
             blacklist[ip] = %w(all)
           end
 
