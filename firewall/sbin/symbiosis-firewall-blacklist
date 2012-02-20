@@ -6,7 +6,7 @@
 # SYNOPSIS
 #  symbiosis-firewall-blacklist [ -h | --help ] [-m | --manual]
 #       [ -v | --verbose ] [ -x | --no-exec] [ -d | --no-delete ]
-#       [ -a | --attempts <n> ] [ -e | --expire-after <n> ]
+#       [ -a | --block-after <n> ] [ -e | --expire-after <n> ]
 #       [ -p | --prefix <dir> ] 
 #
 # OPTIONS
@@ -20,8 +20,12 @@
 #
 #  -d, --no-delete         Do not delete the generated script
 #
-#  -a, --attempts <n>      Number of attempts before an IP address is
-#                          blacklisted. Defaults to 20.
+#  -a, --block-after <n>   Number of attempts before an IP address is
+#                          blacklisted. Defaults to 10.
+#
+#  -b, --block-all-after <n>  Number of attempts before an IP address is
+#                             blocked from all ports, not just the ports
+#                             mentioned in the pattern. Defaults to 25.
 #
 #  -e, --expire-after <n>  Number of days after which blacklisted IPs should be
 #                          expired. Defaults to 2.
@@ -67,6 +71,7 @@
 require 'getoptlong'
 require 'tempfile'
 require 'fileutils'
+require 'syslog'
 
 #
 #  The options set by the command line.
@@ -78,7 +83,8 @@ base_dir     = "/etc/symbiosis/firewall/"
 delete       = true
 execute      = true
 force        = false
-attempts     = 20
+block_after     = 20
+block_all_after = 20
 expire_after = 2
 
 opts = GetoptLong.new(
@@ -89,7 +95,8 @@ opts = GetoptLong.new(
          [ '--no-delete',  '-d', GetoptLong::NO_ARGUMENT ],
          [ '--force',      '-f', GetoptLong::NO_ARGUMENT ],
          [ '--prefix',     '-p', GetoptLong::REQUIRED_ARGUMENT ],
-         [ '--attempts',   '-a', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--block-after',    '-a', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--block-all-after','-b', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--expire-after', '-e', GetoptLong::REQUIRED_ARGUMENT ]
        )
 
@@ -114,8 +121,8 @@ begin
       base_dir     = File.expand_path(arg)
     when '--expire-after'
       expire_after = arg.to_i
-    when '--attempts'
-      attempts = arg.to_i
+    when '--block-after'
+      block-after = arg.to_i
     end
   end
 rescue
@@ -151,6 +158,9 @@ if manual or help
 
   exit 0
 end
+
+# Open syslog
+syslog = Syslog.open( File.basename($0), Syslog::LOG_NDELAY, Syslog::LOG_USER)
 
 #
 # These requires are here to prevent dependency failures when generating manpages.
@@ -196,7 +206,8 @@ end
 # Fetch the IP addresses
 #
 blacklist = Symbiosis::Firewall::Blacklist.new
-blacklist.attempts = attempts
+blacklist.block_after = block_after
+blacklist.block_all_after = block_all_after
 blacklist.base_dir = base_dir
 
 #
@@ -252,7 +263,6 @@ blacklist.generate.each do |ip, ports|
     old_ports = Symbiosis::Utils.get_param(setting, blacklist_d)
 
     if old_ports.is_a?(String) or true == old_ports
-      puts "\tUpdating blacklist entry" if  $VERBOSE 
       
       #
       # Set old_ports to everything if it is just "true" (i.e. an empty file).
@@ -263,11 +273,15 @@ blacklist.generate.each do |ip, ports|
       ports = (ports + old_ports).collect{|pt| pt.nil? ? "all" : pt.to_s }.uniq
 
       ports = %w(all) if ports.any?{|pt| "all" == pt}
+      
+      puts "\tUpdating blacklist entry for #{ports.join(",")} ports" if  $VERBOSE 
+      syslog.info "updating blacklisted IP #{ip} for #{ports.join(",")} ports"
     else
       #
       # Add to the blacklist.
       #
-      puts "\tAdding to blacklist" if ( $VERBOSE )
+      puts "\tAdding to blacklist for #{ports.join(",")} ports" if ( $VERBOSE )
+      syslog.info "adding #{ip} to blacklist for #{ports.join(",")} ports"
     end
 
     updated=true
@@ -296,6 +310,7 @@ Dir.glob( File.join(blacklist_d,"*.auto" ) ).each do |entry|
   if  File.mtime(entry) < expire_before
 
     puts "Removing #{entry}" if ( $VERBOSE )
+    syslog.info "removing blacklisted IP #{ip}"
     File.unlink(entry)
     expired += 1
   end

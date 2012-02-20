@@ -7,9 +7,9 @@ module Symbiosis
     class Blacklist
 
       #
-      # The number of attempts required for a blacklist entry to be activated.  Defaults to 20.
+      # The number of matches required for a blacklist entry to be activated.  Defaults to 20.
       #
-      attr_reader :attempts
+      attr_reader :block_after
 
       #
       # Returns the base directory.  Defaults to /etc/symbiosis/firewall.
@@ -25,7 +25,8 @@ module Symbiosis
       # Sets up a new Symbiosis::Firewall::Blacklist.
       #
       def initialize()
-        @attempts     = 20
+        @block_after     = 10
+        @block_all_ports_after = 25
         @base_dir     = '/etc/symbiosis/firewall'
         @logtail_db   = '/var/lib/symbiosis/firewall-blacklist-logtail.db'
         @patterns     = []
@@ -58,12 +59,17 @@ module Symbiosis
       end
 
       #
-      # This sets the number of attempts needed to trigger blacklisting.  Its
+      # This sets the number of attempts needed to trigger blacklisting for this pattern.  Its
       # argument should be an Integer, and raises an ArgumentError if not.
       #
-      def attempts=(a)
+      def block_after=(a)
         raise ArgumentError, "#{a.inspect} must be an integer" unless a.is_a?(Integer)
-        @attempts = a
+        @block_after = a
+      end
+
+      def block_all_ports_after=(a)
+        raise ArgumentError, "#{a.inspect} must be an integer" unless a.is_a?(Integer)
+        @block_all_ports_after = a
       end
 
       private
@@ -139,13 +145,13 @@ module Symbiosis
           ports.each do |port, hits|
             total_for_ip += hits
 
-            blacklist[ip] << port if hits > @attempts
+            blacklist[ip] << port if hits > @block_after
           end
 
           #
-          # If an IP has exceeded the number of attempts on any port, block it from all ports.
+          # If an IP has exceeded the number of matches, block it from all ports.
           #
-          if total_for_ip > @attempts
+          if total_for_ip > @block_all_ports_after
             blacklist[ip] = %w(all)
           end
 
