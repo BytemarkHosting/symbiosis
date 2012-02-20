@@ -215,7 +215,7 @@ module Symbiosis
         #
         # Make sure the mailbox directory is not world-read/write/executable
         #
-        File.lchmod((mbox_stat.mode & 0770), mboxes_dir) if mbox_stat.writeable?
+        File.chmod((mbox_stat.mode & 0770), mboxes_dir) if mbox_stat.writable?
       end
 
       results
