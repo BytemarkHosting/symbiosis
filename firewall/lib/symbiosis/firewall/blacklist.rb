@@ -1,5 +1,6 @@
 require 'symbiosis/firewall/pattern'
 require 'symbiosis/firewall/directory'
+require 'symbiosis/firewall/blacklistdb'
 require 'symbiosis/firewall/logtail'
 
 module Symbiosis
@@ -29,6 +30,7 @@ module Symbiosis
         @block_all_after = 25
         @base_dir     = '/etc/symbiosis/firewall'
         @logtail_db   = '/var/lib/symbiosis/firewall-blacklist-logtail.db'
+        @count_db     = BlacklistDB.new('/var/lib/symbiosis/firewall-blacklist-count.db')
         @patterns     = []
       end
 
@@ -135,6 +137,7 @@ module Symbiosis
         # of ports, or an array containing "all" for all ports.
         #
         blacklist = Hash.new{|h,k| h[k] = []}
+        timestamp = Time.now.to_i
 
         results.each do |ip, ports|
           #
@@ -147,6 +150,16 @@ module Symbiosis
 
             blacklist[ip] << port if hits > @block_after
           end
+
+          #
+          # Record our count
+          #
+          @count_db.set_count_for(ip, total_for_ip, timestamp)
+
+          #
+          # Get the hits for the last 24 hours
+          #
+          total_for_ip = @count_db.get_count_for(ip, timestamp - 86400)
 
           #
           # If an IP has exceeded the number of matches, block it from all ports.
