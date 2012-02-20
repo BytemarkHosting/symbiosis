@@ -137,6 +137,7 @@ module Symbiosis
           else
             @password = param.split.first.strip
           end
+
         end
         @password
       end
@@ -209,15 +210,6 @@ module Symbiosis
         results << Mailbox.new(local_part, self, mailboxes_dir)
       end
       
-      if results.length > 0
-        mbox_stat = File.lstat(mboxes_dir)
-
-        #
-        # Make sure the mailbox directory is not world-read/write/executable
-        #
-        File.chmod((mbox_stat.mode & 0770), mboxes_dir) if mbox_stat.writable?
-      end
-
       results
     end
 
