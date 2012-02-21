@@ -1,3 +1,9 @@
+bytemark-symbiosis (2012:0221) stable; urgency=low
+
+  * Updated versioned dependencies to use the stable packages.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 21 Feb 2012 10:21:32 +0000
+
 bytemark-symbiosis (2012:0208) stable; urgency=low
 
   * Updated versioned dependencies to use the RC3 packages, i.e. 2012:0208.
