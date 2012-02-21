@@ -1,9 +1,14 @@
+symbiosis-email (2012:0221) stable; urgency=low
+
+  * Updated firewall patterns to check mail.log, rather than mail.err.
+  * Password file permissions are now updated on read to 0600, if possible.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 21 Feb 2012 10:14:16 +0000
+
 symbiosis-email (2012:0215) stable; urgency=low
 
   * Remove old cron-jobs in postinst.
   * Added Domain::Mailbox#password_file method.
-  * Updated firewall patterns to check mail.log, rather than mail.err.
-  * Password file permissions are now updated on read to 0600, if possible.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 20 Feb 2012 21:15:40 +0000
 
