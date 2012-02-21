@@ -1,4 +1,0 @@
-#
-#  Allow all incoming connections to port 123 for NTP
-#
-/sbin/iptables -A INPUT -p udp --dport 123 $SRC -j ACCEPT
