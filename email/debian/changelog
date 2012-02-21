@@ -2,6 +2,7 @@ symbiosis-email (2012:0221) stable; urgency=low
 
   * Updated firewall patterns to check mail.log, rather than mail.err.
   * Password file permissions are now updated on read to 0600, if possible.
+  * Updated depends to require latest symbiosis-common packages. 
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 21 Feb 2012 10:14:16 +0000
 
