@@ -1,8 +1,9 @@
-symbiosis-ftpd (2012:0220) stable; urgency=low
+symbiosis-ftpd (2012:0221) stable; urgency=low
 
   * FTP password now has is mode changed to 0600 on read/write.
+  * Updated dependencies to require latest symbiosis-common. 
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 20 Feb 2012 22:27:08 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 21 Feb 2012 10:19:04 +0000
 
 symbiosis-ftpd (2012:0208) stable; urgency=low
 
