@@ -46,7 +46,7 @@ module Symbiosis
           #
           # Read the password
           #
-          param = get_param("ftp-password", self.config_dir, {:mode =. 0600})
+          param = get_param("ftp-password", self.config_dir, {:mode => 0600})
 
           unless param.is_a?(String)
             @ftp_password = nil
