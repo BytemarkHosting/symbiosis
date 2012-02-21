@@ -1,3 +1,10 @@
+symbiosis-firewall (2012:0221) stable; urgency=low
+
+  * Firewall black/whitelists now log to syslog.
+  * Whitelist interacts better with incron.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 21 Feb 2012 10:12:30 +0000
+
 symbiosis-firewall (2012:0215) stable; urgency=low
 
   * Renamed match-uid-not-www-data to reject-www-data for sanity.

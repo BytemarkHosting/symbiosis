@@ -59,7 +59,7 @@
 require 'getoptlong'
 require 'tempfile'
 require 'fileutils'
-
+require 'syslog'
 
 #
 #  The options set by the command line.
@@ -168,6 +168,7 @@ end
 #
 expired = 0
 whitelist_d = File.join(base_dir, "whitelist.d")
+syslog = Syslog.open( File.basename($0), Syslog::LOG_NDELAY, Syslog::LOG_USER)
 
 #
 # Work out which user we're supposed to create the whitelist directory as.
@@ -177,7 +178,7 @@ begin
   admin_uid = srv.uid
   admin_gid = srv.gid
 rescue Errno::ENOENT
-  admin_gid = admin_uid = 0
+  admin_gid = admin_uid = 1000
 end
 
 # 
@@ -196,6 +197,19 @@ updated=false
 # Expiry is measured in days.
 #
 expire_before = Time.now - ( expire_after * ( 24 * 60 * 60 ) )
+
+#
+# Check to see when we were last run.
+#
+stamp_file = '/var/lib/symbiosis/symbiosis-firewall-whitelist.stamp'
+
+if File.exists?(stamp_file)
+  last_run = File.stat(stamp_file).mtime
+else
+  last_run = nil
+end
+
+FileUtils.touch(stamp_file)
 
 #
 #
@@ -252,10 +266,16 @@ Symbiosis::Utmp.read(wtmp_file).each do |entry|
 
     if false == value
       puts "\tAdding whitelist entry" if  $VERBOSE
+      syslog.info("adding #{ip} to whitelist")
+
       value = "all"
 
-    else
+    elsif last_run.nil? or at > last_run
       puts "\tUpdating whitelist entry" if  $VERBOSE
+      syslog.info("updating #{ip} in whitelist")
+  
+    else
+      next
 
     end
     #
@@ -282,6 +302,8 @@ Dir.glob( File.join(whitelist_d,"*.auto" ) ).each do |entry|
   if  File.mtime(entry) < expire_before
 
     puts "Removing #{entry}" if ( $VERBOSE )
+    syslog.info("expiring #{File.basename(entry,".auto")} from whitelist")
+
     File.unlink(entry)
     expired += 1
 
