@@ -1,8 +1,14 @@
+symbiosis-common (2012:0221) stable; urgency=low
+
+  * Use safe_open to read params as well as write.
+  * get_param, set_param now have options that they can pass to safe_open
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 21 Feb 2012 10:14:57 +0000
+
 symbiosis-common (2012:0215) stable; urgency=low
 
   * Symbiosis::Domains#find now works for wildcarded domains.
   * SSL tests now work if run as a non-root user.
-  * Use safe_open to read params as well as write. 
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 20 Feb 2012 21:13:04 +0000
 
