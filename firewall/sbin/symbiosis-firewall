@@ -238,9 +238,16 @@ if manual or help
 end
 
 #
-# Exit if we've been disabled
+# Set the action
 #
-if File.exists?(File.join(base_dir, "disabled"))
+if action.nil?
+  action = ARGV.first || "load"
+end
+
+#
+# Exit if we've been disabled, but not if we're flushing the firewall.
+#
+if File.exists?(File.join(base_dir, "disabled")) and action != "flush"
   verbose "Firewall disabled.  Exiting." 
   exit 0 
 end
@@ -251,13 +258,6 @@ end
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
 require 'symbiosis/host'
-
-#
-# Set the action
-#
-if action.nil?
-  action = ARGV.first || "load"
-end
 
 
 # DONE parseCommandLineArguments

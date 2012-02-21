@@ -2,8 +2,10 @@ symbiosis-firewall (2012:0221) stable; urgency=low
 
   * Firewall black/whitelists now log to syslog.
   * Whitelist interacts better with incron.
+  * Firewall scripts now use consistent "disabled" flags.
+  * symbiosis-firewall can now flush, even if the disabled flag is in place.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 21 Feb 2012 10:12:30 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 21 Feb 2012 12:15:11 +0000
 
 symbiosis-firewall (2012:0215) stable; urgency=low
 
