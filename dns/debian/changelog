@@ -1,3 +1,9 @@
+symbiosis-tinydns (2012:0222) stable; urgency=low
+
+  * Updated copyright and documentation links.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 14:07:42 +0000
+
 symbiosis-tinydns (2012:0215) stable; urgency=low
 
   * Added an --upload flag to symbiosis-dns-generate.
