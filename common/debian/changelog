@@ -1,3 +1,10 @@
+symbiosis-common (2012:0223) stable; urgency=low
+
+  * Fixed typo in symbiosis-password-test which caused the hourly flag not to
+    work.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 22:42:08 +0000
+
 symbiosis-common (2012:0222) stable; urgency=low
 
   * Updated copyright and documentation links.
