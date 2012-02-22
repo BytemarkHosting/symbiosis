@@ -16,14 +16,14 @@ fi
 update-alternatives --install /var/www/webmail symbiosis-webmail /var/lib/roundcube/ 100
 
 #
-# Configure filterning
+# Configure filtering
 #
 
 
 #
 #  Restart Apache2.
 #
-invoke-rc.d apache2 force-reload || true
+invoke-rc.d apache2 restart || true
 
 #DEBHELPER#
 exit 0
