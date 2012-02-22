@@ -1,6 +1,7 @@
-bytemark-symbiosis (2012:0221) stable; urgency=low
+bytemark-symbiosis (2012:0222) stable; urgency=low
 
   * Updated versioned dependencies to use the stable packages.
+  * Updated copyright dates.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 21 Feb 2012 10:21:32 +0000
 
