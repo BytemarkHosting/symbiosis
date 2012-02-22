@@ -1,11 +1,3 @@
-# symbiosis/domains.rb
-#
-# This code is released under the same terms as Ruby itself.  See LICENCE for
-# more details.
-#
-# (c) 2010 Bytemark Computer Consulting Ltd
-#
-
 require 'symbiosis/domain'
 
 module Symbiosis

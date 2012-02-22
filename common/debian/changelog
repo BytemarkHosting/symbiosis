@@ -1,3 +1,9 @@
+symbiosis-common (2012:0222) stable; urgency=low
+
+  * Updated copyright and documentation links.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 14:05:55 +0000
+
 symbiosis-common (2012:0221) stable; urgency=low
 
   * Use safe_open to read params as well as write.
