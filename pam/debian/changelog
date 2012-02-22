@@ -1,3 +1,9 @@
+symbiosis-pam (2012:0222) stable; urgency=low
+
+  * Updated copyright dates. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 14:11:42 +0000
+
 symbiosis-pam (2012:0208) stable; urgency=low
 
   * This package now does not alter the pam config, instead leaving it to the
