@@ -1,8 +1,9 @@
 symbiosis-webmail (2012:0222) stable; urgency=low
 
-  * Updated postinst to restart rather than reload apache.
+  * Updated postinst to restart rather than reload apache for all three
+    packages.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 10:40:50 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 11:13:53 +0000
 
 symbiosis-webmail (2012:0208) stable; urgency=low
 

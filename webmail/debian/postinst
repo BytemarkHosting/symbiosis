@@ -15,5 +15,10 @@ fi
 #
 rm -f /etc/apache2/conf.d/squirrelmail.local.conf
 
+#
+# Restart apache to pick up webmail/ link
+#
+invoke-rc.d apache2 restart || true
+
 #DEBHELPER#
 exit 0
