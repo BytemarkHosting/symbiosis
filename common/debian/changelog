@@ -1,8 +1,9 @@
 symbiosis-common (2012:0222) stable; urgency=low
 
   * Updated copyright and documentation links.
+  * Fixed tc_utils to work with pam-tmpdir is around.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 14:05:55 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 15:32:19 +0000
 
 symbiosis-common (2012:0221) stable; urgency=low
 

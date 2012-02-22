@@ -8,7 +8,10 @@ class TestUtils < Test::Unit::TestCase
   include Symbiosis::Utils
 
   def setup
-    @prefix = Dir.mktmpdir("srv")
+    #
+    # The prefix has to be in a directory admin can read..
+    #
+    @prefix = Dir.mktmpdir("srv","/tmp")
     @prefix.freeze
   end
 
