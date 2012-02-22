@@ -17,7 +17,7 @@ class TestBlacklistDb < Test::Unit::TestCase
 
   def teardown
     unless $DEBUG
-      File.unlink(@fn) if File.exists?(@fn)
+      File.unlink(@fn.path) if File.exists?(@fn.path)
     else
       FileUtils.move(@fn.path, @fn.path+"-saved")
       puts "BlacklistDB saved in #{@fn.path}-saved"

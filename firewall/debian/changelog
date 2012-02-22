@@ -1,5 +1,6 @@
 symbiosis-firewall (2012:0222) stable; urgency=low
 
+  * Fixed firewall tests to work.
   * Updated copyright dates.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 14:16:39 +0000
