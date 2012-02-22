@@ -23,7 +23,7 @@
 # more details.  
 #
 # (c) 2000-1 Kentaro Goto
-# (c) 2010 Bytemark Computer Consulting Ltd
+# (c) 2010-2012 Bytemark Computer Consulting Ltd
 #
 
 require 'stringio'

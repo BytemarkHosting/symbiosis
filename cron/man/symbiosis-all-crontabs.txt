@@ -1,4 +1,3 @@
-
 NAME
 
 symbiosis-all-crontabs - Execute crontabs for all Symbiosis domains
@@ -12,7 +11,7 @@ As a security measure it is mandatory that a crontab file, located beneath
 /srv/example.com/config/crontab is owned by the same Unix UID which owns
 /srv/example.com.
 
-For each valid crontab file the B<TODO> ruby script will be launched.
+For each valid crontab file symbiosis-crontab(1) will be launched.
 
 OPTIONS
 
@@ -22,14 +21,12 @@ BUGS
 
 None known.
 
+SEE ALSO
+
+ symbiosis-crontab(1)
+
 AUTHOR
 
-Steve
---
-
-LICENSE
-
-Copyright (c) 2010 by Bytemark Computer Consulting Ltd.
-All rights reserved.
+Steve Kemp <steve@bytemark.co.uk>
 
 

@@ -39,20 +39,17 @@ USAGE
   The --test option can be useful for determining when the commands
   will next get executed.
 
-  Full documentation is available at http://symbiosis.bytemark.co.uk/docs
+  Full documentation is available at http://symbiosis.bytemark.co.uk/squeeze/docs
 
 BUGS
 
   The @reboot shortcut is not understood.
 
-  The --test option can be very slow, due to a duff algorithm being
-  used.
+SEE ALSO
+
+ crontab(5)
 
 AUTHOR
 
  Patrick J Cherry <patrick@bytemark.co.uk>
 
-LICENSE
-
-Copyright (c) 2010 by Bytemark Computer Consulting Ltd.
-All rights reserved.
