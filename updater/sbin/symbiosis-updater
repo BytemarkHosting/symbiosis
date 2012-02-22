@@ -253,22 +253,15 @@ None known.
 
 =cut
 
-=head1 AUTHOR
+=head1 SEE ALSO 
 
- Steve
- --
+apt-get(1)
 
 =cut
 
-=head1 LICENSE
+=head1 AUTHOR
 
-Copyright (c) 2008-2010 by Bytemark Computer Consulting Ltd.
-All rights reserved.
-
-This program is free software;
-you can redistribute it and/or modify it under
-the same terms as Perl itself.
-The LICENSE file contains the full text of the license.
+ Steve Kemp <steve@bytemark.co.uk>
 
 =cut
 
