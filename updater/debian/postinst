@@ -11,13 +11,6 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
-#  If we have an old file then remove it.
-#
-if [ -e /etc/apt/sources.list.security ]; then
-    rm -f  /etc/apt/sources.list.security
-fi
-
-#
 #  Make sure we notify the local sysadmin
 #
 if [ ! -e /etc/symbiosis/updater ]; then
