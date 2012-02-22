@@ -21,7 +21,7 @@
  * This software is based upon mod_vhost_alias.c, which was released under the
  * Apache licence, version 2.0.
  *
- * Copyright (c) 2008-2010 Bytemark Computer Consulting Ltd.
+ * Copyright (c) 2008-2012 Bytemark Computer Consulting Ltd.
  * Copyright (c) 1998-1999 Demon Internet Ltd.
  *
  * mod_vhost_alias.c was submitted by Demon Internet to the Apache Software Foundation
