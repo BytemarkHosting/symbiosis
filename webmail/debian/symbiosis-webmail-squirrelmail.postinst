@@ -30,7 +30,7 @@ update-alternatives --install /var/www/webmail symbiosis-webmail /usr/share/squi
 #
 #  Restart Apache2.
 #
-invoke-rc.d apache2 restart || true
+invoke-rc.d apache2 force-reload || true
 
 #DEBHELPER#
 exit 0

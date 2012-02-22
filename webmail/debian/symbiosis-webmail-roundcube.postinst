@@ -23,7 +23,7 @@ update-alternatives --install /var/www/webmail symbiosis-webmail /var/lib/roundc
 #
 #  Restart Apache2.
 #
-invoke-rc.d apache2 restart || true
+invoke-rc.d apache2 force-reload || true
 
 #DEBHELPER#
 exit 0
