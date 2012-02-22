@@ -310,7 +310,7 @@ Dir.glob( File.join(blacklist_d,"*.auto" ) ).each do |entry|
   if  File.mtime(entry) < expire_before
 
     puts "Removing #{entry}" if ( $VERBOSE )
-    syslog.info "removing blacklisted IP #{ip}"
+    syslog.info "removing blacklisted IP #{File.basename(entry,".auto")}"
     File.unlink(entry)
     expired += 1
   end

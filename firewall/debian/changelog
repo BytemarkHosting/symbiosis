@@ -1,3 +1,10 @@
+symbiosis-firewall (2012:0223) stable; urgency=low
+
+  * Fixed typo in symbiosis-firewall-blacklist which caused the expiration of
+    old entries to fail.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 22:43:27 +0000
+
 symbiosis-firewall (2012:0222) stable; urgency=low
 
   * Fixed firewall tests to work.
