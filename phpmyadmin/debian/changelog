@@ -1,6 +1,7 @@
 symbiosis-phpmyadmin (2012:0222) stable; urgency=low
 
   * Restart rather than reload Apache2 after install.
+  * Updated copyright dates.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 10:39:48 +0000
 
