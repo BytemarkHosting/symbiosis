@@ -10,7 +10,6 @@ if [ "$1" != "configure" ]; then
     exit 0
 fi
 
-
 #
 #  If there is volatile then comment it out.
 #
@@ -18,18 +17,18 @@ if ( grep -q volatile /etc/apt/sources.list 2>/dev/null >/dev/null ); then
   sed -i -e 's/^[^#].*volatile.*$/# Removed since volatile no longer exists for squeeze\n# \0/g' /etc/apt/sources.list
 fi
 
-
 #
 #  Update /etc/motd.
 #
-cat >> /etc/motd.tail <<EOF
+if ! ( grep -q Symbiosis /etc/motd.tail 2>/dev/null >/dev/null ); then
+  cat >> /etc/motd.tail <<EOF
 
 To access the Bytemark Symbiosis documentation, please visit:
 
   * http://symbiosis.bytemark.co.uk/
 
 EOF
-
+fi
 
 #
 #  Remove our obsolete vhost init script.
