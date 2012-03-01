@@ -24,7 +24,7 @@ set -v
 #
 if [ -x "/sbin/modprobe" -a -e "/proc/modules" ] ; then
   for i in iptable_filter nf_conntrack nf_conntrack_ftp ; do
-    /sbin/modprobe $i
+    /sbin/modprobe $i 2> /dev/null
   done
 fi
 
