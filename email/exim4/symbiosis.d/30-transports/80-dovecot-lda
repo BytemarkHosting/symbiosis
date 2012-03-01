@@ -1,7 +1,7 @@
 dovecot_lda:
   debug_print = "T: dovecot_lda for $local_part@$domain"
   driver = pipe
-  command = /usr/lib/dovecot/deliver -e -k -n \
+  command = /usr/lib/dovecot/deliver -e -k -s \
             -f "$sender_address" -a "$original_local_part@$original_domain"
   home_directory = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part/
   environment = USER=$local_part@$domain

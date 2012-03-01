@@ -1,3 +1,12 @@
+symbiosis-email (2012:0301) stable; urgency=low
+
+  * Tweaked exim4 config to create mailboxes + subscribe when using Dovecot
+    LDA.
+  * Tweaked exim4 config to preserve the domain when delivering using the
+    vhost_alias router.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 01 Mar 2012 13:50:06 +0000
+
 symbiosis-email (2012:0222) stable; urgency=low
 
   * Updated copyright and documentation links.
