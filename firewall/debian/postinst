@@ -195,12 +195,16 @@ if [ -e $PREFIX/outgoing.d/10-match-uid-not-www-data -a -e $PREFIX/outgoing.d/99
 fi
 
 #
-#  Flush and reload the firewall unless we're in a chroot
+# Chown the firewall directory.
+#
+chown -R 1000:1000 $PREFIX
+
+#
+#  Reload the firewall unless we're in a chroot.
 #
 if [ -z "$CHROOT" ]; then
 
-    symbiosis-firewall flush
-    symbiosis-firewall load
+    symbiosis-firewall load || true
 
 else
     echo "I: In a chroot - not flushing / running firewall"
@@ -224,6 +228,14 @@ done
 if [ -e /etc/cron.hourly/firewall-test ] ; then
   rm -f /etc/cron.hourly/firewall-test
 fi
+
+#
+# Remove another old cron test
+#
+if [ -e /etc/cron.d/firewall-blocker ] ; then
+  rm -f /etc/cron.d/firewall-blocker
+fi
+
 
 #DEBHELPER#
 exit 0

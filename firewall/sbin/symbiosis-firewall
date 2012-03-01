@@ -376,12 +376,6 @@ begin
   end
 
   #
-  # Change the ownership of the firewall directory, if we're going to execute
-  # the firewall script
-  #
-  FileUtils.chown_R("admin", "admin", base_dir) if execute 
-
-  #
   # Load the ports from /etc/services
   #
   Ports.load
