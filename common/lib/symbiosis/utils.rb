@@ -1,4 +1,4 @@
-
+require "fcntl"
 require "fileutils"
 
 module Symbiosis
@@ -364,7 +364,52 @@ module Symbiosis
       end
     end
 
-    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota
+    #
+    # This function locks an open filehandle fh using flock.
+    #
+    # If the lock is unavailable it raises Errno::ENOLCK.
+    #
+    # N.B. This lock is realeased if the filehandle is closed, or if the file
+    # itself is subsquently opened and closed.
+    #
+    def lock(fh)
+      raise ArgumentError, "Expected a file handle not a #{fh.class}" unless fh.is_a?(File)
+      raise ArgumentError, "File handle #{fh} is closed" if fh.closed?
+
+#      flock_struct = [Fcntl::F_WRLCK, IO::SEEK_SET, 0, 0, 0])
+#      fh.fcntl(Fcntl::F_SETLK, flock_struct.pack("s2L2i*"))
+
+      if fh.flock(File::LOCK_EX | File::LOCK_NB)
+        return 0
+      else
+        raise Errno::EAGAIN
+      end
+
+    rescue SystemCallError => err
+      raise Errno::ENOLCK, "Unable to acquire lock -- #{err.to_s}"
+    end
+
+    #
+    # This function removes any lock set by lock() on a filehandle, fh.
+    #
+    def unlock(fh)
+      raise ArgumentError, "Expected a file handle not a #{fh.class}" unless fh.is_a?(File)
+      raise ArgumentError, "File handle #{fh} is closed" if fh.closed?
+
+#      flock_struct = [Fcntl::F_UNLCK, IO::SEEK_SET, 0, 0, 0])
+#      fh.fcntl(Fcntl::F_SETLK, flock_struct.pack("s2L2i*"))
+
+      if fh.flock(File::LOCK_UN | File::LOCK_NB)
+        return 0
+      else
+        raise Errno::EAGAIN
+      end
+
+    rescue SystemCallError => err
+      raise Errno::ENOLCK, "Unable to release lock -- #{err.to_s}"
+    end
+
+    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock
 
   end
 

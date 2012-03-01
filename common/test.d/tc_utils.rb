@@ -1,6 +1,7 @@
 require 'test/unit'
 require 'symbiosis/utils'
 require 'tmpdir'
+require 'tempfile'
 require 'etc'
 
 class TestUtils < Test::Unit::TestCase
@@ -268,6 +269,38 @@ class TestUtils < Test::Unit::TestCase
 
   def test_parse_quota
     # TODO
+  end
+
+  def test_lock
+    fn = File.join(@prefix,"lock")
+
+    fh_parent = File.open(fn, "w+")
+    assert_equal(0, lock(fh_parent))
+
+    #
+    # Check to see if we can check the lock again..
+    #
+    # le.open(fn, "w+") do |fh|
+    # locked?(fh)
+    #nd
+
+    fork do
+      File.open(fn, "r") do |fh_child|
+        assert_raise(Errno::ENOLCK) {  lock(fh_child) }
+      end
+    end
+
+    Process.wait
+
+    unlock(fh_parent)
+
+    fork do
+      File.open(fn, "r") do |fh_child|
+        assert_nothing_raised {  lock(fh_child) }
+      end
+    end
+
+    Process.wait
   end
 
 

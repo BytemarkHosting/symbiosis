@@ -1,3 +1,9 @@
+symbiosis-common (2012:0301) stable; urgency=low
+
+  * Added file locking functions to Symbiosis::Utils.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 01 Mar 2012 13:36:28 +0000
+
 symbiosis-common (2012:0223) stable; urgency=low
 
   * Fixed typo in symbiosis-password-test which caused the hourly flag not to
