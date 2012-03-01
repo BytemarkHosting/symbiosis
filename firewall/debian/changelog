@@ -1,3 +1,9 @@
+symbiosis-firewall (2012:0301) stable; urgency=low
+
+  * Added lockfile checking to symbiosis-firewall.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 01 Mar 2012 13:47:41 +0000
+
 symbiosis-firewall (2012:0223) stable; urgency=low
 
   * Fixed typo in symbiosis-firewall-blacklist which caused the expiration of

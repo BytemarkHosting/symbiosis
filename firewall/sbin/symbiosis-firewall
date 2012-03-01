@@ -258,6 +258,7 @@ end
 require 'symbiosis/firewall/directory'
 require 'symbiosis/firewall/template'
 require 'symbiosis/host'
+require 'symbiosis/utils'
 
 
 # DONE parseCommandLineArguments
@@ -275,6 +276,21 @@ require 'symbiosis/host'
 # DONE loadKernelModules
 # DONE fixOwnership
 # DONE parseServices
+
+#
+# Acquire lock
+#
+lock_fh = nil
+lock_fn = "/var/lock/symbiosis-firewall.lock"
+
+begin
+  lock_fh = File.open(lock_fn, "w+")
+  Symbiosis::Utils.lock(lock_fh)
+rescue Errno::ENOLCK => err
+  warn "symbiosis-firewall: Failed to acquire lock on #{lock_fn}: #{err.to_s}" if $VERBOSE
+  print err.backtrace.join("\n") if $DEBUG
+  exit 1
+end
 
 #
 # Check to see if we've been called as part of a if-up or if-down.
@@ -484,4 +500,18 @@ begin
   end
 
 end
+
+#
+# Release the lock and close.
+#
+begin
+  Symbiosis::Utils.unlock(lock_fh)
+  lock_fh.close unless lock_fh.nil? or lock_fh.closed?
+rescue SystemCallError => err
+  warn "symbiosis-firewall: Failed to release lock on #{lock_fn}: #{err.to_s}" if $VERBOSE
+  puts err.backtrace.join("\n") if $DEBUG
+end
+
+
+exit 0
 
