@@ -8,7 +8,7 @@ Standards-Version: 3.9.1
 
 Package: symbiosis-monit
 Architecture: all
-Depends: ruby1.8, cron, libsqlite3-ruby1.8, liblog4r-ruby1.8, procps, symbiosis-common (>= 2012:0117), ${misc:Depends}
+Depends: ruby1.8, cron, libsqlite3-ruby1.8, liblog4r-ruby1.8, procps, symbiosis-common (>= 2012:0301), ${misc:Depends}
 Replaces: bytemark-vhost-monit
 Conflicts: bytemark-vhost-monit
 Provides: bytemark-vhost-monit

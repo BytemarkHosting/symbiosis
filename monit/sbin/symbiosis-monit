@@ -205,10 +205,26 @@ end
 # These requires are here such that manpage generation works on build machines.
 #
 require 'symbiosis/monitor/runner'
+require 'symbiosis/utils'
 require 'systemexit'
 require 'log4r'
 require 'log4r/outputter/syslogoutputter'
 
+
+#
+# Acquire lock
+#
+lock_fh = nil
+lock_fn = "/var/lock/symbiosis-monit.lock"
+
+begin
+  lock_fh = File.open(lock_fn, "w+")
+  Symbiosis::Utils.lock(lock_fh)
+rescue Errno::ENOLCK => err
+  warn "symbiosis-monit: #{lock_fn}: #{err.to_s}" if $VERBOSE
+  print err.backtrace.join("\n") if $DEBUG
+  exit 0 
+end
 
 begin
   #
@@ -256,6 +272,17 @@ rescue StandardError => err
 end
 
 puts report if interactive or $VERBOSE or $DEBUG
+
+#
+# Release the lock and close.
+#
+begin
+  Symbiosis::Utils.unlock(lock_fh)
+  lock_fh.close unless lock_fh.nil? or lock_fh.closed?
+rescue SystemCallError => err
+  warn "symbiosis-monit: Failed to release lock on #{lock_fn}: #{err.to_s}" if $VERBOSE
+  puts err.backtrace.join("\n") if $DEBUG
+end
 
 # Return the code
 exit (runner.failed_tests.length > 0 ? 1 : 0)
