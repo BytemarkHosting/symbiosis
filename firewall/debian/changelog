@@ -1,3 +1,9 @@
+symbiosis-firewall (2012:0302) stable; urgency=low
+
+  * Removed useless dependency on lockfile-progs.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 02 Mar 2012 10:17:55 +0000
+
 symbiosis-firewall (2012:0301) stable; urgency=low
 
   * Added lockfile checking to symbiosis-firewall.
