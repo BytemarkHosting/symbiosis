@@ -1,8 +1,30 @@
-#
-#
-#  Reject all outgoing connections for www-data<%= address.nil? ? "" : " apart from to address #{address}" %>.
-#
 % iptables_cmds.each do |cmd|
-<%= cmd %> -A OUTPUT <%= dst.empty? ? '' : '\! ' + dst %> --match owner --uid-owner www-data -j REJECT
+#
+# See if the reject-www-data chain exists
+#
+if ! <%= cmd %> -n -L reject-www-data > /dev/null 2>&1 ; then
+
+  #
+  # Create the chain
+  #
+  <%= cmd %> -N reject-www-data
+
+  #
+  # Add the jump in
+  #
+  <%= cmd %> -A OUTPUT --match owner --uid-owner www-data -j reject-www-data
+
+  #
+  # Put the reject rule in at the end of the new chain
+  #
+  <%= cmd %> -A reject-www-data -j REJECT
+fi
+
+% unless address.nil?
+#
+#  Accept all outgoing connections for www-data to address #{address}" %>.
+#
+<%= cmd %> -I reject-www-data <%= dst %> -j ACCEPT
+% end
 % end
 
