@@ -1,3 +1,10 @@
+symbiosis-monit (2012:0308) stable; urgency=low
+
+  * symbiosis-monit now checks for /var/lib/initscripts/nologin and doesn't run
+    if that file exists, since it is assumed that the machine is still booting.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 08 Mar 2012 09:11:40 +0000
+
 symbiosis-monit (2012:0301) stable; urgency=low
 
   * symbiosis-monit now uses a lock file to prevent multiple simulataneous

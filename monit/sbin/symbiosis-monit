@@ -74,8 +74,11 @@
 #
 # DISABLING
 #
-# You may disable the monit script by creating an empty file with the name:
-#   /etc/symbiosis.d/monit/disabled
+# This program may be disabled by creating an empty file with called
+# /etc/symbiosis.d/monit/disabled
+#
+# Also if /var/lib/initscripts/nologin exists, it is assumed that the system is
+# still booting, and as such symbiosis-monit will not run.
 #
 # AUTHOR
 #
@@ -198,6 +201,14 @@ end
 #
 if File.exists?(File.join(dir, "disabled"))
   puts "symbiosis-monit disabled.  Exiting." if $VERBOSE
+  exit 0
+end
+
+#
+# Don't run if the machine is still booting
+#
+if File.exists?("/var/lib/initscripts/nologin")
+  puts "This machine is still booting.  Exiting." if $VERBOSE
   exit 0
 end
 
