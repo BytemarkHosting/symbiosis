@@ -25,7 +25,6 @@ if ! <%= cmd %> -n -L reject-www-data > /dev/null 2>&1 ; then
   #
   <%= cmd %> -A reject-www-data -p tcp -j REJECT --reject-with tcp-reset
   <%= cmd %> -A reject-www-data -j REJECT
-% end
 
 fi
 
@@ -34,5 +33,6 @@ fi
 #  Accept all outgoing connections for www-data to address #{address}" %>.
 #
 <%= cmd %> -I reject-www-data <%= dst %> -j ACCEPT
+% end
 % end
 
