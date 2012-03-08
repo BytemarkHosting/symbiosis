@@ -15,9 +15,18 @@ if ! <%= cmd %> -n -L reject-www-data > /dev/null 2>&1 ; then
   <%= cmd %> -A OUTPUT --match owner --uid-owner www-data -j reject-www-data
 
   #
-  # Put the reject rule in at the end of the new chain
+  # Accept DNS queries
   #
+  <%= cmd %> -A reject-www-data -p tcp --dport 53 -j ACCEPT
+  <%= cmd %> -A reject-www-data -p udp --dport 53 -j ACCEPT
+
+  #
+  # Put the reject rules in at the end of the new chain
+  #
+  <%= cmd %> -A reject-www-data -p tcp -j REJECT --reject-with tcp-reset
   <%= cmd %> -A reject-www-data -j REJECT
+% end
+
 fi
 
 % unless address.nil?
