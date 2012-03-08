@@ -1,7 +1,7 @@
 symbiosis-firewall (2012:0308) stable; urgency=low
 
-  * Updated reject-www-data rule to create own chain, ensuring that the rule
-    will work for multiple addresses.
+  * Updated reject-www-data rule to create its own chain, ensuring that the
+    rule will work for multiple addresses.
   * Allow www-data to do DNS resolution.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 08 Mar 2012 07:13:05 +0000
