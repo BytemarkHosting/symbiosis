@@ -35,5 +35,4 @@ fi
 #
 <%= cmd %> -I reject-www-data <%= dst %> -j ACCEPT
 % end
-% end
 
