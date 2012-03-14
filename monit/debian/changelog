@@ -1,3 +1,9 @@
+symbiosis-monit (2012:0314) stable; urgency=low
+
+  * Updated SSH check to parse sshd_config to determine which ports to check.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 14 Mar 2012 09:54:16 +0000
+
 symbiosis-monit (2012:0308) stable; urgency=low
 
   * symbiosis-monit now checks for /var/lib/initscripts/nologin and doesn't run
