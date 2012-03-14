@@ -11,13 +11,49 @@ class SshdCheck < Symbiosis::Monitor::Check
     @process.pidfile = "/var/run/sshd.pid"
     @process.initscript = "/etc/init.d/ssh"
     @name = "sshd"
-    @port = 22
+    sshd_config = "/etc/ssh/sshd_config"
+    @port = @host = nil
 
-    if ( File.exists?( "/etc/sshd/sshd_config" ) )
+    if ( File.exists?( sshd_config ) )
+      # Need to parse for:
+      #
+      # ListenAddress host|IPv4_addr|IPv6_addr
+      # ListenAddress host|IPv4_addr:port
+      # ListenAddress [host|IPv6_addr]:port
+      # Port port
 
-      File("file").readlines.each |l|
-        @port = $1.to_i if l =~ /^Port\s+(\d+)/
+      File.readlines( sshd_config ).each do |l|
+        case l.chomp
+          # ListenAddress [host|IPv6_addr]:port
+          when /^\s*ListenAddress\s+\[([^\]]+)\]:(\d+)\s*$/i
+            if @host.nil? and @port.nil?
+              @host = $1 
+              @port = $2.to_i
+            end
+          # ListenAddress host|IPv4_addr:port
+          when /^\s*ListenAddress\s+([^:]+):(\d+)\s*$/i
+            if @host.nil? and @port.nil?
+              @host = $1 
+              @port = $2.to_i
+            end
+
+          # ListenAddress host|IPv4_addr|IPv6_addr
+          when /^\s*ListenAddress\s+([^ ]+)\s*$/i
+            @host = $1 if @host.nil?
+
+          # Port port
+          when /^\s*Port\s+(\d+)\s*$/i
+            @port = $1.to_i if @port.nil?
+
+        end
+      end
     end
+    #
+    # Set some defaults.
+    #
+    @host ||= "localhost"
+    @port ||= 22
+
   end
 
 
@@ -29,7 +65,7 @@ class SshdCheck < Symbiosis::Monitor::Check
     return r unless 0 == r
 
     tcpconnection = Symbiosis::Monitor::TCPConnection.new(
-      "localhost", @port, [nil,"SSH-2.0-OpenSSH-4.3p2\n"]
+      @host, @port, [nil,"SSH-2.0-OpenSSH-5.5p1\n"]
     )
     r = do_tcpconnection_check(tcpconnection)
     self.restart if SystemExit::EX_TEMPFAIL == r
