@@ -256,7 +256,7 @@ class Symbiosis
     # the string parsing fails.
     #
     def self.parse(str)
-      if str =~ /\A(?:(?:\S+\s+){5}|@(?:#{SHORTCUTS.keys.join("|")})\s+)(.*)\Z$/
+      if str =~ /\A(?:@(?:#{SHORTCUTS.keys.join("|")})\s+|(?:\S+\s+){5})(.*)\Z$/
 
         # pick off the last match
         command = $+

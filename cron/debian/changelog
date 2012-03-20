@@ -1,3 +1,12 @@
+symbiosis-cron (2012:0320) stable; urgency=low
+
+  * Fixed symbiosis-all-crontabs to fork and exec properly.
+  * Fixed symbiosis-all-crontabs setuid/gid rather than use su.
+  * Fixed cron library to parse @hourly (etc) shortcuts properly.
+  * Test is now installed to /etc/symbiosis/test.d. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 20 Mar 2012 07:23:03 +0000
+
 symbiosis-cron (2012:0222) stable; urgency=low
 
   * Updated copyright and documentation links.

@@ -1,3 +1,6 @@
+#!/usr/bin/ruby1.8
+#
+
 require 'test/unit'
 require 'symbiosis/crontab'
 
@@ -281,6 +284,11 @@ class TestCrontabRecord < Test::Unit::TestCase
     # This should be run at midnight on 31st Sept, i.e. never.
     crontab_record = Symbiosis::CrontabRecord.parse("0  0   31 9  * echo \"impossible?\"")
     assert_nil(crontab_record.next_due(today))
+  end
+
+  def test_single_hyphen_arguments
+    crontab_record = Symbiosis::CrontabRecord.parse("@hourly wget -O - -q -t 1 http://www.example.com/cron.php")
+    assert_equal("wget -O - -q -t 1 http://www.example.com/cron.php",crontab_record.command)
   end
 
   #

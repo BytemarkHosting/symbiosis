@@ -3,5 +3,15 @@
 #export DH_VERBOSE=1
 #
 
-%:
-	dh $@
+DEB_DIVERT_EXTENSION = .dpkg-symbiosis
+DEB_TRANSFORM_FILES_symbiosis-webmail-roundcube += \
+	/etc/roundcube/main.inc.php.dpkg-symbiosis \
+	/etc/roundcube/plugins/managesieve/config.inc.php.dpkg-symbiosis
+
+ifneq ($(wildcard /usr/share/roundcube/plugins/managesieve/config.inc.php.dist),)
+	DEB_CHECK_FILES_SOURCE_/etc/roundcube/plugins/managesieve/config.inc.php.dpkg-symbiosis = /usr/share/roundcube/plugins/managesieve/config.inc.php.dist
+endif
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/config-package.mk
+
