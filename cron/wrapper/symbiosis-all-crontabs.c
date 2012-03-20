@@ -44,13 +44,63 @@ int g_verbose = 0;
 void process_crontab( char *crontab_path, char *domain_path, struct passwd *usr )
 {
     pid_t pid;
-    char env_home[ 1024 ] = { '\0' };
-    char env_shell[ 1024 ] = { '\0' };
-    char env_logname[ 1024 ] = { '\0' };
-    char env_path[ 1024 ] = { '\0' };
+    int   ngroups;
+    gid_t *groups;
+
+    /**
+     * Maximum number of groups
+     */
+    ngroups = (int) sysconf(_SC_NGROUPS_MAX);
 
     if( g_verbose )
       printf("Processing: %s as UID %i:%i\n", crontab_path, usr->pw_uid, usr->pw_gid );
+
+    /**
+     * Allocate memory for the group list.
+     */
+    if (NULL == (groups = malloc(ngroups * sizeof (gid_t))))
+    {
+        printf("*** ERROR: Unable to allocate memory for group list\n");
+        exit(-1);
+    }
+
+    /**
+     *  Retrieve group list 
+     */
+    if (getgrouplist(usr->pw_name, usr->pw_gid, groups, &ngroups) == -1) 
+    {
+        printf("*** ERROR: Unable to get supplementary group list for %s\n", usr->pw_name);
+        exit(-1);
+    }
+
+    int i,j;
+    for (i = 0, j = 0; i < ngroups; i++) 
+    {
+        
+    }
+
+    /**
+     * Set environment and args 
+     */
+    char env_home[ 1024 ]    = { "\0" };
+    char env_shell[ 1024 ]   = { "\0" };
+    char env_logname[ 1024 ] = { "\0" };
+    char env_path[ 1024 ]    = { "\0" };
+
+    /**
+     * Live in /srv/domain.com by default 
+     */
+    chdir(domain_path);
+
+    /**
+     * Fix up environment (this was cleared some time ago)
+     */
+    snprintf(env_home,    sizeof(env_home),    "HOME=%s", usr->pw_dir);
+    snprintf(env_shell,   sizeof(env_shell),   "SHELL=%s", usr->pw_shell);
+    snprintf(env_logname, sizeof(env_logname), "LOGNAME=%s", usr->pw_name);
+    snprintf(env_path,    sizeof(env_path),    "PATH=/usr/local/bin:/usr/bin:/bin");
+    char  *env[]  = {env_home, env_shell, env_logname, env_path, (char *) 0};
+    char  *args[] = { CRONTAB_HELPER, crontab_path, (char *) 0 };
 
     /**
      * Fork
@@ -58,32 +108,12 @@ void process_crontab( char *crontab_path, char *domain_path, struct passwd *usr 
     if ( (pid = fork()) == 0 )
     {
         /**
-         * Live in /srv/domain.com by default 
+         *  Permanently change Supplementary groups, GID and UID.
          */
-        chdir(domain_path);
-
-        /**
-         * Fix up environment (this was cleared some time ago)
-         */
-        snprintf(env_home,    sizeof(env_home), "HOME=%s", usr->pw_dir);
-        snprintf(env_shell,   sizeof(env_home), "SHELL=%s", usr->pw_shell);
-        snprintf(env_logname, sizeof(env_home), "LOGNAME=%s", usr->pw_name);
-        snprintf(env_path,    sizeof(env_home), "PATH=/usr/local/bin:/usr/bin:/bin");
-
-        /**
-         * Set environment and args 
-         */
-        char *env[] = {env_home, env_shell, env_logname, env_path, (char *) 0};
-        char *args[] = { CRONTAB_HELPER, crontab_path, (char *) 0 };
-    
-        /**
-         *  Change UID 
-         */
-        if( setgid(usr->pw_gid) == 0 && setuid(usr->pw_uid) == 0 ) 
+        if( setgroups(ngroups, groups) == 0 &&
+            setregid(usr->pw_gid, usr->pw_gid) == 0 && 
+            setreuid(usr->pw_uid, usr->pw_uid) == 0  )
         {
-            /**
-             * Run the helper
-             */
             execve(*args, args, env);
             printf("*** ERROR: exec failed\n");
             _exit( 1 );
@@ -99,19 +129,26 @@ void process_crontab( char *crontab_path, char *domain_path, struct passwd *usr 
         printf("*** ERROR: Fork failed\n");
         exit( 1 );
     }
+
+    free(groups);
+
 }
 
-
-
 /**
- * Process each entry beneath a given directory,
- * looking for crontabs and invoking our ruby wrapper upon each valid
- * one we find.
- */
+* Process each entry beneath a given directory,
+* looking for crontabs and invoking our ruby wrapper upon each valid
+* one we find.
+*/
 void process_domains( const char *dirname )
 {
    DIR *dp;
    struct dirent *dent;
+       
+   /**
+    * Data from /etc/password for the user
+    */
+  struct passwd *usr;
+  struct group  *grp;
 
    /**
     * Open the directory.
@@ -134,23 +171,16 @@ void process_domains( const char *dirname )
        /**
         * Path of domain & crontab, if it exists.
         */
-       char domain_path[ 1024 ] = { '\0' };
-       char crontab_path[ 1024 ] = { '\0' };
+       char domain_path[ 1024 ]  = { "\0" };
+       char crontab_path[ 1024 ] = { "\0" };
 
        /**
         * Get the name of this entry beneath /srv
         */
        const char *entry = dent->d_name;
        
-       /**
-        * Data from /etc/password for the user
-        */
-       struct passwd *usr;
-       struct group  *grp;
-
        if ( g_verbose )
            printf("Read entry: %s\n", entry );
-
 
        /**
         * Skip any dotfiles we might have found.
@@ -262,9 +292,9 @@ void process_domains( const char *dirname )
        * finally process the crontab
        */
       process_crontab( crontab_path, domain_path, usr );
-   }
+    }
 
-   closedir(dp);
+    closedir(dp);
 }
 
 
