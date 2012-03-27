@@ -50,7 +50,7 @@ void process_crontab( char *crontab_path, char *domain_path, struct passwd *usr 
     /**
      * Maximum number of groups
      */
-    ngroups = (int) sysconf(_SC_NGROUPS_MAX);
+    ngroups = (unsigned int) sysconf(_SC_NGROUPS_MAX);
 
     if( g_verbose )
       printf("Processing: %s as UID %i:%i\n", crontab_path, usr->pw_uid, usr->pw_gid );

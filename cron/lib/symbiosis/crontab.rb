@@ -51,7 +51,7 @@ class DateTime
   end
 end
 
-class Symbiosis
+module Symbiosis
 
   #
   # A class representing a Crontab.

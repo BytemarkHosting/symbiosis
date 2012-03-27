@@ -1,3 +1,10 @@
+symbiosis-cron (2012:0327) stable; urgency=low
+
+  * Fixed Symbiosis to be a module rather than a class in symbiosis/crontab. 
+  * Fixed typedef in crontab-wrapper.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 27 Mar 2012 11:25:40 +0100
+
 symbiosis-cron (2012:0320) stable; urgency=low
 
   * Fixed symbiosis-all-crontabs to fork and exec properly.
