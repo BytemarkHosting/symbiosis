@@ -1,3 +1,11 @@
+symbiosis-httpd (2012:0413) stable; urgency=low
+
+  * Adjust symbiosis-create-sites to catch more OpenSSL errors.
+  * SSL-only sites will not be created if any OpenSSL errors occur.
+    Previously they would have been created using the non-SSL template.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 13 Apr 2012 15:55:03 +0100
+
 symbiosis-httpd (2012:0222) stable; urgency=low
 
   * Updated copyright dates and documentation links.
