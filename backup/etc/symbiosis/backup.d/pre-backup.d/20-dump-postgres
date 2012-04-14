@@ -4,15 +4,13 @@
 # the local system.
 #
 
-
 #
 #  If we don't have postgresql installed exit.
 #
 test -x /etc/init.d/postgresql      || exit 0
-test -x /usr/bin/pg_dumpall         || exit 0
+test -x /usr/bin/psql               || exit 0
+test -x /usr/bin/pg_dump            || exit 0
 id postgres  >/dev/null 2>/dev/null || exit 0
-
-
 
 #
 #  If we don't have a backup directory then create it.
@@ -21,13 +19,33 @@ if [ ! -d /var/backups/postgresql ]; then
     mkdir -p /var/backups/postgresql
 fi
 
+#
+# Make sure the postgres user owns the backup directory.
+#
+chown postgres.postgres /var/backups/postgresql
 
 #
-#  Dump all databases - become the correct user to avoid authentication
-# problems or issues.
+# Work out which databases we need to back up.
 #
-su - postgres -c '/usr/bin/pg_dumpall >/var/backups/postgresql/all.sql'
+dbs=$(su - postgres -c "psql --no-align --tuples-only --command 'select datname from pg_database;'")
 
+for db in $dbs ; do
+  #
+  # Skip template0 as the "template0 database is normally marked datallowconn =
+  # false to prevent modification of it".  This also prevents backing it up.
+  #
+  # See http://www.postgresql.org/docs/8.4/static/manage-ag-templatedbs.html
+  #
+  if [ "$db" = "template0" ] ; then
+    continue
+  fi
+
+  #
+  # This dumps each database into the "custom" format, suitable for straight
+  # import back into postgres using pg_restore.
+  #
+  su - postgres -c "/usr/bin/pg_dump --format=c --file=/var/backups/postgresql/$db.custom $db"
+done
 
 #
 # Exit sanely.

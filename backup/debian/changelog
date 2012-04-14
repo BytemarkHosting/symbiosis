@@ -1,3 +1,12 @@
+symbiosis-backup (2012:0414) stable; urgency=low
+
+  * Updated postgres backup script to work.
+  * Postgres backups now done by database, using the "custom" format to allow
+    easy restoration of dumped databases using pg_restore.
+  * MySQL dumps now use the --opt flag explicitly. 
+
+ -- Patrick Cherry <patch@bitch.dominoid.net>  Sat, 14 Apr 2012 12:30:19 +0100
+
 symbiosis-backup (2012:0222) stable; urgency=low
 
   * Updated copyright dates.

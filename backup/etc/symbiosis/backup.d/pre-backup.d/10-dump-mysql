@@ -37,7 +37,7 @@ for i in /var/lib/mysql/*/; do
     name=`basename $i`
 
     # do the dump
-    mysqldump --user="$user" --pass="$pass" $name | gzip > /var/backups/mysql/$name.gz
+    mysqldump --opt --user="$user" --pass="$pass" $name | gzip > /var/backups/mysql/$name.gz
 
 done
 
