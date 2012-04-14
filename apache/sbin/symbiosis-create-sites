@@ -188,6 +188,12 @@ Symbiosis::Domains.each do |domain|
       next
     end
 
+    document_root = File.join(domain.directory,"public","htdocs")
+    unless File.directory?(document_root)
+      verbose "\tNot configuring this site, as its document root #{document_root} does not exist."
+      next
+    end
+
     #
     #  If SSL is not enabled then we can skip
     #
