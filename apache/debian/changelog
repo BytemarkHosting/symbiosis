@@ -3,6 +3,8 @@ symbiosis-httpd (2012:0413) stable; urgency=low
   * Adjust symbiosis-create-sites to catch more OpenSSL errors.
   * SSL-only sites will not be created if any OpenSSL errors occur.
     Previously they would have been created using the non-SSL template.
+  * Sites with specified IPs are now only created if public/htdocs exists for
+    that site.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 13 Apr 2012 15:55:03 +0100
 
