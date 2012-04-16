@@ -1,3 +1,9 @@
+symbiosis-backup (2012:0416) stable; urgency=low
+
+  * Use "--quiet" when invoking rsync, rather than --verbose.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 16 Apr 2012 09:33:09 +0000
+
 symbiosis-backup (2012:0414) stable; urgency=low
 
   * Updated postgres backup script to work.

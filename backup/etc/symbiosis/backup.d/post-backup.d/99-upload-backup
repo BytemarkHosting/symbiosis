@@ -73,7 +73,7 @@ end
 #
 puts "Sending backups to #{dest}...\n"
 
-puts `rsync --bwlimit=768 --delete-before --delete-excluded --exclude 'localhost/TMP.*' --verbose --archive --recursive --perms --no-owner --no-group --human-readable #{src} #{dest}`
+puts `rsync --bwlimit=768 --delete-before --delete-excluded --exclude 'localhost/TMP.*' --quiet --archive --recursive --perms --no-owner --no-group --human-readable #{src} #{dest}`
 
 #
 # Exit with the exit status of the rsync command
