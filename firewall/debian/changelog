@@ -1,3 +1,11 @@
+symbiosis-firewall (2012:0418) stable; urgency=low
+
+  * Symbiosis::Firewall::Template#to_s no longer tries to interpolate / strip
+    $ variables in comment lines.
+  * Fixed spelling error in symbiosis-firewall
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 18 Apr 2012 15:40:15 +0100
+
 symbiosis-firewall (2012:0308) stable; urgency=low
 
   * Updated reject-www-data rule to create its own chain, ensuring that the

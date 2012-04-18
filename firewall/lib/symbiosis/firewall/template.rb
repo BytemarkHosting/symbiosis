@@ -341,9 +341,12 @@ module Symbiosis
             lines = lines.collect{|l| l =~ /^[^#]*ip6tables / ? "# "+l : l }
           end
 
-          lines = lines.collect{|l| l.gsub("$SRC",src).gsub("$DEST",dst)}
-
           lines = lines.collect do |l|
+            #
+            # Skip commented lines.
+            #
+            next if l =~ /^#/
+
             # 
             # Replace SRC and DEST variable
             #
@@ -352,7 +355,7 @@ module Symbiosis
             #
             # Check there aren't any more odd variables.
             #
-            while l =~ /(\$[A-Z]+)/
+            while l =~ /^[^#]*(\$[A-Z]+)/
               warn "Bad variable #{$1} in #{self.template_file} -- removing!"
               l = l.gsub($1,"")
             end
