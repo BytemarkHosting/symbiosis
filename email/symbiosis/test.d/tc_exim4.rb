@@ -236,10 +236,13 @@ class Exim4ConfigTest < Test::Unit::TestCase
   end
 
   def do_acl_script(filename)
+    #
+    # This is the exim4 pipe object.
+    #
+    exim = nil
 
     # This is to simulate an smtp session
     File.open(filename) do |script|
-      exim = nil
       data_to_send = ""
       while not script.eof? do
         line = script.gets.chomp
@@ -263,8 +266,13 @@ class Exim4ConfigTest < Test::Unit::TestCase
           data_to_send << line+"\n"
         end
       end
-      exim.close if exim.is_a?(IO) and not exim.closed?
     end
+
+  ensure
+    #
+    # Make sure the exim4 pipe is closed at the end of each ACL test.
+    #
+    exim.close if exim.is_a?(IO) and not exim.closed?
   end
 
   def do_smtp_readline(pipe)
