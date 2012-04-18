@@ -443,7 +443,7 @@ begin
         #
         next unless File.executable?(cmd)
 
-        warn "symbiosis-firewall: Flusing #{cmd} rules and chains."
+        warn "symbiosis-firewall: Flushing #{cmd} rules and chains."
 
         %w(INPUT FORWARD OUTPUT).each do |chain|
           #
