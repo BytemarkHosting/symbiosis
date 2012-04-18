@@ -74,7 +74,7 @@ FileUtils.mkdir_p("#{src}/localhost") unless File.directory?("#{src}/localhost")
 #    example.backup.bytemark.co.uk::example/example.vm.bytemark.co.uk/
 #
 puts "Ensuring directory structure is present..."
-puts `rsync --quiet--human-readable --dirs #{src}/localhost #{dest}/`
+puts `rsync --quiet --human-readable --dirs #{src}/localhost #{dest}/`
 
 puts "\nSynchronising backups from #{dest}/localhost..."
 puts `rsync --quiet --archive --recursive --no-perms --no-owner --no-group --human-readable #{dest}/localhost/ #{src}/localhost/`
