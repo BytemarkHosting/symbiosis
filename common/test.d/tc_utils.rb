@@ -280,7 +280,7 @@ class TestUtils < Test::Unit::TestCase
     #
     # Make sure the file exists.
     #
-    assert(File.exists(fn),"Lock file #{fn} doesn't exist.")
+    assert(File.exists?(fn),"Lock file #{fn} doesn't exist.")
 
     #
     # Check to see if we can check the lock again..
