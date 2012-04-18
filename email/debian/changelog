@@ -1,3 +1,12 @@
+symbiosis-email (2012:0418) stable; urgency=low
+
+  * clamav-daemon now has its temporary directory specified in
+    /etc/defaults/clamav-daemon.
+  * exim4 tests now makes sure that the exim4 process is closed at the end of
+    each ACL test.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 18 Apr 2012 10:57:43 +0100
+
 symbiosis-email (2012:0301) stable; urgency=low
 
   * Tweaked exim4 config to create mailboxes + subscribe when using Dovecot
