@@ -32,6 +32,11 @@ fi
 adduser clamav Debian-exim 
 
 #
+# Set the TMPDIR variable for clamav.
+#
+echo "TMPDIR='/var/tmp/'" >> /etc/default/clamav-daemon
+
+#
 #  Enable the spamassassin module
 #
 sed -i -e 's/^\(ENABLED=\)0/\11/' /etc/default/spamassassin

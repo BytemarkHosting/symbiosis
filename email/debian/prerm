@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -e
+
+if [ "$1" == "upgrade" ] ; then
+  #
+  #  Do nothing for upgrades.
+  #
+  exit 0
+fi
+
+#
+# Remove the clamav defaults file, if it matches the md5sum of the one we created.
+#
+if echo "ae779d6822f91492b26697d6b9931835  /etc/default/clamav-daemon" | md5sum -c --status 2>/dev/null ; then
+  rm -f /etc/default/clamav-daemon
+fi
+
+exit 0
+
