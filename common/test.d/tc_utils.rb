@@ -278,29 +278,31 @@ class TestUtils < Test::Unit::TestCase
     assert_equal(0, lock(fh_parent))
 
     #
+    # Make sure the file exists.
+    #
+    assert(File.exists(fn),"Lock file #{fn} doesn't exist.")
+
+    #
     # Check to see if we can check the lock again..
     #
-    # le.open(fn, "w+") do |fh|
-    # locked?(fh)
-    #nd
-
-    fork do
+    pid = fork do
       File.open(fn, "r") do |fh_child|
         assert_raise(Errno::ENOLCK) {  lock(fh_child) }
       end
     end
 
-    Process.wait
+    Process.wait(pid)
 
     unlock(fh_parent)
 
-    fork do
+    pid = fork do
       File.open(fn, "r") do |fh_child|
         assert_nothing_raised {  lock(fh_child) }
       end
     end
 
-    Process.wait
+    Process.wait(pid)
+
   end
 
 
