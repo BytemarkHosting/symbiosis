@@ -1,3 +1,9 @@
+symbiosis-webmail (2012:0420) stable; urgency=low
+
+  * Added Avelseive as a recommendation for SquirrelMail.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 20 Apr 2012 12:00:48 +0100
+
 symbiosis-webmail (2012:0222) stable; urgency=low
 
   * Updated postinst to restart rather than reload apache for all three

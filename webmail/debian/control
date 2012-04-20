@@ -20,7 +20,7 @@ Description: This package gives webmail access to a Symbiosis system
 Package: symbiosis-webmail-squirrelmail
 Architecture: all
 Depends: squirrelmail, ${misc:Depends}
-Recommends: symbiosis-webmail
+Recommends: symbiosis-webmail, avelsieve
 Description: This package gives webmail access to Symbiosis using Squirrelmail
  This package will enable a global webmail system for all domains hosted
  using the Bytemark system.
