@@ -1,4 +1,4 @@
-symbiosis-email (2012:0905) stable; urgency=high
+symbiosis-email (2012:0509) stable; urgency=high
 
   * Fixed bug whereby mailboxes can be accessed using any old password.
 

@@ -179,9 +179,7 @@ module Symbiosis
         #
         # Do the password check.
         #
-        return ArgumentError, "Bad password" unless domain.check_password(pw, self.password)
-
-        return true
+        return domain.check_password(pw, self.password)
       end
 
     end
