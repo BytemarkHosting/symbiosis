@@ -1,8 +1,9 @@
 symbiosis-email (2012:0509) stable; urgency=high
 
   * Fixed bug whereby mailboxes can be accessed using any old password.
+  * Added tests to make sure that this never happens again.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 09 May 2012 12:04:38 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 09 May 2012 12:35:01 +0100
 
 symbiosis-email (2012:0418) stable; urgency=low
 

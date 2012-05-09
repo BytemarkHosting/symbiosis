@@ -49,20 +49,24 @@ class TestCheckpassword < Test::Unit::TestCase
     mailbox.password = pw
 
     assert_nothing_raised{ msg, status = do_checkpassword_test(mailbox.username, pw) }
-    assert_equal(0, status)
+    assert_equal(0, status, "Authentication failed for the correct password when the source is plain text")
     userdb_array(mailbox).each do |val|
       assert(msg.include?(val), "Environment did not contain #{val}")
     end
+    
+    # Make sure a bad password is rejected
+    assert_nothing_raised{ msg, status = do_checkpassword_test(mailbox.username, "BAD PASSWORD "+pw) }
+    assert_equal(1, status, "Authentication succeeded for a bad password")
    
     # Test for a malicious name.
     assert_nothing_raised{ msg, status = do_checkpassword_test("../"+mailbox.username, pw) }
-    assert_equal(1, status)
+    assert_equal(1, status, "Authentication succeeded for a malicious username")
     
     # Test for crypted passwords
     mailbox.encrypt_password = true
     mailbox.password = pw
     assert_nothing_raised{ msg, status = do_checkpassword_test(mailbox.username, pw) }
-    assert_equal(0, status)
+    assert_equal(0, status, "Authentication failed for the correct password when the source is crypted")
     userdb_array(mailbox).each do |val|
       assert(msg.include?(val), "Environment did not contain #{val}")
     end
