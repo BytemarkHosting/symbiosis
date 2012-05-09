@@ -1,3 +1,9 @@
+symbiosis-email (2012:0905) stable; urgency=high
+
+  * Fixed bug whereby mailboxes can be accessed using any old password.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 09 May 2012 12:04:38 +0100
+
 symbiosis-email (2012:0418) stable; urgency=low
 
   * clamav-daemon now has its temporary directory specified in
