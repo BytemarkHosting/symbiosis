@@ -278,7 +278,7 @@ module Symbiosis
       # 
       # Check the password, crypt first, plaintext second.
       #
-      if real_password =~ /^(\{CRYPT\})?((\$(?:1|2a|5|6)\$[a-zA-Z0-9.\/]{1,16}\$)?[a-zA-Z0-9\.\/]+)$/
+      if real_password =~ /^(\{(?:crypt|CRYPT)\})?((\$(?:1|2a|5|6)\$[a-zA-Z0-9.\/]{1,16}\$)?[a-zA-Z0-9\.\/]+)$/
         crypt = $1.to_s
         crypted_password = $2
         salt =  $3.to_s
@@ -303,7 +303,7 @@ module Symbiosis
       #
       # Fall back to a plain text comparison
       #
-      return given_password == real_password
+      return (given_password == real_password)
     end
 
     def aliases

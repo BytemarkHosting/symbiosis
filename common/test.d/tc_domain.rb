@@ -53,6 +53,13 @@ class TestDomain < Test::Unit::TestCase
         "correct password was not accepted (#{method} crypted with CRYPT prefix)")
 
       #
+      # Check with a lower-case crypt, just in case.
+      #
+      crypt_password_with_prefix = "{crypt}"+crypt_password
+      assert( domain.check_password(password, crypt_password_with_prefix), 
+        "correct password was not accepted (#{method} crypted with crypt prefix)")
+
+      #
       # Don't accept bad passwords.
       #
       assert( !domain.check_password(bad_password, crypt_password_with_prefix),
