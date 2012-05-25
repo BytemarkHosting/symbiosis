@@ -11,7 +11,7 @@ rescue LoadError
   # Do nothing.
 end
 
-class TestMysqlDumps < Test::Unit::TestCase
+class TcBackupsMysql < Test::Unit::TestCase
 
   def setup
     @charsets = %w(UTF8 LATIN1)

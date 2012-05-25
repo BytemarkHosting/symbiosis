@@ -13,7 +13,7 @@ end
 require 'symbiosis/utils'
 require 'test/unit'
 
-class MyTest < Test::Unit::TestCase
+class TcBackupsPostgres < Test::Unit::TestCase
 
   def setup
     @charsets = %w(UTF8 LATIN1)
@@ -32,7 +32,7 @@ class MyTest < Test::Unit::TestCase
   def teardown
     @charsets.each do |charset|
       database = Iconv.conv(charset, @default_charset, @database) + " #{charset}"
-      drop_db(database, charset) if @dbs_created
+      drop_db(database, charset) if has_postgres?
       dump_name = calculate_dump_name(database)
       File.unlink(dump_name) if File.exists?(dump_name)
     end
@@ -84,7 +84,7 @@ class MyTest < Test::Unit::TestCase
   end
 
   def has_postgres?
-    defined? PGconn and Process.uid(0) and Etc.getpwnam("postgres")
+    defined? PGconn and Process.uid == 0 and Etc.getpwnam("postgres")
   rescue ArgumentError
     return false
   end
@@ -103,6 +103,10 @@ class MyTest < Test::Unit::TestCase
   # because postgres gets confuzzled too easily.
   #
   def test_postgres_dumps
+    unless has_postgres?
+      puts "Not running Postgres backup tests, since not all the requirements are in place."
+      return
+    end
 
     #
     # Create a DB for each charset.  Use Iconv to convert the data between our
