@@ -1,3 +1,12 @@
+symbiosis-backup (2012:0525) stable; urgency=low
+
+  * Updated postgres and mysql scripts to ruby, using URL encoding for dump
+    files.  Closes #3396.
+  * Now with testing goodness, although this requires
+    libmysql-ruby/libpgsql-ruby to work.
+
+ -- Patrick Cherry <patrick@bytemark.co.uk>  Fri, 25 May 2012 16:17:15 +0100
+
 symbiosis-backup (2012:0416) stable; urgency=low
 
   * Use "--quiet" when invoking rsync, rather than --verbose.
@@ -11,7 +20,7 @@ symbiosis-backup (2012:0414) stable; urgency=low
     easy restoration of dumped databases using pg_restore.
   * MySQL dumps now use the --opt flag explicitly. 
 
- -- Patrick Cherry <patch@bitch.dominoid.net>  Sat, 14 Apr 2012 12:30:19 +0100
+ -- Patrick Cherry <patrick@bytemark.co.uk>  Sat, 14 Apr 2012 12:30:19 +0100
 
 symbiosis-backup (2012:0222) stable; urgency=low
 

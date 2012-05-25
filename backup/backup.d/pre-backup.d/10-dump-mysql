@@ -1,0 +1,83 @@
+#!/usr/bin/ruby -w
+#
+#  This script is designed to dump all the MySQL databases upon
+# the local system.
+#
+
+require 'symbiosis/utils'
+require 'uri'
+
+backup_dir = "/var/backups/mysql"
+encoding   = "utf8"
+
+database_cmd      = "/usr/bin/mysql"
+database_dump_cmd = "/usr/bin/mysqldump"
+
+#
+# If we don't have a backup directory then create it.  Backup2l will complain
+# if this isn't present.
+#
+Symbiosis::Utils.mkdir_p backup_dir unless File.exists?(backup_dir) 
+
+#
+#  If we don't have mysqld installed exit.
+#
+File.executable?("/usr/sbin/mysqld")    or exit 0
+File.executable?("/usr/bin/mysql")      or exit 0
+File.executable?("/usr/bin/mysqldump")  or exit 0
+File.readable?("/etc/mysql/debian.cnf") or exit 0
+
+#
+# Default to utf8.
+#
+cmd = %w(
+  /usr/bin/mysql
+  --defaults-file=/etc/mysql/debian.cnf
+  --skip-column-names 
+  --batch 
+  --default-character-set=UTF8
+)
+
+databases = IO.popen(cmd.join(" ")+" --execute 'SHOW DATABASES'"){|io| io.readlines}.collect{|l| l.chomp}
+
+unless 0 == $?
+  puts "Failed to ascertain list of databases." if $VERBOSE
+  exit 1
+end
+
+#
+# This allows us to specify a database on the command line (for testing).
+#
+databases = ARGV unless ARGV.empty?
+
+databases.each do |database|
+  dump = File.join(backup_dir,URI.escape(database,/[^a-zA-Z0-9._-]/)) + ".sql.gz"
+
+  cmd = %w(
+    /usr/bin/mysqldump 
+    --defaults-file=/etc/mysql/debian.cnf 
+    --databases
+    --opt
+  )
+
+  cmd << "--skip-lock-tables" if "information_schema" == database
+  cmd << "'#{database}' | gzip -9c"
+
+  Symbiosis::Utils.safe_open(dump, "a+") do |fh|
+    fh.truncate(0)
+    IO.popen(cmd.join(" ")) do |io|
+      fh.write(io.read(4096)) until io.eof?
+    end
+
+    unless 0 == $?
+      puts "mysqldump of #{database} failed." if $VERBOSE 
+    end
+  end
+
+  warn "Dump of '#{database}' in #{dump} is zero in size." unless File.stat(dump).size?
+end
+
+#
+# Exit sanely.
+#
+exit 0

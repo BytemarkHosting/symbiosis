@@ -1,0 +1,130 @@
+#!/usr/bin/ruby -w
+#
+# This script is designed to dump all the postgresql databases upon
+# the local system.
+#
+#
+require 'symbiosis/utils'
+require 'etc'
+require 'uri'
+require 'pp'
+
+backup_dir = "/var/backups/postgresql"
+
+#
+# If we don't have a backup directory then create it.  Backup2l will complain
+# if this isn't present.
+#
+Symbiosis::Utils.mkdir_p backup_dir unless File.exists?("/var/backups/mysql") 
+
+begin 
+  user = Etc.getpwnam("postgres")
+  group = Etc.getgrnam("postgres")
+
+  #
+  # Use lchown to make sure that any symlink is not followed.
+  #
+  File.lchown(user.uid, group.gid, backup_dir)
+rescue ArgumentError => err
+  #
+  # We've not found the postgres user -- postgres is not installed.
+  #
+  puts "Postgres user not found" if $VERBOSE 
+  exit 0
+end
+
+
+#
+# If we don't have postgres installed exit.
+#
+unless File.executable?("/usr/bin/psql") and File.executable?("/usr/bin/pg_dump")
+  puts "Neither /usr/bin/psql nor /usr/bin/pg_dump are executable." if $VERBOSE
+  exit 0
+end 
+
+#
+# Change user id to postgres
+#
+unless 0 == Process.uid
+  puts "Unable to drop privileges if not running as root." if $VERBOSE
+  exit 0
+end
+
+#
+# Try to drop privs.
+#
+begin
+  Process::Sys.setgid(group.gid) 
+  Process::Sys.setuid(user.uid)
+rescue Errno::EPERM => err
+  puts "Unable to drop privileges from #{Process.uid}:#{Process.gid} to #{user.uid}:#{group.gid}" if $VERBOSE
+  exit 0
+end
+
+
+#
+# Default to utf8.
+#
+cmd = %w(
+  /usr/bin/psql
+  --no-align
+  --tuples-only
+  --command
+)
+
+databases = IO.popen(cmd.join(" ")+" 'select datname from pg_database;'"){|io| io.readlines}.collect{|l| l.chomp}
+
+unless 0 == $?
+  puts "Failed to ascertain list of postgres databases." if $VERBOSE
+  exit 0 
+end
+
+databases = ARGV unless ARGV.empty?
+
+if databases.empty?
+  puts "No Postgres databases found" if $VERBOSE
+  exit 0
+end
+
+databases.each do |database|
+  #
+  # Skip template0 as the "template0 database is normally marked datallowconn =
+  # false to prevent modification of it".  This also prevents backing it up.
+  #
+  # See http://www.postgresql.org/docs/8.4/static/manage-ag-templatedbs.html
+  #
+  next if "template0" == database 
+
+  dump = File.join(backup_dir, URI.escape(database,/[^a-zA-Z0-9._-]/))+".custom"
+
+  cmd = %w(
+    /usr/bin/pg_dump 
+    --format=c
+  )
+  cmd << "'#{database}'"
+
+  #
+  # This dumps each database into the "custom" format, suitable for straight
+  # import back into postgres using pg_restore.
+  #
+  Symbiosis::Utils.safe_open(dump, "a+") do |fh|
+    fh.truncate(0)
+    IO.popen(cmd.join(" ")) do |io|
+      fh.write(io.read(4096)) until io.eof?
+    end
+
+    unless 0 == $?
+      puts "Failed to dump #{database}." if $VERBOSE
+    end
+  end
+
+  unless File.stat(dump).size?
+    warn "Failed #{database} dump #{dump} is zero in size."
+    next
+  end
+end
+
+#
+# Exit sanely.
+#
+exit 0

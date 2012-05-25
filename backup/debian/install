@@ -1,2 +1,3 @@
 bug.report           usr/share/bug/symbiosis-backup/
-etc/
+backup.d             etc/symbiosis/
+test.d/*             etc/symbiosis/test.d/
