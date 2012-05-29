@@ -1,0 +1,8 @@
+Document: symbiosis-api-doc
+Title: Symbiosis API documenatation
+Author: Patrick J Cherry
+Section: Ruby
+
+Format: HTML
+Index: /usr/share/doc/symbiosis-api-doc/html/index.html
+Files: /usr/share/doc/symbiosis-api-doc/html/*.html

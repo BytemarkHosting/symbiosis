@@ -1,0 +1,13 @@
+Source: symbiosis-api-doc
+Section: doc
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
+Build-Depends: debhelper (>= 7.0.0)
+Standards-Version: 3.9.1
+
+Package: symbiosis-api-doc
+Architecture: all
+Depends: ${misc:Depends}
+Description: API documentation for Symbiosis
+

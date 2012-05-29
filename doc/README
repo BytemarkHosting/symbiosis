@@ -1,0 +1,14 @@
+
+Symbiosis API Documentation
+===========================
+
+This package is generated from the comments in the Ruby code used
+throughout the Symbiosis system.  It could allow users to develop
+their own code based on the code written by Bytemark for the Symbiosis
+system, allowing further developement to occur.
+
+As ever, bugs or unexpectedness can be reported to the Symbiosis issue
+tracker at https://projects.bytemark.co.uk/projects/symbiosis/issues.
+
+ -- Patrick J Cherry
+
