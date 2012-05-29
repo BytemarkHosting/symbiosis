@@ -1,27 +1,51 @@
-
 README
 ------
 
-  This README is intentionally brief.
+This README is intentionally brief.
 
-  All the details on the Bytemark Symbiosis packages may be found online:
+All the details on the Bytemark Symbiosis packages may be found online:
 
-     http://symbiosis.bytemark.co.uk/
-
-  Note that the repository has branches for etch + lenny.
-
+  http://symbiosis.bytemark.co.uk/
 
 Building The Packages
 ---------------------
 
-  You should be able to build all packages via :
+The minimium packages needed to get the build process working are:
 
-                make all
+  rake devscripts rdoc graphviz
 
-  Once you're done you'll see a bunch of .deb files in the current
- directory.  Failures are going to be hard to spot, so do look over
- the output to ensure that you see as many packages as you expect.
+You should be able to build all packages via :
 
-  (Mostly failures will be due to lack of build-dependencies.)
+  rake repo
 
+This will generate all files and copy them to a subdirectory of
+'repo/'.  Each package has its own dependency requirements and the
+build will fail if these are not met.
+
+Using schroot/sbuild/sautobild
+------------------------------
+
+It is possible to build the packages using per-arch/distro chroots.
+Bytemark have written a package called "sautobuild" which can perform
+automated builds of a source package, given a set of schroots.
+
+Other rake tasks
+----------------
+
+There are other rake tasks that can be seen by running 
+
+  rake -T
+
+API Documentation
+-----------------
+
+There is plenty of documentation in the Ruby libraries written for
+Symbiosis.  Rdoc is used to generate it as part of the
+symbiosis-api-doc package.  If you run
+
+  rake rdoc
+
+This will generate it in doc/html.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>
 
