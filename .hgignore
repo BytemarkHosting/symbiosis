@@ -25,6 +25,7 @@ Sources.gz
 *.changes
 *.dsc
 *.tar.gz
+./repo/*
 
 #
 #  Per-Package
@@ -68,6 +69,12 @@ Sources.gz
 #  Cron
 #
 ./cron/debian/symbiosis-cron/
+
+#
+# Docs
+#
+./doc/debian/symbiosis-api-doc/
+./doc/html/
 
 #
 #  DNS
@@ -149,3 +156,4 @@ Sources.gz
 #  Webmail
 #
 ./webmail/debian/symbiosis-webmail/
+
