@@ -130,14 +130,17 @@ module Symbiosis
       #
       # Do the password check.
       #
-      raise ArgumentError, "Bad password" unless check_password(password, self.ftp_password)
+      if true === check_password(password, self.ftp_password)
 
-      #
-      # OK, we've successfully logged in.  Create the directory
-      #
-      create_dir(File.expand_path(ftp_chroot_dir)) unless File.directory?(ftp_chroot_dir)
+        #
+        # OK, we've successfully logged in.  Create the directory
+        #
+        create_dir(File.expand_path(ftp_chroot_dir)) unless File.directory?(ftp_chroot_dir)
 
-      return true
+        return true
+      else
+        return false
+      end
     end
 
   end

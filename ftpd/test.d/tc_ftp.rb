@@ -16,10 +16,6 @@ class TestFTP < Test::Unit::TestCase
     @domain = Symbiosis::Domain.new()
     @domain.create()
 
-    #
-    #  Set the password to a random string.
-    #
-    @domain.ftp_password = Symbiosis::Utils.random_string()
   end
 
   def teardown
@@ -35,9 +31,53 @@ class TestFTP < Test::Unit::TestCase
 
   def test_login
     #
+    # Try logging in when no password has been set.
+    #
+    assert_raise(Net::FTPPermError, "FTP Login succeeded when FTP logins were not permitted.")  do
+      Net::FTP.open('localhost') do |ftp|
+        ftp.login( @domain.name, "some password here" )
+      end
+    end
+
+    #
+    # Try logging in when an empty file is in place.
+    #
+    @domain.ftp_password = true
+
+    assert_raise(Net::FTPPermError, "FTP Login succeeded when FTP logins were not permitted.")  do
+      Net::FTP.open('localhost') do |ftp|
+        ftp.login( @domain.name, "" )
+      end
+    end
+
+
+    #
+    #  Set the password to a random string.
+    #
+    @domain.ftp_password = Symbiosis::Utils.random_string()
+
+    #
+    # Try logging in without a password.
+    #
+    assert_raise(Net::FTPPermError, "FTP Login without password succeeded")  do
+      Net::FTP.open('localhost') do |ftp|
+        ftp.login( @domain.name, "" )
+      end
+    end
+
+    #
+    # Try logging in with an incorrect password.
+    #
+    assert_raise(Net::FTPPermError, "FTP Login with incorrect password succeeded")  do
+      Net::FTP.open('localhost') do |ftp|
+        ftp.login( @domain.name, @domain.ftp_password+" BAD PASSWORD")
+      end
+    end
+
+    #
     #  Attempt a login, and report on the success.
     #
-    assert_nothing_raised("Login failed") do
+    assert_nothing_raised("FTP Login with correct password failed") do
       Net::FTP.open('localhost') do |ftp|
         ftp.login( @domain.name, @domain.ftp_password )
       end

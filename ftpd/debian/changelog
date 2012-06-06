@@ -1,3 +1,10 @@
+symbiosis-ftpd (2012:0606) stable; urgency=low
+
+  * Updated FTP login strategy to be more precise.
+  * Added more tests.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 06 Jun 2012 16:31:44 +0100
+
 symbiosis-ftpd (2012:0222) stable; urgency=low
 
   * Updated copyright and documentation links.
