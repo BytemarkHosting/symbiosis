@@ -1,3 +1,9 @@
+symbiosis-common (2012:0606) stable; urgency=low
+
+  * Updated the configuration file handling not to break on empty files.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 06 Jun 2012 12:19:53 +0100
+
 symbiosis-common (2012:0510) stable; urgency=low
 
   * The {CRYPT} prefix for passwords doesn't need to be upper case now, for
