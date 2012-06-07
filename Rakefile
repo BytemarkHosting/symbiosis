@@ -7,12 +7,11 @@ require 'pp'
 
 DEBEMAIL=ENV["DEBEMAIL"] || "symbiosis@bytemark.co.uk"
 DEB_BUILD_ARCH=`dpkg-architecture -qDEB_BUILD_ARCH`.chomp
-AVAILABLE_BUILD_ARCH=["amd64", "i386"]
-
+  
 CLEAN.add   %w(Release.asc Packages.new Sources.new Release.new *-stamp)
 CLOBBER.add %w(Packages Sources Packages.gz Sources.gz Release Release.gpg *.deb *.tar.gz *.build *.diff.gz *.dsc *.changes)
   
-DISTRO = "squeeze"
+DISTRO = "stable"
 
 #
 # Monkey patch rake to output on stdout like normal people
@@ -22,6 +21,41 @@ module RakeFileUtils
   def rake_output_message(message)
     $stdout.puts(message)
   end
+end
+
+def has_sautobuild?
+  return @has_sautobuild if defined? @has_sautobuild
+  @has_sautobuild = File.executable?("/usr/bin/sautobuild")
+end
+
+def available_build_archs
+  return @available_build_archs if defined? @available_build_archs
+
+  if has_sautobuild?
+    chroots = `/usr/bin/schroot -l`
+    return (@available_build_archs = [DEB_BUILD_ARCH]) unless 0 == $?
+  else
+    return (@available_build_archs = [DEB_BUILD_ARCH])
+  end
+
+  #
+  # Symbiosis is only built/tested on amd64/i386.
+  #
+  possibles = %w(amd64 i386)
+
+  archs = chroots.collect do |chroot|
+    if chroot =~ /^(?:chroot:)?#{DISTRO}-(#{possibles.join("|")})$/
+      archs << $1
+    end
+  end.compact.sort.uniq
+
+  if archs.empty?
+    warn "Could not find any schroots for the #{DISTRO} (#{possibles.join(", ")}).  Not using sautobuild"
+    @has_sautobuild = false
+    archs = [DEB_BUILD_ARCH] 
+  end
+
+  @available_build_archs = archs
 end
 
 #
@@ -67,7 +101,7 @@ end
 
 def package_changess
   all_packages.collect do |pkgdir, pkg, version, distro, arch| 
-    (arch == "all" ? [DEB_BUILD_ARCH] : AVAILABLE_BUILD_ARCH).collect do |this_arch|
+    (arch == "all" ? [DEB_BUILD_ARCH] : available_build_archs).collect do |this_arch|
       "#{pkg}_#{version}_#{this_arch}.changes"
     end
   end.flatten
@@ -237,8 +271,8 @@ end
 #
 # Rule to compile binary packages.
 #
-rule(/^([^_]+)_([^_]+)_(#{AVAILABLE_BUILD_ARCH.join("|")}).changes$/ => [ 
-    proc{|task_name| task_name.sub(/_(#{AVAILABLE_BUILD_ARCH.join("|")}).changes$/,".dsc")} 
+rule(/^([^_]+)_([^_]+)_(#{available_build_archs.join("|")}).changes$/ => [ 
+    proc{|task_name| task_name.sub(/_(#{available_build_archs.join("|")}).changes$/,".dsc")} 
   ]) do |t|
   #
   # Need to have the distro and the arch:
@@ -249,8 +283,11 @@ rule(/^([^_]+)_([^_]+)_(#{AVAILABLE_BUILD_ARCH.join("|")}).changes$/ => [
   #
   # Now call sbuild and debsign
   #
-  sh "sbuild #{(target_arch == "all" ? "--arch-all" : "")} --nolog --arch=#{arch} --dist=#{distro} #{t.source}"
-#  sh "debsign #{t.name}"
+  if has_sautobuild?
+    sh "sautobuild --no-repo --dist=#{distro} #{t.source}"
+  else
+    sh "cd #{pkgdir} && debuild -us -uc -sa"
+  end
 end
 
 
@@ -269,7 +306,7 @@ namespace :pkg do
           if ar == "all"
             ["#{pk}_#{vr}_#{DEB_BUILD_ARCH}.changes"]
           elsif ar == "any"
-            AVAILABLE_BUILD_ARCH.collect{|a| "#{pk}_#{vr}_#{a}.changes"}
+            available_build_archs.collect{|a| "#{pk}_#{vr}_#{a}.changes"}
           end
         end.flatten
       )
@@ -334,17 +371,17 @@ file "#{htdocs_home}/latest" => "#{htdocs_home}/#{hg_number}/Release.gpg" do |t|
   sh "cd #{htdocs_home} && ln -sf #{hg_number} latest" unless File.exists?("#{htdocs_home}/latest")
 end
 
-AVAILABLE_BUILD_ARCH.each do |arch|
+available_build_archs.each do |arch|
   file "#{htdocs_home}/latest/#{arch}" => "#{htdocs_home}/latest" do |t|
     sh "cd #{t.prerequisites.first} && ln -sf . #{arch}"
   end
 end 
 
 desc "Upload packages to the local tree" 
-task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/latest/#{arch}"}
+task "upload" => available_build_archs.collect{|arch| "#{htdocs_home}/latest/#{arch}"}
 
 desc "Upload packages to mirror. !DANGER!" 
-task "upload-live" => ["#{htdocs_home}/#{DISTRO}"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/#{DISTRO}/#{arch}"} do |t|
+task "upload-live" => ["#{htdocs_home}/#{DISTRO}"] + available_build_archs.collect{|arch| "#{htdocs_home}/#{DISTRO}/#{arch}"} do |t|
   sh "rsync -Pr --delete #{t.prerequisites.first}/ repo@mirroir.sh:htdocs/symbiosis/squeeze/"
 end
 
