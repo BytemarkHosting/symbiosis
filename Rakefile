@@ -2,14 +2,16 @@
 
 require 'fileutils'
 require 'rake/clean'
-require 'digest'
+require 'md5'
 require 'pp'
 
 DEBEMAIL=ENV["DEBEMAIL"] || "symbiosis@bytemark.co.uk"
 DEB_BUILD_ARCH=`dpkg-architecture -qDEB_BUILD_ARCH`.chomp
-# REPONAME, DISTRO = File.dirname(File.expand_path(__FILE__)).split("/").last(2)
-DISTRO="stable"
-REPONAME="symbiosis"
+  
+CLEAN.add   %w(Release.asc Packages.new Sources.new Release.new *-stamp)
+CLOBBER.add %w(Packages Sources Packages.gz Sources.gz Release Release.gpg *.deb *.tar.gz *.build *.diff.gz *.dsc *.changes)
+  
+DISTRO = "stable"
 
 #
 # Monkey patch rake to output on stdout like normal people
@@ -23,7 +25,7 @@ end
 
 def has_sautobuild?
   return @has_sautobuild if defined? @has_sautobuild
-  @has_sautobuild = !ENV.has_key?("NO_SAUTOBUILD") and File.executable?("/usr/bin/sautobuild")
+  @has_sautobuild = File.executable?("/usr/bin/sautobuild")
 end
 
 def available_build_archs
@@ -37,15 +39,13 @@ def available_build_archs
   end
 
   #
-  # We only build/test on amd64/i386.
+  # Symbiosis is only built/tested on amd64/i386.
   #
   possibles = %w(amd64 i386)
 
   archs = chroots.collect do |chroot|
     if chroot =~ /^(?:chroot:)?#{DISTRO}-(#{possibles.join("|")})$/
-      $1
-    else
-      nil
+      archs << $1
     end
   end.compact.sort.uniq
 
@@ -69,19 +69,18 @@ def all_packages
   #
   return @all_packages unless @all_packages.nil?
 
+  puts "Reading packages..."
+
   @all_packages = Dir["*"].collect do |pkgdir|
 
     next unless File.exists?(pkgdir+"/debian/changelog")
 
-    bin_pkgs = []
-    source = pkg = arch = version = distro = nil
-    arch_dependent = false
-
+    pkg = debian_version = distro = nil
     File.open(pkgdir+"/debian/changelog","r") do |fh|
       while !fh.eof? do
         fh.gets
         next unless $_ =~ /^([^ ]+) \((?:[0-9]+:)?([^\)]+)\) ([^;]+); /
-        source, version, distro = [$1, $2, $3]
+        pkg, debian_version, distro = [$1, $2, $3]
         break
       end
     end
@@ -89,93 +88,37 @@ def all_packages
     #
     # Assume all architectures
     #
-    bin_pkgs = []
     arch = "all"
     File.open(File.join(pkgdir,"debian","control")){|fh| fh.readlines}.each do |l|
-      case l
-        when /^Package: (.*)/
-          pkg = $1
-        when /^Architecture: (.*)/
-          this_arch = $1
-          arch_dependent = (arch_dependent or this_arch != "all")
-          (this_arch == "any" ? available_build_archs : %w(all)).collect do |a|
-            bin_pkgs << "#{pkg}_#{version}_#{a}.deb"
-          end
-          pkg = nil
-      end
+      next unless l =~ /^Architecture: (.*)/
+      arch = $1 unless $1 == "all"
     end
 
-    source_version = "#{source}_#{version}"
+    [pkgdir, pkg, debian_version, distro, arch]
 
-    {:dir => pkgdir,
-     :source => source,
-     :source_changes => "#{source_version}_source.changes",
-     :changes => (arch_dependent ? available_build_archs : [DEB_BUILD_ARCH]).collect do |this_arch|
-        "#{source_version}_#{this_arch}.changes"
-     end,
-     :builds => (arch_dependent ? available_build_archs : [DEB_BUILD_ARCH]).collect do |this_arch|
-        "#{source_version}_#{this_arch}.build"
-     end,
-     :packages => bin_pkgs,
-     :version => version,
-     :distro  => distro,
-     :targz   => source_version+".tar.gz",
-     :diffgz  => source_version+".diff.gz",
-     :dsc     => source_version+".dsc",
-     :arch_dependent => arch_dependent }
-  end.compact
+  end.reject{|e| e.nil?}
 end
 
-def package_changess(source = nil)
-  all_packages.select do |pkg| 
-    source.nil? or pkg[:source] == source
-  end.collect { |pkg| pkg[:changes] }.flatten
-end
-
-def source_changess(source = nil)
-  all_packages.select do |pkg|
-    source.nil? or pkg[:source] == source
-  end.collect{|pkg| pkg[:source_changes] }
-end
-
-def dscs(source = nil)
-  all_packages.select do |pkg|
-    source.nil? or pkg[:source] == source
-  end.collect{|pkg| pkg[:dsc] }
-end
-
-def source_dirs(source= nil)
-  all_packages.select do |pkg|
-    source.nil? or pkg[:source] == source
-  end.collect{|pkg| pkg[:dir] }
-end
-
-def packages(source = nil)
-  all_packages.select do |pkg|
-    source.nil? or pkg[:source] == source
-  end.collect{|pkg| pkg[:packages] }.flatten
-end
-
-def targzs(source = nil)
-  all_packages.select do |pkg|
-    source.nil? or pkg[:source] == source
-  end.collect{|pkg| pkg[:targz] }
-end
-
-def builds(source = nil)
-  all_packages.select do |pkg|
-    source.nil? or pkg[:source] == source
-  end.collect{|pkg| pkg[:builds] }.flatten
-end
-
-def find_package_by_filename(fn)
-  return nil unless fn =~ /\./
-
-  all_packages.find do |pkg|
-    pkg.values.any? do |val|
-      (val.is_a?(Array) ?  val.include?(fn) : val == fn)
+def package_changess
+  all_packages.collect do |pkgdir, pkg, version, distro, arch| 
+    (arch == "all" ? [DEB_BUILD_ARCH] : available_build_archs).collect do |this_arch|
+      "#{pkg}_#{version}_#{this_arch}.changes"
     end
-  end
+  end.flatten
+end
+
+def source_changess
+  all_packages.collect{|pkgdir, pkg, version, distro, arch| "#{pkg}_#{version}_source.changes"}
+end
+
+def dscs
+  all_packages.collect{|pkgdir, pkg, version, distro, arch| "#{pkg}_#{version}.dsc"}
+end
+
+def source_dirs
+  all_packages.collect do |pkgdir, pkg, version, distro, arch|
+    pkgdir
+  end.uniq
 end
 
 #
@@ -186,128 +129,195 @@ def upstream_version(debian_version)
   $2
 end
 
-#
-# Works out the mercurial identity for the current RCS repo.
-#
-def hg_id
-  return @hg_id if defined? @hg_id
+task :default => [:build]
 
-  @hg_id = `hg id -i -r tip`.chomp
-  @hg_id = nil if 0 != $?
-  @hg_id
-end
+desc "Verify integrity of packages using lintian"
+task :lintian => ["lintian-stamp"]
 
-#
-# Returns the name of the repository directory.
-#
-def repo_dir 
-  if hg_id.nil?
-    File.join("repo", distro)
-  else
-    File.join("repo", hg_id)
-  end
-end
+desc "Verify package signatures"
+task :verify => ["verify-stamp"] 
 
-#####################################################################
-#
-# TASKS
-#
-#####################################################################
-
-# The default task if nothing is specified
-task :default => "Release"
-
-#
-# Generate the Release file
-#
+desc "Generate Release file"
 file "Release" => ["Sources.gz", "Sources", "Packages.gz", "Packages"] do |t|
-  require 'socket'
-
   # 
   # Standard headers
   #
   release =<<EOF
 Archive: #{DISTRO}
-Label: #{REPONAME}
-Origin: #{Socket.gethostname}
-Architectures: #{available_build_archs.join(" ")} source
+Label: Symbiosis
+Origin: Bytemark Hosting
+Architectures: amd64 i386 source
+Components: main
+MD5Sum: 
 EOF
   #
   # Add the md5sums for each prereq.
   #
-  hashes = Hash.new{|h,k| h[k] = []}
   t.prerequisites.each do |prereq|
-    data = File.read(prereq)
-    size = File.stat(prereq).size
-    [Digest::MD5, Digest::SHA1, Digest::SHA256].each do |klass|
-      hashes[klass] << [klass.hexdigest(data), size, prereq]
-    end
+    release << " "+[ MD5.hexdigest(File.read(prereq)),
+                     File.stat(prereq).size,
+                     prereq].join(" ")+"\n"
   end
-  release << "MD5Sum: \n " + hashes[Digest::MD5].collect{|m| m.join(" ")}.join("\n ")+"\n"
-  release << "SHA1: \n "   + hashes[Digest::SHA1].collect{|m| m.join(" ")}.join("\n ")+"\n"
-  release << "SHA256: \n " + hashes[Digest::SHA256].collect{|m| m.join(" ")}.join("\n ")+"\n"
 
   File.open(t.name+".new","w+"){|fh| fh.puts release}
   FileUtils.mv("#{t.name}.new", t.name, :force => true)
 end
 
-#
-# Generate the Packages file
-#
-file "Packages" => packages do |t|
+desc "Generic rule to create a detached signature for something."
+rule '.gpg' => [ proc {|t| t.sub(/.gpg$/,"") } ] do |t|
+  sh "gpg --armor --sign-with #{DEBEMAIL} --detach-sign --output - #{t.source} > #{t.name}"
+end
+
+desc "Generic rule to sign something with a cleartext signature"
+rule '.asc' => [ proc {|t| t.sub(/.asc$/,"") } ] do |t|
+  sh "gpg --armor --sign-with #{DEBEMAIL} --clearsign --output - #{t.source} > #{t.name}"
+end
+
+desc "Generic rule to zip things up, keeping a copy."
+rule '.gz' => [ proc {|t| t.sub(/.gz$/,"") } ] do |t|
+  sh "cat #{t.source} | gzip -9c > #{t.name}"
+end
+
+desc "Generate Release.gpg"
+task :build => [ "Release.gpg" ] 
+
+desc "Generate Packages file"
+file "Packages" => package_changess do |t|
   sh "dpkg-scanpackages -m . /dev/null > #{t.name}.new"
   FileUtils.mv("#{t.name}.new", t.name, :force => true)
 end
 
-#
-# Generate the Sources file
-#
-file "Sources" => source_changess + dscs do |t| 
+desc "Generate Sources file"
+file "Sources" => dscs + source_changess do |t| 
   sh "dpkg-scansources . /dev/null > #{t.name}.new"
   FileUtils.mv("#{t.name}.new", t.name, :force => true)
 end
 
-desc "Sign the repository"
-task :sign  => ["all", "Release.gpg" ] 
-
-desc "Build all packages and documentation"
-task :all   => ["Release"]
-
-desc "Check all build dependencies."
-task :dependencies  => "pkg:dependencies" 
-
-desc "Remove any temporary products."
-task :clean => "pkg:clean" do
- rm_f  %w(Release.asc Packages.new Sources.new Release.new *-stamp)
-end
-
-desc "Remove any generated file."
-task :clobber => %w(clean pkg:clobber) do
- rm_f %w(Packages Sources Packages.gz Sources.gz Release Release.gpg)
-end
-
-desc "Verify integrity of packages using lintian"
-task :lintian => ["lintian-stamp"]
-
 file "lintian-stamp" => source_changess + package_changess do |t| 
-  if has_sautobuild?
-    sh "schroot -c #{DISTRO} -- lintian -X cpy -I #{t.prerequisites.join(" ")}"
-  else
-    sh "lintian -X cpy -I #{t.prerequisites.join(" ")}"
-  end
+  sh "schroot -c #{DISTRO} -- lintian -X cpy -I #{t.prerequisites.join(" ")}"
   FileUtils.touch t.name
 end
 
-desc "Verify package signatures"
-task :verify => ["verify-stamp"] 
-
-file "verify-stamp" => source_changess + packages + ["Release.gpg"] do |t| 
+file "verify-stamp" => source_changess + package_changess + ["Release.gpg"] do |t| #: $(SOURCE_CHANGES) $(PACKAGE_CHANGES) Release.gpg
   t.prerequisites.each do |prereq|
     sh "gpg --verify #{prereq}"
   end
   FileUtils.touch t.name
 end
 
+namespace :debian do
+  namespace :rules do
+    task :clean do
+      source_dirs.each do |d|
+        begin
+          File.chmod(0755, "#{d}/debian/rules")
+          sh "cd #{d} && fakeroot debian/rules clean"
+        rescue => err
+          # do nothing because because this rules clean cannot be expected to
+          # work for every package outside of a chroot.
+        end
+      end
+    end
+  end
+end
+
+
+#
+# This builds the dsc, as well as the diff.gz
+#
+rule(/\.((tar|diff)\.gz|dsc)$/ =>
+  proc do |task_name|
+    task_name =~ /(.*)\.(diff\.gz|dsc)$/
+    pkg, version = $1.split("_").first(2)
+    Dir.glob("#{pkg}-#{upstream_version(version)}/**").select{|f| File.file?(f)} 
+  end
+) do |t|
+  pkg, version = t.name.split("_").first(2)
+  pkgdir, pkg, version, distro, target_arch = all_packages.find{|pd,pk,vr,ds,ar| pk == pkg}
+  sh "dpkg-source -b #{pkgdir}"
+end
+
+#
+# Since diff.gz are generated at the same time as dsc..
+#
+#rule ".diff.gz" => [
+#  proc{|task_name| task_name.sub(/diff\.gz$/,"dsc")}
+#]
+
+#
+# Rule to generate the source changes
+#
+rule(/_source.changes$/ => [
+    proc{|task_name| task_name.sub(/_source\.changes$/,".dsc")}
+ ]) do |t|
+  #
+  # Work out the package name and the version
+  #
+  pkg, version = t.name.split("_").first(2)
+  pkgdir, pkg, version, distro, target_arch = all_packages.find{|pd,pk,vr,ds,ar| pk == pkg}
+
+  #
+  # Make sure we move any old changes out of the way.
+  #
+  FileUtils.rm_f(t.name)
+
+  #
+  # Now generate the changes, and sign.
+  #
+  sh "cd #{pkgdir} && dpkg-genchanges -S > ../#{t.name}"
+#  sh "debsign #{t.name}"
+end
+
+#
+# Rule to compile binary packages.
+#
+rule(/^([^_]+)_([^_]+)_(#{available_build_archs.join("|")}).changes$/ => [ 
+    proc{|task_name| task_name.sub(/_(#{available_build_archs.join("|")}).changes$/,".dsc")} 
+  ]) do |t|
+  #
+  # Need to have the distro and the arch:
+  #
+  pkg, version, arch = File.basename(t.name,'.changes').split("_")
+  pkgdir, pkg, version, distro, target_arch = all_packages.find{|pd,pk,vr,ds,ar| pk == pkg and vr == version}
+
+  #
+  # Now call sbuild and debsign
+  #
+  if has_sautobuild?
+    sh "sautobuild --no-repo --dist=#{distro} #{t.source}"
+  else
+    sh "cd #{pkgdir} && debuild -us -uc -sa"
+  end
+end
+
+
+#
+# Added all packaging tasks beneath a pkg namespace, because I think there is
+# already a "rake" namespace.
+#
+namespace :pkg do
+  source_dirs.each do |pkgdir|
+    namespace pkgdir do
+      these_packages = all_packages.find_all{|pd,pk,vr,ds,ar| pd == pkgdir}
+
+      desc "Build #{pkgdir}"
+      task :build => (
+        these_packages.collect do |pd,pk,vr,ds,ar| 
+          if ar == "all"
+            ["#{pk}_#{vr}_#{DEB_BUILD_ARCH}.changes"]
+          elsif ar == "any"
+            available_build_archs.collect{|a| "#{pk}_#{vr}_#{a}.changes"}
+          end
+        end.flatten
+      )
+
+    end
+    desc "Build all versions of all packages"
+    task :build => "pkg:#{pkgdir}:build".to_sym
+
+  end
+
+end
 
 desc "Check which packages need their changelogs updating"
 task "check_changelogs" do
@@ -331,247 +341,50 @@ task "check_changelogs" do
   end
 end
 
-desc "Build a repository suitable for testing."
-task "repo" => "Release" do
-  mkdir_p repo_dir
-  cp packages, repo_dir
-  cp targzs, repo_dir
-  cp source_changess, repo_dir
-  cp package_changess, repo_dir
-  cp dscs, repo_dir
-  cp builds, repo_dir
-  cp %w(Release Sources.gz Sources Packages.gz Packages), repo_dir
+task "rdoc" do
+  sh "rdoc1.8 --exclude 't[sc]_.*.rb' "
 end
 
-desc "Generate API documentation."
-task "rdoc" => "doc/html/created.rid"
 
-#
-# This rule makes sure the docs are rebuild if there is a change to any of the
-# ruby code.
-#
-rule("doc/html/created.rid" => 
-  proc do
-    source_files = Dir.glob(File.join("*","lib","**","*")).select{|f| File.file?(f)}
-    source_files += Dir.glob(File.join("*","ext","**","*")).select{|f| File.file?(f)}
-    source_files
+rsync_args = %w(
+   --recursive 
+   --partial 
+   --verbose
+   --copy-links
+)
+
+rsync_excludes = %w(*/ Makefile Rakefile TODO README .hgignore AUTOBUILD .hgtags)
+
+hg_number  = `hg id -i -r tip`.chomp
+htdocs_home = File.join(ENV['HOME'],"htdocs",DISTRO)
+
+file "#{htdocs_home}/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
+  cmd = %w(rsync) + rsync_args
+  rsync_excludes.each do |ex|
+    cmd << "--exclude '#{ex}'"
   end
-) do
-  Rake::Task["rdoc:all"].invoke
+  sh "#{cmd.join(" ")} --times $PWD/ #{htdocs_home}/#{hg_number}"
+  rm "#{htdocs_home}/latest" if File.exists?("#{htdocs_home}/latest")
 end
 
-namespace :rdoc do
-
-  #
-  # Build all the documentation, removing any existing.
-  #
-  task :all => ["dependencies", "clobber"] do
-    sh "rdoc1.8 --diagram --op doc/html */lib/ */ext/"
-  end
-
-  #
-  # Make sure we've got the correct dependencies for building rdoc.
-  #
-  task :dependencies do 
-    missing_build_deps = []
-    [
-      %w(/usr/bin/rdoc1.8 rdoc1.8),
-      %w(/usr/bin/dot graphviz)
-    ].each do |executable, package|
-      missing_build_deps << package unless File.executable?(executable)
-    end
-  
-    raise "Need to install the following packages to build documentation:\n  #{missing_build_deps.join(" ")}" unless missing_build_deps.empty?
-  end 
-
-  task :clean do
-    # no op
-  end
-  
-  task :clobber do
-    rm_rf "doc/html"
-  end
-
+file "#{htdocs_home}/latest" => "#{htdocs_home}/#{hg_number}/Release.gpg" do |t|
+  sh "cd #{htdocs_home} && ln -sf #{hg_number} latest" unless File.exists?("#{htdocs_home}/latest")
 end
+
+available_build_archs.each do |arch|
+  file "#{htdocs_home}/latest/#{arch}" => "#{htdocs_home}/latest" do |t|
+    sh "cd #{t.prerequisites.first} && ln -sf . #{arch}"
+  end
+end 
 
 desc "Upload packages to the local tree" 
-task "upload" => "repo" do
-  #
-  # TODO
-  #
+task "upload" => available_build_archs.collect{|arch| "#{htdocs_home}/latest/#{arch}"}
+
+desc "Upload packages to mirror. !DANGER!" 
+task "upload-live" => ["#{htdocs_home}/#{DISTRO}"] + available_build_archs.collect{|arch| "#{htdocs_home}/#{DISTRO}/#{arch}"} do |t|
+  sh "rsync -Pr --delete #{t.prerequisites.first}/ repo@mirroir.sh:htdocs/symbiosis/squeeze/"
 end
 
-
-#
-# Create a namespace for all the packaging tasks
-#
-namespace :pkg do
-
-  #
-  # Create a namespace per package.
-  #
-  all_packages.each do |pkg|
-    
-    #
-    # Task to build our package -- an easy to remember name
-    #
-    desc "Build #{pkg[:source]}"
-    task pkg[:source]   => "pkg:#{pkg[:source]}:all"
-    
-    #
-    # Add the package specific tasks to the generic build tasks -- these are
-    # used in the top-level tasks.
-    #
-    task :all           => "pkg:#{pkg[:source]}:all"
-    task :genchanges    => "pkg:#{pkg[:source]}:genchanges"
-    task :source        => "pkg:#{pkg[:source]}:source"
-    task :buildpackage  => "pkg:#{pkg[:source]}:buildpackage"
-    task :clean         => "pkg:#{pkg[:source]}:clean"
-    task :clobber       => "pkg:#{pkg[:source]}:clobber"
-    task :dependencies  => "pkg:#{pkg[:source]}:dependencies"
-
-    namespace pkg[:source] do
-      
-      task :source => ["clean"] do |t|
-        #
-        # Make sure the documentation is build before creating the source tgz
-        # for any documentation package.
-        #
-        Rake::Task["rdoc"].invoke if "doc" == pkg[:dir]
-        sh "dpkg-source -b #{pkg[:dir]}"
-      end
-
-      task :genchanges => ["clean", pkg[:dsc]] do 
-        sh "cd #{pkg[:dir]} && dpkg-genchanges -S > ../#{pkg[:source_changes]}"
-      end
-
-      task :buildpackage => ["dependencies", pkg[:dsc], pkg[:source_changes]].flatten do
-        #
-        # Now call sautobuild and debsign
-        #
-        if has_sautobuild?
-          sh "/usr/bin/sautobuild --no-repo --dist=#{pkg[:distro]} #{pkg[:dir]}"
-        else
-          sh "cd #{pkg[:dir]} && debuild -us -uc -sa"
-        end
-      end
-
-      task :clean do
-        Rake::Task["rdoc:clean"].invoke if "doc" == pkg[:dir]
-        begin
-          unless has_sautobuild?
-            File.chmod(0755, "#{pkg[:dir]}/debian/rules")
-            sh "cd #{pkg[:dir]} && fakeroot debian/rules clean"
-          end
-        rescue => err
-          # do nothing because because this rules clean cannot be expected to
-          # work for every package outside of a chroot.
-        end
-      end
-
-      task :clobber => "clean" do
-        Rake::Task["rdoc:clobber"].invoke if "doc" == pkg[:dir]
-
-        rm_f pkg[:packages] + pkg[:builds] + pkg[:changes] + [pkg[:dsc], pkg[:targz], pkg[:diffgz], pkg[:source_changes]]
-      end
-
-      task :dependencies => [File.join(pkg[:dir],"debian","control")] do |t|
-        Rake::Task["rdoc:dependencies"].invoke if "doc" == pkg[:dir]
-
-        missing_build_deps = if has_sautobuild?
-          []
-        else
-          pkg_depends = `cd #{pkg[:dir]} && dpkg-checkbuilddeps 2>&1`.chomp
-          if 0 != $? 
-            if pkg_depends =~ /^dpkg-checkbuilddeps: Unmet build dependencies: (.*)/i
-              $1.gsub(/\([^\)]+\)/,'').split(" ")
-            else
-              raise "dpkg-checkbuilddeps returned unrecognised output:\n#{pkg_depends}"
-            end
-          else
-            []
-          end
-        end
-
-        raise "Need to install the following packages to build #{pkg[:source]}:\n  #{missing_build_deps.join(" ")}" unless missing_build_deps.empty?
-      end 
-
-      task :all  => %w(dependencies clean)+pkg[:packages]
-    end
-
-  end
-
-end
-
-#####################################################################
-# 
-# RULES
-#
-#####################################################################
-
-desc "Generic rule to create a detached signature for something."
-rule '.gpg' => [ proc {|t| t.sub(/.gpg$/,"") } ] do |t|
-  sh "gpg --armor --sign-with #{DEBEMAIL} --detach-sign --output - #{t.source} > #{t.name}"
-end
-
-desc "Generic rule to sign something with a cleartext signature"
-rule '.asc' => [ proc {|t| t.sub(/.asc$/,"") } ] do |t|
-  sh "gpg --armor --sign-with #{DEBEMAIL} --clearsign --output - #{t.source} > #{t.name}"
-end
-
-desc "Generic rule to zip things up, keeping a copy."
-rule '.gz' => [ proc {|t| t.sub(/.gz$/,"") } ] do |t|
-  sh "cat #{t.source} | gzip -9c > #{t.name}"
-end
-
-# dsc/targz => source
-# source.changes => dsc
-# deb/build/changes => source.changes
-
-desc "Generic rule to call the :source task for a package given a filename."
-rule(/^[^\/]+\.(tar\.gz|diff\.gz|dsc)$/ =>
-  proc do |task_name|
-    pkg = find_package_by_filename(task_name)
-
-    if pkg.nil?
-      raise "Could not find package to build for #{task_name}"
-    end
-
-    source_files = Dir.glob(File.join(pkg[:dir],"**", "*")).select{|f| File.file?(f)}
-    source_files << 'doc/html/created.rid' if pkg[:dir] == "doc"
-
-    source_files
-  end
-) do |t|
-  pkg = find_package_by_filename(t.name)
-
-  Rake::Task["pkg:#{pkg[:source]}:source"].invoke
-end
-
-desc "Generic rule to call the :genchanges task for a package given a filename."
-rule(/^[^\/]+_source\.changes$/ =>
-  proc do |task_name|
-    pkg = find_package_by_filename(task_name)
-    raise "Could not find package to build for #{task_name}" if pkg.nil?
-    pkg[:dsc]
-  end
-) do |t|
-  pkg = find_package_by_filename(t.name)
-
-  Rake::Task["pkg:#{pkg[:source]}:genchanges"].invoke
-end
-
-desc "Generic rule to call the :buildpackage task for a package given a filename."
-rule(/^[^\/]+(_(#{available_build_archs.join("|")})\.(build|changes)|\.deb)$/ =>
-  proc do |task_name|
-    pkg = find_package_by_filename(task_name)
-    raise "Could not find package to build for #{task_name}" if pkg.nil?
-    pkg[:source_changes]
-  end  
-) do |t|
-  pkg = find_package_by_filename(t.name)
-
-  Rake::Task["pkg:#{pkg[:source]}:buildpackage"].invoke
-end
-
+desc "Complete build cycle"
+task "clean_build_and_upload" => %w(clobber build upload)
 

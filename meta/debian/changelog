@@ -1,3 +1,10 @@
+bytemark-symbiosis (2012:0607) stable; urgency=low
+
+  * Updated dependencies to add in symbiosis-pam.
+  * Removed use of cdbs.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 07 Jun 2012 17:28:08 +0100
+
 bytemark-symbiosis (2012:0222) stable; urgency=low
 
   * Updated versioned dependencies to use the stable packages.

@@ -32,9 +32,9 @@ a:
 #
 all: dependencies
 	mkdir -p ./output || true
-	for i in */debian/; do pushd $$(dirname $$i) ; ../build-utils/mybuild ; popd ; done
-	(cd output/ ; dpkg-scanpackages . /dev/null | gzip > Packages.gz)
-	(cd output/ ; dpkg-scansources  . /dev/null | gzip > Sources.gz)
+	for i in */debian/; do pushd $$(dirname $$i) ; debuild ;  popd ; done
+#	(cd output/ ; dpkg-scanpackages . /dev/null | gzip > Packages.gz)
+#	(cd output/ ; dpkg-scansources  . /dev/null | gzip > Sources.gz)
 
 
 changelog:
@@ -69,14 +69,11 @@ clean:
 	-rm */*.1
 	for i in */; do pushd $$i; if [ -e Makefile ]; then make clean; fi ; debuild clean ; popd; done
 
-
-
 #
 #  Run "linda" on all binary packages to test for Debian policy violations.
 #
 linda: all
 	linda *.changes
-
 
 #
 #  Run "lintian" on all binary packages to test for Debian policy violations.
