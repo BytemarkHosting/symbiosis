@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/ruby 
 #
 #  This script is designed to dump all the MySQL databases upon
 # the local system.
@@ -48,7 +48,12 @@ end
 #
 # This allows us to specify a database on the command line (for testing).
 #
-databases = ARGV unless ARGV.empty?
+databases = (databases & ARGV) unless ARGV.empty?
+
+if databases.empty?
+  puts "No Mysql databases found" if $VERBOSE
+  exit 0
+end
 
 databases.each do |database|
   dump = File.join(backup_dir,URI.escape(database,/[^a-zA-Z0-9._-]/)) + ".sql.gz"
