@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/ruby 
 #
 # This script is designed to dump all the postgresql databases upon
 # the local system.
@@ -79,7 +79,7 @@ unless 0 == $?
   exit 0 
 end
 
-databases = ARGV unless ARGV.empty?
+databases = (databases & ARGV) unless ARGV.empty?
 
 if databases.empty?
   puts "No Postgres databases found" if $VERBOSE

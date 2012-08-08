@@ -1,3 +1,19 @@
+symbiosis-backup (2012:0808) stable; urgency=low
+
+  * Add --perms to the rsync command line when downloading backups to avoid
+    ACL-related messages.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 08 Aug 2012 10:22:01 +0000
+
+symbiosis-backup (2012:0614) stable; urgency=low
+
+  * Updated postgres and mysql scripts not be output verbose things by
+    default.
+  * Updated postgres and mysql scripts to check command line args against
+    existing DB.  Close #3536.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 14 Jun 2012 12:17:34 +0100
+
 symbiosis-backup (2012:0525) stable; urgency=low
 
   * Updated postgres and mysql scripts to ruby, using URL encoding for dump

@@ -3,13 +3,27 @@ Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), cdbs
+Build-Depends: debhelper (>= 7.0.0)
 Standards-Version: 3.9.1
 
 Package: bytemark-symbiosis
 Architecture: all
-Depends: symbiosis-updater (>= 2012:0222), symbiosis-key (>= 2012:0222), ${misc:Depends}
-Recommends: symbiosis-httpd (>= 2012:0222), symbiosis-backup (>= 2012:0222), symbiosis-common (>= 2012:0222), symbiosis-cron (>= 2012:0222), symbiosis-tinydns (>= 2012:0222), symbiosis-email (>= 2012:0222), symbiosis-firewall (>= 2012:0222), symbiosis-ftpd (>= 2012:0222), symbiosis-monit (>= 2012:0222), symbiosis-mysql (>= 2012:0222), symbiosis-phpmyadmin (>= 2012:0222), symbiosis-webmail (>= 2012:0222)
+Depends: symbiosis-key (>= 2012:0222), 
+  symbiosis-updater (>= 2012:0222),
+  ${misc:Depends}
+Recommends: symbiosis-backup (>= 2012:0222),
+  symbiosis-common (>= 2012:0222),
+  symbiosis-cron (>= 2012:0222),
+  symbiosis-email (>= 2012:0222),
+  symbiosis-firewall (>= 2012:0222), 
+  symbiosis-ftpd (>= 2012:0222),
+  symbiosis-httpd (>= 2012:0222), 
+  symbiosis-monit (>= 2012:0222), 
+  symbiosis-mysql (>= 2012:0222),
+  symbiosis-pam (>= 2012:0222), 
+  symbiosis-phpmyadmin (>= 2012:0222), 
+  symbiosis-tinydns (>= 2012:0222), 
+  symbiosis-webmail (>= 2012:0222) 
 Replaces: bytemark-vhost
 Conflicts: bytemark-vhost
 Provides: bytemark-vhost
