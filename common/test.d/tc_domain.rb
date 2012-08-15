@@ -1,6 +1,6 @@
+# encoding: UTF-8
 
 require 'test/unit'
-
 require 'symbiosis/domain'
 
 class TestDomain < Test::Unit::TestCase
@@ -82,5 +82,37 @@ class TestDomain < Test::Unit::TestCase
 
   end
 
+  def test_password_with_foreign_shit
+    utf8_password = "ábë"
+    domain = Domain.new("test")
+
+    %w(UTF8 ISO-8859-1).each do |enc|
+      if utf8_password.respond_to?(:encode)
+        password = utf8_password.encode(enc)
+      else
+        require 'iconv' unless defined?(Iconv)
+        password = Iconv.conv(enc, "UTF-8", utf8_password)
+      end
+
+      #
+      # Make sure the UTF-8 password works.
+      #
+      assert(domain.check_password(password, password))
+
+      #
+      # Now crypy+check
+      #
+      des_crypt_password = password.crypt("ab")
+      assert(domain.check_password(password, des_crypt_password), "Correct password not accepted, DES crypt, #{enc} encoding.")
+  
+      #
+      # glibc
+      #
+      glibc2_crypt_password = password.crypt("$1$ab$")
+      assert(domain.check_password(password, glibc2_crypt_password), "Correct password not accepted, glibc2 crypt, #{enc} encoding.")
+      assert(domain.check_password(utf8_password, glibc2_crypt_password), "Correct password not accepted, glibc2 crypt, #{enc} encoding.")
+    end
+
+  end
 
 end
