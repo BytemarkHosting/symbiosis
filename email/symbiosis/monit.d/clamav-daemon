@@ -24,6 +24,16 @@ class ClamdCheck < Symbiosis::Monitor::Check
   def should_be_running
     (0 < Dir.glob('/srv/*/config/antivirus').length)
   end
+
+  #
+  # Ignore the test if 
+  #   * dpkg if running 
+  #   * the initscript is missing and clamav should not be running.
+  #
+  def should_ignore?
+    self.class.dpkg_running? or 
+      (not File.exists?(@process.initscript) and not should_be_running)
+  end
 end
 
 exit ClamdCheck.new.do_check if $0 == __FILE__
