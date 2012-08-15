@@ -1,9 +1,15 @@
-symbiosis-email (2012:0815) stable; urgency=high
+symbiosis-email (2012:0815) stable; urgency=low
 
+  [ Steve Kemp ]
   * Weaken dependencies such that spamassassin & clamav scanners are
-    merely suggested and not required.
+    merely recommended and not required.
 
- -- Steve Kemp <steve@bytemark.co.uk>  Wed, 15 Aug 2012 10:11:01 +0000
+  [ Patrick J Cherry ]
+  * Updated monitoring scripts to be sensible about when they run
+    clamd/spamassassin tests in light of the fact they are no longer hard
+    dependencies.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 15 Aug 2012 17:28:02 +0100
 
 symbiosis-email (2012:0509) stable; urgency=high
 
