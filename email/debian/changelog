@@ -1,3 +1,10 @@
+symbiosis-email (2012:0815) stable; urgency=high
+
+  * Weaken dependencies such that spamassassin & clamav scanners are
+    merely suggested and not required.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 15 Aug 2012 10:11:01 +0000
+
 symbiosis-email (2012:0509) stable; urgency=high
 
   * Fixed bug whereby mailboxes can be accessed using any old password.
