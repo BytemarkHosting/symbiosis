@@ -1,3 +1,10 @@
+symbiosis-monit (2012:0816) stable; urgency=low
+
+  * Updated --verbose flag to do what one would expect it to do, which is
+    increase the output verbosity in a meaningful way.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 16 Aug 2012 17:42:45 +0100
+
 symbiosis-monit (2012:0314) stable; urgency=low
 
   * Updated SSH check to parse sshd_config to determine which ports to check.
