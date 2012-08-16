@@ -39,7 +39,7 @@
 # -s, --state-db <file>      Specify where the state databse should be kept.
 #                            The default is /var/lib/symbiosis/monit.db.
 #
-# -v, --verbose              Show verbose output.
+# -v, --verbose              Synonym for "-t verbose".
 #
 # -h, --help                 Show help.
 #
@@ -160,7 +160,7 @@ begin
       when "--template-directory"
         template_dir = arg
       when "--verbose"
-        $VERBOSE = true
+        template = "verbose"
     end
   end
 rescue GetoptLong::InvalidOption => e
