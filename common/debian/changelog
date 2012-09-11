@@ -1,3 +1,13 @@
+symbiosis-common (2012:0911) stable; urgency=low
+
+  * Fixed SSL certificate subject checking for a domain.  The primary name is
+    now also checked, not just the aliases.
+  * Added strict SSL checking which raises exceptions more often in the
+    ssl_verify method.
+  * Added tests to prove certificates with SNI / wildcard subjects work.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 11 Sep 2012 15:55:46 +0100
+
 symbiosis-common (2012:0606) stable; urgency=low
 
   * Updated the configuration file handling not to break on empty files.
