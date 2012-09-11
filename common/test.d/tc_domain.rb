@@ -110,7 +110,6 @@ class TestDomain < Test::Unit::TestCase
       #
       glibc2_crypt_password = password.crypt("$1$ab$")
       assert(domain.check_password(password, glibc2_crypt_password), "Correct password not accepted, glibc2 crypt, #{enc} encoding.")
-      assert(domain.check_password(utf8_password, glibc2_crypt_password), "Correct password not accepted, glibc2 crypt, #{enc} encoding.")
     end
 
   end
