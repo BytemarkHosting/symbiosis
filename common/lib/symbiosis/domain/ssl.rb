@@ -280,24 +280,39 @@ module Symbiosis
     # If either of these last two checks fail, a
     # OpenSSL::X509::CertificateError is raised.
     #
-    def ssl_verify(certificate = self.ssl_x509_certificate, key = self.ssl_key, store = self.ssl_certificate_store)
+    def ssl_verify(certificate = self.ssl_x509_certificate, key = self.ssl_key, store = self.ssl_certificate_store, strict_checking=false)
 
       #
       # Firstly check that the certificate is valid for the domain or one of its aliases.
       #
-      unless self.aliases.any? { |domain_alias| OpenSSL::SSL.verify_certificate_identity(certificate, domain_alias) }
-        warn "\tThe certificate subject is not valid for this domain #{self.name}." if $VERBOSE
+      unless ([self.name] + self.aliases).any? { |domain_alias| OpenSSL::SSL.verify_certificate_identity(certificate, domain_alias) }
+        msg = "The certificate subject is not valid for this domain #{self.name}."
+        if strict_checking
+          raise OpenSSL::X509::CertificateError, msg
+        else
+          warn "\t#{msg}" if $VERBOSE
+        end
       end
 
       # Check that the certificate is current
       # 
       #
       if certificate.not_before > Time.now 
-        warn "\tThe certificate for #{self.name} is not valid yet." if $VERBOSE
+        msg = "The certificate for #{self.name} is not valid yet."
+        if strict_checking
+          raise OpenSSL::X509::CertificateError, msg
+        else
+          warn "\t#{msg}" if $VERBOSE
+        end
       end
 
       if certificate.not_after < Time.now 
-        warn "\tThe certificate for #{self.name} has expired." if $VERBOSE
+        msg = "The certificate for #{self.name} has expired."
+        if strict_checking
+          raise OpenSSL::X509::CertificateError, msg
+        else
+          warn "\t#{msg}" if $VERBOSE
+        end
       end
 
       # Next check that the key matches the certificate.
