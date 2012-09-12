@@ -42,25 +42,25 @@ class TcBackupsMysql < Test::Unit::TestCase
   end
 
   def has_mysql?
-    defined? Mysql and 
-      @username and @password 
+    defined? Mysql and
+      @username and @password
   end
 
   def parse_defaults_file(fn)
     File.open(fn,"r") do |fh|
       found_client = false
 
-      until fh.eof? 
-	line = fh.gets
+      until fh.eof?
+        line = fh.gets
         case line.chomp
           when /^\s*\[client\]/
             found_client = true
           when /^\s*\[/
-	    break if found_client
+            break if found_client
           when /\s*user\s*=\s*(\S+)/
-	    @username = $1 if found_client
+            @username = $1 if found_client
           when /\s*password\s*=\s*(\S+)/
-	    @password = $1 if found_client
+            @password = $1 if found_client
         end
       end
     end
@@ -70,6 +70,15 @@ class TcBackupsMysql < Test::Unit::TestCase
 
   def calculate_dump_name(database, charset=@default_charset)
     File.join(@backup_dir, URI.escape(Iconv.conv(@default_charset,charset,database),/[^a-zA-Z0-9._-]/)) + ".sql.gz"
+  end
+
+  def create_db(database, charset=@default_charset)
+    assert_nothing_raised("Failure when creating MySQL DB with #{charset} charset.") {
+      dbh = Mysql.new(nil, @username, @password)
+      dbh.query("SET CHARSET #{charset}")
+      dbh.query("SET NAMES #{charset}")
+      dbh.query("CREATE DATABASE `#{database}` CHARACTER SET #{charset};")
+    }
   end
 
   def drop_db(database, charset=@default_charset)
@@ -109,11 +118,12 @@ class TcBackupsMysql < Test::Unit::TestCase
       value = Iconv.conv(charset, @default_charset, @value)
       res = nil
 
-      assert_nothing_raised("Failure when creating MySQL DB to test backups.") {
+      create_db(database, charset)
+
+      assert_nothing_raised("Failure when populating MySQL DB to test backups.") {
         dbh = Mysql.new(nil, @username, @password)
         dbh.query("SET CHARSET #{charset}")
         dbh.query("SET NAMES #{charset}")
-        dbh.query("CREATE DATABASE `#{database}` CHARACTER SET #{charset};")
         dbh.query "USE `#{database}`;"
         dbh.query "CREATE TABLE `#{table}` (`#{column}` CHAR(20) CHARACTER SET #{charset});"
         dbh.query "INSERT INTO `#{table}` (`#{column}`) VALUES (\"#{value}\");"
@@ -133,11 +143,12 @@ class TcBackupsMysql < Test::Unit::TestCase
       assert_equal(0, $?, "#{@backup_script} returned non-zero.")
 
       drop_db(database, charset)
- 
-      dump_name = calculate_dump_name(database, charset) 
-      assert(File.exists?(dump_name),"Mysql dump file '#{dump_name}' does not exist.")    
 
-      system("zcat #{dump_name} | /usr/bin/mysql --defaults-extra-file=/etc/mysql/debian.cnf")
+      dump_name = calculate_dump_name(database, charset)
+      assert(File.exists?(dump_name),"Mysql dump file '#{dump_name}' does not exist.")
+
+      create_db(database, charset)
+      system("zcat #{dump_name} | /usr/bin/mysql --defaults-file=#{@defaults_file} --default-character-set=#{charset} '#{database}'")
       assert_equal(0, $?, "Failed to restore MySQL database from dump.")
 
       res = nil
@@ -158,9 +169,9 @@ class TcBackupsMysql < Test::Unit::TestCase
       assert_equal(1, res.num_rows, "Mysql returned the wrong number of rows")
       assert_equal(column, res.fetch_fields.first.name, "Mysql returned the wrong field name")
       assert_equal(value,  res.fetch_row.first, "Mysql returned the wrong value")
-    
+
     end
 
   end
-  
+
 end
