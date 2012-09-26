@@ -62,12 +62,12 @@ NameVirtualHost <%= ip %>:80
         #
         #  The document root
         #
-        DocumentRoot <%= domain_directory %>/public/htdocs
+        DocumentRoot <%= htdocs_directory %>
 
         #
         # General CGI Handling
         #
-        ScriptAlias /cgi-bin/ <%= domain_directory %>/public/cgi-bin/
+        ScriptAlias /cgi-bin/ <%=cgibin_directory %>
         <Location /cgi-bin>
                 Options +ExecCGI
         </Location>
@@ -114,12 +114,12 @@ NameVirtualHost <%= ip %>:80
         #
         #  The document root
         #
-        DocumentRoot     <%= domain_directory %>/public/htdocs/
+        DocumentRoot     <%= htdocs_directory %>
 
         #
         # General CGI Handling
         #
-        ScriptAlias /cgi-bin/ <%= domain_directory %>/public/cgi-bin/
+        ScriptAlias /cgi-bin/ <%= cgibin_directory %>
         <Location /cgi-bin>
                 Options +ExecCGI
         </Location>

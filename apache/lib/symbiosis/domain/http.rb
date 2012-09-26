@@ -42,10 +42,25 @@ module Symbiosis
 
     #
     # Returns the directory where stats files should be kept.  Defaults to
-    # public/htdocs/stats.
+    # stats inside the htdocs_dir
     #
     def stats_dir
-      File.join(self.directory, "public", "htdocs", "stats")
+      File.join(self.htdocs_dir "stats")
+    end
+
+    #
+    # Returns the directory where HTML documents are served from.  Defaults to
+    # public/htdocs
+    #
+    def htdocs_dir
+      File.join(self.public_dir, "htdocs")
+    end
+
+    #
+    # Return the directory where CGI executables are server
+    #
+    def cgibin_dir
+      File.join(self.public_dir, "cgi-bin")
     end
 
   end

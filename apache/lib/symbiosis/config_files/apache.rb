@@ -1,4 +1,5 @@
 require 'symbiosis/config_file'
+require 'symbiosis/domain/http'
 require 'tempfile'
 
 module Symbiosis
@@ -50,7 +51,7 @@ module Symbiosis
         # Make sure the file exists, and that it is a symlink pointing to our
         # config file
         #
-        if File.symlink?(fn) 
+        if File.symlink?(fn)
           ln = File.readlink(fn)
 
           unless ln =~ /^\//
@@ -109,15 +110,15 @@ module Symbiosis
         # Symlink away!
         #
         File.symlink(self.filename, fn)
-        
+
         nil
       end
 
       #
       # This disables a site whose configuration is contained in fn.  This
       # function makes sure that the site is enabled, before disabling it.
-      # 
-      # 
+      #
+      #
       #
       def disable(fn = nil, force = false)
         #
@@ -187,8 +188,30 @@ module Symbiosis
       # If no domain has been defined, nil is returned.
       #
       def domain_directory
-        if defined?(@domain) and @domain.is_a?(Symbiosis::Domain) 
+        if defined?(@domain) and @domain.is_a?(Symbiosis::Domain)
           @domain.directory
+        else
+          nil
+        end
+      end
+
+      #
+      # Returns the domain's htdocs directory.
+      #
+      def htdocs_directory
+        if defined?(@domain) and @domain.is_a?(Symbiosis::Domain)
+          @domain.htdocs_dir
+        else
+          nil
+        end
+      end
+
+      #
+      # Returns the domain's cgi-bin directory.
+      #
+      def cgibin_directory
+        if defined?(@domain) and @domain.is_a?(Symbiosis::Domain)
+          @domain.cgibin_dir
         else
           nil
         end
@@ -212,11 +235,11 @@ module Symbiosis
         ans = []
         if defined?(@domain) and @domain.is_a?(Symbiosis::Domain)
           #
-          # 
+          #
           #
           ans << "SSLCertificateFile #{@domain.ssl_certificate_file}"
           #
-          # Add the separate key unless the key is in the certificate. 
+          # Add the separate key unless the key is in the certificate.
           #
           ans << "SSLCertificateKeyFile #{@domain.ssl_key_file}" unless @domain.ssl_certificate_file == @domain.ssl_key_file
           #
@@ -245,7 +268,7 @@ module Symbiosis
       # If no domain is set, then this returns false.
       #
       def mandatory_ssl?
-        if defined?(@domain) and @domain.is_a?(Symbiosis::Domain) 
+        if defined?(@domain) and @domain.is_a?(Symbiosis::Domain)
           @domain.ssl_mandatory?
         else
           false

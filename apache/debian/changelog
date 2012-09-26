@@ -1,3 +1,18 @@
+symbiosis-httpd (2012:0926) stable; urgency=low
+
+  * symbiosis-httpd now requires geoip-database, which is neeeded by
+    Webalizer.  Fixes #3741.
+  * symbiosis-generate-stats updated to be more flexible with file locations.
+  * symbiosis-generate-stats updated to be more verbose, when required.
+  * symbiosis-generate-stats now will not create the stats directory unless
+    the parent directory is owned by the same user.
+  * Symbiosis::ConfigFiles::Apache now uses Symbiosis::Domain#public_dir.
+  * Symbiosis::ConfigFiles::Apache has a couple of new methods,
+    htdocs_directory and cgibin_directory for use in templates.
+  * The templates have been updated to use these methods.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 26 Sep 2012 13:20:14 +0100
+
 symbiosis-httpd (2012:0529) stable; urgency=low
 
   * Added manpage for symbiosis-rotate-logs.

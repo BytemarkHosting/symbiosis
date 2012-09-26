@@ -145,39 +145,18 @@ Symbiosis::Domains.each do |domain|
   end
 
   #
-  # OK now we need to look for a logfile, or two.
-  #
-  #  access.log     for HTTP accesses.
-  #  ssl_access.log for HTTPS accesses.
-  #
-  process = Array.new()
-
-  %w( access.log.1 ssl_access.log.1 ).each do |name|
-    log = File.join( domain.log_dir, name ) 
-    process.push(log) if File.exists?(log) 
-  end
-
-  #
-  # If we didn't find a logfile we're done.
-  #
-  if ( process.empty? )
-    verbose "\tSkipping this domain, no suitable logfiles found"
-    next
-  end
-
-  #
-  #  Create a configuration file, if one wasn't found.
+  # Create a configuration file, if one wasn't found.
   #
   webalizer_conf = File.join( domain.config_dir, "webalizer.conf" )
 
   config          = Symbiosis::ConfigFiles::Webalizer.new(webalizer_conf, "#")
-  config.template = template 
+  config.template = template
   config.domain   = domain
 
   write_config = false
 
   #
-  # This is taken from symbiosis-create-stes
+  # This is taken from symbiosis-create-sites
   #
   if ( $FORCE )
     verbose "\tForcing re-creation of configuration due to --force."
@@ -210,13 +189,99 @@ Symbiosis::Domains.each do |domain|
   #
   config.write if write_config
 
+  #
+  # OK now we need to look for a logfile, or two.
+  #
+  #  access.log     for HTTP accesses.
+  #  ssl_access.log for HTTPS accesses.
+  #
+  #
+  # Firstly check when webalizer was last run.
+  #
+  last_run = nil
 
   #
-  #  If we don't have a statistics directory then we need to create it,
-  # and we need to create it with the domains' UID/GID.  This method will not
-  # error if the directory already exists.
+  # Read webalizer config to find where the history file is kept, so we can see when
   #
-  domain.create_dir( domain.stats_dir )
+  output_dir   = domain.config_dir
+  history_name = "webalizer.hist"
+
+  File.open(config.filename) do |fh|
+    while line = fh.gets
+      case line.chomp
+        when /^ *HistoryName +([^ ]+)/
+          history_name = $1
+        when /^ *OutputDir +([^ ]+)/
+          output_dir = $1
+      end
+    end
+  end
+
+  #
+  # Make sure the output dir is absolute
+  #
+  unless output_dir =~ /^\//
+    output_dir = File.join(domain.config_dir, output_dir)
+  end
+
+  #
+  # Work out the history file name
+  #
+  if history_name =~ /^\//
+    history_file = history_name
+  else
+    history_file = File.join(output_dir, history_name)
+  end
+
+  #
+  # Now stat() it -- webalizer updates this file with each run.
+  #
+  if File.exists?(history_file)
+    last_run = File.stat(history_file).mtime
+  end
+
+  #
+  # Now select all the log files, and sort based on mtime.
+  #
+  process = Dir.glob(File.join(domain.log_dir,'{ssl_access,access}.log.*')).reject do |log|
+    last_run and File.stat(log).mtime < last_run
+  end.sort{|a,b| File.stat(a).mtime <=> File.stat(b).mtime}
+
+  #
+  # If we didn't find a logfile we're done.
+  #
+  if ( process.empty? )
+    verbose "\tSkipping this domain, no suitable logfiles found"
+    next
+  end
+
+  #
+  # Iterate through the stats directory until we find a directory that exists,
+  #
+  cdir = output_dir
+  while cdir != "/"
+    break if File.exists?(cdir)
+    cdir, odir = File.split(cdir)
+  end
+
+  #
+  # Now make sure that this directory is owned by the domain's owner.
+  #
+  unless File.stat(cdir).uid == domain.uid
+    if File.symlink?(cdir)
+      verbose "\tSkipping as #{File.readlink(cdir)} (symlinked from #{cdir}) is not owned by #{domain.user}."
+    else
+      verbose "\tSkipping as #{cdir} is not owned by #{domain.user}."
+    end
+    next
+  end
+
+  #
+  # If we don't have a statistics directory then we need to create it, and we
+  # need to create it with the domains' UID/GID.  This method will not error if
+  # the directory already exists.
+  #
+  domain.create_dir( output_dir )
 
   #
   #  Now process each logfile.
@@ -226,9 +291,8 @@ Symbiosis::Domains.each do |domain|
   #
   #  Now run it under sudo, as the user ID of the domain.
   #
-  system( "cd #{domain.config_dir} && sudo -u '\##{domain.uid}' -- webalizer -q #{process.join(" ")} >/dev/null 2>/dev/null" )
+  quiet = ($VERBOSE ? "-d" : "-Q")
+  system( "cd #{domain.config_dir} && sudo -u '\##{domain.uid}' -- webalizer -c #{webalizer_conf} #{quiet} #{process.join(" ")}" )
 
 end
-
-
 
