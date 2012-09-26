@@ -1,3 +1,12 @@
+symbiosis-common (2012:0926) stable; urgency=low
+
+  * Updated Symbiosis::Domain to have a public_dir method to specify its
+    public directory.
+  * Removed the automatic creation of public/cgi-bin in the postinst for the
+    default domain, as it is not strictly needed.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 26 Sep 2012 11:40:19 +0100
+
 symbiosis-common (2012:0911) stable; urgency=low
 
   * Fixed SSL certificate subject checking for a domain.  The primary name is

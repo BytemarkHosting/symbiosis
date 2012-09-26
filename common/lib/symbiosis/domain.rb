@@ -128,10 +128,18 @@ module Symbiosis
     end
 
     #
+    # Public directory -- this is where non-private stuff is stored, i.e. logs
+    # and htdocs, mostly.
+    #
+    def public_dir
+      File.join(self.directory, "public")
+    end
+
+    #
     # Domains logfile directory.  Defaults to self.directory/public/logs
     #
     def log_dir
-      File.join(self.directory,"public","logs")
+      File.join(self.public_dir, "logs")
     end
 
     #
