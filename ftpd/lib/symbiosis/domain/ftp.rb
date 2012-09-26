@@ -14,10 +14,10 @@ module Symbiosis
 
     #
     # Returns the FTP chroot directory.  Currently defaults to
-    # self.directory/public/./
+    # the domain's public directory.
     #
     def ftp_chroot_dir
-      File.join(self.directory, "public", ".", "")
+      File.join(self.public_dir, "./")
     end
 
     #

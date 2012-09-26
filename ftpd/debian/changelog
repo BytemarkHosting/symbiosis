@@ -1,3 +1,10 @@
+symbiosis-ftpd (2012:0926) stable; urgency=low
+
+  * Updated the FTP library to use Symbiosis::Domain#public_dir.
+  * Changed debian/control to require new symbiosis-common package.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 26 Sep 2012 13:18:35 +0100
+
 symbiosis-ftpd (2012:0912) stable; urgency=low
 
   * Updated FTP login tests to test for both plain and crypted passwords.
