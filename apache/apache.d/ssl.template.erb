@@ -67,7 +67,8 @@ NameVirtualHost <%= ip %>:80
         #
         # General CGI Handling
         #
-        ScriptAlias /cgi-bin/ <%=cgibin_directory %>
+        ScriptAlias /cgi-bin/ <%= cgibin_directory %>
+
         <Location /cgi-bin>
                 Options +ExecCGI
         </Location>
@@ -120,6 +121,7 @@ NameVirtualHost <%= ip %>:80
         # General CGI Handling
         #
         ScriptAlias /cgi-bin/ <%= cgibin_directory %>
+
         <Location /cgi-bin>
                 Options +ExecCGI
         </Location>
