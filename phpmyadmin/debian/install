@@ -1,2 +1,2 @@
 test.d                    etc/symbiosis/
-
+patterns.d                etc/symbiosis/firewall/
