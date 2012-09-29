@@ -45,7 +45,7 @@ module Symbiosis
     # stats inside the htdocs_dir
     #
     def stats_dir
-      File.join(self.htdocs_dir "stats")
+      File.join(self.htdocs_dir, "stats")
     end
 
     #

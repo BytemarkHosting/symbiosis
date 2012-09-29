@@ -1,3 +1,9 @@
+symbiosis-httpd (2012:0929) stable; urgency=low
+
+  * Fixed error in symbiosis/domain/http.rb.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Sat, 29 Sep 2012 20:34:57 +0100
+
 symbiosis-httpd (2012:0927) stable; urgency=low
 
   * Added extra spaces to the SSL/non-SSL to fix a regression introduced in
