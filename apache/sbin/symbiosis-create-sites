@@ -9,7 +9,7 @@
 #  symbiosis-create-sites [ --ssl-template | -s <file> ] 
 #                         [ --non-ssl-template | -t <file> ] 
 #                         [ --apache2-dir | -a <directory> ] 
-#                         [ --force | -f ] [ --no-restart | -r ]
+#                         [ --force | -f ] [ --no-reload | -r ]
 #                         [ --help | -h ] [ --manual | -m ] [ --verbose | -v ]
 #
 # OPTIONS
@@ -28,7 +28,7 @@
 #
 # --force, -f       Force the re-creation of all sites.
 #
-# --no-restart, -r  Do not restart apache2 even if changes have taken place.
+# --no-reload, -r  Do not reload apache2 even if changes have taken place.
 #
 # --manual, -m      Show the manual for this script.
 #
@@ -59,9 +59,9 @@ help      = false
 manual    = false
 
 #
-#  Do we need to restart apache?
+#  Do we need to reload apache?
 #
-$RESTART=false
+$RELOAD=false
 
 #
 # The root directory -- '/' by default.
@@ -70,14 +70,15 @@ root = "/"
 non_ssl_template = nil 
 ssl_template     = nil 
 apache2_dir      = nil
-no_restart       = false
+no_reload       = false
 
 opts = GetoptLong.new(
          [ '--help',             '-h', GetoptLong::NO_ARGUMENT ],
          [ '--manual',           '-m', GetoptLong::NO_ARGUMENT ],
          [ '--verbose',          '-v', GetoptLong::NO_ARGUMENT ],
          [ '--force',            '-f', GetoptLong::NO_ARGUMENT ],
-         [ '--no-restart',       '-n', GetoptLong::NO_ARGUMENT],
+         [ '--no-reload',        '-n', GetoptLong::NO_ARGUMENT],
+         [ '--no-restart',       '-N', GetoptLong::NO_ARGUMENT],
          [ '--ssl-template',     '-s', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--non-ssl-template', '-t', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--apache2-dir',      '-a', GetoptLong::REQUIRED_ARGUMENT ],
@@ -94,8 +95,11 @@ opts.each do |opt, arg|
     apache2_dir = arg
   when '--root'
     root = arg
+  when '--no-reload'
+    no_reload = true
+  # This is a legacy option.
   when '--no-restart'
-    no_restart = true
+    no_reload = true
   when '--help'
     help = true
   when '--manual'
@@ -270,8 +274,8 @@ Symbiosis::Domains.each do |domain|
       verbose "\tWriting configuration"
       config.write
 
-      # Definitely restart if we've rewritten the config.
-      $RESTART = true
+      # Definitely reload if we've rewritten the config.
+      $RELOAD = true
 
       unless config.enabled?(sites_enabled_file)
         verbose "\tEnabling site"
@@ -294,8 +298,8 @@ end
 #
 #  All done.
 #
-if ( $RESTART and !no_restart )
-  verbose "Restarting Apache"
+if ( $RELOAD and !no_reload )
+  verbose "Reloading Apache"
 
-  system( "/etc/init.d/apache2 restart" )
+  system( "/etc/init.d/apache2 reload" )
 end
