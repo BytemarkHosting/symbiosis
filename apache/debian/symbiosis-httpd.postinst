@@ -7,8 +7,6 @@
 # --
 #
 
-
-
 set -e
 
 #
@@ -23,7 +21,7 @@ fi
 #  Remove any existing sites (the zz-mass-hosting ones will be recreated later).
 #
 for i in mass-hosting mass-hosting.ssl zz-mass-hosting zz-mass-hosting.ssl default 000-default 00-default ; do
-  a2dissite $i > /dev/null 2>&1 || true
+  a2dissite -q $i 2>/dev/null || true
 done
 
 ##
@@ -31,24 +29,33 @@ done
 ##
 
 #
-#  Enable common modules
+#  Enable common modules + mod_vhost_bytemark
 #
-a2enmod rewrite      >/dev/null 2>/dev/null
-a2enmod cgi          >/dev/null 2>/dev/null
-a2enmod php5         >/dev/null 2>/dev/null
-a2enmod ssl          >/dev/null 2>/dev/null
-a2enmod dir          >/dev/null 2>/dev/null
+restart_type="reload"
+for mod in rewrite cgi php5 ssl dir mod_vhost_bytemark ; do
+  if ! [ -e /etc/apache2/mods-enabled/$mod.load ] ; then
+    echo "I: enabling apache module $mod"
+    restart_type="restart"
+    a2enmod -q $mod
+  fi
+done
 
 #
-#  Use the bytemark module for mass-hosting.
+# Disable other old/unwanted modules.
 #
-a2enmod  mod_vhost_bytemark  >/dev/null 2>/dev/null
-a2dismod vhost_alias         >/dev/null 2>/dev/null
+for mod in vhost_alias ; do
+  if [ -e /etc/apache2/mods-enabled/$mod.load ] ; then
+    echo "I: disabling apache module $mod"
+    restart_type="restart"
+    a2dismod -q $mod
+  fi
+done
 
 #
 # Now create the mass-hosting snippets
 #
-symbiosis-create-mass-hosting-sites --no-restart --verbose
+symbiosis-create-mass-hosting-sites --no-reload --verbose
+symbiosis-create-sites              --no-reload --verbose
 
 #
 # And enable (if not already enabled)
@@ -97,10 +104,6 @@ fi
 #
 #  Restart Apache2.
 #
-if which invoke-rc.d >/dev/null 2>&1; then
-    invoke-rc.d apache2 restart
-else
-    /etc/init.d/apache2 restart
-fi
+invoke-rc.d apache2 $restart_type
 
 exit 0
