@@ -159,17 +159,11 @@ ssl_template     = File.join(root, "/etc/symbiosis/apache.d/zz-mass-hosting.ssl.
 apache2_dir      = File.join(root, "/etc/apache2") if apache2_dir.nil?
 
 #
-# Any arguments on the command line specify which domains to do.
+# For each template.
 #
-domains_to_configure = ARGV
-
-primary_ips = [Symbiosis::Host.primary_ipv4, Symbiosis::Host.primary_ipv6]
-
-#
-#  For each domain.
-#
-
 [non_ssl_template, ssl_template].each do |tmpl|
+  verbose "Template: #{tmpl} "
+
   begin
     tmpl_basename        = File.basename(tmpl, ".template.erb")
     sites_available_file = File.join(apache2_dir, "sites-available","#{tmpl_basename}")
@@ -200,7 +194,7 @@ primary_ips = [Symbiosis::Host.primary_ipv4, Symbiosis::Host.primary_ipv6]
         verbose "\tRe-creating configuration as it is out of date."
 
       else
-        verbose "\tSite already present and up-to date."
+        verbose "\tSite is present and up-to date."
         next
 
       end
