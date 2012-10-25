@@ -188,13 +188,13 @@ Symbiosis::Domains.each do |domain|
     config.domain = domain
 
     if domain.ips.any?{|ip| primary_ips.include?(ip)}
-      verbose "\tNot configuring this site, as it is using at least one of this host's primary IPs."
+      verbose "\tThis site is using the host's primary IPs -- it is covered by the mass-hosting config.  Skipping."
       next
     end
 
     document_root = File.join(domain.directory,"public","htdocs")
     unless File.directory?(document_root)
-      verbose "\tNot configuring this site, as its document root #{document_root} does not exist."
+      verbose "\tThe document root #{document_root} does not exist.  Skipping"
       next
     end
 
