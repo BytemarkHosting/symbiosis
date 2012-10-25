@@ -59,6 +59,7 @@ opts = GetoptLong.new(
                       [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
                       [ '--verbose',    '-v', GetoptLong::NO_ARGUMENT ],
                       [ '--force',      '-f', GetoptLong::NO_ARGUMENT ],
+                      [ '--prefix',     '-p', GetoptLong::REQUIRED_ARGUMENT ],
                       [ '--template',   '-t', GetoptLong::REQUIRED_ARGUMENT ]
                       )
 
