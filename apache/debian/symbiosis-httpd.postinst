@@ -21,7 +21,7 @@ fi
 #  Remove any existing sites (the zz-mass-hosting ones will be recreated later).
 #
 for i in mass-hosting mass-hosting.ssl zz-mass-hosting zz-mass-hosting.ssl default 000-default 00-default ; do
-  a2dissite -q $i 2>/dev/null || true
+  a2dissite -q $i || true
 done
 
 ##
@@ -60,8 +60,9 @@ symbiosis-create-sites              --no-reload --verbose
 #
 # And enable (if not already enabled)
 #
-a2ensite zz-mass-hosting     > /dev/null 2>&1
-a2ensite zz-mass-hosting.ssl > /dev/null 2>&1
+for i in zz-mass-hosting zz-mass-hosting.ssl ; do
+  a2ensite -q $i || true
+done
 
 #######################################
 # Remove old cronjobs.
