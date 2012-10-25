@@ -6,8 +6,8 @@
 #
 # SYNOPSIS
 #  symbiosis-generate-stats [ --template | -t <filename> ] [ --force | -f ]
-#       [ -h | --help ] [-m | --manual] [ -v | --verbose ]
-#
+#                           [ --prefix | -p <directory> ] [ -h | --help ]
+#                           [-m | --manual] [ -v | --verbose ]
 #
 # OPTIONS
 #  -t, --template <file>   Set the webalizer config template file. Defaults to
@@ -16,12 +16,13 @@
 #  -f, --force             Force regeneration of the webalizer configuration
 #                          snippet for all domains.
 #
+#  -p, --prefix <directory>  Prefix directory, defaults to /srv.
+#
 #  -h, --help              Show a help message, and exit.
 #
 #  -m, --manual            Show this manual, and exit.
 #
 #  -v, --verbose           Show verbose errors
-#
 #
 # USAGE
 #
@@ -51,7 +52,7 @@ help         = false
 manual       = false
 $VERBOSE     = false
 $FORCE       = false
-
+prefix       = "/srv"
 
 opts = GetoptLong.new(
                       [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
@@ -75,6 +76,8 @@ begin
       $FORCE = true
     when '--template'
       template = arg
+    when '--prefix'
+      prefix = arg
     end
   end
 rescue
@@ -125,7 +128,7 @@ def verbose(s) ; puts s if $VERBOSE ; end
 #
 #  Potentially we process each domain.
 #
-Symbiosis::Domains.each do |domain|
+Symbiosis::Domains.each(prefix) do |domain|
   verbose "Considering domain: #{domain}"
 
   #
@@ -286,13 +289,14 @@ Symbiosis::Domains.each do |domain|
   #
   #  Now process each logfile.
   #
-  puts "\tRunning webalizer against #{process.join(" ")}" if $VERBOSE
+  process.each do |stinking_log_file|
+    puts "\tRunning webalizer against #{stinking_log_file}" if $VERBOSE
 
-  #
-  #  Now run it under sudo, as the user ID of the domain.
-  #
-  quiet = ($VERBOSE ? "-d" : "-Q")
-  system( "cd #{domain.config_dir} && sudo -u '\##{domain.uid}' -- webalizer -c #{webalizer_conf} #{quiet} #{process.join(" ")}" )
-
+    #
+    #  Now run it under sudo, as the user ID of the domain.
+    #
+    quiet = ($VERBOSE ? "-d" : "-Q")
+    system( "cd #{domain.config_dir} && sudo -u '\##{domain.uid}' -- webalizer -c #{webalizer_conf} #{quiet} #{stinking_log_file}" )
+  end
 end
 
