@@ -10,8 +10,7 @@
 #
 # OPTIONS
 #
-#  -n, --max-rotations <n>   Maximum number of rotations to keep, defaults to
-#                            30.
+#  -n, --max-rotations <n>   Maximum number of rotations to keep, defaults to 30.
 #
 #  -c, --compress-at <n>     Rotation at which the log file should be
 #                            compressed, defaults to 2.
@@ -282,7 +281,13 @@ if ( rotated )
   verbose( "Since we rotated we now restart the apache logger")
   Kernel.system( "killall -HUP symbiosis-apache-logger" )
   verbose( "Since we rotated we now generate statistics" )
-  Kernel.system( "/usr/sbin/symbiosis-generate-stats" ) 
+  
+  #
+  # Add similar arguments on to the generate-stats command as wot we received.
+  #
+  stats_args  = " --prefix #{prefix}"
+  stats_args += " --verbose" if $VERBOSE
+  Kernel.system( "/usr/sbin/symbiosis-generate-stats #{stats_args}" ) 
 end
 
 
