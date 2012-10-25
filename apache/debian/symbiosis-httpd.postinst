@@ -21,7 +21,7 @@ fi
 #  Remove any existing sites (the zz-mass-hosting ones will be recreated later).
 #
 for i in mass-hosting mass-hosting.ssl zz-mass-hosting zz-mass-hosting.ssl default 000-default 00-default ; do
-  a2dissite -q $i || true
+  a2dissite -q $i 2>/dev/null || true
 done
 
 ##
@@ -61,7 +61,7 @@ symbiosis-create-sites              --no-reload --verbose
 # And enable (if not already enabled)
 #
 for i in zz-mass-hosting zz-mass-hosting.ssl ; do
-  a2ensite -q $i || true
+  a2ensite -q $i 2>/dev/null || true
 done
 
 #######################################

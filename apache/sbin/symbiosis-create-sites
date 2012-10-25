@@ -176,7 +176,7 @@ Symbiosis::Domains.each do |domain|
   next unless domains_to_configure.empty? or domains_to_configure.include?(domain.name)
 
   if domain.is_alias?
-    verbose "\tSkipping as #{domain.symlink} is a link to #{domain.directory}."
+    verbose "\t#{domain.symlink} is a link to #{domain.directory}.  Skipping."
     next
   end
 
@@ -256,7 +256,7 @@ Symbiosis::Domains.each do |domain|
         verbose "\tRe-creating configuration as it is out of date."
 
       else
-        verbose "\tSite already present and up-to date."
+        verbose "\tConfiguration is up-to date."
         next
 
       end

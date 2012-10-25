@@ -12,7 +12,7 @@ symbiosis-httpd (2012:1025) stable; urgency=low
     templates.
   * Verbose output of symbiosis-create-(mass-hosting-)?sites is clearer.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 25 Oct 2012 15:45:49 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk> Thu, 25 Oct 2012 16:09:15 +0100
 
 symbiosis-httpd (2012:0929) stable; urgency=low
 

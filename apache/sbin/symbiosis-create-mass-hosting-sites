@@ -162,12 +162,13 @@ apache2_dir      = File.join(root, "/etc/apache2") if apache2_dir.nil?
 # For each template.
 #
 [non_ssl_template, ssl_template].each do |tmpl|
-  verbose "Template: #{tmpl} "
 
   begin
     tmpl_basename        = File.basename(tmpl, ".template.erb")
     sites_available_file = File.join(apache2_dir, "sites-available","#{tmpl_basename}")
     sites_enabled_file   = File.join(apache2_dir, "sites-enabled","#{tmpl_basename}")
+
+    verbose "Mass hosting: #{tmpl_basename} "
 
     config          = Symbiosis::ConfigFiles::Apache.new(sites_available_file, "#")
     config.template = tmpl
@@ -194,7 +195,7 @@ apache2_dir      = File.join(root, "/etc/apache2") if apache2_dir.nil?
         verbose "\tRe-creating configuration as it is out of date."
 
       else
-        verbose "\tSite is present and up-to date."
+        verbose "\tConfiguration is up-to date."
         next
 
       end
