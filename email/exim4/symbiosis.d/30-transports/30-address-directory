@@ -39,4 +39,14 @@ address_directory:
              ${if eq{$2}{}{b}{$2}}\
             }{k=1000 M=1000000 G=1000000000 ki=1024 Mi=1048576 Gi=1073741824}{$value}{1}}}\
           }{0}}
+  #
+  # Make sure we only have one quota for the whole mailbox
+  #
+  quota_directory    = VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/Maildir/
+  #
+  # Allow the quota-busting message through.
+  #
+  quota_is_inclusive = false
+
+
 
