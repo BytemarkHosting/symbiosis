@@ -21,23 +21,22 @@ address_directory:
   #  b) Use the per-domain quota if set
   #  c) Use a zero quota
   #
-  # We then sanity check it to make sure that we're using the specified format.
-  #
-  # NB The Exim manual says that the multiplier can only be K,M, or G.  Dovecot
-  # wants k, M, or G.  Having had a look at the exim4 source, the comparison is
-  # done after making the multiplier lowercase, so we can specify k, M, or G.
-  #
-  # See line 301 of src/transports/appendfile.c in v4.72.
+  # If the quota is in the correct format, use a lookup table to find the
+  # correct multiplier for the integer, and mulitply it up appropriately.
   #
   quota = ${if match{ \
             ${if exists{VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/quota} \ 
               {${readfile{VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/quota}}} \
               { \
-                ${if exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/default_mailbox_quota} \
-                  {${readfile{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/default_mailbox_quota}}} \
+                ${if exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/mailbox-quota} \
+                  {${readfile{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/mailbox-quota}}} \
                   {0} \
                 } \
               } \
             } \
-          }{\N\b(\d+[kMG]?)\b\N}{$1}{0}}
+          }{\N\b(\d+)([kMG]i?)?\b\N}{\
+            ${eval:$1*${extract{\
+             ${if eq{$2}{}{b}{$2}}\
+            }{k=1000 M=1000000 G=1000000000 ki=1024 Mi=1048576 Gi=1073741824}{$value}{1}}}\
+          }{0}}
 

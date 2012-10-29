@@ -240,7 +240,7 @@ module Symbiosis
         ans = nil
       end
 
-      set_param("default-mailbox-quota", quota, self.config_dir)
+      set_param("mailbox-quota", quota, self.config_dir)
 
       ans
     end
@@ -251,7 +251,7 @@ module Symbiosis
     #
     def default_mailbox_quota
       quota = nil
-      param = get_param("default-mailbox-quota",self.config_dir)
+      param = get_param("mailbox-quota",self.config_dir)
 
       unless param.is_a?(String)
         quota = nil
