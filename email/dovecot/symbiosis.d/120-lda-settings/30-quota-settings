@@ -1,0 +1,5 @@
+#
+# Make sure that if a quota gets filled, this triggers a temporary denial
+#
+quota_full_tempfail = yes
+
