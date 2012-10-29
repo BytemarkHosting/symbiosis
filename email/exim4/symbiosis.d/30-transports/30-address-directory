@@ -14,6 +14,12 @@ address_directory:
   allow_symlink
   maildir_format
   maildir_use_size_file
+  #
+  # The maildir++ spec says that message size should be tagged to the end of
+  # each maildir file, so we better make sure we do it, even if exim4 doesn't
+  # need it :)
+  #
+  maildir_tag = ,S=$message_size
   # 
   # Work out if this is a symbiosis domain
   # and See if a per-domain quota has been set.
