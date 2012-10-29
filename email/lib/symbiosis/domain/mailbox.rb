@@ -5,9 +5,9 @@ require 'symbiosis/domain'
 module Symbiosis
 
   class Domain
-    
+
     class Mailbox
-  
+
       include Symbiosis::Utils
 
       #
@@ -60,7 +60,7 @@ module Symbiosis
       def create
         self.domain.create_dir(self.directory) unless self.exists?
         self
-      end 
+      end
 
       #
       # Returns true if the mailbox already exists.
@@ -76,7 +76,7 @@ module Symbiosis
       #
       def quota=(q)
         self.create
-        
+
         unless q.nil?
           ans = parse_quota(q)
         else
@@ -115,6 +115,59 @@ module Symbiosis
       end
 
       #
+      # This checks to see if the quota file updated by Dovecot/Exim4 needs to
+      # be removed, in case of quota changes.
+      #
+      def rebuild_quota_if_needed
+        #
+        # Both exim4 and dovecot use the maildirsize file.
+        #
+        maildirsize_file = File.join(self.mailbox, "maildirsize")
+
+        #
+        # If the maildirsize file is missing, return false because a rebuild just involves removing the file anyway.
+        #
+        return false if !File.exists?(maildirsize_file)
+
+        #
+        # Fetch the real quota, and set it to zero if none is set.
+        #
+        expected_size  = self.quota
+        expected_size  = 0 if real_size.nil?
+        expected_count = 0
+
+        #
+        # Now fetch + parse definition
+        #
+        real_size  = nil
+        real_count = nil
+
+        File.open(maildirsize_file, 'r') do |fh|
+          real_quota_definition = fh.gets
+        end
+
+        real_quota_definition.split(",").each do |qpart|
+          case qpart
+            when /^(\d+)S$/
+              real_size = $1
+            when /^(\d+)C$/
+              real_count = $1
+            else
+              next
+          end
+        end
+
+        #
+        # Remove the maildirsize file, unless real matches expectation.
+        #
+        unless (real_count == expected_count) and (real_size == expected_size)
+          File.unlink maildirsize_file
+        end
+
+        return nil
+      end
+
+      #
       # Returns the name of the mailbox password file.
       #
       def password_file
@@ -126,7 +179,7 @@ module Symbiosis
       # mailbox doesn't exist.
       #
       def password
-        if self.exists? and @password.nil? 
+        if self.exists? and @password.nil?
           #
           # Read the password
           #
@@ -156,7 +209,7 @@ module Symbiosis
         else
           set_param("password", @password, self.directory, :mode => 0600)
         end
-    
+
         return @password
       end
 
@@ -207,7 +260,7 @@ module Symbiosis
 
         results << Mailbox.new(local_part, self, mailboxes_dir)
       end
-      
+
       results
     end
 
@@ -222,7 +275,7 @@ module Symbiosis
 
     #
     # Create a new mail box for a local part.
-    # 
+    #
     def create_mailbox(local_part, mailboxes_dir = "mailboxes")
       mailbox = Mailbox.new(local_part, self, mailboxes_dir)
       mailbox.create
@@ -231,7 +284,7 @@ module Symbiosis
     #
     # Set the default mailbox quota for the domain.  Uses
     # Symbiosis::Utils#parse_quota to check the argment.  Returns an
-    # interpreted quota, i.e. an integer or nil.  
+    # interpreted quota, i.e. an integer or nil.
     #
     def default_mailbox_quota=(q)
       unless q.nil?
@@ -269,17 +322,17 @@ module Symbiosis
   end
 
   class Domains
-   
+
     #
     # Finds and returns a mailbox based on an email address.
-    #  
+    #
     def self.find_mailbox(address, prefix="/srv")
       raise ArgumentError, "Address is not a String" unless address.is_a?(String)
       address = address.downcase.split("@")
 
       domain = address.pop
       local_part = address.join("@")
-      
+
       domain = find(domain, prefix)
       return nil if domain.nil?
 
