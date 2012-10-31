@@ -2,12 +2,10 @@ $: << "../.."
 
 exit 0 if Process.euid != 0
 
-# require 'bytemark_vhost_mail'
 require 'test/unit'
 require "tempfile"
 require 'yaml'
 require 'timeout'
-# require "exim4/exim_rewrite_scan"
 require 'fileutils'
 
 # TODO Rewrite the basics of these tests..
@@ -468,6 +466,20 @@ class Exim4ConfigTest < Test::Unit::TestCase
     end
   end
 
+  def test_router_vhost_forward_sieve
+    do_acl_setup
+    domain = @acl_config['local_domains'].first
+    lp = "sieve_test"
+    mailbox = File.join(@vhost_dir, domain, @vhost_mailbox_dir, lp)
+    FileUtils.mkdir_p(mailbox)
+    FileUtils.touch(File.join(mailbox,"sieve"))
+    action = lp+"@"+domain
+    router = "vhost_forward_sieve"
+    transport = "dovecot_lda"
+    # change the action for testing
+    do_exim4_bt(lp+"@"+domain, action, router, transport)
+  end
+
   def test_router_vhost_vacation
     do_acl_setup
     domain = @acl_config['local_domains'].first
@@ -525,7 +537,6 @@ class Exim4ConfigTest < Test::Unit::TestCase
     FileUtils.chown_R("1000","1000", File.join(@vhost_dir,domain))
 
     do_acl_script('exim4_acl_tests/router_vhost_aliases_check')
-
   end
 
   def test_router_vhost_default_forward
@@ -545,10 +556,16 @@ class Exim4ConfigTest < Test::Unit::TestCase
   end
 
   def test_router_vhost_default_forward_check
-
   end
 
+  #
+  # postmaster should get re-written to root@$(hostname), which (in this
+  # instance) gets delivered by the exim4 mail_for_root router.
+  #
   def test_router_vhost_postmaster
+    do_acl_setup()
+    domain = @acl_config['local_domains'].first
+    do_exim4_bt("postmaster@"+domain, "/var/mail/mail", "mail_for_root", "address_file")
   end
 
   def test_router_system_aliases
@@ -619,7 +636,10 @@ class Exim4ConfigTest < Test::Unit::TestCase
   # TRANSPORTS
   ################################################################################
 
-  # I don't think there is anything we can do with this.  We'll just have to trust exim.
+  #
+  # I don't think there is anything we can do with this.  We'll just have to
+  # trust exim.
+  #
 
   ################################################################################
   # REWRITES
