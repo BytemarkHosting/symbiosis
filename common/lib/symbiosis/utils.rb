@@ -193,7 +193,7 @@ module Symbiosis
         #
         # Create the file
         #
-        safe_open(fn, File::WRONLY|File::CREAT, :mode => 0644, :uid => parent_dir_stat.uid, :gid => parent_dir_stat.gid) do |fh|
+        safe_open(fn, File::WRONLY|File::CREAT, opts) do |fh|
           #
           # We're good to go.
           #
