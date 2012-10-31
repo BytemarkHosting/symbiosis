@@ -173,7 +173,7 @@ EOF
     #
     # An IMAP/POP3 login should trigger this normally.
     #
-    @mailbox.rebuild_quota_if_needed
+    @mailbox.rebuild_maildirsize
 
     sender_address = "postmaster@#{@mailbox.domain.to_s}"
     rcpt_address   = @mailbox.username
@@ -266,7 +266,7 @@ EOF
     # Now create a quota 
     #
     @mailbox.quota = "5ki"
-    @mailbox.rebuild_quota_if_needed
+    @mailbox.rebuild_maildirsize
     
     # 
     # And make our message VERY long.

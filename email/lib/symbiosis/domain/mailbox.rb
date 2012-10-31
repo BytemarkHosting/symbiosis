@@ -1,6 +1,7 @@
 
 require 'symbiosis/domains'
 require 'symbiosis/domain'
+require 'socket'
 
 module Symbiosis
 
@@ -52,6 +53,13 @@ module Symbiosis
       #
       def directory
         File.join(self.domain.directory, self.mailboxes_dir, self.local_part)
+      end
+
+      #
+      # Returns the location of the Maildir
+      #
+      def maildir
+        File.join(self.directory, "Maildir")
       end
 
       #
@@ -118,33 +126,37 @@ module Symbiosis
       # This checks to see if the quota file updated by Dovecot/Exim4 needs to
       # be removed, in case of quota changes.
       #
-      def rebuild_quota_if_needed
+      def rebuild_maildirsize
         #
-        # Both exim4 and dovecot use the maildirsize file.
+        # Make sure the Maildir directory exists -- create it if missing.
         #
-        maildirsize_file = File.join(self.mailbox, "maildirsize")
-
-        #
-        # If the maildirsize file is missing, return false because a rebuild just involves removing the file anyway.
-        #
-        return false if !File.exists?(maildirsize_file)
+        self.domain.create_dir(self.maildir, 0700) unless File.directory?(self.maildir)
 
         #
         # Fetch the real quota, and set it to zero if none is set.
         #
         expected_size  = self.quota
-        expected_size  = 0 if real_size.nil?
         expected_count = 0
+
+        #
+        # If no quota has been set, or it is zero, remove the maildirsize file.
+        #
+        if expected_size.nil? or (0 == expected_size and 0 == expected_count)
+          set_param("maildirsize", false, self.maildir)
+          return nil
+        end
 
         #
         # Now fetch + parse definition
         #
-        real_size  = nil
-        real_count = nil
+        real_size  = 0
+        real_count = 0
+        real_quota_definition = get_param("maildirsize", self.maildir)
 
-        File.open(maildirsize_file, 'r') do |fh|
-          real_quota_definition = fh.gets
-        end
+        #
+        # If no real_quota_definition was found, set it to an empty string.
+        #
+        real_quota_definition = "" if false == real_quota_definition
 
         real_quota_definition.split(",").each do |qpart|
           case qpart
@@ -158,10 +170,75 @@ module Symbiosis
         end
 
         #
-        # Remove the maildirsize file, unless real matches expectation.
+        # If things are OK, just return
         #
-        unless (real_count == expected_count) and (real_size == expected_size)
-          File.unlink maildirsize_file
+        return nil if (real_count == expected_count) and (real_size == expected_size)
+
+        #
+        # Otherwise rebuild the maildirsize file, unless real matches expectation.
+        #
+        used_size = 0
+        used_count = 0
+
+        %w(new cur).each do |dir|
+          Dir.glob(File.join(self.maildir,"**",dir,"*"), File::FNM_DOTMATCH).each do |fn|
+            next unless File.file?(fn)
+            used_count += 1
+            #
+            #  ,S=nnnn[:,]
+            #
+            if fn =~ /,S=(\d+)(?:[:,]|$)/
+              used_size += $1.to_i
+            else
+              begin
+                used_size += File.stat(fn).size
+              rescue Erro::ENOENT
+                # do nothing
+              end
+            end
+          end
+        end
+
+        #
+        # This is the OFFISHAL way.  See http://www.courier-mta.org/imap/README.maildirquota.html
+        #
+        # Start with a temporary file, using DJB's unique name generator. http://cr.yp.to/proto/maildir.html 
+        # 
+        tv = Time.now
+        tmpfile = File.join(self.maildir, "tmp", [tv.tv_sec, "M#{tv.tv_usec}P#{Process.pid}", Socket.gethostname].join("."))
+
+        #
+        # Make sure there's a temporary directory available
+        #
+        self.domain.create_dir(File.dirname(tmpfile), 0700) unless File.exists?(File.dirname(tmpfile))
+
+        begin
+          #
+          # Now open the temp file, and write
+          #
+          safe_open(tmpfile, File::WRONLY|File::CREAT, :mode => 0644, :uid => self.domain.uid, :gid => self.domain.gid) do |fh|
+            #
+            # Truncate the file and write.
+            #
+            fh.truncate(0)
+
+            #
+            # Apparently we should make sure the line is 14 characters long, including newline.
+            #
+            fh.write "#{expected_size}S,#{expected_count}C".ljust(13) + "\n"
+            fh.write "#{used_size} #{used_count}".ljust(13) + "\n"
+          end
+
+          #
+          # Now rename our file.
+          #
+          File.rename(tmpfile, File.join(self.maildir, "maildirsize"))
+
+        ensure
+          #
+          # Make sure we clear up after ourselves.
+          #
+          File.unlink(tmpfile) if File.eixsts?(tmpfile)
         end
 
         return nil
