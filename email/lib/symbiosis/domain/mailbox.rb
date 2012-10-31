@@ -238,7 +238,7 @@ module Symbiosis
           #
           # Make sure we clear up after ourselves.
           #
-          File.unlink(tmpfile) if File.eixsts?(tmpfile)
+          File.unlink(tmpfile) if File.exist?(tmpfile)
         end
 
         return nil
