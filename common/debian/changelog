@@ -1,3 +1,9 @@
+symbiosis-common (2012:1031) lucid; urgency=low
+
+  * Symbiois::Utils#set_param now passes paramters given on to safe_open.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 31 Oct 2012 14:47:25 +0000
+
 symbiosis-common (2012:0926) stable; urgency=low
 
   * Updated Symbiosis::Domain to have a public_dir method to specify its
