@@ -1,18 +1,27 @@
-symbiosis-email (2012:1029) stable; urgency=low
+symbiosis-email (2012:1031) stable; urgency=low
 
   * Dovecot LDA now returns a temporary failure when a mailbox is overquota,
-    ensuring it behaves like exim4 in this situation.
+    ensuring it behaves like Exim4 in this situation.
   * Corrected default mailbox quota parameter filename to be mailbox-quota
     everywhere, rather than default_mailbox_quota or default-mailbox-quota.
   * Exim4 quotas now support the documented suffixes of k, M, G, ki, Mi, Gi.
   * Exim4 quotas are now based on the size of just one Maildir, rather than
-    any sub-folders, ensuring enforcement for deliveries made during an exim
+    any sub-folders, ensuring enforcement for deliveries made during an Exim
     filter.
   * Re-strengthened dependencies such that spamassassin & clamav scanners are
     required and not merely recommended, since the post-install script assumes
     both are instralled.
+  * When users log in over IMAP/POP3/SMTP the maildirsize quota file, which
+    the Dovecot LDA relies on, is now rebuilt.
+  * Exim4 now tags maildir-delivered messages with their size, which it later
+    uses for quota calculations.
+  * Dovecot will now automatically create the maildir during delivery if not
+    already there.
+  * Added more tests for both Exim4 and Dovecot.
+  * The IMAP quota is now named, so it shouldn't break apple mail, according
+    to the Dovecot documentation.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 29 Oct 2012 11:11:10 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 31 Oct 2012 16:47:36 +0000
 
 symbiosis-email (2012:0815) stable; urgency=low
 
