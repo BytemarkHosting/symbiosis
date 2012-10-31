@@ -1,6 +1,6 @@
   #
   # Set the default quota rule as "unlimited".
   #
-  quota      = maildir
+  quota      = maildir:Symbiosis mailbox quota
   quota_rule = ?:storage=0
 
