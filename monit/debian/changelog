@@ -1,3 +1,10 @@
+symbiosis-monit (2012:1031) stable; urgency=low
+
+  * Updated the man-page of "symbiosis-monit" to refer to the correct
+    filename to disable the tool.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 31 Oct 2012 10:10:10 +0000
+
 symbiosis-monit (2012:0816) stable; urgency=low
 
   * Updated --verbose flag to do what one would expect it to do, which is
