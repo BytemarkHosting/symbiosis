@@ -75,7 +75,7 @@
 # DISABLING
 #
 # This program may be disabled by creating an empty file with called
-# /etc/symbiosis.d/monit/disabled
+# /etc/symbiosis/monit.d/disabled
 #
 # Also if /var/lib/initscripts/nologin exists, it is assumed that the system is
 # still booting, and as such symbiosis-monit will not run.
