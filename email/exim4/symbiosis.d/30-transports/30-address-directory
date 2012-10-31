@@ -9,17 +9,19 @@ address_directory:
   return_path_add
   # This is enabled by default, but just to be explicit..
   create_directory
-  check_string = ""
-  escape_string = ""
   allow_symlink
   maildir_format
   maildir_use_size_file
   #
+  # Make sure we only have one quota for the whole mailbox
+  #
+  quota_directory    = VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/Maildir/
+  #
   # The maildir++ spec says that message size should be tagged to the end of
-  # each maildir file, so we better make sure we do it, even if exim4 doesn't
-  # need it :)
+  # each maildir file, so we better make sure we do it.
   #
   maildir_tag = ,S=$message_size
+  quota_size_regex = ,S=(\d+)
   # 
   # Work out if this is a symbiosis domain
   # and See if a per-domain quota has been set.
@@ -43,16 +45,6 @@ address_directory:
           }{\N\b(\d+)([kMG]i?)?\b\N}{\
             ${eval:$1*${extract{\
              ${if eq{$2}{}{b}{$2}}\
-            }{k=1000 M=1000000 G=1000000000 ki=1024 Mi=1048576 Gi=1073741824}{$value}{1}}}\
+            }{k=1000 M=1000000 G=1000000000 T=1000000000000 ki=1024 Mi=1048576 Gi=1073741824 Ti=1099511627776}{$value}{1}}}\
           }{0}}
-  #
-  # Make sure we only have one quota for the whole mailbox
-  #
-  quota_directory    = VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/Maildir/
-  #
-  # Allow the quota-busting message through.
-  #
-  quota_is_inclusive = false
-
-
 
