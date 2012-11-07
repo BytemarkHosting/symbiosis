@@ -44,8 +44,8 @@ module Symbiosis
       #
       # Make sure the name is a valid domain name.
       #
-      unless name =~ NAME_REGEXP
-        raise ArgumentError, "Bad name '#{name.inspect}'"
+      unless @name =~ NAME_REGEXP
+        raise ArgumentError, "Bad name '#{@name.inspect}'"
       end
 
       #
