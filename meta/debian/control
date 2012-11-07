@@ -23,7 +23,8 @@ Recommends: symbiosis-backup (>= 2012:0222),
   symbiosis-pam (>= 2012:0222), 
   symbiosis-phpmyadmin (>= 2012:0222), 
   symbiosis-tinydns (>= 2012:0222), 
-  symbiosis-webmail (>= 2012:0222) 
+  symbiosis-webmail (>= 2012:0222),
+  openssh-server
 Replaces: bytemark-vhost
 Conflicts: bytemark-vhost
 Provides: bytemark-vhost
