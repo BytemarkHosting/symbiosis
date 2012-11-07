@@ -29,12 +29,18 @@ class TestUtils < Test::Unit::TestCase
     dir = File.join(@prefix,"a","b")
     uid = Process.euid
     gid = Process.groups.first
+    gid = Process.egid if gid.nil?
 
     assert_nothing_raised{ mkdir_p(dir, :uid => uid, :gid => gid, :mode => 0700) }
     assert(File.directory?(dir),"mkdir_p did not create the directroy #{dir}")
-    assert_equal(uid, File.stat(dir).uid, "mkdir_p did not set the uid correctly")
-    assert_equal(gid, File.stat(dir).gid, "mkdir_p did not set the gid correctly")
-    assert_equal(0700, File.stat(dir).mode & 0700, "Permissions on #{dir} are not what were set.")
+
+    #
+    # Now stat the directory.
+    #
+    stat = File.stat(dir)
+    assert_equal(uid, stat.uid, "mkdir_p did not set the uid correctly")
+    assert_equal(gid, stat.gid, "mkdir_p did not set the gid correctly")
+    assert_equal(0700, stat.mode & 0700, "Permissions on #{dir} are not what were set.")
 
     #
     # Make sure we can't create a directory on top of a file
