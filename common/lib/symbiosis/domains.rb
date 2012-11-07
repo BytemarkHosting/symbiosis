@@ -33,8 +33,8 @@ module Symbiosis
       #
       # Sanity check name.
       #
-      return nil unless domain =~ /^[a-z0-9-]+\.([a-z0-9-]+\.?)+$/
-     
+      return nil unless domain =~ Symbiosis::Domain::NAME_REGEXP
+
       #
       # Search all domains.  This returns a maximum of two results -- one with
       # www. and one without, assuming /srv/www.domain and /srv/domain both
@@ -83,10 +83,11 @@ module Symbiosis
         next unless File.directory?(entry)
 
         this_prefix, domain = File.split(entry)
+
         #
-        # Don't want dotfiles.
+        # Sanity check name.
         #
-        next if domain =~ /^\./ 
+        next unless domain =~ Symbiosis::Domain::NAME_REGEXP
 
         begin
           results << Domain.new(domain, this_prefix)

@@ -17,6 +17,11 @@ module Symbiosis
     attr_reader :uid, :gid, :user, :group, :name, :prefix, :directory, :symlink
 
     #
+    # This is a regular expression that matches valid domain names.
+    #
+    NAME_REGEXP = /^[a-z0-9-]+\.([a-z0-9-]+\.?)+$/i
+
+    #
     # Creates a new domain object.  If no name is set a random domain name is
     # generated, based on 10 characters in the imaginary <code>.test</code> TLD.
     #
@@ -34,6 +39,13 @@ module Symbiosis
         @name = random_string(10).downcase+".test" 
       else
         @name = name
+      end
+
+      #
+      # Make sure the name is a valid domain name.
+      #
+      unless name =~ NAME_REGEXP
+        raise ArgumentError, "Bad name '#{name.inspect}'"
       end
 
       #

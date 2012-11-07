@@ -8,7 +8,7 @@ Standards-Version: 3.9.1
 
 Package: symbiosis-common
 Architecture: all
-Depends: ruby1.8, libopenssl-ruby, liblinux-netlink-ruby, libcracklib-ruby, ${misc:Depends}
+Depends: ruby1.8, libopenssl-ruby, liblinux-netlink-ruby, libcracklib-ruby, openssl, ${misc:Depends}
 Replaces: symbiosis-firewall (<< 2011:1214), symbiosis-range, symbiosis-test, bytemark-vhost-range, bytemark-vhost-test, symbiosis-crack
 Breaks: symbiosis-firewall (<< 2011:1214), symbiosis-email (<< 2012:0215)
 Conflicts: symbiosis-range, symbiosis-test, symbiosis-crack, bytemark-vhost-range, bytemark-vhost-test, symbiosis-email (<< 2012:0215)
