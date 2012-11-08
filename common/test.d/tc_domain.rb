@@ -11,7 +11,7 @@ class TestDomain < Test::Unit::TestCase
     password = "foo"
     bad_password = "bar"
 
-    domain = Domain.new("test")
+    domain = Domain.new()
 
     #
     # Run a set of tests against the password three times
@@ -84,7 +84,7 @@ class TestDomain < Test::Unit::TestCase
 
   def test_password_with_foreign_shit
     utf8_password = "ábë"
-    domain = Domain.new("test")
+    domain = Domain.new()
 
     %w(UTF8 ISO-8859-1).each do |enc|
       if utf8_password.respond_to?(:encode)
