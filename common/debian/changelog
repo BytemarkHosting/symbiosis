@@ -1,4 +1,4 @@
-symbiosis-common (2012:1031) lucid; urgency=low
+symbiosis-common (2012:1031) stable; urgency=low
 
   * Symbiois::Utils#set_param now passes paramters given on to safe_open.
 
