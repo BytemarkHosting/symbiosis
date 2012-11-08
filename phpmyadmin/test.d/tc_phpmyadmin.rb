@@ -46,7 +46,7 @@ class TestPhpMyAdmin < Test::Unit::TestCase
     if ( File.exists?( "/etc/mysql/debian.cnf" ) )
 
       File.open("/etc/mysql/debian.cnf").each do |line|
-        if ( line =~ /password\s+=\s+(.*)/ )
+        if ( line =~ /password\s*=\s*(\S+)/  )
           pass = $1.dup
         end
       end
@@ -54,6 +54,16 @@ class TestPhpMyAdmin < Test::Unit::TestCase
 
     pass
   end
+
+
+  #
+  # Ensure there is a sane password in the Debian-specific MySQL configuration file
+  #
+  def test_debian_passwd
+     assert( File.exists?( "/etc/mysql/debian.cnf" ), "There is a debian password file present" )
+     assert( !debian_passwd().nil?, "Reading a password succeeded.  [We got #{debian_passwd()}" )
+  end
+
 
   #
   # Test that we can get the PHPMyAdmin page.
