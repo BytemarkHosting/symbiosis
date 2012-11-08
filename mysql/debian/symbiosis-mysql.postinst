@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 set -e
 
 #
@@ -9,6 +8,54 @@ set -e
 if [ "$1" != "configure" ]; then
         echo "I: Skipping configuration"
         exit 0
+fi
+
+#
+# Make sure this password is not used.
+#
+bad_password="G6R11l8ssmHT6RMS"
+
+if ( echo quit | mysql -u debian-sys-maint -p$bad_password > /dev/null 2>&1 ) ; then
+  #
+  # OK change it.
+  #
+  new_password=`perl -e 'print map{("a".."z","A".."Z",0..9)[int(rand(62))]}(1..16)'`;
+
+  if [ -f /etc/mysql/debian.cnf ] ; then 
+    sed -e "s/^\(password *= *\).*/\1$new_password/g" /etc/mysql/debian.cnf > /etc/mysql/debian.cnf.dpkg-postinst
+  else
+    # Fingers crossed this is correct.
+    cat > /etc/mysql/debian.cnf.dpkg-postinst <<EOF
+# Automatically generated for Debian scripts. DO NOT TOUCH!
+[client]
+host     = localhost
+user     = debian-sys-maint
+password = $new_password
+socket   = /var/run/mysqld/mysqld.sock
+[mysql_upgrade]
+user     = debian-sys-maint
+password = $new_password
+socket   = /var/run/mysqld/mysqld.sock
+basedir  = /usr
+EOF
+  fi
+
+  if ( echo "set password = password('$new_password');" | mysql -u debian-sys-maint -p$bad_password ) ; then
+    if (echo quit | mysql --defaults-extra-file=/etc/mysql/debian.cnf.dpkg-postinst > /dev/null 2>&1 ) ; then
+      echo "I: Changed debian-sys-maint password."
+      mv /etc/mysql/debian.cnf.dpkg-postinst /etc/mysql/debian.cnf
+      chmod 600 /etc/mysql/debian.cnf
+    else
+      echo "E: debian-sys-maint password update failed when logging in using /etc/mysql/debian.cnf.dpkg-postinst."
+      exit 1
+    fi
+  else
+    echo "E: debian-sys-maint password update failed when trying to set password."
+    rm -f /etc/mysql/debian.cnf.dpkg-postinst
+    exit 1
+  fi
+else
+  echo "I: Not changing debian-sys-maint password, as it has already been changed."
 fi
 
 #DEBHELPER#

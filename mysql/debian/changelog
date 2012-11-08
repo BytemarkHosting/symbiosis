@@ -1,3 +1,10 @@
+symbiosis-mysql (2012:1107) stable; urgency=low
+
+  * Updated postinst to change debian-sys-maint password in certain
+    circumstances.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 08 Nov 2012 16:57:41 +0000
+
 symbiosis-mysql (2012:0320) stable; urgency=low
 
   * Removed _db monitoring URL and configuration.
