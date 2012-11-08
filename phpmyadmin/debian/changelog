@@ -1,3 +1,10 @@
+symbiosis-phpmyadmin (2012:1108) stable; urgency=low
+
+  * Deny logins to PHPMyAdmin for the internal user 'debian-sys-maint'
+  * Added test-case to ensure this is always the case.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Thu, 8 Nov 2012 15:54:55 +0000
+
 symbiosis-phpmyadmin (2012:0927) stable; urgency=low
 
   * Added firewall patterns matching Suhosin output to stop attackers hitting

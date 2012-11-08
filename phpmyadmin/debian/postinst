@@ -77,6 +77,29 @@ fi
 
 
 
+
+#
+#  Disable logins over the web for the debian-sys-maint user.
+#
+if [ -e /etc/phpmyadmin/config.inc.php ]; then
+    if ( ! grep Symbiosis-Debian-Sys-Maint /etc/phpmyadmin/config.inc.php >/dev/null 2>/dev/null ); then
+        cat >>/etc/phpmyadmin/config.inc.php <<EOF
+
+//
+// This snippet denies logins to the 'debian-sys-maint' user, which
+// is provided by the Debian mysql-server package(s).
+//
+// Symbiosis made this change.
+//
+// Symbiosis-Debian-Sys-Maint
+//
+\$cfg['Servers'][\$i]['AllowDeny']['order'] = 'deny,allow';
+\$cfg['Servers'][\$i]['AllowDeny']['rules'] = array( 'deny debian-sys-maint from all' );
+EOF
+    fi
+fi
+
+
 #
 #  Restart Apache2 to ensure this change is picked up.
 #
