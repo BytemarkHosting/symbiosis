@@ -11,11 +11,15 @@ require 'test/unit'
 class TestPhpMyAdmin < Test::Unit::TestCase
 
   def setup
-	# NOP
-	@ip = Symbiosis::Host.primary_ip.to_s
+    @ip = Symbiosis::Host.primary_ip.to_s
 
-	@username = "root"
-	@password = passwd()
+    # Username we expect to find
+    @username = "root"
+    @password = passwd()
+
+    # user setup by mysql-server*
+    @debian_user = "debian-sys-maint"
+    @debian_pass = debian_passwd()
   end
 
   def teardown
@@ -33,6 +37,23 @@ class TestPhpMyAdmin < Test::Unit::TestCase
       end
   end
 
+  #
+  #  Fetch the debian password
+  #
+  def debian_passwd()
+    pass = nil
+
+    if ( File.exists?( "/etc/mysql/debian.cnf" ) )
+
+      File.open("/etc/mysql/debian.cnf").each do |line|
+        if ( line =~ /password\s+=\s+(.*)/ )
+          pass = $1.dup
+        end
+      end
+    end
+
+    pass
+  end
 
   #
   # Test that we can get the PHPMyAdmin page.
@@ -105,6 +126,30 @@ class TestPhpMyAdmin < Test::Unit::TestCase
 	    end
       end
   end
+
+
+  #
+  #  Test that logging in with the 'debian-sys-maint' user fails.
+  #
+  def test_disabled_user
+      assert_nothing_raised("test that https://localhost/phpmyadmin denies the Debian user") do
+
+	    http             = Net::HTTP.new( @ip, 443 )
+	    http.use_ssl     = true
+
+	    # disable "warning: peer certificate won't be verified in this SSL session."
+	    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+	    # Get the contents
+	    http.start do |http|
+	      request  = Net::HTTP::Get.new("/phpmyadmin/")
+	      request.basic_auth @debian_user, @debian_pass
+
+	      response = http.request(request)
+              assert( response.code.to_i == 401, "Login failed for the 'debian-sys-maint' user." )
+	    end
+      end
+ end
 
 
 end
