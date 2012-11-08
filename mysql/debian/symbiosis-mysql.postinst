@@ -15,13 +15,13 @@ fi
 #
 bad_password="G6R11l8ssmHT6RMS"
 
-if ( echo quit | mysql -u debian-sys-maint -p$bad_password > /dev/null 2>&1 ) ; then
+if ( /usr/bin/mysql -u debian-sys-maint -p$bad_password -e "quit" > /dev/null 2>&1 ) ; then
   #
   # OK change it.
   #
   new_password=`perl -e 'print map{("a".."z","A".."Z",0..9)[int(rand(62))]}(1..16)'`;
 
-  if [ -f /etc/mysql/debian.cnf ] ; then 
+  if [ -f /etc/mysql/debian.cnf ] ; then
     sed -e "s/^\(password *= *\).*/\1$new_password/g" /etc/mysql/debian.cnf > /etc/mysql/debian.cnf.dpkg-postinst
   else
     # Fingers crossed this is correct.
@@ -40,21 +40,44 @@ basedir  = /usr
 EOF
   fi
 
-  if ( echo "set password = password('$new_password');" | mysql -u debian-sys-maint -p$bad_password ) ; then
-    if (echo quit | mysql --defaults-extra-file=/etc/mysql/debian.cnf.dpkg-postinst > /dev/null 2>&1 ) ; then
+  #
+  # Change the password
+  #
+  if ( /usr/bin/mysql -u debian-sys-maint -p$bad_password -e "set password = password('$new_password');" ) ; then
+    #
+    # Check it has changed.
+    #
+    if ( /usr/bin/mysql --defaults-extra-file=/etc/mysql/debian.cnf.dpkg-postinst -e "quit" > /dev/null 2>&1 ) ; then
+      #
+      # Everything is OK.  Woo!
+      #
       echo "I: Changed debian-sys-maint password."
       mv /etc/mysql/debian.cnf.dpkg-postinst /etc/mysql/debian.cnf
       chmod 600 /etc/mysql/debian.cnf
+
     else
+      #
+      # Logging in with the new password failed -- in this case the newly
+      # edited config should be kept, just in case we need to know what the new
+      # password should be.
+      #
       echo "E: debian-sys-maint password update failed when logging in using /etc/mysql/debian.cnf.dpkg-postinst."
       exit 1
+
     fi
   else
+    #
+    # Setting the password failed -- in this case the newly edited config can be junked.
+    #
     echo "E: debian-sys-maint password update failed when trying to set password."
     rm -f /etc/mysql/debian.cnf.dpkg-postinst
     exit 1
+
   fi
 else
+  #
+  # Don't need to do anything.
+  #
   echo "I: Not changing debian-sys-maint password, as it has already been changed."
 fi
 
