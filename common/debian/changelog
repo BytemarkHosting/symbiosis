@@ -1,3 +1,14 @@
+symbiosis-common (2012:1109) stable; urgency=low
+
+  * Fixed tests to use sane test domains.
+  * Updated to require openssl (as it is needed by the he postinst)
+  * Domains that don't match a sane regexp are no longer returned as domains
+    at all.  Fixes #3796.
+  * Updated tc_utils test to use the process egid if there are no process
+    groups.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Nov 2012 16:05:13 +0000
+
 symbiosis-common (2012:1031) stable; urgency=low
 
   * Symbiois::Utils#set_param now passes paramters given on to safe_open.
