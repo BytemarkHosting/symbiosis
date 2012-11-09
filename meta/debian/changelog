@@ -1,3 +1,9 @@
+bytemark-symbiosis (2012:1109) stable; urgency=low
+
+  * Added openssh-server as a recommendation.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Nov 2012 16:14:53 +0000
+
 bytemark-symbiosis (2012:0607) stable; urgency=low
 
   * Updated dependencies to add in symbiosis-pam.
