@@ -1,3 +1,11 @@
+symbiosis-webmail (2012:1109) stable; urgency=low
+
+  * Updated webmail package to add a snippet to make suhosin play nicely with
+    webmail installs.
+  * Apache is now reloaded, not restarted on install.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Nov 2012 16:13:06 +0000
+
 symbiosis-webmail (2012:0420) stable; urgency=low
 
   * Added Avelseive as a recommendation for SquirrelMail.

@@ -1,1 +1,2 @@
 conf.d/*  /etc/apache2/conf.d/
+php5/conf.d etc/php5/
