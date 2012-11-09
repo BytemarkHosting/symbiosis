@@ -82,7 +82,7 @@ class DovecotCheck < Symbiosis::Monitor::Check
 
     tcpconnection = Symbiosis::Monitor::TCPConnection.new(
      "localhost",
-     "sieve",
+     4190,
      [resp, "LOGOUT\r\n", resp] )
 
     do_tcpconnection_check(tcpconnection)
