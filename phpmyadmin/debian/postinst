@@ -29,81 +29,27 @@ if [ -e /etc/phpmyadmin/apache.conf ]; then
 fi
 
 #
-#  Append HTTP basic auth
+#  Append Symbiosis configuration file requirement
 #
 if [ -e /etc/phpmyadmin/config.inc.php ]; then
 
-    if ( ! grep Symbiosis-Auth /etc/phpmyadmin/config.inc.php >/dev/null 2>/dev/null ); then
+    if ( ! grep -q "require('/etc/phpmyadmin/config.symbiosis.inc.php')" /etc/phpmyadmin/config.inc.php ); then
         cat >>/etc/phpmyadmin/config.inc.php <<EOF
 
-//
-//  This setting uses HTTP BasicAuth rather than cookies for
-// authentication, this is more sane in the presence of remote
-// attackers probing your server.
-//
-//  Symbiosis made this change.
-//
-//  Symbiosis-Auth
-//
-\$cfg['Servers'][\$i]['auth_type'] = 'http';
-EOF
-    fi
-    #
-    # change cookie auth to http, everywhere.  This is to catch the configuration section used when dbconfig-common is used to configure the database.
-    #
-    sed  -i -e "s/^\([ \t]*\$cfg\[[\"']Servers[\"']\]\[\$i\]\[[\"']auth_type[\"']\][ \t]*=[ \t]*[\"']\)cookie\(['\"];\)/\1http\2/" /etc/phpmyadmin/config.inc.php
-fi
-
-
-#
-#  Force SSL
-#
-
-if [ -e /etc/phpmyadmin/config.inc.php ]; then
-    if ( ! grep Symbiosis-SSL /etc/phpmyadmin/config.inc.php >/dev/null 2>/dev/null ); then
-        cat >>/etc/phpmyadmin/config.inc.php <<EOF
-
-//
-// This flag mandates the use of SSL for phpmyadmin
-//
-// Symbiosis made this change.
-//
-// Symbiosis-SSL
-//
-\$cfg['ForceSSL'] = true;
+/**
+ * Read symbiosis config.
+ */
+if (is_readable('/etc/phpmyadmin/config.symbiosis.inc.php')) {
+    require('/etc/phpmyadmin/config.symbiosis.inc.php');
+}
 EOF
     fi
 fi
 
-
-
-
 #
-#  Disable logins over the web for the debian-sys-maint user.
+#  Reload Apache2 to ensure this change is picked up.
 #
-if [ -e /etc/phpmyadmin/config.inc.php ]; then
-    if ( ! grep Symbiosis-Debian-Sys-Maint /etc/phpmyadmin/config.inc.php >/dev/null 2>/dev/null ); then
-        cat >>/etc/phpmyadmin/config.inc.php <<EOF
-
-//
-// This snippet denies logins to the 'debian-sys-maint' user, which
-// is provided by the Debian mysql-server package(s).
-//
-// Symbiosis made this change.
-//
-// Symbiosis-Debian-Sys-Maint
-//
-\$cfg['Servers'][\$i]['AllowDeny']['order'] = 'deny,allow';
-\$cfg['Servers'][\$i]['AllowDeny']['rules'] = array( 'deny debian-sys-maint from all' );
-EOF
-    fi
-fi
-
-
-#
-#  Restart Apache2 to ensure this change is picked up.
-#
-invoke-rc.d apache2 restart || true
+invoke-rc.d apache2 reload || true
 
 #DEBHELPER#
 exit 0
