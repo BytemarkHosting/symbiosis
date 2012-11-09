@@ -1,3 +1,4 @@
 test.d                    etc/symbiosis/
 patterns.d                etc/symbiosis/firewall/
-phpmyadmin/*              etc/phpmyadmin/
+phpmyadmin                etc/
+php5                      etc/
