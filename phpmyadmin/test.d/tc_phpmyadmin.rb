@@ -1,165 +1,230 @@
 #
 #  Simple tests of the PHPMyAdmin installation
 #
-#
 require 'symbiosis/host'
-require 'net/http'
 require 'net/https'
-require 'socket'
 require 'test/unit'
+
+begin
+  require 'mysql'
+rescue LoadError
+  # Do nothing.
+end
 
 class TestPhpMyAdmin < Test::Unit::TestCase
 
   def setup
     @ip = Symbiosis::Host.primary_ip.to_s
-
-    # Username we expect to find
-    @username = "root"
-    @password = passwd()
-
-    # user setup by mysql-server*
-    @debian_user = "debian-sys-maint"
-    @debian_pass = debian_passwd()
   end
 
   def teardown
-	# NOP
+    # NOP
   end
 
   #
   #  Fetch the admin password
   #
-  def passwd()
-      if ( File.exists?( "/etc/symbiosis/.passwd" ) )
-        `cat /etc/symbiosis/.passwd`.chop
-      else
-	nil
-      end
+  def root_passwd()
+    if ( File.exists?( "/etc/symbiosis/.passwd" ) )
+      File.read("/etc/symbiosis/.passwd").chomp
+    else
+      nil
+    end
   end
 
   #
   #  Fetch the debian password
   #
   def debian_passwd()
-    pass = nil
+    #
+    # If there is no debian.cnf, give up now.
+    #
+    return nil unless File.exists?( "/etc/mysql/debian.cnf" )
 
-    if ( File.exists?( "/etc/mysql/debian.cnf" ) )
+    File.open("/etc/mysql/debian.cnf").each do |line|
+      next unless line =~ /^\s*password\s*=\s*(\S+)/
 
-      File.open("/etc/mysql/debian.cnf").each do |line|
-        if ( line =~ /password\s*=\s*(\S+)/  )
-          pass = $1.dup
-        end
-      end
+      return $1
     end
 
-    pass
+    nil
   end
 
+  #
+  # Test that we redirected to the HTTPS site if we connect on port 80.
+  #
+  def test_phpmyadmin_http_redirect
+    http         = Net::HTTP.new( @ip, 80 )
+    http.use_ssl = false
 
-  #
-  # Ensure there is a sane password in the Debian-specific MySQL configuration file
-  #
-  def test_debian_passwd
-     assert( File.exists?( "/etc/mysql/debian.cnf" ), "There is a debian password file present" )
-     assert( !debian_passwd().nil?, "Reading a password succeeded.  [We got #{debian_passwd()}" )
+    # Get the contents
+    http.start do |http|
+      request  = Net::HTTP::Get.new("/phpmyadmin/")
+      response = http.request(request)
+
+      assert_equal(302, response.code.to_i, "No redirect when fetching /phpmyadmin/" )
+      assert_match(/^https:/, response['location'], "Redirect to non-https site when when fetching /phpmyadmin/")
+    end
   end
 
-
   #
-  # Test that we can get the PHPMyAdmin page.
+  # Test that we get a 401 if we don't supply a username/password.
   #
-  def test_raw_http_phpmyadmin
-      assert_nothing_raised("test that http://localhost/phpmyadmin redirects to SSL") do
-	    http             = Net::HTTP.new( @ip, 80 )
-	    http.use_ssl     = false
+  def test_phpmyadmin_requires_basic_authentication
+    http     = Net::HTTP.new( @ip, 443 )
+    http.use_ssl   = true
 
-	    # Get the contents
-	    http.start do |http|
-	      request  = Net::HTTP::Get.new("/phpmyadmin/")
-	      response = http.request(request)
+    # disable "warning: peer certificate won't be verified in this SSL session."
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
+    # Get the contents
+    http.start do |http|
+      request  = Net::HTTP::Get.new("/phpmyadmin/")
+      response = http.request(request)
 
-              assert( response.code.to_i == 302, "We received a redirect when fetching /phpmyadmin/" )
-	    end
-      end
+      assert_equal(401, response.code.to_i, "Did not get '401 Unauthenticated' response when fetching /phpmyadmin/" )
+    end
   end
 
-
-
   #
-  # Test that we can get the PHPMyAdmin page.
+  # Make sure that if we don't give a root password, we *always* get 401
+  # unauthenticated (even if no root password has been set) 
   #
-  def test_raw_https_phpmyadmin
-      assert_nothing_raised("test that httpS://localhost/phpmyadmin prompts for auth") do
+  def test_root_login_fails_when_no_password_is_given
+    http     = Net::HTTP.new( @ip, 443 )
+    http.use_ssl   = true
 
-	    http             = Net::HTTP.new( @ip, 443 )
-	    http.use_ssl     = true
+    # disable "warning: peer certificate won't be verified in this SSL session."
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-	    # disable "warning: peer certificate won't be verified in this SSL session."
-	    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-	    # Get the contents
-	    http.start do |http|
-	      request  = Net::HTTP::Get.new("/phpmyadmin/")
-	      response = http.request(request)
-
-              assert( response.code.to_i == 401, "We received an 'unauthenticated' response when fetching /phpmyadmin/" )
-	    end
-      end
- end
-
-  #
-  # Now test that we succeed when using a username + password.
-  #
-  def test_auth_https_phpmyadmin
-
-      if ( @password.nil? )
-      	 puts "Avoiding test - cannot determine root password for MySQL"
-	 return
-      end
-
-      assert_nothing_raised("test that httpS://localhost/phpmyadmin accepts a valid login") do
-
-	    http             = Net::HTTP.new( @ip, 443 )
-	    http.use_ssl     = true
-
-	    # disable "warning: peer certificate won't be verified in this SSL session."
-	    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-	    # Get the contents
-	    http.start do |http|
-	      request  = Net::HTTP::Get.new("/phpmyadmin/")
-	      request.basic_auth @username, @password
-
-	      response = http.request(request)
-	      assert( response.code.to_i == 200, "Logging in with the valid username/password works" )
-	    end
-      end
+    # Get the contents
+    http.start do |http|
+      request  = Net::HTTP::Get.new("/phpmyadmin/")
+      request.basic_auth "root", ""
+      response = http.request(request)
+      assert_equal(401, response.code.to_i, "Phpmyadmin login for root succeeded when no password was given." )
+    end
   end
 
+  #
+  # Now test that we succeed with the root username + password.
+  #
+  def test_root_login_succeeds
+    #
+    # Fetch the root password.
+    #
+    password = root_passwd()
+
+    #
+    # Check our username/password are correct.
+    #
+    ok = do_verify_mysql_user("root", password)
+    if ok.nil?
+      puts "\nSkipping phpmyadmin root auth test - password not found."
+      return 
+    elsif false == ok
+      puts "\nSkipping phpmyadmin root auth test - incorrect password found."
+      return
+    end
+
+    http     = Net::HTTP.new( @ip, 443 )
+    http.use_ssl   = true
+
+    # disable "warning: peer certificate won't be verified in this SSL session."
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+    # Get the contents
+    http.start do |http|
+      request  = Net::HTTP::Get.new("/phpmyadmin/")
+      request.basic_auth "root", password
+      response = http.request(request)
+      assert_equal(200, response.code.to_i, "Phpmyadmin login failed for the root user." )
+    end
+  end
 
   #
   #  Test that logging in with the 'debian-sys-maint' user fails.
   #
-  def test_disabled_user
-      assert_nothing_raised("test that https://localhost/phpmyadmin denies the Debian user") do
+  def test_debian_sys_maint_cannot_login
+    #
+    # Fetch the debian-sys-maint password
+    #
+    password = debian_passwd()
+    
+    #
+    # Check our username/password are correct.
+    #
+    ok = do_verify_mysql_user("debian-sys-maint", password)
+    if ok.nil?
+      puts "\nSkipping phpmyadmin debian-sys-maint auth test - password not found."
+      return 
+    elsif false == ok
+      puts "\nSkipping phpmyadmin debian-sys-maint auth test - incorrect password found."
+      return
+    end
 
-	    http             = Net::HTTP.new( @ip, 443 )
-	    http.use_ssl     = true
+    http     = Net::HTTP.new( @ip, 443 )
+    http.use_ssl   = true
 
-	    # disable "warning: peer certificate won't be verified in this SSL session."
-	    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    # disable "warning: peer certificate won't be verified in this SSL session."
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-	    # Get the contents
-	    http.start do |http|
-	      request  = Net::HTTP::Get.new("/phpmyadmin/")
-	      request.basic_auth @debian_user, @debian_pass
+    # Get the contents
+    http.start do |http|
+      request  = Net::HTTP::Get.new("/phpmyadmin/")
+      request.basic_auth "debian-sys-maint", password
 
-	      response = http.request(request)
-              assert( response.code.to_i == 401, "Login failed for the 'debian-sys-maint' user." )
-	    end
-      end
- end
+      response = http.request(request)
+      assert_equal(401, response.code.to_i, "Phpmyadmin login succeeded for the debian-sys-maint user." )
+    end
+  end
+
+  ########################################################################
+
+  #
+  # This is a quick check to make sure the username/password work.
+  #
+  #  nil -> unable to check
+  #  false -> check failed
+  #  true -> check passed!
+  #  
+  def do_verify_mysql_user(username, password)
+    #
+    # If no username/password set, return nil.
+    #
+    if ( username.nil? or password.nil? )
+      return nil
+
+    #
+    # Use the ruby Mysql library if available.
+    #
+    elsif defined? Mysql
+      dbh = nil
+      begin
+        dbh = Mysql.new(nil, username, password)
+        return true
+
+      rescue Mysql::Error
+        return false
+
+      ensure
+        dbh.close if dbh
+      end      
+
+    #
+    # Failing that, try the mysql command line.
+    #
+    elsif File.executable?("/usr/bin/mysql")
+      system("/usr/bin/mysql -u#{username} -p#{password} -e quit >/dev/null 2>&1")
+      return $?.success?
+
+    end
+
+    #
+    # If we get this far, return nil.  No check has taken place.
+    #
+    return nil
+  end
 
 
 end
