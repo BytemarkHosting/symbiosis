@@ -30,7 +30,7 @@ def available_build_archs
   return @available_build_archs if defined? @available_build_archs
 
   if has_sautobuild?
-    chroots = `/usr/bin/schroot -l`
+    chroots = `/usr/bin/schroot -l`.to_s.split
     return (@available_build_archs = [DEB_BUILD_ARCH]) unless 0 == $?
   else
     return (@available_build_archs = [DEB_BUILD_ARCH])
