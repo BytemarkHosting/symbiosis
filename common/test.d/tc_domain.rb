@@ -114,4 +114,19 @@ class TestDomain < Test::Unit::TestCase
 
   end
 
+  def test_xckd_password
+    domain = Domain.new()
+    password = "correct horse battery staple"
+
+    assert(domain.check_password(password, password))
+
+    des_crypt_password = password.crypt("ab")
+    assert(domain.check_password(password, des_crypt_password), "Correct xkcd password not accepted, DES crypt.")
+
+    glibc2_crypt_password = password.crypt("$1$ab$")
+    assert(domain.check_password(password, glibc2_crypt_password), "Correct xkcd password not accepted, glibc2 crypt.")
+
+
+  end
+
 end
