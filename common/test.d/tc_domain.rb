@@ -1,6 +1,7 @@
 # encoding: UTF-8
 
 require 'test/unit'
+require 'tmpdir'
 require 'symbiosis/domain'
 
 class TestDomain < Test::Unit::TestCase
@@ -127,6 +128,87 @@ class TestDomain < Test::Unit::TestCase
     assert(domain.check_password(password, glibc2_crypt_password), "Correct xkcd password not accepted, glibc2 crypt.")
 
 
+  end
+
+  def test_aliases
+    #
+    # This tmpdir gets destroyed at the end of the block.
+    #
+    Dir.mktmpdir do |prefix|
+      #
+      # This shouldn't happen (tm).
+      #
+      assert(File.exists?(prefix), "Temporary directory missing")
+
+      domain = Domain.new(nil, prefix)
+      FileUtils.mkdir_p(domain.directory)
+      
+      #
+      # By default just the www.domain should be returned by Domain#aliases
+      #
+      aliases = [ "www."+domain.name ]
+
+      assert_equal([], aliases - domain.aliases, 
+        "Not all aliases returned by Symbiosis::Domain#aliases after a single domain was created.")
+      assert_equal([], domain.aliases - aliases, 
+        "Too many all aliases returned by Symbiosis::Domain#aliases after a single domain was created.")
+
+      symlinked_domain =  Domain.new(nil, prefix) 
+      FileUtils.ln_s(domain.directory, symlinked_domain.directory)
+
+      #
+      # We should get the domain, with "www." on the front, plus the symlinked domain.
+      #
+      aliases += [
+        symlinked_domain.name,
+        "www."+symlinked_domain.name
+      ]
+
+      assert_equal([], aliases - domain.aliases, 
+        "not all aliases returned by Symbiosis::Domain#aliases")
+      assert_equal([], domain.aliases - aliases, 
+        "Too many aliases returned by Symbiosis::Domain#aliases")
+      
+      #
+      # Create another new domain
+      #
+      other_domain = Domain.new(nil, prefix)
+      FileUtils.mkdir_p(other_domain.directory)
+
+      #
+      # We should get just this new www.other_domain back
+      #
+      assert_equal([], ["www."+other_domain.name] - other_domain.aliases)
+
+      #
+      # And we should get the same answer as before for the original domain.
+      #
+      assert_equal([], aliases - domain.aliases, 
+        "Not all aliases returned by Symbiosis::Domain#aliases after a separate domain was created.")
+      assert_equal([], domain.aliases - aliases, 
+        "Too many all aliases returned by Symbiosis::Domain#aliases after a separate domain was created.")
+      
+      #
+      # Now create a dangling symlink
+      #
+      FileUtils.ln_s(File.join(prefix, "nonexistent.com"), symlinked_domain.directory)
+
+      #
+      # We should get the same thing back
+      #
+      assert_equal([], aliases - domain.aliases,
+        "not all aliases returned by Symbiosis::Domain#aliases after a dangling symlink was created.")
+      assert_equal([], domain.aliases - aliases, 
+        "Too many aliases returned by Symbiosis::Domain#aliases after a dangling symlink was created.")
+
+
+      #
+      # Now make a www.other_domain directory.  This should now not return www.domain as an alias.
+      #
+      FileUtils.mkdir_p(File.join(prefix, "www."+other_domain.name))
+      assert_equal([], other_domain.aliases, "www.other_domain returned as an alias to other_domain, when it exists in its own right.")
+      
+    end
   end
 
 end

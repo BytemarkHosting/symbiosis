@@ -60,7 +60,7 @@ module Symbiosis
       @symlink   = nil
 
       #
-      # If the directoy exists, then check that we're not following a symlink.
+      # If the directory exists, then check that we're not following a symlink.
       #
       if File.directory?(@directory)
         #
@@ -328,45 +328,77 @@ module Symbiosis
 
     def aliases
       results = []
-      results << "www.#{self.name}" unless self.name =~ /^www\./
 
-      self_stat = File.stat(self.directory)
       #
-      #  For each domain.
+      # If our domain is real, see what symlinks are pointing at it.
       #
-      Dir.glob( File.join(self.prefix,"*") ) do |entry|
-        #
-        # Skip entry if it isn't a directory
-        #
-        next unless File.directory?(entry)
+      if File.directory?(self.directory)  
+
+        self_stat = File.stat(self.directory)
 
         #
-        # Check the inodes.
+        #  For each domain.
         #
-        target_stat = File.stat(entry)
-        target_lstat = File.lstat(entry)
+        Dir.glob( File.join(self.prefix,"*") ) do |entry|
+          #
+          # Skip entry if it isn't a directory
+          #
+          next unless File.directory?(entry)
+
+          #
+          # Check the inodes.
+          #
+          target_stat = File.stat(entry)
+          target_lstat = File.lstat(entry)
+
+          #
+          # Skip unless the target is a link (i.e. stat and lstat inodes differ)
+          # and the stat inode matches our own stat inode.
+          #
+          next unless target_lstat.ino != target_stat.ino and target_stat.ino == self_stat.ino 
+
+          #
+          # Split
+          #
+          this_prefix, this_domain = File.split(entry)
+
+          #
+          # Don't want dotfiles.
+          #
+          next if this_domain =~ /^\./ 
+      
+          #
+          # And record.
+          #
+          results << this_domain
+        end
+      end
+
+      #
+      # Now run through the results, adding "www." to each if there is nothing el
+      #
+      ([self.name] + results).each do |this_domain|
+        next if this_domain =~ /^www\./
 
         #
-        # Skip unless the target is a link (i.e. stat and lstat inodes differ)
-        # and the stat inode matches our own stat inode.
+        # Add on www.
         #
-        next unless target_lstat.ino != target_stat.ino and target_stat.ino == self_stat.ino 
+        this_domain = "www."+this_domain
 
         #
-        # Split
+        # Skip if we've already found it.
         #
-        this_prefix, this_domain = File.split(entry)
+        next if results.include?(this_domain)
 
         #
-        # Don't want dotfiles.
+        # Skip if we've not already found it, but it exists on the system.
         #
-        next if this_domain =~ /^\./ 
-    
+        next if File.exists?(File.join(self.prefix, this_domain))
+
         #
-        # And record.
+        # OK add it!
         #
         results << this_domain
-        results << "www.#{this_domain}" unless this_domain =~ /^www\./
       end
 
       results.sort.uniq
