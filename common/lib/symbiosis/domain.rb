@@ -336,6 +336,11 @@ module Symbiosis
       #
       Dir.glob( File.join(self.prefix,"*") ) do |entry|
         #
+        # Skip entry if it isn't a directory
+        #
+        next unless File.directory?(entry)
+
+        #
         # Check the inodes.
         #
         target_stat = File.stat(entry)
