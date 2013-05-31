@@ -158,7 +158,7 @@ require 'symbiosis/ipaddr'
 #
 # Exit if we've been disabled
 #
-if %w(disabled.whitelist whitelist/disabled).any?{|fn| File.exists?(File.join(base_dir, fn))}
+if %w(disabled.whitelist whitelist.d/disabled).any?{|fn| File.exists?(File.join(base_dir, fn))}
   puts "Firewall whitelist disabled.  Exiting." if $VERBOSE
   exit 0
 end
