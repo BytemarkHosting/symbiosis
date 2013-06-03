@@ -95,6 +95,25 @@ class TestCheckpassword < Test::Unit::TestCase
     assert_nothing_raised{ msg, status = do_checkpassword_test(mailbox.username, "") }
     assert_equal(111, status, msg)
   end
+
+  def test_xkcd_password
+    msg = nil
+    status = nil
+    xkcd_password = "correct horse battery staple"
+    mailbox = @domain.create_mailbox("test")
+    mailbox.password = xkcd_password
+    
+
+    assert_nothing_raised{ msg, status = do_checkpassword_test(mailbox.username, xkcd_password) }
+    assert_equal(0, status, msg)
+
+    mailbox.encrypt_password = true
+    mailbox.password = xkcd_password
+
+    assert_nothing_raised{ msg, status = do_checkpassword_test(mailbox.username, xkcd_password) }
+    assert_equal(0, status, msg)
+  end
+
 end
 
 
