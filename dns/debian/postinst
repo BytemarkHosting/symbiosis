@@ -29,7 +29,12 @@ rm -f /etc/cron.hourly/create-dns 2>/dev/null >/dev/null || true
 #
 #  If we're not on a Bytemark host then we do nothing.
 #
-if [ ! /usr/bin/is-bytemark-ip ]; then
+if ! /usr/bin/is-bytemark-ip ; then
+    #
+    # Create a dummy data directory
+    #
+    mkdir -p /root/BytemarkDNS/data
+
     if [ -x /root/BytemarkDNS/upload ]; then
         chmod 644 /root/BytemarkDNS/upload
     fi
@@ -37,8 +42,8 @@ if [ ! /usr/bin/is-bytemark-ip ]; then
     echo "* ============================================================= *"
     echo "*  This machine doesn't appear to be within the Bytemark Range  *"
     echo "* ============================================================= *"
-    exit 0;
 
+    exit 0;
 fi
 
 #
@@ -69,11 +74,10 @@ fi
 #  If we have a /root/BytemarkDNS.zip file then we're OK.
 #
 if [ !  -d /root/BytemarkDNS ]; then
-
     #
     #  Get the file
     #
-    cd /root && wget -OBytemarkDNS.zip http://upload.ns.bytemark.co.uk/create/
+    cd /root && wget -O BytemarkDNS.zip http://upload.ns.bytemark.co.uk/create/
 
     #
     #  Unzip it
