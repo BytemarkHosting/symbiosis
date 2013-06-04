@@ -1,23 +1,42 @@
 #!/usr/bin/ruby1.8
-# 
+#
 # NAME
 #
-#   is-bytemark-ip -- determine if we're using a Bytemark IP
+#   is-bytemark-ip -- Check if a system's IP addresses are on the Bytemark network.
 #
 # SYNOPSIS
 #
-#  Help Options:
+#   is-bytemark-ip [ --ipv4 | -4 ] [ --ipv6 | -6 ]
+#                  [ --verbose | -v ] [ --help | -h ] [ <ip address> ]
 #
-#   --help        Show the help information for this script.
-#   --verbose     Show debugging information.
+# OPTIONS
 #
-# If we're on a Bytemark IP 1 is output and the script exits 0.  If not, "0" is
-# output and the script exists 1.
+#  --ipv4          Check IPv4 addresses
+#
+#  --ipv6          Check IPv6 addresses
+#
+#   --help         Show the help information for this script.
+#
+#   --verbose      Show debugging information.
+#
+# DESCRIPTION
+#
+# This script can be used to determine if an IP address is on the Bytemark
+# Hosting network.  It accepts zero or more arguments of IP addresses.  If none
+# are given, the system's IP addresses are checked.
+#
+# If one of the IP addresses is within the Bytemark network, it outputs "1" and
+# exits with 0. Otherwise it outputs "0" and exits with 1.
+#
+# If no addresses are given on the command line, this script only checks for
+# IPv4 addresses. To check IPv6 addresses, use the -6 flag.  To check for both,
+# use both the -4 and -6 flags.
 #
 # AUTHOR
 #
 #   Patrick J. Cherry <patrick@bytemark.co.uk>
 #
+
 
 #
 #  Modules we require
@@ -28,12 +47,14 @@ require 'getoptlong'
 opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
     [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
-    [ '--show-all', '-a', GetoptLong::NO_ARGUMENT ]
+    [ '--ipv4',  '-4', GetoptLong::NO_ARGUMENT ],
+    [ '--ipv6',  '-6', GetoptLong::NO_ARGUMENT ]
 )
 
 help = false
 $VERBOSE = false
-show_all = false
+ipv4 = nil
+ipv6 = nil
 
 opts.each do |opt,arg|
   case opt
@@ -41,8 +62,10 @@ opts.each do |opt,arg|
       help = true
     when '--verbose'
       $VERBOSE = true
-    when '--show-all'
-      show_all = true
+    when '--ipv6'
+      ipv6 = true
+    when '--ipv4'
+      ipv4 = true
   end
 end
 
@@ -52,7 +75,7 @@ end
 if help
   # Open the file, stripping the shebang line
   lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
-  
+
   lines.each do |line|
     line.chomp!
     break if line.empty?
@@ -68,10 +91,9 @@ end
 require 'symbiosis/range'
 
 if ARGV.length > 0
-
   # Collect each of the args, rejecting duff IPs.
 
-  ips = ARGV.collect do |arg| 
+  ips = ARGV.collect do |arg|
     begin
       IPAddr.new(arg)
     rescue ArgumentError
@@ -79,16 +101,56 @@ if ARGV.length > 0
       # do nothing
       nil
     end
-  end.reject{|ip| ip.nil? }
+  end.compact
+
+  #
+  # Do the sane thing and check all the addresses on the command line, if
+  # nothing else has been specified.
+  #
+  if ipv4.nil? and ipv6.nil?
+    ipv4 = true if ips.any?{|ip| ip.ipv4?}
+    ipv6 = true if ips.any?{|ip| ip.ipv6?}
+  end
+
 else
   ips = Symbiosis::Range.ip_addresses
+
+end
+
+#
+# Set the IPv4 flag if nothing else has been set.
+#
+if ipv4.nil? and ipv6.nil?
+  ipv4 = true
 end
   
+#
+# Weed out the IPs we're going to check
+#
+ips.reject! do |ip|
+  ipv6 != ip.ipv6? and ipv4 != ip.ipv4?
+end
 
-if ips.any?{|ip| Symbiosis::Range.is_bytemark_ip?(ip)}
+
+if ips.length == 0
+  puts "No IPs found" if $VERBOSE
+  puts "0"
+  exit 1
+end
+
+if $VERBOSE
+  puts "Checking the following IPs for Bytemarkiness:"
+  puts " * " + ips.collect{|i| i.to_s}.join("\n * ") + "\n\n"
+end
+
+matching_ip = ips.find{|ip| Symbiosis::Host.is_bytemark_ip?(ip)}
+
+if matching_ip
+  puts "Found #{matching_ip.to_s} to be on the Bytemark network" if $VERBOSE
   puts "1"
   exit 0
 else
+  puts "None of those IPs are on the Bytemark network" if $VERBOSE
   puts "0"
   exit 1
 end
