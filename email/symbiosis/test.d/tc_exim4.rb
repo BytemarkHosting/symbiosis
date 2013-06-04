@@ -160,7 +160,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
       when ":fail:"
         status = 2
       when nil
-        status = 2
+        status = nil
     end
 
     test_destination = (not destination.nil?)
