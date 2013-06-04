@@ -29,7 +29,7 @@ rm -f /etc/cron.hourly/create-dns 2>/dev/null >/dev/null || true
 #
 #  If we're not on a Bytemark host then we do nothing.
 #
-if ! /usr/bin/is-bytemark-ip ; then
+if [ "$(/usr/bin/is-bytemark-ip)" == "0" ] ; then
     #
     # Create a dummy data directory
     #
@@ -43,7 +43,7 @@ if ! /usr/bin/is-bytemark-ip ; then
     echo "*  This machine doesn't appear to be within the Bytemark Range  *"
     echo "* ============================================================= *"
 
-    exit 0;
+    exit 0
 fi
 
 #
