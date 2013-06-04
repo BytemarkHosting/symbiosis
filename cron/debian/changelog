@@ -1,4 +1,4 @@
-symbiosis-cron (2012:0327) stable; urgency=low
+symbiosis-cron (2012:0327) oldstable; urgency=low
 
   * Fixed Symbiosis to be a module rather than a class in symbiosis/crontab. 
   * Fixed typedef in crontab-wrapper.

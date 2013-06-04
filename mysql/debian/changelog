@@ -1,4 +1,4 @@
-symbiosis-mysql (2012:1108) stable; urgency=low
+symbiosis-mysql (2012:1108) oldstable; urgency=low
 
   * Updated postinst to change debian-sys-maint password in certain
     circumstances.

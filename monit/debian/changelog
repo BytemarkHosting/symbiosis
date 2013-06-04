@@ -1,4 +1,4 @@
-symbiosis-monit (2012:1031) stable; urgency=low
+symbiosis-monit (2012:1031) oldstable; urgency=low
 
   * Updated the man-page of "symbiosis-monit" to refer to the correct
     filename to disable the tool.

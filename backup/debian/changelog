@@ -1,4 +1,4 @@
-symbiosis-backup (2012:0912) stable; urgency=low
+symbiosis-backup (2012:0912) oldstable; urgency=low
 
   * Updated mysql tests to pass now that the --databases arg has been removed.
 

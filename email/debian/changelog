@@ -1,4 +1,4 @@
-symbiosis-email (2012:1031) stable; urgency=low
+symbiosis-email (2012:1031) oldstable; urgency=low
 
   * Dovecot LDA now returns a temporary failure when a mailbox is overquota,
     ensuring it behaves like Exim4 in this situation.

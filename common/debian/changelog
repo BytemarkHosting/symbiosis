@@ -1,4 +1,4 @@
-symbiosis-common (2012:1109) stable; urgency=low
+symbiosis-common (2012:1109) oldstable; urgency=low
 
   * Fixed tests to use sane test domains.
   * Updated to require openssl (as it is needed by the he postinst)
