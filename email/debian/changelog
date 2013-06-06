@@ -1,3 +1,9 @@
+symbiosis-email (2013:0606) oldstable; urgency=high
+
+  * Removed use_shell from the dovecot lda transport in exim4.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 06 Jun 2013 17:19:31 +0100
+
 symbiosis-email (2012:1031) oldstable; urgency=low
 
   * Dovecot LDA now returns a temporary failure when a mailbox is overquota,
