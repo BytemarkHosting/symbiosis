@@ -23,7 +23,7 @@ end
 
 def has_sautobuild?
   return @has_sautobuild if defined? @has_sautobuild
-  @has_sautobuild = !ENV.has_key?("NO_SAUTOBUILD") and File.executable?("/usr/bin/sautobuild")
+  @has_sautobuild = ( !ENV.has_key?("NO_SAUTOBUILD") and File.executable?("/usr/bin/sautobuild") )
 end
 
 def available_build_archs
