@@ -135,7 +135,7 @@ module Symbiosis
               fd.fcntl(Fcntl::F_GETLK, args)
               Fcntl::F_WRLCK == args.unpack("s2L5i*").first
             end
-          rescue Errno::EPERM, Errno::EACCES, Errno::EAGAIN => err
+          rescue Errno::EPERM, Errno::EACCES, Errno::EAGAIN, Errno::EINVAL => err
             return true
           end
         end
