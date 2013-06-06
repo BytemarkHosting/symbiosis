@@ -5,7 +5,6 @@ dovecot_lda:
             -f "$sender_address" -a "$original_local_part@$original_domain"
   home_directory = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part/
   environment = USER=$local_part@$domain
-  use_shell
   log_output
   log_defer_output
   return_fail_output
