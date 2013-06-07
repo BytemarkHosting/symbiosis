@@ -57,13 +57,6 @@ done
 symbiosis-create-mass-hosting-sites --no-reload --verbose
 symbiosis-create-sites              --no-reload --verbose
 
-#
-# And enable (if not already enabled)
-#
-for i in zz-mass-hosting zz-mass-hosting.ssl ; do
-  a2ensite -q $i 2>/dev/null || true
-done
-
 #######################################
 # Remove old cronjobs.
 #
