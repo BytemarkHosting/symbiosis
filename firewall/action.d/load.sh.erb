@@ -38,12 +38,12 @@ for cmd in <%= iptables_cmds.join(" ") %> ; do
     #
     # Fix policy, flush chain, and allow everything on loopback.
     #
-    $cmd  -P $chain ACCEPT
+    $cmd -P $chain ACCEPT
   done
   #
   # Flush everything
   #
-  $cmd  -F
+  $cmd -F
   #
   # Delete old chains
   #
@@ -51,8 +51,8 @@ for cmd in <%= iptables_cmds.join(" ") %> ; do
   #
   # Allow everythink on loopback
   #
-  $cmd  -I INPUT  -i lo -j ACCEPT
-  $cmd  -I OUTPUT -o lo -j ACCEPT
+  $cmd -I INPUT  -i lo -j ACCEPT
+  $cmd -I OUTPUT -o lo -j ACCEPT
 done
 #######################################################################
 
@@ -66,14 +66,6 @@ done
 %   disabled = (!File.directory?(dir) or  File.exists?(File.join(dir,"disabled.#{chain}")) or File.exists?(File.join(dir,"disabled")))
 #######################################################################
 for cmd in <%= iptables_cmds.join(" ") %> ; do
-%   if disabled
-
-  #
-  # See if the chain exists, flush, and remove if it does.
-  #
-  $cmd -n -L <%= chain %> > /dev/null 2>&1 && $cmd  -F <%= chain %> && $cmd -X <%= chain%> 
-%   else
-
   #
   # See if the chain exists, create if not.
   #
@@ -82,15 +74,14 @@ for cmd in <%= iptables_cmds.join(" ") %> ; do
   # 
   # Flush the chain, just in case it already existed.
   #
-  $cmd  -F <%= chain %> 
-%  end
-
+  $cmd -F <%= chain %> 
 done
 
-%   next if disabled
-%   list = IPListDirectory.new(dir, "incoming", chain)
-%   list.default = chain
-<%=  list.to_s %>
+%   if ! disabled
+%     list = IPListDirectory.new(dir, "incoming", chain)
+%     list.default = chain
+<%=   list.to_s %>
+%   end
 #
 # Add the jump in
 #
