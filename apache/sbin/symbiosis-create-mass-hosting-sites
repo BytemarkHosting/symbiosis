@@ -36,9 +36,14 @@
 # USAGE
 #
 # This script generates two snippets of Apache configuration for use on the
-# primary IP addresses of a machine.
+# primary IP addresses of a machine.  Having done so it reloads apache2.
 #
-# Having done so it reloads apache2.
+# This script can be disabled by creating the file
+# /etc/symbiosis/apache.d/disabled, or
+# /etc/symbiosis/apache.d/disabled.zz-mass-hosting. This will also prevent any
+# further package updates from recreating the zz-mass-hosting sites in the
+# apache2 configuration. However it will not disable any sites that are
+# currently in place. These should be removed manually.
 #
 # AUTHOR
 #
@@ -142,6 +147,13 @@ end
 
 def verbose(s) ; puts s if $VERBOSE ; end
 
+#
+# Disable creation of mass hosting sites.
+#
+if File.exists?("/etc/symbiosis/apache.d/disabled") or File.exists?("/etc/symbiosis/apache.d/disabled.zz-mass-hosting")
+  verbose "Symbiosis mass hosting disabled.  Exiting."
+  exit 0
+end
 
 #
 # Requirements after the help clause has finished.

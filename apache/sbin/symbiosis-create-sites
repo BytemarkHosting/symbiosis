@@ -28,7 +28,7 @@
 #
 # --force, -f       Force the re-creation of all sites.
 #
-# --no-reload, -r  Do not reload apache2 even if changes have taken place.
+# --no-reload, -r   Do not reload apache2 even if changes have taken place.
 #
 # --manual, -m      Show the manual for this script.
 #
@@ -38,9 +38,15 @@
 #
 # USAGE
 #
-#   This script is designed to iterate over the domains hosted
-#  upon a Symbiosis system, and configure Apache to listen appropriate
-#  when a domain is configured for SSL hosting and not yet configured.
+# This script is designed to iterate over the domains hosted upon a Symbiosis
+# system, and configure Apache to listen appropriate when a domain is
+# configured for SSL hosting and not yet configured.
+#
+# This script can be disabled by creating the file
+# /etc/symbiosis/apache.d/disabled. This will also prevent any further package
+# updates from recreating these sites in the apache2 configuration. However it
+# will not disable any sites that are currently in place. These should be
+# removed manually.
 #
 # AUTHOR
 #
@@ -142,6 +148,14 @@ end
 
 def verbose(s)
   puts s if $VERBOSE
+end
+
+#
+# Disable creation of mass hosting sites.
+#
+if File.exists?("/etc/symbiosis/apache.d/disabled")
+  verbose "Symbiosis automatic apache configuration disabled. Exiting."
+  exit 0
 end
 
 #
