@@ -4,7 +4,7 @@
 #
 % iptables_cmds.each do |cmd|
 % unless port.nil?
-<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -j DROP --reject-with tcp-reset
+<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -j DROP 
 <%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -j DROP
 % else
 <%= cmd %> -A <%= chain%> <%= src_or_dst %> -j DROP
