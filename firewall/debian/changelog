@@ -1,8 +1,10 @@
-symbiosis-firewall (2013:0607) oldstable; urgency=low
+symbiosis-firewall (2013:0610) oldstable; urgency=low
 
   * Fixed disabling white/blacklist functionality.
+  * Changed blacklist to drop rather than reject connections.
+  * Blacklist limits are now 100/24h or 25 since last run.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 07 Jun 2013 11:13:43 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 10 Jun 2013 14:31:48 +0100
 
 symbiosis-firewall (2012:0418) oldstable; urgency=low
 
