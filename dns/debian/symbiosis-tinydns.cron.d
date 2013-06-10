@@ -1,9 +1,11 @@
+SHELL=/bin/bash
+
 #
 #  Ensure that we upload our file once per day, regardless of any
 # changes or not.
 #
 
-0 0 * * * root  [ -x /usr/sbin/symbiosis-dns-generate ] && /usr/sbin/symbiosis-dns-generate --upload
+0 0 * * * root  [ -x /usr/sbin/symbiosis-dns-generate ] && /usr/sbin/symbiosis-dns-generate --upload --sleep 7200
 
 #
 #  Run four times per-hour and upload if changed
