@@ -4,18 +4,39 @@
 #
 #   symbiosis-dns-generate - Generate DNS snippet files for Symbiosis domains. 
 #
+# USAGE
+#
+#   symbiosis-dns-generate [ --sleep SEC | -s SEC ] [ --template TEMPLATE | -t TEMPLATE ]
+#          [ --bytemarkdns-dir DIR | -b DIR ] [ --force | -f ] [ --verbose | -v ] 
+#          [ --help | -h ] [ DOMAIN ]
+#
 # SYNOPSIS
 #
-#   --force       Force the re-creation of all DNS data.
-#   --upload      Force the upload of all DNS data.
-#   --template    Specify an alternative template file to read.
-#   --help        Show the help information for this script.
-#   --verbose     Show debugging information.
+#   --sleep SEC            sleep for a random amount of time before doing
+#                          anything, up to a maximum of SEC seconds.
+#
+#   --template TEMPLATE    Specify an alternative template file to read.
+#   
+#   --bytemarkdns-dir DIR  Specify where the BytemarkDNS zip file has been
+#                          unpacked to.  Defaults to /root/BytemarkDNS/
+#
+#   --force              Force the re-creation of all DNS data.
+#   --upload             Force the upload of all DNS data.
+#   --help               Show the help information for this script.
+#   --verbose            Show debugging information.
 #
 # DETAILS
 #
 # This script is designed to iterate over the domains hosted upon a Symbiosis
-# system, and create TinyDNS snippets for each one. 
+# system, and create TinyDNS snippets for each one. This can then be uploaded
+# to the Bytemark content DNS service.
+#
+# Domains can also be specified manually on the command line, in which case
+# only those domains will be processed.
+#
+# SEE ALSO
+#
+# http://www.bytemark.co.uk/dnsc
 #
 # AUTHOR
 #
@@ -29,53 +50,58 @@ require 'getoptlong'
 #
 #  Entry point to the code
 #
-$FORCE    = false
-$HELP     = false
+force    = false
+help     = false
 $VERBOSE  = false
 
 #
 # Do we need to re-upload the data?
 #
-$UPLOAD=false
+upload=false
 
 #
 # The root directory -- '/' by default.
 #
-root = "/"
+root             = "/"
 dns_template     = nil 
-bytemarkdns_data_dir      = nil
+bytemarkdns_dir  = nil
+sleep_for        = nil 
 
 opts = GetoptLong.new(
+         [ '--bytemarkdns-dir', '-b', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--force',    '-f', GetoptLong::NO_ARGUMENT ],
          [ '--help',     '-h', GetoptLong::NO_ARGUMENT ],
-         [ '--verbose',  '-v', GetoptLong::NO_ARGUMENT ],
-         [ '--upload',   '-u', GetoptLong::NO_ARGUMENT ],
+         [ '--sleep',    '-s', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--template', '-t', GetoptLong::REQUIRED_ARGUMENT ],
-         [ '--force',    '-f', GetoptLong::NO_ARGUMENT ]
+         [ '--upload',   '-u', GetoptLong::NO_ARGUMENT ],
+         [ '--verbose',  '-v', GetoptLong::NO_ARGUMENT ]
        )
 
 opts.each do |opt, arg|
   case opt
   when '--help'
-    $HELP = true
+    help = true
   when '--verbose'
     $VERBOSE = true
   when '--template'
     dns_template = arg
-  when '--bytemarkdns-data-dir'
-    bytemarkdns_data_dir = arg
+  when '--bytemarkdns-dir'
+    bytemarkdns_dir = arg
+  when '--sleep'
+    sleep_for = arg
   when '--root'
     root = arg
   when '--force'
-    $FORCE = true
+    force = true
   when '--upload'
-    $UPLOAD = true
+    upload = true
   end
 end
 
 #
 # CAUTION! Here be quality kode.
 #
-if $HELP
+if help
   # Open the file, stripping the shebang line
   lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
 
@@ -99,8 +125,33 @@ require 'symbiosis/config_files/tinydns'
 #
 # Set the default paths.
 #
-dns_template         = File.join(root, "/etc/symbiosis/dns.d/tinydns.template.erb") if dns_template.nil?
-bytemarkdns_data_dir = File.join(root, "/root/BytemarkDNS/data") if bytemarkdns_data_dir.nil?
+dns_template    = File.join(root, "/etc/symbiosis/dns.d/tinydns.template.erb") if dns_template.nil?
+bytemarkdns_dir = File.join(root, "/root/BytemarkDNS") if bytemarkdns_dir.nil?
+
+#
+# Bail out if the template is missing
+#
+unless File.file?(dns_template)
+  warn "Unable generate DNS data because the template #{dns_template.inspect} is missing."
+  exit 1
+end
+
+#
+# Bail out if the BytemarkDNS directory is missing
+#
+unless File.directory?(bytemarkdns_dir)
+  warn "Unable generate DNS data because the BytemarkDNS directory #{bytemarkdns_dir.inspect} is missing."
+  exit 1
+end
+
+#
+# Work out if we need to sleep.
+#
+unless sleep_for.nil?
+  sleep_for = (sleep_for =~ /(\d+)/ ? rand($1.to_i) : 0)
+  verbose "Sleeping for #{sleep_for}s before starting work"
+  sleep sleep_for
+end
 
 #
 # Any arguments on the command line specify which domains to do.
@@ -109,7 +160,7 @@ domains_to_configure = ARGV
 string_to_hash = []
 
 #
-#  For each domain.
+# For each domain.
 #
 Symbiosis::Domains.each do |domain|
 
@@ -129,7 +180,7 @@ Symbiosis::Domains.each do |domain|
     #
     do_create = false
 
-    if ( $FORCE )
+    if ( force )
       verbose "\tForcing re-creation of snippet due to --force."
       do_create = true
 
@@ -183,6 +234,13 @@ Symbiosis::Domains.each do |domain|
     end
  
     #
+    # Make sure the BytemarkDNS/data directory exists, and create if not.
+    #
+    unless File.directory?(File.join(bytemarkdns_dir, "data"))
+      Symbiosis::Utils.mkdir_p(File.join(bytemarkdns_dir, "data"))
+    end
+
+    #
     # Copy all the DNS data across to BytemarkDNS/data
     # 
     # FIXME: At this point more checks are needed, to prevent overwriting of
@@ -194,7 +252,7 @@ Symbiosis::Domains.each do |domain|
       string_to_hash << file
       string_to_hash << input
 
-      new_filename = File.join(bytemarkdns_data_dir, File.basename(file))
+      new_filename = File.join(bytemarkdns_dir, 'data', File.basename(file)) 
 
       verbose "\tWriting data to #{new_filename}"
       Symbiosis::Utils.safe_open(new_filename,File::WRONLY|File::CREAT) do |fh|
@@ -235,7 +293,7 @@ begin
   #
   # This is where we expect to find the current hash.
   #
-  hash_file = File.expand_path(File.join(bytemarkdns_data_dir,"../.hash"))
+  hash_file = File.expand_path(File.join(bytemarkdns_dir,".hash"))
 
   if File.exists?(hash_file)
     old_hash = File.readlines(hash_file).first.to_s.chomp
@@ -247,8 +305,8 @@ begin
   # Upload if the flag was set in the options, if there is no old hash, or the
   # new hash doesn't match the old one.
   #
-  if $UPLOAD or (old_hash.nil? or new_hash != old_hash )
-    upload_script = File.expand_path(File.join(bytemarkdns_data_dir,"../upload"))
+  if upload or (old_hash.nil? or new_hash != old_hash )
+    upload_script = File.expand_path(File.join(bytemarkdns_dir,"upload"))
 
     verbose "Uploading using #{upload_script}"
 
@@ -266,6 +324,13 @@ begin
       while !io.eof? do
         verbose io.readline
       end
+    end
+
+    #
+    # Don't write the hash out.
+    #
+    unless 0 == $?
+      raise StandardError, "#{upload_script.inspect} failed."
     end
 
     verbose "Writing hash to #{hash_file}"
