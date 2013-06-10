@@ -1,3 +1,14 @@
+symbiosis-tinydns (2013:0610) oldstable; urgency=low
+
+  * Updated symbiosis-dns-generate to have a sleep option, as well as general
+    tidying.
+  * --bytemarkdns-dir option documented
+  * --template option better documented
+  * The hash checksum file will not be written if upload fails.
+  * Updated crontab to use new sleep option at midnight.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 10 Jun 2013 11:50:36 +0100
+
 symbiosis-tinydns (2013:0606) oldstable; urgency=low
 
   * Updated postinst to work better on non-Bytemark IPs.
