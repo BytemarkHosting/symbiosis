@@ -158,6 +158,9 @@ if File.exists?("/etc/symbiosis/apache.d/disabled")
   exit 0
 end
 
+zz_mass_hosting_disabled = File.exists?("/etc/symbiosis/apache.d/disabled.zz-mass-hosting")
+verbose "Symbiosis automatic mass-hosting configuration disabled.  Configuring all sites." if zz_mass_hosting_disabled
+
 #
 # Requirements after the help clause has finished.
 #
@@ -201,7 +204,7 @@ Symbiosis::Domains.each do |domain|
     config        = Symbiosis::ConfigFiles::Apache.new(sites_available_file, "#")
     config.domain = domain
 
-    if domain.ips.any?{|ip| primary_ips.include?(ip)}
+    if !zz_mass_hosting_disabled and domain.ips.any?{|ip| primary_ips.include?(ip)} 
       verbose "\tThis site is using the host's primary IPs -- it is covered by the mass-hosting config.  Skipping."
       next
     end

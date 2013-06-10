@@ -20,8 +20,25 @@ fi
 #
 #  Remove any existing sites (the zz-mass-hosting ones will be recreated later).
 #
-for i in mass-hosting mass-hosting.ssl zz-mass-hosting zz-mass-hosting.ssl default 000-default 00-default ; do
+for i in mass-hosting mass-hosting.ssl default 000-default 00-default ; do
   a2dissite -q $i 2>/dev/null || true
+done
+
+#
+# Remove these if they're not symlinks pointing to our config files, but save
+# them in an array to make sure we put them back later.
+#
+declare -a relink
+
+for i in zz-mass-hosting zz-mass-hosting.ssl ; do
+  #
+  # Remove and relink if the sites-enabled symlink doesn't point at the
+  # sites-available file.
+  #
+  if [ ! /etc/apache2/sites-available/$i -ef /etc/apache2/sites-enabled/$i ] ; then 
+    a2dissite -q $i 2>/dev/null || true
+    relink[${#relink[@]}]=$i
+  fi
 done
 
 ##
@@ -56,6 +73,13 @@ done
 #
 symbiosis-create-mass-hosting-sites --no-reload --verbose
 symbiosis-create-sites              --no-reload --verbose
+
+#
+# Now relink any sites that were removed earlier
+#
+for i in relink[*] ; do
+  a2ensite -q $i 2>/dev/null || true
+done
 
 #######################################
 # Remove old cronjobs.
