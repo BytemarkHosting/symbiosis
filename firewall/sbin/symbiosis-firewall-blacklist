@@ -21,11 +21,11 @@
 #  -d, --no-delete         Do not delete the generated script
 #
 #  -a, --block-after <n>   Number of attempts before an IP address is
-#                          blacklisted. Defaults to 10.
+#                          blacklisted. Defaults to 25.
 #
 #  -b, --block-all-after <n>  Number of attempts before an IP address is
 #                             blocked from all ports, not just the ports
-#                             mentioned in the pattern. Defaults to 25.
+#                             mentioned in the pattern. Defaults to 100.
 #
 #  -e, --expire-after <n>  Number of days after which blacklisted IPs should be
 #                          expired. Defaults to 2.
@@ -83,8 +83,8 @@ base_dir     = "/etc/symbiosis/firewall/"
 delete       = true
 execute      = true
 force        = false
-block_after     = 20
-block_all_after = 20
+block_after     = 25
+block_all_after = 100
 expire_after = 2
 
 opts = GetoptLong.new(

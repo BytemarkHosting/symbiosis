@@ -26,8 +26,8 @@ module Symbiosis
       # Sets up a new Symbiosis::Firewall::Blacklist.
       #
       def initialize()
-        @block_after     = 10
-        @block_all_after = 25
+        @block_after     = 25
+        @block_all_after = 100
         @base_dir     = '/etc/symbiosis/firewall'
         @logtail_db   = '/var/lib/symbiosis/firewall-blacklist-logtail.db'
         @count_db     = BlacklistDB.new('/var/lib/symbiosis/firewall-blacklist-count.db')
