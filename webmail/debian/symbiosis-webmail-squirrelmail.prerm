@@ -3,21 +3,25 @@
 set -e
 
 #
-# Remove the existing link.
-#
-rm -f /etc/apache2/conf.d/squirrelmail.conf
-rm -f /etc/apache2/conf.d/squirrelmail.local.conf
-
-#
 # Remove our symbiosis alternative.
 #
 update-alternatives --remove symbiosis-webmail /usr/share/squirrelmail/
 
+#
+# Restart apache2 if apache2ctl exists and is executable.
+#
+if [ -x /usr/sbin/apache2ctl ] ; then
+  #
+  # Remove the existing link.
+  #
+  rm -f /etc/apache2/conf.d/squirrelmail.conf
+  rm -f /etc/apache2/conf.d/squirrelmail.local.conf
 
-#
-#  Restart Apache2.
-#
-invoke-rc.d apache2 force-reload || true
+  #
+  #  Restart Apache2.
+  #
+  invoke-rc.d apache2 force-reload || true
+fi
 
 
 #DEBHELPER#

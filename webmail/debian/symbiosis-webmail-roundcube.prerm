@@ -8,10 +8,14 @@ set -e
 update-alternatives --remove symbiosis-webmail /var/lib/roundcube/
 
 #
-#  Restart Apache2.
+# Restart apache2 if apache2ctl exists and is executable.
 #
-invoke-rc.d apache2 force-reload || true
-
+if [ -x /usr/sbin/apache2ctl ] ; then
+  #
+  #  Restart Apache2.
+  #
+  invoke-rc.d apache2 force-reload || true
+fi
 
 #DEBHELPER#
 exit 0

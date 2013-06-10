@@ -1,3 +1,11 @@
+symbiosis-webmail (2013:0610) oldstable; urgency=low
+
+  * Updated webmail packages to check for apache2ctl before trying to restart
+    it.
+  * Added the recommended suhosin encrypt session option.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 10 Jun 2013 12:04:22 +0100
+
 symbiosis-webmail (2012:1109) oldstable; urgency=low
 
   * Updated webmail package to add a snippet to make suhosin play nicely with

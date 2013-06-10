@@ -16,14 +16,16 @@ fi
 update-alternatives --install /var/www/webmail symbiosis-webmail /var/lib/roundcube/ 100
 
 #
-# Configure filtering
+# Restart apache2 if the apache2ctl exists and is exectuable
 #
+if [ -x /usr/sbin/apache2ctl ] ; then
 
+  #
+  #  Restart Apache2.
+  #
+  invoke-rc.d apache2 force-reload || true
 
-#
-#  Restart Apache2.
-#
-invoke-rc.d apache2 force-reload || true
+fi
 
 #DEBHELPER#
 exit 0
