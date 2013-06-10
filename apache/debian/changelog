@@ -2,8 +2,10 @@ symbiosis-httpd (2013:0606) oldstable; urgency=low
 
   * Added better support for disabling the automatic apache2 configuration
     handling, hopefully to prevent breakage on upgrades.
+  * Postinst now relinks zz-mass-hosting{,.ssl} only if it removed those links
+    in the first place.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 07 Jun 2013 13:51:22 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 10 Jun 2013 16:24:41 +0100
 
 symbiosis-httpd (2012:1025) oldstable; urgency=low
 
