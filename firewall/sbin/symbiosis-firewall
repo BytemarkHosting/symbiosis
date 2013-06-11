@@ -304,6 +304,14 @@ if ENV.has_key?("IFACE") and ENV.has_key?("PHASE")
     $VERBOSE = true
   end
 
+  #
+  # Don't bother even looking at this if the loopback interface is involved.
+  #
+  if "lo" == iface
+    verbose "symbiosis-firewall: Not configuring firewall for loopback interface #{iface}"
+    exit 0
+  end
+
   case phase
     when "post-up"
       action = "load"
@@ -312,7 +320,7 @@ if ENV.has_key?("IFACE") and ENV.has_key?("PHASE")
     when "post-down" 
       action = "flush"
     else
-      warn "symbiosis-firewalls: Don't know what to do during if-up/if-down phase #{phase.inspect}"
+      warn "symbiosis-firewall: Don't know what to do during if-up/if-down phase #{phase.inspect}"
       exit 1
   end
 
@@ -329,14 +337,14 @@ if ENV.has_key?("IFACE") and ENV.has_key?("PHASE")
       verbose "Flushing firewall for all #{address_families.join(" and ")} interfaces."
     else
       warn "symbiosis-firewall: Not running firewall as no primary interface was found." if $VERBOSE
-      exit 1
+      exit 0
     end
 
   elsif Symbiosis::Host.primary_interface.ifname == iface
     verbose "Running #{action} for interface #{iface} (#{address_families.join(" and ")})" if $VERBOSE
 
   else
-    warn "symbiosis-firewalls: Not running firewall for secondary interface #{iface.inspect}" if $VERBOSE
+    warn "symbiosis-firewall: Not running firewall for secondary interface #{iface.inspect}" if $VERBOSE
     exit 0
   end
 
