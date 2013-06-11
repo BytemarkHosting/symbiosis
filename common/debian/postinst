@@ -108,27 +108,33 @@ fi
 
 
 #
+# Find the hostname.
+#
+if [ -f /etc/hostname ] ; then
+  HOSTNAME=$(< /etc/hostname)
+else
+  HOSTNAME=$(hostname --fqdn)
+fi
+
 #
 #  If there are no existing directories beneath /srv/ create a default.
 #
 if [ $(ls -l /srv/ | grep ^d | wc -l) -lt 1 ] ; then
-
     #
-    #  Roots
+    # Roots
     #
-    mkdir -p /srv/$(hostname --fqdn)/public/htdocs
-    mkdir -p /srv/$(hostname --fqdn)/mailboxes/root
-
+    mkdir -p /srv/$HOSTNAME/public/htdocs
+    mkdir -p /srv/$HOSTNAME/mailboxes/root
 
     #
     #  If we have a password then set it for the mailbox.
     #
     if [ -s /etc/symbiosis/.passwd ]; then
-        cat /etc/symbiosis/.passwd  > /srv/$(hostname --fqdn)/mailboxes/root/password
+        /usr/bin/symbiosis-encrypt-password /etc/symbiosis/.passwd > /srv/$HOSTNAME/mailboxes/root/password
     fi
 
     chown    admin:admin /srv/
-    chown -R admin:admin /srv/$(hostname --fqdn)
+    chown -R admin:admin /srv/$HOSTNAME
 fi
 
 #
@@ -200,7 +206,7 @@ if [ "$makessl" == "1" ]; then
     #
     #  Make the key
     #
-    openssl req -subj "/C=GB/ST=England/L=York/CN=$(cat /etc/hostname)" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
+    openssl req -subj "/C=GB/ST=England/L=York/CN=$HOSTNAME" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
 
     #
     #  Combine Cert + Key
@@ -211,11 +217,8 @@ fi
 #
 # Finally add our magic IP adding script to if-up.d, and as a cronjob
 #
-
 ln -sf /usr/sbin/symbiosis-configure-ips /etc/network/if-up.d/
 ln -sf /usr/sbin/symbiosis-configure-ips /etc/cron.hourly/
-
-
 
 #DEBHELPER#
 exit 0
