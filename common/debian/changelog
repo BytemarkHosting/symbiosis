@@ -1,3 +1,10 @@
+symbiosis-common (2013:0611) oldstable; urgency=low
+
+  * Postinst now uses /etc/hostname or $(hostname) to determine what the
+    hostname is, not a mixture of both.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 11 Jun 2013 16:36:16 +0100
+
 symbiosis-common (2013:0606) oldstable; urgency=low
 
   * Updated is-bytemark-ip to work properly.
