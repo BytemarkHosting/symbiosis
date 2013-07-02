@@ -11,11 +11,19 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
-# Make sure this password is not used.
+# Make sure neither of these passwords are used.
 #
-bad_password="G6R11l8ssmHT6RMS"
+bad_password=""
+for test_password in G6R11l8ssmHT6RMS QSDL28TIXp06ccYy ; do
 
-if ( /usr/bin/mysql -u debian-sys-maint -p$bad_password -e "quit" > /dev/null 2>&1 ) ; then
+  if ( /usr/bin/mysql -u debian-sys-maint -p$test_password -e "quit" > /dev/null 2>&1 ) ; then
+    bad_password="$test_password"
+    break
+  fi
+
+done
+
+if [ -n "$bad_password" ] ; then
   #
   # OK change it.
   #
