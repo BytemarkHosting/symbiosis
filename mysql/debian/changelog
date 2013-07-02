@@ -1,3 +1,10 @@
+symbiosis-mysql (2013:0702) oldstable; urgency=low
+
+  * Updated postinst to change debian-sys-maint password for 32-bit Bytemark
+    images.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 02 Jul 2013 11:42:34 +0100
+
 symbiosis-mysql (2012:1108) oldstable; urgency=low
 
   * Updated postinst to change debian-sys-maint password in certain
