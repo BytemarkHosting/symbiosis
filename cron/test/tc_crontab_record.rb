@@ -36,7 +36,13 @@ MAILTO=bob@my-brilliant-site.com
 #
 # Run once a month
 #
-@monthly          /usr/local/bin/monthly-job.sh"
+@monthly          /usr/local/bin/monthly-job.sh
+
+#
+# run every minute
+#
+* * * * * php --some-argument-or-other cronjob.php
+"
     end
 
     assert_equal("bob@my-brilliant-site.com",@crontab.environment["MAILTO"])
@@ -70,6 +76,16 @@ MAILTO=bob@my-brilliant-site.com
     assert_equal((1..12).to_a, record.mon)
     assert_equal((0..6).to_a, record.wday)
     assert_equal("/usr/local/bin/monthly-job.sh", record.command)
+    
+    # Next entry -- Run every minute
+    #
+    record = @crontab.records[3]
+    assert_equal((0..59).to_a, record.min)
+    assert_equal((0..23).to_a, record.hour)
+    assert_equal((1..31).to_a, record.mday)
+    assert_equal((1..12).to_a, record.mon)
+    assert_equal((0..6).to_a, record.wday)
+    assert_equal("php --some-argument-or-other cronjob.php", record.command)
   end
 
 end

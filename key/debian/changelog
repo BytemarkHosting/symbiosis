@@ -1,17 +1,17 @@
-symbiosis-key (2010:0923) stable; urgency=low
+symbiosis-key (2010:0923) oldstable; urgency=low
 
   * New release.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 23 Sep 2010 10:13:01 +0100
 
-symbiosis-key (2010:0914) stable; urgency=low
+symbiosis-key (2010:0914) oldstable; urgency=low
 
   * Add new key
   * Remove old keys in post inst 
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:36:39 +0100
 
-symbiosis-key (2010:0603) stable; urgency=low
+symbiosis-key (2010:0603) oldstable; urgency=low
 
   * Renamed package
   * Tidied up packaging
@@ -19,32 +19,32 @@ symbiosis-key (2010:0603) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:31 +0100
 
-bytemark-vhost-key (2009:1026-1) stable; urgency=low
+bytemark-vhost-key (2009:1026-1) oldstable; urgency=low
 
   * Install both keys to plain files beneath
     /usr/share/bytemark-vhost-key/
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 26 Oct 2009 10:33:01 +0000
 
-bytemark-vhost-key (20090707153244) stable; urgency=low
+bytemark-vhost-key (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
 
-bytemark-vhost-key (20090522105210) stable; urgency=low
+bytemark-vhost-key (20090522105210) oldstable; urgency=low
 
   * New release for Lenny.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
 
-bytemark-vhost-key (20081117163642) stable; urgency=low
+bytemark-vhost-key (20081117163642) oldstable; urgency=low
 
   * Updated the short description of this package.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 16:36:16 +0000
 
-bytemark-vhost-key (20081110153344) stable; urgency=low
+bytemark-vhost-key (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package bytemark-vhost-key
     - Support may be found at http://vhost.bytemark.co.uk/

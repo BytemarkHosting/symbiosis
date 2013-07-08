@@ -1,13 +1,19 @@
-symbiosis-httpd (2010:1018) stable; urgency=low
+symbiosis-httpd (2010:1111) oldstable; urgency=low
 
   [ Steve Kemp ]
-  * Use the mtime of the config/ip + ssl.key files to control the regeneration
-    of Apache scripts.  Reference RT:# 278451
   * Update the ACL for the /bytemark/ hierarchy.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thur, 11 Nov 2010 14:28:59 +0000
 
-symbiosis-httpd (2010:0923) stable; urgency=low
+symbiosis-httpd (2010:1018) oldstable; urgency=low
+
+  [ Steve Kemp ]
+  * Use the mtime of the config/ip + ssl.key files to control the regeneration
+    of Apache scripts.  Reference RT:# 278451
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 18 Oct 2010 15:16:17 +0000
+
+symbiosis-httpd (2010:0923) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Correctly install ourself when the system doesn't use eth0 as
@@ -15,14 +21,14 @@ symbiosis-httpd (2010:0923) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 23 Sep 2010 09:57:00 +0000
 
-symbiosis-httpd (2010:0917) stable; urgency=low
+symbiosis-httpd (2010:0917) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Don't log mod_vhost_alias_bytemark messages to /var/log/apache2/error.log
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 17 Sep 2010 12:33:45 +0000
 
-symbiosis-httpd (2010:0915) stable; urgency=low
+symbiosis-httpd (2010:0915) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Use a template file for the SSL-site creation, and honour the flag
@@ -34,7 +40,7 @@ symbiosis-httpd (2010:0915) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 15 Sep 2010 12:55:21 +0000
 
-symbiosis-httpd (2010:0722) stable; urgency=low
+symbiosis-httpd (2010:0722) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Added a new binary package, libapache2-mod-ruid, to provide per-UID
@@ -42,7 +48,7 @@ symbiosis-httpd (2010:0722) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 22 Jul 2010 14:26:38 +0000
 
-symbiosis-httpd (2010:0604) stable; urgency=low
+symbiosis-httpd (2010:0604) oldstable; urgency=low
 
   [ Steve Kemp ]
   * Correct the missing shebang upon the configure-additional script.
@@ -54,105 +60,105 @@ symbiosis-httpd (2010:0604) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 04 Jun 2010 09:44:09 +0100
 
-libapache2-mod-vhost-bytemark (2010:0525) stable; urgency=low
+libapache2-mod-vhost-bytemark (2010:0525) oldstable; urgency=low
 
   * Ensure that when we're creating new SSL virtual hosts that we
     correctly cope with the addition of an SSL bundle.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 25 May 2010 15:00:51 +0000
 
-libapache2-mod-vhost-bytemark (2009:1026-1) stable; urgency=low
+libapache2-mod-vhost-bytemark (2009:1026-1) oldstable; urgency=low
 
   * Move logs into the correct location.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 26 Oct 2009 15:00:51 +0000
 
-libapache2-mod-vhost-bytemark (2009:1021-1) stable; urgency=low
+libapache2-mod-vhost-bytemark (2009:1021-1) oldstable; urgency=low
 
   * Correctly use the epoch.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 21 Oct 2009 16:51:16 +0000
 
-libapache2-mod-vhost-bytemark (2009.1009-1) stable; urgency=low
+libapache2-mod-vhost-bytemark (2009.1009-1) oldstable; urgency=low
 
   * Correctly archive and prune old logs.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 9 Oct 2009 11:33:11 +0000
 
-libapache2-mod-vhost-bytemark (20090804161200) stable; urgency=low
+libapache2-mod-vhost-bytemark (20090804161200) oldstable; urgency=low
 
   * Set the content type in our /bytemark/info/ page.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 4 Aug 2009 16:12:00 +0100
 
-libapache2-mod-vhost-bytemark (20090731103324) stable; urgency=low
+libapache2-mod-vhost-bytemark (20090731103324) oldstable; urgency=low
 
   * Generated logs/ and stats/ have correct ownership.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 31 Jul 2009 10:33:24 +1000
 
-libapache2-mod-vhost-bytemark (20090714122742) stable; urgency=low
+libapache2-mod-vhost-bytemark (20090714122742) oldstable; urgency=low
 
   * Fixed typo on the front-page.
   * Enable index.php for the /bytemark/ path.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 14 Jul 2009 12:27:42 +0000
 
-libapache2-mod-vhost-bytemark (20090708161223) stable; urgency=low
+libapache2-mod-vhost-bytemark (20090708161223) oldstable; urgency=low
 
   * Don't hang processing logs for empty domains.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 8 Jul 2009 16:12:23 +0000
 
-libapache2-mod-vhost-bytemark (20090707164326) stable; urgency=low
+libapache2-mod-vhost-bytemark (20090707164326) oldstable; urgency=low
 
   * Added bytemark/info page with restrictive ACL
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 16:43:26 +0000
 
-libapache2-mod-vhost-bytemark (20090707153244) stable; urgency=low
+libapache2-mod-vhost-bytemark (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
 
-libapache2-mod-vhost-bytemark (20090707094355) stable; urgency=low
+libapache2-mod-vhost-bytemark (20090707094355) oldstable; urgency=low
 
   * Update the pre-rm script to be less broken.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tues, 8 Jul 2009 09:44:01 +0000
 
-libapache2-mod-vhost-bytemark (20090706162121) stable; urgency=low
+libapache2-mod-vhost-bytemark (20090706162121) oldstable; urgency=low
 
   * Forcible lenny rebuild
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 16:21:21 +0000
 
-libapache2-mod-vhost-bytemark (20090706151825) stable; urgency=low
+libapache2-mod-vhost-bytemark (20090706151825) oldstable; urgency=low
 
   * Prune the old logs from the correct location.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 15:18:25 +0000
 
-libapache2-mod-vhost-bytemark (20090706150949) stable; urgency=low
+libapache2-mod-vhost-bytemark (20090706150949) oldstable; urgency=low
 
   * Use perl for make-logs
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 15:10:09 +0000
 
-libapache2-mod-vhost-bytemark (20090706110146) stable; urgency=low
+libapache2-mod-vhost-bytemark (20090706110146) oldstable; urgency=low
 
   * Use "mtime" not "ctime" to purge old logs.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 7 Jul 2009 10:44:10 +0000
 
-libapache2-mod-vhost-bytemark (20081118175414) stable; urgency=low
+libapache2-mod-vhost-bytemark (20081118175414) oldstable; urgency=low
 
   * Make sure the "admin" exists.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 18 Nov 2008 17:55:21 +0000
 
-libapache2-mod-vhost-bytemark (20081117153127) stable; urgency=low
+libapache2-mod-vhost-bytemark (20081117153127) oldstable; urgency=low
 
   * The create-ssl-sites script now understands config/ssl.bundle
   * The auto-generated files will have a warning suggesting users shouldn't
@@ -160,13 +166,13 @@ libapache2-mod-vhost-bytemark (20081117153127) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 15:33:51 +0000
 
-libapache2-mod-vhost-bytemark (20081110153345) stable; urgency=low
+libapache2-mod-vhost-bytemark (20081110153345) oldstable; urgency=low
 
   * Reinstate the postinstallation files.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 10 Nov 2008 15:33:44 +0000
 
-libapache2-mod-vhost-bytemark (20081110153344) stable; urgency=low
+libapache2-mod-vhost-bytemark (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package libapache2-mod-vhost-bytemark
     - Support may be found at http://vhost.bytemark.co.uk/

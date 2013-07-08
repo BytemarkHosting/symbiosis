@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #  THis script will:
 #
@@ -14,16 +14,22 @@
 # -- 
 #
 
-REPO=Symbiosis
-SRC=https://projects.bytemark.co.uk/hg/$REPO
-DST=$HOME/$REPO
-LOCK=$DST/$REPO-builder.lck
+#
+# Set up some default values
+# 
 
-LOGFILE=$DST/$REPO-builder.$$.log
-ERRFILE=$DST/$REPO-builder.$$.err
-MAILTO="patrick@bytemark.co.uk"
+REPO=${REPO:-symbiosis}
+SRC=${SRC:-https://projects.bytemark.co.uk/hg/$REPO}
+DST=${DST:-$HOME/$REPO}
+LOCK=${LOCK:-$DST/$REPO-builder.lck}
 
-GUESTNAME=symtester
+LOGFILE=${LOGFILE:-$DST/$REPO-builder.$$.log}
+ERRFILE=${ERRFILE:-$DST/$REPO-builder.$$.err}
+MAILTO=${MAILTO:-patrick@bytemark.co.uk}
+
+GUESTNAME=${GUESTNAME:-$REPO-tester}
+
+FORCE=${FORCE:-}
 
 #
 # Exit on errors

@@ -34,12 +34,12 @@ Tests to be carried out:
 
 -- clamav-daemon -------------------------------------------------------
  * Checking process
- * clamd doesn't appear to be runing: No such file or directory - /var/run/clamav/clamd.pid
+ * clamd doesn't appear to be running: No such file or directory - /var/run/clamav/clamd.pid
  * Process state OK -- clamd should not be running
 
 -- clamav-freshclam ----------------------------------------------------
  * Checking process
- * freshclam doesn't appear to be runing: No such file or directory - /var/run/clamav/freshclam.pid
+ * freshclam doesn't appear to be running: No such file or directory - /var/run/clamav/freshclam.pid
  * Process state OK -- freshclam should not be running
 
 -- cron ----------------------------------------------------------------
@@ -116,7 +116,7 @@ Tests to be carried out:
 
 -- spamassassin --------------------------------------------------------
  * Checking process
- * spamd doesn't appear to be runing: No such file or directory - /var/run/spamd.pid
+ * spamd doesn't appear to be running: No such file or directory - /var/run/spamd.pid
  * Process state OK -- spamd should not be running
 
 -- sshd ----------------------------------------------------------------

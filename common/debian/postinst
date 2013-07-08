@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #  This script has the task of performing the "common" post-install
 # setup for all the Symbiosis packages.

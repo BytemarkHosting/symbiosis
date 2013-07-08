@@ -1,37 +1,37 @@
-symbiosis-common (2010:1124) stable; urgency=low
+symbiosis-common (2010:1124) oldstable; urgency=low
 
   * Add the "admin" user to the "adm" group - such that it may read
     apache logfiles, etc.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 24 Nov 2010 14:33:41 +0000
 
-symbiosis-common (2010:0914) stable; urgency=low
+symbiosis-common (2010:0914) oldstable; urgency=low
 
   * Added test suite
   * Fixed password check to work
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:43:37 +0100
 
-symbiosis-common (2010:0830) stable; urgency=low
+symbiosis-common (2010:0830) oldstable; urgency=low
 
   * Install a small library of Perl functions.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 30 Aug 2010 09:44:09 +0000
 
-symbiosis-common (2010:0817) stable; urgency=low
+symbiosis-common (2010:0817) oldstable; urgency=low
 
   * Updated the post-installation script to make /etc/symbiosis if
     it isn't present.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 17 Aug 2010 11:11:11 +0000
 
-symbiosis-common (2010:0727) stable; urgency=low
+symbiosis-common (2010:0727) oldstable; urgency=low
 
   * Install lib/symbiosis/domains.rb
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 27 Jul 2010 12:40:00 +0000
 
-symbiosis-common (2010:0625) stable; urgency=low
+symbiosis-common (2010:0625) oldstable; urgency=low
 
   * New package
 

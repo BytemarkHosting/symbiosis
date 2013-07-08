@@ -1,5 +1,4 @@
-bin/create-ssl-sites      etc/cron.hourly/
-bin/configure-additional  etc/cron.hourly/
-bin/make-logs             etc/cron.daily/
-bin/symbiosis-combine-ssl usr/bin
-etc/*                     etc/
+sbin                      usr/
+test.d                    etc/symbiosis/
+apache.d                  etc/symbiosis/
+lib/*                     usr/lib/ruby/1.8/

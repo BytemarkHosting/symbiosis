@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # This just provisions a machine for each distro / architecture.
@@ -16,28 +16,28 @@ for arch in i386 amd64 ; do
                 #
                 # If we already have an image, carry on.
                 #
-                if [ -d /shared/images/symtester/$distro/$arch/run ] ; then
-                  echo Image for symtester/$distro/$arch already exists
+                if [ -d /shared/images/$GUESTNAME/$distro/$arch/run ] ; then
+                  echo Image for $GUESTNAME/$distro/$arch already exists
                   continue
                 fi
 
                 #
                 #  If the guest exists.
                 #
-                if [ -d /shared/guests/symtester/ ]; then
-                  sudo km delete symtester
+                if [ -d /shared/guests/$GUESTNAME/ ]; then
+                  sudo km delete $GUESTNAME
                 fi
 
                 #
                 #  Recreate
                 #
                 sudo km-provision --pass=$passwd  --ip=89.16.160.206 \
-                             --name=symtester --arch=$arch \
+                             --name=$GUESTNAME --arch=$arch \
                              --key=$HOME/.ssh/id_rsa.pub \
                              --imager=http://imager3.bytemark.co.uk:5000 \
                              --dist=$distro \
                              --nostart
 
-                sudo cp -R /shared/guests/symtester/* /shared/images/symtester/$distro/$arch
+                sudo cp -R /shared/guests/$GUESTNAME/* /shared/images/$GUESTNAME/$distro/$arch
         done
 done

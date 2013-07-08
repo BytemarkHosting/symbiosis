@@ -2,9 +2,12 @@
 
 set -e
 
-mkdir -p /srv/symtester/config/
-touch    /srv/symtester/config/antivirus
-touch    /srv/symtester/config/antispam
+GUESTNAME=${GUESTNAME:-symtester}
+BUILDER=${BUILDER:-symbiosis-builder.sh.bytemark.co.uk}
+
+mkdir -p "/srv/$GUESTNAME.test/config/"
+touch    "/srv/$GUESTNAME.test/config/antivirus"
+touch    "/srv/$GUESTNAME.test/config/antispam"
 
 #
 # Start spam & anti-virus bits
@@ -33,7 +36,7 @@ sleep 20
 # package1,version1
 # package2,version2
 #
-pkgvers=`wget -q -O - http://symbiosis-builder.sh.bytemark.co.uk/current/Packages | grep '^\(Package\|Version\)' | sed -n 'N;s/\(Package\|Version\): //g;s/\n/,/;p' | uniq`
+pkgvers=`wget -q -O - http://$BUILDER/lenny/current/Packages | grep '^\(Package\|Version\)' | sed -n 'N;s/\(Package\|Version\): //g;s/\n/,/;p' | uniq`
 
 for pkgver in $pkgvers ; do
   pkg=${pkgver%,*} 

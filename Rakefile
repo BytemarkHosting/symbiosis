@@ -12,7 +12,7 @@ AVAILABLE_BUILD_ARCH=["amd64", "i386"]
 CLEAN.add   %w(Release.asc Packages.new Sources.new Release.new *-stamp)
 CLOBBER.add %w(Packages Sources Packages.gz Sources.gz Release Release.gpg *.deb *.tar.gz *.build *.diff.gz *.dsc *.changes)
   
-DISTRO = File.basename(FileUtils.pwd)
+DISTRO = "lenny"
 
 #
 # Monkey patch rake to output on stdout like normal people
@@ -95,7 +95,7 @@ def upstream_version(debian_version)
   $2
 end
 
-task :default => [:all]
+task :default => [:build]
 
 desc "Verify integrity of packages using lintian"
 task :lintian => ["lintian-stamp"]
@@ -145,7 +145,7 @@ rule '.gz' => [ proc {|t| t.sub(/.gz$/,"") } ] do |t|
 end
 
 desc "Generate Release.gpg"
-task :all => [ "Release.gpg" ] 
+task :build => [ "Release.gpg" ] 
 
 desc "Generate Packages file"
 file "Packages" => package_changess do |t|
@@ -314,33 +314,36 @@ rsync_args = %w(
 
 rsync_excludes = %w(*/ Makefile Rakefile TODO README .hgignore AUTOBUILD .hgtags)
 
-hg_number  = `hg id -n -r tip`.chomp
-release = "current"
+hg_number  = `hg id -i -r tip`.chomp
+htdocs_home = File.join(ENV['HOME'],"htdocs",DISTRO)
 
-file "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
+file "#{htdocs_home}/#{hg_number}/Release.gpg" => "Release.gpg"  do |t|
   cmd = %w(rsync) + rsync_args
   rsync_excludes.each do |ex|
     cmd << "--exclude '#{ex}'"
   end
-  sh "#{cmd.join(" ")} --times $PWD/ #{ENV['HOME']}/htdocs/#{hg_number}"
-  rm "#{ENV['HOME']}/htdocs/#{release}"
+  sh "#{cmd.join(" ")} --times $PWD/ #{htdocs_home}/#{hg_number}"
+  rm "#{htdocs_home}/latest" if File.exists?("#{htdocs_home}/latest")
 end
 
-file "#{ENV["HOME"]}/htdocs/#{release}" => "#{ENV['HOME']}/htdocs/#{hg_number}/Release.gpg" do |t|
-  sh "cd #{ENV["HOME"]}/htdocs && ln -sf #{hg_number} #{release}"
+file "#{htdocs_home}/latest" => "#{htdocs_home}/#{hg_number}/Release.gpg" do |t|
+  sh "cd #{htdocs_home} && ln -sf #{hg_number} latest"
 end
 
 AVAILABLE_BUILD_ARCH.each do |arch|
-  file "#{ENV["HOME"]}/htdocs/#{release}/#{arch}" => "#{ENV["HOME"]}/htdocs/#{release}" do |t|
+  file "#{htdocs_home}/latest/#{arch}" => "#{htdocs_home}/latest" do |t|
     sh "cd #{t.prerequisites.first} && ln -sf . #{arch}"
   end
 end 
 
 desc "Upload packages to the local tree" 
-task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/#{release}/#{arch}"}
+task "upload" => AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/latest/#{arch}"}
 
 desc "Upload packages to mirror. !DANGER!" 
-task "upload-live" => ["#{ENV['HOME']}/htdocs/lenny"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{ENV["HOME"]}/htdocs/lenny/#{arch}"} do |t|
+task "upload-live" => ["#{htdocs_home}/lenny"] + AVAILABLE_BUILD_ARCH.collect{|arch| "#{htdocs_home}/lenny/#{arch}"} do |t|
   sh "rsync -Pr --delete #{t.prerequisites.first}/ repo@mirroir.sh:htdocs/symbiosis/lenny/"
 end
+
+desc "Complete build cycle"
+task "clean_build_and_upload" => %w(clobber build upload)
 

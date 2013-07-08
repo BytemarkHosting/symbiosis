@@ -29,34 +29,64 @@
 #include <unistd.h>
 #include <string.h>
 
-
-
-
 /**
  * Global verbosity flag.
  */
 int g_verbose = 0;
 
-
-
+#define CRONTAB_HELPER "/usr/bin/symbiosis-crontab"
+#define SRV_DIR        "/srv"
 
 /**
  * fork() so that we can launch a program in the background.
  */
-void fork_program( char *program )
+void process_crontab( char *crontab_path, char *domain_path, struct passwd *pwd )
 {
-    pid_t pid = fork();
-
-    if ( pid == 0 )
+    pid_t pid;
+          
+    if ( (pid = fork()) == 0 )
     {
-        system( program );
+        if( g_verbose )
+           printf("Processing: %s as UID %i:%i\n", crontab_path, pwd->pw_uid, pwd->pw_gid );
+
+        /**
+         *  Change UID 
+         */
+        if( setgid(pwd->pw_gid) == 0 && setuid(pwd->pw_uid) == 0 ) {
+          /*
+           *  Live in /srv/domain.com by default 
+           */
+          chdir(domain_path);
+
+          /**
+           * Fix up environment (this was cleared some time ago)
+           */
+          setenv("HOME", pwd->pw_dir, 1);
+          setenv("SHELL", pwd->pw_shell, 1);
+          setenv("LOGNAME", pwd->pw_name, 1);
+          setenv("PATH", "/usr/bin:/bin", 1);
+
+          /**
+           * Run the helper
+           */
+          char *args[] = { CRONTAB_HELPER, crontab_path, (char *) 0 };
+
+          execv(*args, args);
+          printf("*** ERROR: exec failed\n");
+          exit( 1 );
+        }
+        else
+        {
+          printf("*** ERROR: Unable to change UID.");
+          exit( 1 );
+        }
     }
     else if (pid < 0)
     {
-        printf("Fork failed\n");
+        printf("*** ERROR: Fork failed\n");
+        exit( 1 );
     }
 }
-
 
 
 
@@ -80,7 +110,6 @@ void process_domains( const char *dirname )
        return;
    }
 
-
    /**
     * Read each entry in the directory.
     */
@@ -88,24 +117,22 @@ void process_domains( const char *dirname )
    {
        struct stat domain;
        struct stat crontab;
-       struct passwd *pwd;
 
        /**
-        * Filename of crontab, if it exists.
+        * Path of domain & crontab, if it exists.
         */
-       char filename[ 1024 ] = { '\0' };
-
-       /**
-        * Command to run, if any.
-        */
-       char command[ 1024 ] = { '\0' };
-
+       char domain_path[ 1024 ] = { '\0' };
+       char crontab_path[ 1024 ] = { '\0' };
 
        /**
         * Get the name of this entry beneath /srv
         */
        const char *entry = dent->d_name;
-
+       
+       /**
+        * Data from /etc/password for the user
+        */
+       struct passwd *pwd;
 
        if ( g_verbose )
            printf("Read entry: %s\n", entry );
@@ -122,87 +149,83 @@ void process_domains( const char *dirname )
            continue ;
        }
 
-
        /**
-        * Look for /srv/$name/config/crontab
-        */
-       snprintf(filename, sizeof(filename)-1,
-                "/srv/%s/config/crontab",
-                entry );
-       if ( stat( filename, &crontab ) != 0 )
-       {
-           if ( g_verbose )
-               printf("\tIgnoring as /srv/%s/config/crontab doesnt exist\n",
-                      entry );
-           continue;
-       }
-       else
-       {
-           if ( S_ISDIR(crontab.st_mode) )
-           {
-               if ( g_verbose )
-                   printf("\tIgnoring as /srv/%s/config/crontab is a directory\n",
-                          entry);
-
-               continue;
-           }
-
-       }
-
-       /**
-        * OK we have /srv/$name & /srv/$name/config/crontab.
-        *
-        * Ensure the owners match.
-        */
-       snprintf(filename, sizeof(filename)-1,
-                "/srv/%s", entry );
-       if ( stat(filename, &domain ) != 0 )
-       {
-           if ( g_verbose )
-               printf("\tstat( /srv/%s ) - failed\n", entry );
-           continue;
-       }
-
-
-       /**
-        * OK here we have two statbufs - one for /srv/$name, and
-        * one for /srv/$name/config/crontab
-        */
-       if ( domain.st_uid != crontab.st_uid )
-       {
-           if ( g_verbose )
-              printf("UIDs don't match for /srv/%s and /srv/%s/config/crontab\n", entry, entry );
-           continue;
-       }
-
-
-       /**
-        * Found a valid domain with a crontab - now we need to find
-        * the username to execute with.
+        * Stat /srv/domain to make sure it is a directory
         *
         */
-       pwd = getpwuid(domain.st_uid);
-       if ( ( pwd == NULL ) ||
-            ( pwd->pw_name == NULL ) )
+       snprintf(domain_path, sizeof(domain_path)-1,
+                "%s/%s", dirname, entry );
+       if ( stat(domain_path, &domain ) != 0 )
        {
            if ( g_verbose )
-           {
-             printf("\tFailed to find username for UID %d\n", domain.st_uid );
-             continue;
-           }
+               printf("\tstat( %s ) - failed\n", domain_path );
+           continue;
+       }
+      
+      /**
+       *  Make sure the domain directory is a directory 
+       */
+
+      if ( ! S_ISDIR(domain.st_mode) )
+       {
+           if ( g_verbose )
+               printf("\tIgnoring as %s is not a directory\n", domain_path);
+
+           continue;
+       }
+       
+        /**
+        * Look for /srv/$name/config/crontab, and make sure it is a file.
+        *
+        */
+       snprintf(crontab_path, sizeof(crontab_path)-1,
+                "%s/%s/config/crontab",
+                dirname, entry );
+
+       if ( stat( crontab_path, &crontab ) != 0 )
+       {
+           if ( g_verbose )
+               printf("\tIgnoring as %s doesnt exist\n", crontab_path );
+
+           continue;
        }
 
-       /**
-        * Build up the command to run, and execute it.
-        */
-       snprintf(command, sizeof(command)-1,
-                "/bin/su -s /bin/sh -c '/usr/bin/symbiosis-crontab /srv/%s/config/crontab' %s",
-                entry, pwd->pw_name  );
+       if ( ! S_ISREG(crontab.st_mode) )
+       {
+           if ( g_verbose )
+               printf("\tIgnoring as %s is not a file\n", crontab_path);
 
-       if ( g_verbose )
-           printf("Launching: %s\n", command );
+           continue;
+       }
 
-       fork_program( command );
+
+      /**
+       * Lookup the userid in /etc/password
+       */
+      pwd = getpwuid(domain.st_uid);
+      if ( ( pwd == NULL ) ||
+           ( pwd->pw_name == NULL ) )
+      {
+          if ( g_verbose )
+              printf("\tFailed to find username for UID %d\n", domain.st_uid );
+          continue;
+      }
+      
+      /**
+       * make sure that the user has a sane UID
+       */
+      if ( pwd->pw_uid < 1000 || pwd->pw_gid < 1000)
+      {
+          if ( g_verbose )
+              printf("Owner UID/GID is less than 1000 for %s owned by %s -- not processing.\n", domain_path, pwd->pw_name );
+           continue;
+      }
+
+ 
+      /*
+       * finally process the crontab
+       */
+      process_crontab( crontab_path, domain_path, pwd );
    }
 
    closedir(dp);
@@ -221,6 +244,20 @@ int main( int argc, char *argv[] )
     struct stat statbuf;
 
     /**
+     * Empty our enviroment
+     */
+    clearenv();
+
+    /**
+     * Make sure we're root
+     */
+    if( getuid() != 0 ) 
+    {
+      printf("This program must be invoked as root.\n");
+      return -1;
+    }
+
+    /**
      * Parse arguments looking for a verbose flag.
      */
     for ( i = 1; i < argc; i++ )
@@ -229,14 +266,13 @@ int main( int argc, char *argv[] )
           g_verbose = 1;
     }
 
-
     /**
      * See if we have our helper present.
      */
-    if ( stat( "/usr/bin/symbiosis-crontab", &statbuf ) != 0 )
+    if ( stat( CRONTAB_HELPER, &statbuf ) != 0 )
     {
         if ( g_verbose )
-            printf("Our helper is missing: /usr/bin/symbiosis-crontab\n" );
+            printf("Our helper is missing: %s\n", CRONTAB_HELPER );
 
         return -1;
     }
@@ -245,10 +281,10 @@ int main( int argc, char *argv[] )
     /**
      * Ensure that /srv is present.
      */
-    if ( stat( "/srv", &statbuf ) != 0 )
+    if ( stat( SRV_DIR, &statbuf ) != 0 )
     {
         if ( g_verbose )
-            printf( "/srv isn't present.\n" );
+            printf( "%s isn't present.\n", SRV_DIR );
 
         return -1;
     }
@@ -259,7 +295,7 @@ int main( int argc, char *argv[] )
     if ( ! S_ISDIR( statbuf.st_mode ) )
     {
         if ( g_verbose )
-            printf( "/srv isn't a directory.\n" );
+            printf( "%s isn't a directory.\n", SRV_DIR );
 
         return -1;
     }
@@ -268,7 +304,7 @@ int main( int argc, char *argv[] )
     /**
      * OK we're good to proceed.
      */
-    process_domains( "/srv/" );
+    process_domains( SRV_DIR );
 
 
     /**

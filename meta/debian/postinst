@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -17,10 +17,15 @@ fi
 if ( ! grep volatile /etc/apt/sources.list 2>/dev/null >/dev/null ); then
     cat >> /etc/apt/sources.list <<EOF
 
-deb     http://mirror.bytemark.co.uk/debian-volatile/ stable/volatile main contrib non-free
-deb-src http://mirror.bytemark.co.uk/debian-volatile/ stable/volatile main contrib non-free
+deb     http://mirror.bytemark.co.uk/debian-volatile/ lenny/volatile main contrib non-free
+deb-src http://mirror.bytemark.co.uk/debian-volatile/ lenny/volatile main contrib non-free
 EOF
 
+else
+  #
+  # Make sure we change "stable/volatile" to "lenny/volatile"
+  #
+  sed -i -e 's#\<stable/volatile#lenny/volatile#g' /etc/apt/sources.list
 fi
 
 

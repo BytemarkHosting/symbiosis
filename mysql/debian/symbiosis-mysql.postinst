@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 
 #
@@ -91,12 +91,32 @@ if ( mysql --user=root --pass="" -e "SHOW DATABASES" 2>/dev/null >/dev/null ); t
 fi
 
 #
+# Record if any action is needed.
+#
+action=""
+
+#
 #  If we're not binding globally then fix things, and restart.
 #
 if ( grep ^bind-address /etc/mysql/my.cnf >/dev/null 2>/dev/null ); then
     sed -i~ -e "s/^bind-address[ \t]*=[ \t]*127.0.0.1/# \0/" /etc/mysql/my.cnf
-    invoke-rc.d mysql restart
+    action="restart"
 fi
+
+#
+#  Skip-bdb 
+#
+if ( grep ^skip-bdb /etc/mysql/my.cnf >/dev/null 2>/dev/null ); then
+    sed -i~ -e "s/^skip-bdb.*/# \0/" /etc/mysql/my.cnf
+    action="restart"
+fi
+
+#
+# Restart mysql if needed.
+#
+if [ -n "$action" ] ; then
+  invoke-rc.d mysql $action
+fi 
 
 #DEBHELPER#
 exit 0

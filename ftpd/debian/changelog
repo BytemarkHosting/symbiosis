@@ -1,53 +1,53 @@
-symbiosis-ftpd (2010:0901) stable; urgency=low
+symbiosis-ftpd (2010:0901) oldstable; urgency=low
 
   * Updated to use the common library code for performing FTP logins.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 01 Sep 2010 12:13:14 +0000
 
-symbiosis-ftpd (2010:0603) stable; urgency=low
+symbiosis-ftpd (2010:0603) oldstable; urgency=low
 
   * Renamed package
   * Switched to dpkg-source 3.0 (native) format
 
  -- Steve Kemp <steve@bytemark.co.uk>  Thu, 03 Jun 2010 13:51:31 +0100
 
-bytemark-vhost-ftpd (2009:1021-1) stable; urgency=low
+bytemark-vhost-ftpd (2009:1021-1) oldstable; urgency=low
 
   * Correctly use the epoch.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 21 Oct 2009 16:51:16 +0000
 
-bytemark-vhost-ftpd (2009.1009-1) stable; urgency=low
+bytemark-vhost-ftpd (2009.1009-1) oldstable; urgency=low
 
   * Our firewalling now only blocks port 21 access.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 9 Oct 2009 12:43:12 +0000
 
-bytemark-vhost-ftpd (20090707153244) stable; urgency=low
+bytemark-vhost-ftpd (20090707153244) oldstable; urgency=low
 
   * Per-Lenny vhost repository, rather than branches
 
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 7 Jul 2009 15:32:44 +0000
 
-bytemark-vhost-ftpd (20090522105210) stable; urgency=low
+bytemark-vhost-ftpd (20090522105210) oldstable; urgency=low
 
   * New release for Lenny.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 22 May 2009 10:52:10 +0000
 
-bytemark-vhost-ftpd (20081117171455) stable; urgency=low
+bytemark-vhost-ftpd (20081117171455) oldstable; urgency=low
 
   * New format for blacklist patterns.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Mon, 17 Nov 2008 17:17:17 +0000
 
-bytemark-vhost-ftpd (20081110153345) stable; urgency=low
+bytemark-vhost-ftpd (20081110153345) oldstable; urgency=low
 
   * Blacklist IPs which fail our login.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Fri, 14 Nov 2008 17:11:11 +0000
 
-bytemark-vhost-ftpd (20081110153344) stable; urgency=low
+bytemark-vhost-ftpd (20081110153344) oldstable; urgency=low
 
   * The Bytemark Virtual Hosting Package bytemark-vhost-ftpd
     - Support may be found at http://vhost.bytemark.co.uk/
