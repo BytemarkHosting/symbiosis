@@ -1,4 +1,3 @@
 bin        usr/
 sbin       usr/
-lib/*      usr/lib/ruby/1.8/
 test.d/*   etc/symbiosis/test.d/

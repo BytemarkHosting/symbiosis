@@ -343,16 +343,26 @@ module Symbiosis
 
         n = $1.to_f
         m = case $2
-          when "k": 1e3
-          when "M": 1e6
-          when "G": 1e9
-          when "T": 1e12
-          when "P": 1e15
-          when "ki": 2**10
-          when "Mi": 2**20
-          when "Gi": 2**30
-          when "Ti": 2**40
-          when "Pi": 2**50
+          when "k"
+           1e3
+          when "M"
+            1e6
+          when "G"
+            1e9
+          when "T"
+            1e12
+          when "P"
+            1e15
+          when "ki"
+            2**10
+          when "Mi"
+            2**20
+          when "Gi"
+            2**30
+          when "Ti"
+            2**40
+          when "Pi"
+            2**50
           else 1
         end
 

@@ -87,7 +87,7 @@ class TestDomain < Test::Unit::TestCase
     utf8_password = "ábë"
     domain = Domain.new()
 
-    %w(UTF8 ISO-8859-1).each do |enc|
+    %w(UTF-8 ISO-8859-1).each do |enc|
       if utf8_password.respond_to?(:encode)
         password = utf8_password.encode(enc)
       else

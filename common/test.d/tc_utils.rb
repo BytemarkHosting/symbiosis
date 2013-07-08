@@ -176,6 +176,11 @@ class TestUtils < Test::Unit::TestCase
       return
     end
 
+    if ENV.has_key?("FAKEROOTKEY")
+      warn "\nSkipping test_safe_open_as_root as it is running under fakeroot"
+      return
+    end
+
     #
     # Set up a typical evil scenario
     #

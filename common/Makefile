@@ -19,7 +19,12 @@ docs: man/symbiosis-encrypt-password.man  man/is-bytemark-ip.man  man/symbiosis-
 clean:
 	$(RM) -r man
 
-test:
+test: test1.8 test1.9.1
+
+test1.9.1:
+	cd test.d ; for i in t*.rb ; do ruby1.9.1 -I ../lib $$i ; true ; done
+
+test1.8:
 	cd test.d ; for i in t*.rb ; do ruby1.8 -I ../lib $$i ; true ; done
 
 .PHONY: test clean all docs
