@@ -7,6 +7,8 @@ nop:
 	@echo " docs      - Create manpages for scripts in sbin."
 	@echo " "
 
+install: docs
+
 docs: man/symbiosis-create-mass-hosting-sites.man  man/symbiosis-create-sites.man  man/symbiosis-apache-logger.man man/symbiosis-generate-stats.man man/symbiosis-rotate-logs.man
 
 man/%.man: ./sbin/%
