@@ -2,7 +2,7 @@
 
 require 'fileutils'
 require 'rake/clean'
-require 'md5'
+require 'digest/md5'
 require 'pp'
 
 DEBEMAIL=ENV["DEBEMAIL"] || "symbiosis@bytemark.co.uk"
@@ -120,7 +120,7 @@ EOF
   # Add the md5sums for each prereq.
   #
   t.prerequisites.each do |prereq|
-    release << " "+[ MD5.hexdigest(File.read(prereq)),
+    release << " "+[ Digest::MD5.hexdigest(File.read(prereq)),
                      File.stat(prereq).size,
                      prereq].join(" ")+"\n"
   end
