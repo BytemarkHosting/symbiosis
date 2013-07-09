@@ -1,4 +1,4 @@
-bytemark-symbiosis (2012:1109) oldstable; urgency=low
+bytemark-symbiosis (2012:1109) stable; urgency=low
 
   * Added openssh-server as a recommendation.
 

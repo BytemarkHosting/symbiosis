@@ -1,4 +1,4 @@
-symbiosis-monit (2013:0606) oldstable; urgency=low
+symbiosis-monit (2013:0606) stable; urgency=low
 
   * Added check for EINVAL, closes #4411.
 

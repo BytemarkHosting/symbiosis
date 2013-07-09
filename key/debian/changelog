@@ -1,4 +1,4 @@
-symbiosis-key (2012:0813) oldstable; urgency=low
+symbiosis-key (2012:0813) stable; urgency=low
 
   * Updated Bytemark apt signing key.
 

@@ -1,4 +1,4 @@
-symbiosis-phpmyadmin (2012:1109) oldstable; urgency=low
+symbiosis-phpmyadmin (2012:1109) stable; urgency=low
 
   [ Steve Kemp ]
   * Deny logins to PHPMyAdmin for the internal user 'debian-sys-maint'

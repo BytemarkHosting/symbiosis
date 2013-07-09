@@ -1,4 +1,4 @@
-symbiosis-email (2013:0606) oldstable; urgency=high
+symbiosis-email (2013:0606) stable; urgency=high
 
   * Removed use_shell from the dovecot lda transport in exim4.
 

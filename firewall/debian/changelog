@@ -1,4 +1,4 @@
-symbiosis-firewall (2013:0611) oldstable; urgency=low
+symbiosis-firewall (2013:0611) stable; urgency=low
 
   * Configure the firewall not to run duing ifup/down if the interface is the
     "lo" loopback interface.

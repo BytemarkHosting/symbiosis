@@ -1,4 +1,4 @@
-symbiosis-ftpd (2012:0926) oldstable; urgency=low
+symbiosis-ftpd (2012:0926) stable; urgency=low
 
   * Updated the FTP library to use Symbiosis::Domain#public_dir.
   * Changed debian/control to require new symbiosis-common package.
