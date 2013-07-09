@@ -1,3 +1,9 @@
+symbiosis-common (2013:0709) stable; urgency=low
+
+  * Repackaged for wheezy.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 09 Jul 2013 09:30:37 +0100
+
 symbiosis-common (2013:0611) oldstable; urgency=low
 
   * Postinst now uses /etc/hostname or $(hostname) to determine what the
