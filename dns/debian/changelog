@@ -1,4 +1,4 @@
-symbiosis-tinydns (2010:09240) oldstable; urgency=low
+symbiosis-tinydns (2010:09240) lenny; urgency=low
 
   [ Steve Kemp ]
   * Pre-Depend upon symbiosis-range - no longer assume eth0.

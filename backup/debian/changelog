@@ -1,4 +1,4 @@
-symbiosis-backup (2011:0222) oldstable; urgency=low
+symbiosis-backup (2011:0222) lenny; urgency=low
 
   [ Steve Kemp ]
   * Use 'bash' explicitly for the post-installation script.

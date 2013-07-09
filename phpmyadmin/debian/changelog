@@ -1,4 +1,4 @@
-symbiosis-phpmyadmin (2010:0908) oldstable; urgency=low
+symbiosis-phpmyadmin (2010:0908) lenny; urgency=low
 
   * Changed prerm to clean up after itself, and also changed restart to
     reload in postinst

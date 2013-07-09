@@ -1,4 +1,4 @@
-symbiosis-updater (2010:1012) oldstable; urgency=low
+symbiosis-updater (2010:1012) lenny; urgency=low
 
   * Updated the cron-job such that systems only fetch & apply updates
     Monday to Friday.

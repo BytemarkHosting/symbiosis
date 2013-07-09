@@ -1,4 +1,4 @@
-symbiosis-ftpd (2010:0901) oldstable; urgency=low
+symbiosis-ftpd (2010:0901) lenny; urgency=low
 
   * Updated to use the common library code for performing FTP logins.
 

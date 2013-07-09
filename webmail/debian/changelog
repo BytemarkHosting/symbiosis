@@ -1,4 +1,4 @@
-symbiosis-webmail (2010:0908) oldstable; urgency=low
+symbiosis-webmail (2010:0908) lenny; urgency=low
 
   * Changed restart to reload in postinst and prerm scripts
 

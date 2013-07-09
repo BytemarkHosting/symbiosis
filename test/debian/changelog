@@ -1,4 +1,4 @@
-symbiosis-test (2010:0914) oldstable; urgency=low
+symbiosis-test (2010:0914) lenny; urgency=low
 
   * Removed dovecot test -- now in email package.
 

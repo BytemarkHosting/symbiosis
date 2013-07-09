@@ -1,4 +1,4 @@
-symbiosis-monit (2010:0909) oldstable; urgency=low
+symbiosis-monit (2010:0909) lenny; urgency=low
 
   * Removed the obsolete bytemark-vhost-monit cronjob.
   * Update the current cronjob to exit if the script isn't installed.

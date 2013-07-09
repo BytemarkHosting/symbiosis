@@ -1,4 +1,4 @@
-symbiosis-mysql (2010:0916) oldstable; urgency=low
+symbiosis-mysql (2010:0916) lenny; urgency=low
 
   * Updated postinst to remove skip-bdb from my.cnf as needed.
 

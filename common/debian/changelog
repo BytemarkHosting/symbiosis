@@ -1,4 +1,4 @@
-symbiosis-common (2010:1124) oldstable; urgency=low
+symbiosis-common (2010:1124) lenny; urgency=low
 
   * Add the "admin" user to the "adm" group - such that it may read
     apache logfiles, etc.

@@ -1,4 +1,4 @@
-bytemark-symbiosis (2010:0817) oldstable; urgency=low
+bytemark-symbiosis (2010:0817) lenny; urgency=low
 
   * Remove the old bytemark-vhost init script.
   * Changed "metapackage" & "meta package" to "meta-package" in our description.
