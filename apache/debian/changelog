@@ -1,3 +1,9 @@
+symbiosis-httpd (2013:0711) STABLE; urgency=low
+
+  Updated apache build dependencies - apache2-prefork-dev in place of apache2-dev. 
+
+ -- John Hackett <jhackett@maker.sh.bytemark.co.uk>  Thu, 11 Jul 2013 12:47:21 +0100
+
 symbiosis-httpd (2013:0606) stable; urgency=low
 
   * Added better support for disabling the automatic apache2 configuration
