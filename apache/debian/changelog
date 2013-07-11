@@ -1,4 +1,4 @@
-symbiosis-httpd (2013:0711) STABLE; urgency=low
+symbiosis-httpd (2013:0711) stable; urgency=low
 
   Updated apache build dependencies - apache2-prefork-dev in place of apache2-dev. 
 
