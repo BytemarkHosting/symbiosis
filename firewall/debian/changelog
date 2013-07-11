@@ -1,3 +1,9 @@
+symbiosis-firewall (2013:0711) stable; urgency=low
+
+  * Changing build tag + added ruby1.8 dependency.
+
+ -- John Hackett <jhackett@maker.sh.bytemark.co.uk>  Thu, 11 Jul 2013 15:12:37 +0100
+
 symbiosis-firewall (2013:0611) stable; urgency=low
 
   * Configure the firewall not to run duing ifup/down if the interface is the
