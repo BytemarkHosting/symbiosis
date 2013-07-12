@@ -1,3 +1,9 @@
+symbiosis-mysql (2013:0703) stable; urgency=low
+
+  * Updated to use package mysql-server (installs 5.5) instead of mysql-server-5.1
+
+ -- Patrick J Cherry <jhackett@maker.sh.bytemark.co.uk>  Fri, 12 Jul 2013 10:10:47 +0100
+
 symbiosis-mysql (2013:0702) stable; urgency=low
 
   * Updated postinst to change debian-sys-maint password for 32-bit Bytemark
