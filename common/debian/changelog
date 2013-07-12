@@ -1,3 +1,9 @@
+symbiosis-common (2013:0712) stable; urgency=low
+
+  * Removed ruby-openssl dependency.
+
+ -- John Hackett <jhackett@maker.sh.bytemark.co.uk>  Fri, 12 Jul 2013 10:13:53 +0100
+
 symbiosis-common (2013:0709) stable; urgency=low
 
   * Repackaged for wheezy.
