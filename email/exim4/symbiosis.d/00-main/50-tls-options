@@ -51,10 +51,13 @@ tls_on_connect_ports = 465
 # RC4-MD5                 SSLv3 Kx=RSA      Au=RSA  Enc=RC4(128)  Mac=MD5 
 #
 
+# TODO: Check the below works with Outlook.
 # For GnuTLS:
-tls_require_ciphers      = AES_256:AES_128:3DES:ARCFOUR_128
-gnutls_require_kx        = DHE_RSA:DHE_DSS:RSA
-gnutls_require_mac       = MD5:SHA1
-gnutls_require_protocols = SSL3:TLS1
+tls_require_ciphers      = ${if =={$received_port}{25}\
+                           {NORMAL:%COMPAT}\
+                           {SECURE128}}
+#gnutls_require_kx        = DHE_RSA:DHE_DSS:RSA
+#gnutls_require_mac       = MD5:SHA1
+#gnutls_require_protocols = SSL3:TLS1
 
 
