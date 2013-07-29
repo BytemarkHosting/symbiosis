@@ -1,8 +1,8 @@
-symbiosis-email (2013:0606) stable; urgency=high
+symbiosis-email (2013:0729) stable; urgency=low
 
-  * Removed use_shell from the dovecot lda transport in exim4.
+  * Added dovecot-managesieved and dovecot-sieved as dependencies.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 06 Jun 2013 17:19:31 +0100
+ -- John Hackett <jhackett@bytemark.co.uk>  Mon, 29 Jul 2013 14:58:00 +0100
 
 symbiosis-email (2012:1031) oldstable; urgency=low
 
