@@ -8,7 +8,7 @@ Standards-Version: 3.9.1
 
 Package: symbiosis-email
 Architecture: all
-Depends: symbiosis-common (>= 2012:0221), exim4-daemon-heavy, dovecot-managesieved, dovecot-sieved, dovecot-imapd, dovecot-pop3d, ruby1.8, adduser, make, clamav-daemon, clamav-freshclam, spamassassin, ${misc:Depends}
+Depends: symbiosis-common (>= 2012:0221), exim4-daemon-heavy, dovecot-sieve, dovecot-imapd, dovecot-pop3d, ruby1.8, adduser, make, clamav-daemon, clamav-freshclam, spamassassin, ${misc:Depends}
 Recommends: symbiosis-webmail
 Replaces: bytemark-vhost-email, symbiosis-monit (<< 2011:1206), symbiosis-test
 Breaks:  symbiosis-monit (<< 2011:1206)

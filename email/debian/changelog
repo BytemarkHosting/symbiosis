@@ -1,3 +1,9 @@
+symbiosis-email (2013:0731) stable; urgency=low
+
+  * Removed dovecot-managesieved and dovecot-sieved as dependencies, added dovecot-sieve instead.
+
+ -- John Hackett <jhackett@bytemark.co.uk>  Wed, 31 Jul 2013 13:40:00 +0100
+
 symbiosis-email (2013:0729) stable; urgency=low
 
   * Added dovecot-managesieved and dovecot-sieved as dependencies.
