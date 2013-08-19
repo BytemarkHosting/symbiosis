@@ -2,12 +2,12 @@
 #
 # NAME
 #
-#   symbiosis-dns-generate - Generate DNS snippet files for Symbiosis domains. 
+#   symbiosis-dns-generate - Generate DNS snippet files for Symbiosis domains.
 #
 # USAGE
 #
 #   symbiosis-dns-generate [ --sleep SEC | -s SEC ] [ --template TEMPLATE | -t TEMPLATE ]
-#          [ --bytemarkdns-dir DIR | -b DIR ] [ --force | -f ] [ --verbose | -v ] 
+#          [ --bytemarkdns-dir DIR | -b DIR ] [ --force | -f ] [ --verbose | -v ]
 #          [ --help | -h ] [ DOMAIN ]
 #
 # SYNOPSIS
@@ -16,7 +16,7 @@
 #                          anything, up to a maximum of SEC seconds.
 #
 #   --template TEMPLATE    Specify an alternative template file to read.
-#   
+#
 #   --bytemarkdns-dir DIR  Specify where the BytemarkDNS zip file has been
 #                          unpacked to.  Defaults to /root/BytemarkDNS/
 #
@@ -63,9 +63,9 @@ upload=false
 # The root directory -- '/' by default.
 #
 root             = "/"
-dns_template     = nil 
+dns_template     = nil
 bytemarkdns_dir  = nil
-sleep_for        = nil 
+sleep_for        = nil
 
 opts = GetoptLong.new(
          [ '--bytemarkdns-dir', '-b', GetoptLong::REQUIRED_ARGUMENT ],
@@ -132,7 +132,7 @@ bytemarkdns_dir = File.join(root, "/root/BytemarkDNS") if bytemarkdns_dir.nil?
 # Bail out if the template is missing
 #
 unless File.file?(dns_template)
-  warn "Unable generate DNS data because the template #{dns_template.inspect} is missing."
+  verbose "Unable generate DNS data because the template #{dns_template.inspect} is missing."
   exit 1
 end
 
@@ -140,7 +140,7 @@ end
 # Bail out if the BytemarkDNS directory is missing
 #
 unless File.directory?(bytemarkdns_dir)
-  warn "Unable generate DNS data because the BytemarkDNS directory #{bytemarkdns_dir.inspect} is missing."
+  verbose "Unable generate DNS data because the BytemarkDNS directory #{bytemarkdns_dir.inspect} is missing."
   exit 1
 end
 
@@ -208,7 +208,7 @@ Symbiosis::Domains.each do |domain|
     #
     # Check the TinyDNS syntax.. TODO!
     #
-    if do_create 
+    if do_create
       if config.ok?
 
         verbose "\tWriting snippet to #{output}"
@@ -217,12 +217,12 @@ Symbiosis::Domains.each do |domain|
         # Create directory with the same ownership as the parent
         #
         domain.create_dir(output_dir) unless File.exists?(output_dir)
-        
+
         #
         # Write the snippet
         #
         config.write
-  
+
         #
         # Make sure the ownership is correct.
         #
@@ -232,7 +232,7 @@ Symbiosis::Domains.each do |domain|
         verbose "\tThe new DNS snippet is invalid -- no changes have been made."
       end
     end
- 
+
     #
     # Make sure the BytemarkDNS/data directory exists, and create if not.
     #
@@ -242,7 +242,7 @@ Symbiosis::Domains.each do |domain|
 
     #
     # Copy all the DNS data across to BytemarkDNS/data
-    # 
+    #
     # FIXME: At this point more checks are needed, to prevent overwriting of
     # another user's DNS data.
     #
@@ -252,7 +252,7 @@ Symbiosis::Domains.each do |domain|
       string_to_hash << file
       string_to_hash << input
 
-      new_filename = File.join(bytemarkdns_dir, 'data', File.basename(file)) 
+      new_filename = File.join(bytemarkdns_dir, 'data', File.basename(file))
 
       verbose "\tWriting data to #{new_filename}"
       Symbiosis::Utils.safe_open(new_filename,File::WRONLY|File::CREAT) do |fh|
@@ -276,7 +276,7 @@ EOF
     # Rescue errors for this domain, but continue for others.
     #
   rescue StandardError => err
-    warn "\tUnable to create DNS data for #{domain.name} because #{err.to_s}"
+    verbose "\tUnable to create DNS data for #{domain.name} because #{err.to_s}"
     verbose "\t"+err.backtrace.join("\n\t")
   end
 end
@@ -350,6 +350,6 @@ end
 #
 #  All done.
 #
-  
+
 exit 0
 
