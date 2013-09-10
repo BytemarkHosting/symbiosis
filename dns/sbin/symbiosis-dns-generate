@@ -132,7 +132,7 @@ bytemarkdns_dir = File.join(root, "/root/BytemarkDNS") if bytemarkdns_dir.nil?
 # Bail out if the template is missing
 #
 unless File.file?(dns_template)
-  warn "Unable generate DNS data because the template #{dns_template.inspect} is missing."
+  verbose "Unable generate DNS data because the template #{dns_template.inspect} is missing."
   exit 1
 end
 
@@ -140,7 +140,7 @@ end
 # Bail out if the BytemarkDNS directory is missing
 #
 unless File.directory?(bytemarkdns_dir)
-  warn "Unable generate DNS data because the BytemarkDNS directory #{bytemarkdns_dir.inspect} is missing."
+  verbose "Unable generate DNS data because the BytemarkDNS directory #{bytemarkdns_dir.inspect} is missing."
   exit 1
 end
 
@@ -276,7 +276,7 @@ EOF
     # Rescue errors for this domain, but continue for others.
     #
   rescue StandardError => err
-    warn "\tUnable to create DNS data for #{domain.name} because #{err.to_s}"
+    verbose "\tUnable to create DNS data for #{domain.name} because #{err.to_s}"
     verbose "\t"+err.backtrace.join("\n\t")
   end
 end
