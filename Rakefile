@@ -36,13 +36,8 @@ def available_build_archs
     return (@available_build_archs = [DEB_BUILD_ARCH])
   end
 
-  #
-  # We only build/test on amd64/i386.
-  #
-  possibles = %w(amd64 i386)
-
   archs = chroots.collect do |chroot|
-    if chroot =~ /^(?:chroot:)?#{DISTRO}_#{RELEASE}-(#{possibles.join("|")})$/i
+    if chroot =~ /^(?:chroot:)?#{DISTRO}_#{RELEASE}-([a-z0-9]+)$/i
       $1
     else
       nil
@@ -50,7 +45,7 @@ def available_build_archs
   end.compact.sort.uniq
 
   if archs.empty?
-    warn "Could not find any schroots for the #{DISTRO} #{RELEASE} (#{possibles.join(", ")}).  Not using sautobuild"
+    warn "Could not find any schroots for the #{DISTRO} #{RELEASE}.  Not using sautobuild"
     @has_sautobuild = false
     archs = [DEB_BUILD_ARCH] 
   end
