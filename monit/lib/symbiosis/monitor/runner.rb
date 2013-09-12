@@ -67,7 +67,7 @@ module Symbiosis
             raise result unless test.success?
             if test.retried
               result.backtrace.each{ |l| logger.info("#{test.name}: #{l}") }
-              logger.warning("#{test.name}: PASSED")
+              logger.warn("#{test.name}: PASSED")
             else
               result.backtrace.each{ |l| logger.debug("#{test.name}: #{l}") }
               logger.debug("#{test.name}: PASSED")
@@ -82,14 +82,14 @@ module Symbiosis
             # If we get a temporary failure, retry!
             #
             if ( SystemExit::EX_TEMPFAIL == err.to_i and not test.retried )
-              logger.warning("#{test.name}: RETRYING (following #{err.to_s})")
+              logger.warn("#{test.name}: RETRYING (following #{err.to_s})")
               retry
             end
 
             # 
             # Otherwise do nothing.
             #
-            logger.warning("#{test.name}: FAILED: #{err.to_s}")
+            logger.warn("#{test.name}: FAILED: #{err.to_s}")
           rescue RuntimeError => err
             error err.to_s
           end
