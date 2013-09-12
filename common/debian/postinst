@@ -42,7 +42,7 @@ if ( ! grep ^admin: /etc/passwd 2>/dev/null >/dev/null ); then
     #
     #  Now set the password for admin to that used by root if it isn't there
     #
-    usermod -p $(grep root /etc/shadow | awk -F: '{print $2}') admin
+    usermod -p "$(grep root /etc/shadow | cut -f 2 -d :)" admin
 fi
 
 
