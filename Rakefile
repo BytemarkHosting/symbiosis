@@ -5,11 +5,11 @@ require 'rake/clean'
 require 'digest'
 require 'pp'
 
-DEBEMAIL=ENV["DEBEMAIL"] || "symbiosis@bytemark.co.uk"
-DEB_BUILD_ARCH=`dpkg-architecture -qDEB_BUILD_ARCH`.chomp
-# REPONAME, DISTRO = File.dirname(File.expand_path(__FILE__)).split("/").last(2)
-DISTRO="stable"
-REPONAME="symbiosis"
+DEBEMAIL = ENV["DEBEMAIL"] || "symbiosis@bytemark.co.uk"
+DEB_BUILD_ARCH = ENV["BUILD_ARCH"] || `dpkg-architecture -qDEB_BUILD_ARCH`.chomp
+DISTRO   = (ENV["DISTRO"]   || "debian").downcase
+RELEASE  = (ENV["RELEASE"]  || "stable").downcase
+REPONAME = (ENV["REPONAME"] || "symbiosis").downcase
 
 #
 # Monkey patch rake to output on stdout like normal people
@@ -42,7 +42,7 @@ def available_build_archs
   possibles = %w(amd64 i386)
 
   archs = chroots.collect do |chroot|
-    if chroot =~ /^(?:chroot:)?#{DISTRO}-(#{possibles.join("|")})$/
+    if chroot =~ /^(?:chroot:)?#{DISTRO}_#{RELEASE}-(#{possibles.join("|")})$/i
       $1
     else
       nil
@@ -50,7 +50,7 @@ def available_build_archs
   end.compact.sort.uniq
 
   if archs.empty?
-    warn "Could not find any schroots for the #{DISTRO} (#{possibles.join(", ")}).  Not using sautobuild"
+    warn "Could not find any schroots for the #{DISTRO} #{RELEASE} (#{possibles.join(", ")}).  Not using sautobuild"
     @has_sautobuild = false
     archs = [DEB_BUILD_ARCH] 
   end
@@ -227,9 +227,10 @@ file "Release" => ["Sources.gz", "Sources", "Packages.gz", "Packages"] do |t|
   # Standard headers
   #
   release =<<EOF
-Archive: #{DISTRO}
-Label: #{REPONAME}
+Description: Bytemark Symbiosis, built for #{DISTRO.capitalize} #{RELEASE}
 Origin: #{Socket.gethostname}
+Label: #{REPONAME}
+Suite: #{RELEASE}
 Architectures: #{available_build_archs.join(" ")} source
 EOF
   #
@@ -291,7 +292,7 @@ task :lintian => ["lintian-stamp"]
 
 file "lintian-stamp" => source_changess + package_changess do |t| 
   if has_sautobuild?
-    sh "schroot -c #{DISTRO} -- lintian -X cpy -I #{t.prerequisites.join(" ")}"
+    sh "schroot -c #{RELEASE} -- lintian -X cpy -I #{t.prerequisites.join(" ")}"
   else
     sh "lintian -X cpy -I #{t.prerequisites.join(" ")}"
   end
