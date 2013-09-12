@@ -287,7 +287,7 @@ task :lintian => ["lintian-stamp"]
 
 file "lintian-stamp" => source_changess + package_changess do |t| 
   if has_sautobuild?
-    sh "schroot -c #{RELEASE} -- lintian -X cpy -I #{t.prerequisites.join(" ")}"
+    sh "schroot -c #{DISTRO}_#{RELEASE} -- lintian -X cpy -I #{t.prerequisites.join(" ")}"
   else
     sh "lintian -X cpy -I #{t.prerequisites.join(" ")}"
   end
@@ -446,7 +446,7 @@ namespace :pkg do
         # Now call sautobuild and debsign
         #
         if has_sautobuild?
-          sh "/usr/bin/sautobuild --no-repo --dist=#{pkg[:distro]} #{pkg[:dir]}"
+          sh "/usr/bin/sautobuild --no-repo --dist=#{DISTRO}_#{RELEASE} #{pkg[:dir]}"
         else
           sh "cd #{pkg[:dir]} && debuild -us -uc -sa"
         end
