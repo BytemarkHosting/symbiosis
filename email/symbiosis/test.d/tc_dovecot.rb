@@ -300,7 +300,7 @@ EOF
       end
       ENV['HOME'] = @mailbox.directory
 
-      cmd = "/usr/lib/dovecot/deliver -k -s -f \"#{sender_address}\" -a \"#{rcpt_address}\""
+      cmd = "/usr/lib/dovecot/deliver -k -f \"#{sender_address}\" -a \"#{rcpt_address}\""
 
       IO.popen(cmd,"w+") do |pipe|
         pipe.puts msg
