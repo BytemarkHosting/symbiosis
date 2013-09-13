@@ -19,7 +19,7 @@ class TestRunner < Test::Unit::TestCase
     @template_d = "/usr/share/symbiosis/monit" unless File.directory?(@template_d)
 
     @log = Log4r::Logger.new("Symbiosis::Monitor")
-    @log.level = Log4r::CRIT unless $debug or $verbose
+    @log.level = Log4r::ERROR unless $debug or $verbose
     @log.add Log4r::Outputter.stdout()
     #
     # Set up the flip-flop test to fail initially
