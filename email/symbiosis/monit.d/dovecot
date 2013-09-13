@@ -59,7 +59,7 @@ class DovecotCheck < Symbiosis::Monitor::Check
     tcpconnection = Symbiosis::Monitor::TCPConnection.new(
      "localhost",
      proto,
-     [nil,"* CAPABILITY\r\n",nil,"* LOGOUT\r\n",nil],
+     [/^. OK/, "s CAPABILITY\r\n", /^s OK/, "s LOGOUT\r\n", /^s OK/],
      "imaps" == proto)
 
     do_tcpconnection_check(tcpconnection)
