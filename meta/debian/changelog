@@ -1,3 +1,9 @@
+bytemark-symbiosis (2013:0913) stable; urgency=low
+
+  * Updated init script.  To be amazing.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 13 Sep 2013 16:35:14 +0100
+
 bytemark-symbiosis (2012:1109) stable; urgency=low
 
   * Added openssh-server as a recommendation.
