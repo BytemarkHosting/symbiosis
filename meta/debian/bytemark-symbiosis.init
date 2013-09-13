@@ -26,13 +26,15 @@ SELF=$(cd $(dirname $0); pwd -P)/$(basename $0)
 
 # Allows us to use COLOURS!
 if log_use_fancy_output; then
-  BLUE=$( $TPUT setaf 4)
-  YELLOW=$( $TPUT setaf 3)
-  NORMAL=$( $TPUT op)
+  B="$($TPUT bold)"
+  L="$($TPUT setaf 4)"
+  Y="$($TPUT setaf 3)"
+  N="$($TPUT op)"
+  U="$($TPUT sgr0)"
 else
-  BLUE=''
-  YELLOW=''
-  NORMAL=''
+  B=''
+  Y=''
+  N=''
 fi
 
 case "${1:-''}" in
@@ -40,21 +42,21 @@ case "${1:-''}" in
         log_daemon_msg "Starting symbiosis init" "symbiosis"
         log_end_msg 0
         cat <<EOF
-= = = = = = = = = = = = = = = = = = = = = = = = =${BLUE}
+= = = = = = = = = = = = = = = = = = = = = = = = =${B}${L}
   _ _____   _______ ___ __  __   _   ___ _  __
  (_) _ ) \\ / /_   _| __|  \\/  | /_\\ | _ \\ |/ /
   _| _ \\\\ V /  | | | _|| |\\/| |/ _ \\|   / ' < 
- (_)___/ |_|   |_| |___|_| _|_/_/ \\_\\_|_\\_|\\_\\${YELLOW}
+ (_)${Y}___${L}/ |_|   |_| |_${Y}__${L}|_| ${Y}_${L}|_|_/ \\_\\_|_\\${Y}_${L}|\\_\\${Y}
    / __/__ __ __ _  / /   (_)___   ___  (_)___
   _\\ \\ / // //  ' \\/ _ \\ / // _ \\ (_-< / /(_-<
  /___/ \\_, //_/_/_/_.__//_/ \\___//___//_//___/
-      /___/                                    ${NORMAL}
+      /___/${N}
 
    For documentation please visit
 
      *  http://symbiosis.bytemark.co.uk/
-
-= = = = = = = = = = = = = = = = = = = = = = = = = 
+${U}
+= = = = = = = = = = = = = = = = = = = = = = = = =
 EOF
        ;;
 
