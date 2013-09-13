@@ -7,6 +7,7 @@
 #                    [ --help | -h ] [ --manual | -n ] [ --always-mail | -a ]
 #                    [ -m | --mailto <email> ] [ -f | --mailfrom <email> ] 
 #                    [ -t | --template <template> ] [ -d | --template-dir <dir> ]
+#                    [ -l | --max-load <load> ] [ -F | --force ]
 #                    [ -s | --state-db <file> ] [ --verbose | -v ]
 #
 # OPTIONS
@@ -39,6 +40,15 @@
 # -s, --state-db <file>      Specify where the state databse should be kept.
 #                            The default is /var/lib/symbiosis/monit.db.
 #
+# -l, --max-load <load>      If the one-minute load average is greater or equal
+#                            to this number, do not run the tests, unles
+#                            the --force flag is given. Defaults to the number
+#                            of CPU cores in a machine, as per /proc/cpuinfo,
+#                            or 2 if that file cannot be read.
+#
+# -F, --force                Run tests, even if symbiosis-monit would otherwise
+#                            be disabled. See DISABLING below. 
+#
 # -v, --verbose              Synonym for "-t verbose".
 #
 # -h, --help                 Show help.
@@ -57,7 +67,6 @@
 # of EX_TEMPFAIL (75).
 #
 # Tests that are continually failing will only get their failure reported once.
-# A message will also be sent w
 #
 # LOGGING
 #
@@ -70,7 +79,7 @@
 # 
 #   0   if none of the tests fail;
 #   1   if any of the tests fail;
-#   75  if dpkg is running.
+#   75  if the program has been disabled for any reason (see DISABLING below).
 #
 # DISABLING
 #
@@ -79,6 +88,16 @@
 #
 # Also if /var/lib/initscripts/nologin exists, it is assumed that the system is
 # still booting, and as such symbiosis-monit will not run.
+#
+# If the program detects dpkg is running, it will not start. This is to avoid
+# restarting stopped services that might have been stopped by dpkg during an
+# upgrade.
+#
+# Finally if the load average is deemed too high, i.e. a number greater than
+# the number of CPUs in a machine, this program will not run. See also
+# the --max-load option.
+#
+# To force the program to run regardless, use the --force flag.
 #
 # AUTHOR
 #
@@ -126,14 +145,30 @@ opts = nil
 interactive = true unless ENV['TERM'].nil? or ENV['TERM'].empty?
 
 #
+# Work out the maximum load, usually the same as the number of CPU cores.
+#
+max_load = 0
+if File.readable?('/proc/cpuinfo')
+  File.readlines('/proc/cpuinfo').each do |l|
+    max_load += 1 if l =~ /^processor\s+:/i
+  end
+else
+  max_load = 2
+end
+
+force    = false
+
+#
 # Options parsing
 #
 begin
   opts = GetoptLong.new(
                         [ "--always-mail","-a", GetoptLong::NO_ARGUMENT ],
+                        [ "--force" ,     "-F", GetoptLong::NO_ARGUMENT ],
                         [ "--help" ,      "-h", GetoptLong::NO_ARGUMENT ],
                         [ "--manual" ,    "-n", GetoptLong::NO_ARGUMENT ],
                         [ "--verbose" ,   "-v", GetoptLong::NO_ARGUMENT ],
+                        [ "--max-load",   "-l", GetoptLong::REQUIRED_ARGUMENT ],
                         [ "--mailto",     "-m", GetoptLong::REQUIRED_ARGUMENT ],
                         [ "--mailfrom",   "-f", GetoptLong::REQUIRED_ARGUMENT ],
                         [ "--state-db",   "-s", GetoptLong::REQUIRED_ARGUMENT ],
@@ -159,6 +194,10 @@ begin
         template = arg
       when "--template-directory"
         template_dir = arg
+      when "--max-load"
+        max_load = arg.to_f
+      when "--force"
+        force = true
       when "--verbose"
         template = "verbose"
     end
@@ -197,22 +236,6 @@ if manual or help
 end
 
 #
-# Exit if we've been disabled
-#
-if File.exists?(File.join(dir, "disabled"))
-  puts "symbiosis-monit disabled.  Exiting." if $VERBOSE
-  exit 0
-end
-
-#
-# Don't run if the machine is still booting
-#
-if File.exists?("/var/lib/initscripts/nologin")
-  puts "This machine is still booting.  Exiting." if $VERBOSE
-  exit 0
-end
-
-#
 # These requires are here such that manpage generation works on build machines.
 #
 require 'symbiosis/monitor/runner'
@@ -221,6 +244,31 @@ require 'systemexit'
 require 'log4r'
 require 'log4r/outputter/syslogoutputter'
 
+#
+# Exit if we've been disabled
+#
+if File.exists?(File.join(dir, "disabled"))
+  msg = "symbiosis-monit: disabled. "
+  if force
+    warn msg + "Ignoring as --force given." if $VERBOSE
+  else
+    warn msg + "Exiting." if $VERBOSE
+    exit SystemExit::EX_TEMPFAIL
+  end
+end
+
+#
+# Don't run if the machine is still booting
+#
+if File.exists?("/var/lib/initscripts/nologin")
+  msg = "symbiosis-monit: This machine is still booting. "
+  if force
+    warn msg + "Ignoring as --force given." if $VERBOSE
+  else
+    warn msg + "Exiting." if $VERBOSE
+    exit SystemExit::EX_TEMPFAIL
+  end
+end
 
 #
 # Acquire lock
@@ -232,9 +280,13 @@ begin
   lock_fh = File.open(lock_fn, "w+")
   Symbiosis::Utils.lock(lock_fh)
 rescue Errno::ENOLCK => err
-  warn "symbiosis-monit: #{lock_fn}: #{err.to_s}" if $VERBOSE
-  print err.backtrace.join("\n") if $DEBUG
-  exit 0 
+  msg = "symbiosis-monit: #{lock_fn}: #{err.to_s}"
+  if force
+    warn msg + "Ignoring as --force given." if $VERBOSE
+  else
+    warn msg + "Exiting." if $VERBOSE
+    exit 0
+  end
 end
 
 begin
@@ -245,14 +297,36 @@ begin
   outputter = Log4r::SyslogOutputter.new("symbiosis-monit")
   outputter.level = Log4r::INFO
   logger.outputters << outputter
+ 
+  #
+  # Bail out if the load is too high
+  #
+  if File.readable?("/proc/loadavg")
+    load1, *remainder = File.read("/proc/loadavg").split(" ")
+    load1 = load1.to_f if load1 =~ /^[\d\.]+$/
+    if load1 >= max_load
+      msg = "symbiosis-monit: Load too high. " 
+      if force
+        warn msg + "Ignoring as --force given." if $VERBOSE
+      else
+        warn msg + "Exiting." if $VERBOSE
+        exit SystemExit::EX_TEMPFAIL
+      end
+    end
+  end
 
   #
   # Bail out if dpkg is running.
   #
   if 0 == Process.uid
     if Symbiosis::Monitor::Check.dpkg_running?
-      print "dpkg running -- not conducting tests." if $VERBOSE
-      exit SystemExit::EX_TEMPFAIL
+      msg = "symbiosis-monit: dpkg running. " if $VERBOSE
+      if force
+        warn msg + "Ignoring as --force given." if $VERBOSE
+      else
+        warn msg + "Exiting." if $VERBOSE
+        exit SystemExit::EX_TEMPFAIL
+      end
     end
   end
 
