@@ -41,15 +41,13 @@
 
 require 'getoptlong'
 
-
 #
 # The options set by the command line.  These are all global variables.
 #
 $help         = false
 $manual       = false
 $VERBOSE      = false
-$max_files    = 50
-$default_log  = "/var/log/apache2/zz-mass-hosting.log"
+logger_args   = Hash.new
 $sync         = false
 $log_filename = "access.log"
 $uid          = nil
@@ -76,11 +74,11 @@ begin
     when '--verbose'
       $VERBOSE = true
     when "--sync"
-      $sync = true
+      logger_args[:sync] = true
     when "--max-files"
-      $max_files = arg.to_i
+      logger_args[:max_files] = arg.to_i
     when "--log-filename"
-      $log_filename = arg
+      logger_args[:log_filename] = arg
     when "--uid"
       $uid = arg.to_i
     when "--gid"
@@ -96,7 +94,7 @@ end
 #
 # This is the default log name
 #
-$default_log = File.expand_path(ARGV.pop) if ARGV.size > 0
+logger_args[:default_log] = File.expand_path(ARGV.pop) if ARGV.size > 0
 
 #
 # CAUTION! Here be quality kode.
@@ -127,38 +125,6 @@ if $manual or $help
   exit 0
 end
 
-
-require 'symbiosis/domains'
-require 'symbiosis/utils'
-
-
-
-########################################################################
-#
-# Takes an array of filehandles and closes them all.
-#
-def do_close_all(fhs)
-  fhs.flatten.each do |fh|
-    #
-    # Don't try to close stuff that is already closed.
-    #
-    next if fh.closed?
-
-    begin
-      #
-      # Flush to disc!
-      #
-      warn "#{$0}: Flushing and closing #{fh.path}" if $VERBOSE
-      fh.flush
-      fh.close
-    rescue IOError
-      # ignore
-    end
-  end
-end
-
-
-
 ########################################################################
 #
 # Drop privs.  Make sure either both UID/GID are set, or neither.
@@ -183,221 +149,36 @@ if $uid and $gid
   end
 end
 
-########################################################################
+require 'symbiosis/apache_logger'
+require 'eventmachine'
 
-processing_thread = Thread.new do 
-  #
-  # Set up our finish-up and close-filehandles flags
-  #
-  Thread.current['finish_now']        = false
-  Thread.current['close_filehandles'] = false
+EventMachine.run do
+  logger = EventMachine.attach($stdin, Symbiosis::ApacheLogger)
 
   #
-  # This is our buffer.  Allocate a thread-variable with the same name so the
-  # buffer can be added to outside the thread.
+  # trap HUP -- reopen all files.
   #
-  buffer = []
-  Thread.current['buffer']     = buffer
-
-  #
-  # Our filehandle store is an array of File objects.
-  #
-  filehandles = []
+  %w(HUP USR1).each do |sig|
+    trap(sig) do
+      warn "#{$0}: Caught #{sig}" if $VERBOSE 
+      EventMachine.next_tick do
+        logger.close_filehandles(true) 
+      end
+    end
+  end
   
   #
-  # Set up some default file-handle options.
+  # term INT, TERM -- close all files and exit.
   #
-  default_filehandle_opts = {:mode => 0644}
-  default_filehandle_opts[:uid] = $uid unless $uid.nil? 
-  default_filehandle_opts[:gid] = $gid unless $gid.nil? 
-  
-  #
-  # Open a default file for all non-matching domains.
-  #
-  warn "#{$0}: Opening default log file #{$default_log}" if $VERBOSE 
-  default_filehandle = Symbiosis::Utils.safe_open($default_log,'a+',default_filehandle_opts)
-  default_filehandle.sync = $sync
-
-  #
-  # This is our buffer-processing loop.
-  #
-  loop do
-
-    if buffer.empty?
-
-      if Thread.current['close_filehandles'] or Thread.current['finish_now']
-        warn "#{$0}: Closing filehandles" if $VERBOSE
-
-        #
-        # Close all the filehandles.
-        #
-        do_close_all(filehandles + [default_filehandle])
-
-        #
-        # Reset our flag.
-        #
-        Thread.current['close_filehandles'] = false
-
-        #
-        # If the buffer is empty, we can break out of the loop, if needed.
-        #
-        break if Thread.current['finish_now']
+  %w(QUIT TERM INT).each do |sig|
+    trap(sig) do
+      warn "#{$0}: Caught #{sig}" if $VERBOSE 
+      EventMachine.next_tick do
+        logger.close_filehandles(true) 
       end
-
-      #
-      # Sleep for a bit before checking the buffer again.
-      #
-      sleep 1
-      next
+      EventMachine.stop
+      exit 0
     end
-
-    #
-    # Shift the first entry off the beginning of the buffer.
-    #
-    line = buffer.shift
- 
-    #
-    # Split the line into a domain name, and the rest of the line.  The domain is
-    # always the first field.  This is supplied by the REMOTE USER so suitable
-    # sanity checks have to be made.
-    #
-    # This "split" splits the line into two at the first group of spaces.
-    #
-    # irb(main):030:0> "a  b c".split(" ",2)
-    # => ["a", " b   c"]
-    #
-    domain_name, line_without_domain_name = line.to_s.split(" ",2)
-
-    #
-    # Set up the filehandle as nil to force us to find it each time.
-    #
-    filehandle = nil
-
-    #
-    # Find our domain.  This finds www and non-www prefixes, and returns nil
-    # unless the domain is sane.  We can only do this if we're root.
-    #
-    if 0 == Process.uid and (domain = Symbiosis::Domains.find(domain_name))
-      #
-      # Fetch the log filename
-      #
-      log_filename = File.expand_path(File.join(domain.log_dir, $log_filename))
-
-      #
-      # Fetch the file handle, or open the logfile, as needed.
-      #
-      filehandle = filehandles.find{|fh| fh.is_a?(File) and fh.path == log_filename}
-
-      #
-      # Remove the filehandle from the arry (we'll add it back later)
-      #
-      filehandles.delete(filehandle) 
-
-      #
-      # If no filehandle was found, or the filehandle we've found is duff,
-      # (re)-open it.
-      #
-      unless filehandle.is_a?(File) and not filehandle.closed?
-        #
-        # Make sure we don't open more than 50 file handles.
-        #
-        if filehandles.length >= $max_files
-          other_filehandle = filehandles.pop
-          other_filehandle.close
-        end
-
-        begin
-          #
-          # Set up a couple of things before we open the file.  This will make
-          # sure the ownerships are correct.
-          #
-          begin
-            warn "#{$0}: Creating directory #{File.dirname(log_filename)}" if $VERBOSE 
-            Symbiosis::Utils.mkdir_p(File.dirname(log_filename), :uid => domain.uid, :gid => domain.gid, :mode => 0755)
-          rescue Errno::EEXIST
-            # ignore
-          end
-
-          warn "#{$0}: Opening log file #{log_filename}" if $VERBOSE 
-          filehandle = Symbiosis::Utils.safe_open(log_filename, "a+", :mode => 0644, :uid => domain.uid, :gid => domain.gid )
-          filehandle.sync = $sync
-
-        rescue StandardError => err
-          filehandle = nil
-          warn "#{$0}: Caught #{err}" if $VERBOSE
-        end
-
-      end
-
-    end
-
-    if filehandle.nil? 
-      warn "#{$0}: No file handle found -- logging to default file for #{domain.inspect}" if $VERBOSE and domain.is_a?(Symbiosis::Domain)
-
-      #
-      # Make sure the default filehandle is open.
-      #
-      if default_filehandle.nil? or default_filehandle.closed?
-        warn "#{$0}: Opening default log file #{$default_log}" if $VERBOSE 
-        default_filehandle = Symbiosis::Utils.safe_open($default_log,'a+', default_filehandle_opts)
-        default_filehandle.sync = $sync
-      end
-      #
-      # Write the unadulterated line to the default log.
-      #
-      default_filehandle.write(line)
-    else
-      #
-      # Add the filehandle onto our array.
-      #
-      filehandles << filehandle
-      #
-      # Write the log, but without the domain on the front.
-      #
-      filehandle.write(line_without_domain_name)
-    end
-
-  end # End of the loop.
-
-  warn "#{$0}: Processing thread finished." if $VERBOSE
-
+  end  
 end
-
-########################################################################
-#
-# trap HUP -- reopen all files.
-#
-%w(HUP USR1).each do |sig|
-  trap(sig) do
-    warn "#{$0}: Caught #{sig}" if $VERBOSE 
-    processing_thread['close_filehandles'] = true
-  end
-end
-
-#
-# term INT, TERM -- close all files and exit.
-#
-%w(QUIT TERM INT).each do |sig|
-  trap(sig) do
-    warn "#{$0}: Caught #{sig}" if $VERBOSE 
-    processing_thread['finish_now'] = true
-    processing_thread.join
-    exit 0
-  end
-end
-
-#
-# This will continue until STDIN is closed.
-#
-while (line = STDIN.gets)
-  processing_thread['buffer'] << line
-  break unless processing_thread.alive?
-end
-
-#
-# Finish off our thread.
-#
-processing_thread['finish_now'] = true
-processing_thread.join
-
 
