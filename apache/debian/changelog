@@ -1,8 +1,14 @@
+symbiosis-httpd (2013:0917) stable; urgency=low
+
+  * New EventMachine-based apache logger.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Sep 2013 15:08:24 +0100
+
 symbiosis-httpd (2013:0711) stable; urgency=low
 
-  Updated apache build dependencies - apache2-prefork-dev in place of apache2-dev. 
+  * Updated apache build dependencies - apache2-prefork-dev in place of apache2-dev. 
 
- -- John Hackett <jhackett@maker.sh.bytemark.co.uk>  Thu, 11 Jul 2013 12:47:21 +0100
+ -- John Hackett <jhackett@bytemark.co.uk>  Thu, 11 Jul 2013 12:47:21 +0100
 
 symbiosis-httpd (2013:0606) stable; urgency=low
 
