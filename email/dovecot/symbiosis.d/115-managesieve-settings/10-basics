@@ -1,5 +1,5 @@
 
   # Specify an alternative address:port the daemon must listen on
   # (default: *:2000)
-  listen = *:4190,[::]:4190
+  service { inet_listener { *:4190,[::]:4190 } }
 

@@ -2,5 +2,5 @@
 ## Managesieve specific settings
 ##
 
-protocol managesieve {
+protocol sieve {
 
