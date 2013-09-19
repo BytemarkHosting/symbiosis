@@ -4,6 +4,6 @@
   # configuration files for more information how to do it.
   # http://wiki.dovecot.org/UserDatabase/Prefetch
   userdb {
-    driver=prefetch
+    driver = prefetch
   }
 

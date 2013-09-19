@@ -4,5 +4,12 @@
   # authentication with BSDs internally accesses shadow files, which also
   # requires roots. Note that this user is NOT used to access mails.
   # That user is specified by userdb above.
-  auth_user = root
+  
+  service auth {
+    unix_listener auth-client {
+      mode = 0666
+    }
+    user = root
+  }
+
 
