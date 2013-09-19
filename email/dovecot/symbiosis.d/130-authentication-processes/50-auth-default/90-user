@@ -4,5 +4,5 @@
   # authentication with BSDs internally accesses shadow files, which also
   # requires roots. Note that this user is NOT used to access mails.
   # That user is specified by userdb above.
-  user = root
+  auth_user = root
 
