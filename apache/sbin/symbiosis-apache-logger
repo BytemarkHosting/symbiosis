@@ -102,8 +102,8 @@ $default_log = File.expand_path(ARGV.pop) if ARGV.size > 0
 #
 # Show the manual, or the help
 #
-Symbiosis::Utils.show_help( __FILE__ ) if  $help
-Symbiosis::Utils.show_usage( __FILE__ ) if  $manual
+Symbiosis::Utils.show_usage( __FILE__ ) if  $help
+Symbiosis::Utils.show_manual( __FILE__ ) if  $manual
 
 #
 #  If either happened we can exit.

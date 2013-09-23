@@ -11,19 +11,28 @@ module Symbiosis
 
     #
     # Many of our utility scripts have integrated documentation at their
-    # head.  This method will show the help-text to the caller.
+    # head.
     #
-    def show_usage( filename )
+    # This method will show the manual to the caller.
+    #
+    def show_manual( filename )
       show_help_or_usage( filename, false )
     end
 
     #
-    #  Show the help only
+    # Many of our utility scripts have integrated documentation at their
+    # head.
     #
-    def show_help( filename )
+    # This method will show brief usage-information to the caller.
+    #
+    def show_usage( filename )
       show_help_or_usage( filename, true )
     end
 
+
+    #
+    #  Show either the manual, or the brief usage text.
+    #
     def show_help_or_usage( filename, help )
 
       #
@@ -451,7 +460,7 @@ module Symbiosis
       raise Errno::ENOLCK, "Unable to release lock -- #{err.to_s}"
     end
 
-    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock, :show_help, :show_usage, :show_help_or_usage
+    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock, :show_manual, :show_usage, :show_help_or_usage
 
   end
 
