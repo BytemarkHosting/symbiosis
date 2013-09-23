@@ -54,7 +54,7 @@
 
 
 require 'getoptlong'
-require 'symbiosis/utils.rb'
+require 'symbiosis/utils'
 
 #
 #  Entry point to the code

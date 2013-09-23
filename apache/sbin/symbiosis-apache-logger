@@ -40,7 +40,7 @@
 #
 
 require 'getoptlong'
-require 'symbiosis/utils.rb'
+require 'symbiosis/utils'
 
 #
 # The options set by the command line.  These are all global variables.

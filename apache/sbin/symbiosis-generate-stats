@@ -41,7 +41,7 @@
 # Standard ruby
 #
 require 'getoptlong'
-require 'symbiosis/utils.rb'
+require 'symbiosis/utils'
 
 
 
