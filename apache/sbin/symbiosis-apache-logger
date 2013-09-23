@@ -40,6 +40,7 @@
 #
 
 require 'getoptlong'
+require 'symbiosis/utils.rb'
 
 #
 # The options set by the command line.  These are all global variables.
@@ -96,34 +97,20 @@ end
 #
 logger_args[:default_log] = File.expand_path(ARGV.pop) if ARGV.size > 0
 
+
 #
-# CAUTION! Here be quality kode.
+# Show the manual, or the help
 #
-if $manual or $help
+Symbiosis::Utils.show_usage( __FILE__ ) if  $help
+Symbiosis::Utils.show_manual( __FILE__ ) if  $manual
 
-  # Open the file, stripping the shebang line
-  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
-
-  found_synopsis = false
-
-  lines.each do |line|
-
-    line.chomp!
-    break if line.empty?
-
-    if $help and !found_synopsis
-      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
-      next
-    end
-
-    puts line[2..-1].to_s
-
-    break if $help and found_synopsis and line =~ /^#\s*$/
-
-  end
-
+#
+#  If either happened we can exit.
+#
+if ( $help or $manual )
   exit 0
 end
+
 
 ########################################################################
 #

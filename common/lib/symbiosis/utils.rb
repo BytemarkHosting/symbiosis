@@ -470,7 +470,7 @@ module Symbiosis
       raise Errno::ENOLCK, "Unable to release lock -- #{err.to_s}"
     end
 
-    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock, :show_usage, :show_help, :show_help_or_usage
+    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock, :show_usage, :show_manual, :show_help_or_usage
 
   end
 
