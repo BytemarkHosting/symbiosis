@@ -38,18 +38,19 @@
 # Standard ruby
 #
 require 'getoptlong'
+require 'symbiosis/utils.rb'
 require 'fileutils'
 
 
 #
 #  The options set by the command line.
 #
-help         = false
-manual       = false
-$VERBOSE     = false
+$help         = false
+$manual       = false
+$VERBOSE      = false
 max_rotations = 30
-prefix       = '/srv'
-compress_at  = 2
+prefix        = '/srv'
+compress_at   = 2
 
 opts = GetoptLong.new(
                       [ '--max-rotations', '-n', GetoptLong::REQUIRED_ARGUMENT],
@@ -71,47 +72,33 @@ begin
     when '--prefix'
       prefix = arg
     when '--help'
-      help = true
+      $help = true
     when '--manual'
-      manual = true
+      $manual = true
     when '--verbose'
       $VERBOSE = true
     end
   end
 rescue
   # any errors, show the help
-  help = true
+  $help = true
 end
 
 
 #
-# CAUTION! Here be quality kode.
+# Show the manual, or the help
 #
-if manual or help
+Symbiosis::Utils.show_usage( __FILE__ ) if  $help
+Symbiosis::Utils.show_manual( __FILE__ ) if  $manual
 
-  # Open the file, stripping the shebang line
-  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
-
-  found_synopsis = false
-
-  lines.each do |line|
-
-    line.chomp!
-    break if line.empty?
-
-    if help and !found_synopsis
-      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
-      next
-    end
-
-    puts line[2..-1].to_s
-
-    break if help and found_synopsis and line =~ /^#\s*$/
-
-  end
-
+#
+#  If either happened we can exit.
+#
+if ( $help or $manual )
   exit 0
 end
+
+
 
 #
 # Symbiosis libraries -- required here so they're not needed during the build
