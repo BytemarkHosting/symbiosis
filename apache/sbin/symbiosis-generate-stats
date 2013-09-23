@@ -49,8 +49,8 @@ require 'symbiosis/utils'
 #  The options set by the command line.
 #
 template     = '/etc/symbiosis/apache.d/webalizer.conf.erb'
-$help        = false
-$manual      = false
+help         = false
+manual       = false
 $VERBOSE     = false
 $FORCE       = false
 prefix       = "/srv"
@@ -69,9 +69,9 @@ begin
   opts.each do |opt,arg|
     case opt
     when '--help'
-      $help = true
+      help = true
     when '--manual'
-      $manual = true
+      manual = true
     when '--verbose'
       $VERBOSE = true
     when '--force'
@@ -84,20 +84,20 @@ begin
   end
 rescue
   # any errors, show the help
-  $help = true
+  help = true
 end
 
 
 #
 # Show the manual, or the help
 #
-Symbiosis::Utils.show_usage( __FILE__ ) if  $help
-Symbiosis::Utils.show_manual( __FILE__ ) if  $manual
+Symbiosis::Utils.show_usage( __FILE__ ) if  help
+Symbiosis::Utils.show_manual( __FILE__ ) if manual
 
 #
 #  If either happened we can exit.
 #
-if ( $help or $manual )
+if ( help or manual )
   exit 0
 end
 

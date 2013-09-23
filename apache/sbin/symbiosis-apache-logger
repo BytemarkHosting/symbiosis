@@ -45,8 +45,8 @@ require 'symbiosis/utils'
 #
 # The options set by the command line.  These are all global variables.
 #
-$help         = false
-$manual       = false
+help          = false
+manual        = false
 $VERBOSE      = false
 logger_args   = Hash.new
 $sync         = false
@@ -69,9 +69,9 @@ begin
   opts.each do |opt,arg|
     case opt
     when '--help'
-      $help = true
+      help = true
     when '--manual'
-      $manual = true
+      manual = true
     when '--verbose'
       $VERBOSE = true
     when "--sync"
@@ -89,7 +89,7 @@ begin
 rescue => err
   # any errors, show the help
   warn err.to_s
-  $help = true
+  help = true
 end
 
 #
@@ -101,13 +101,13 @@ logger_args[:default_log] = File.expand_path(ARGV.pop) if ARGV.size > 0
 #
 # Show the manual, or the help
 #
-Symbiosis::Utils.show_usage( __FILE__ ) if  $help
-Symbiosis::Utils.show_manual( __FILE__ ) if  $manual
+Symbiosis::Utils.show_usage( __FILE__ ) if  help
+Symbiosis::Utils.show_manual( __FILE__ ) if manual
 
 #
 #  If either happened we can exit.
 #
-if ( $help or $manual )
+if ( help or manual )
   exit 0
 end
 
