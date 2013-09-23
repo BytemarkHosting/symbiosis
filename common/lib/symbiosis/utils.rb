@@ -8,7 +8,7 @@ module Symbiosis
   #
   module Utils
 
-    # 
+    #
     # This function uses the FileUtils mkdir_p command to make a directory.
     # It adds the extra options of :uid and :gid to allow these to be set in
     # one fell swoop.
@@ -51,7 +51,7 @@ module Symbiosis
         parent = File.dirname(parent)
       end
 
-      # 
+      #
       # Then set the options such that the uid/gid of the parent dir can be
       # propagated, but only if we're root.
       #
@@ -103,7 +103,7 @@ module Symbiosis
       return dir
     end
 
-    # 
+    #
     # This function generates a string of random numbers and letters from the
     # sequence A-Z, a-z, 0-9 minus 0, O, o, 1, I, i, l.
     #
@@ -198,7 +198,7 @@ module Symbiosis
           # We're good to go.
           #
           fh.truncate(0)
-          
+
           #
           # Record the value
           #
@@ -222,12 +222,12 @@ module Symbiosis
     #
     # +opts+ is an options hash in which the uid, gid, and mode file bits can
     # be specified.
-    # 
+    #
     # * :uid is the User ID, e.g. 1000.
     # * :gid is the Group ID, e.g. 1000.
     # * :mode is the permissions, e.g. 0644.
     #
-    # By default mode is set using the current umask.  
+    # By default mode is set using the current umask.
     #
     def safe_open(file, mode = File::RDONLY, opts = {}, &block)
       #
@@ -254,7 +254,7 @@ module Symbiosis
       #
       fh = nil
 
-      begin  
+      begin
         #
         # This will raise an error if we can't open the file
         #
@@ -265,7 +265,7 @@ module Symbiosis
         #
         link_stat = fh.lstat
         file_stat = fh.stat
-  
+
         if link_stat.symlink? and file_stat.uid != link_stat.uid
           #
           # uh-oh .. symlink pointing at a file owned by someone else?
@@ -277,7 +277,7 @@ module Symbiosis
         # Change the uid/gid as needed.
         #
         if link_stat.writable? and
-         ((opts[:uid] and file_stat.uid != opts[:uid]) or 
+         ((opts[:uid] and file_stat.uid != opts[:uid]) or
           (opts[:gid] and file_stat.gid != opts[:gid]))
           #
           # Change the owner if not already correct
@@ -316,7 +316,7 @@ module Symbiosis
         #
         return fh
       end
-      
+
     end
 
     #
@@ -329,7 +329,7 @@ module Symbiosis
     #
     #  * k, M, G, T, P as powers of 10
     #  * ki, Mi, Gi, Ti, Pi as powers of 2.
-    # 
+    #
     # The answer is given as an Integer.
     #
     # An argument error is given if the string cannot be parsed, or the
@@ -338,7 +338,7 @@ module Symbiosis
     def parse_quota(quota)
       if quota.is_a?(Numeric)
         return quota.round.to_i
- 
+
       elsif quota.is_a?(String) and quota =~ /^\s*([\d\.]+)\s*([bkMGTP]i?)?/
 
         n = $1.to_f
