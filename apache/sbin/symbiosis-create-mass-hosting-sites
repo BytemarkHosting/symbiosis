@@ -89,32 +89,38 @@ opts = GetoptLong.new(
          [ '--root-dir',         '-r', GetoptLong::REQUIRED_ARGUMENT ]
        )
 
-opts.each do |opt, arg|
-  case opt
-  when '--help'
-    help = true
-  when '--manual'
-    manual = true
-  when '--verbose'
-    $VERBOSE = true
-  when '--template'
-    ssl_template = arg
-  when '--ssl-template'
-    ssl_template = arg
-  when '--non-ssl-template'
-    non_ssl_template = arg
-  when '--apache2-dir'
-    apache2_dir = arg
-  when '--root'
-    root = arg
-  when '--no-reload'
-    no_reload = true
-  # Legacy option.
-  when '--no-restart'
-    no_reload = true
-  when '--force'
-    $FORCE = true
+begin
+  opts.each do |opt, arg|
+    case opt
+    when '--help'
+      help = true
+    when '--manual'
+      manual = true
+    when '--verbose'
+      $VERBOSE = true
+    when '--template'
+      ssl_template = arg
+    when '--ssl-template'
+      ssl_template = arg
+    when '--non-ssl-template'
+      non_ssl_template = arg
+    when '--apache2-dir'
+      apache2_dir = arg
+    when '--root'
+      root = arg
+    when '--no-reload'
+      no_reload = true
+      # Legacy option.
+    when '--no-restart'
+      no_reload = true
+    when '--force'
+      $FORCE = true
+    end
   end
+rescue => err
+  # any errors, show the help
+  warn err.to_s
+  help = true
 end
 
 #

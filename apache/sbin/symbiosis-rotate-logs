@@ -79,8 +79,9 @@ begin
       $VERBOSE = true
     end
   end
-rescue
+rescue => err
   # any errors, show the help
+  warn err.to_s
   help = true
 end
 
