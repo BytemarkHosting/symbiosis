@@ -1,12 +1,54 @@
 require "fcntl"
 require "fileutils"
 
+
 module Symbiosis
 
   #
   # This module has a number of useful methods that are used everywhere.
   #
   module Utils
+
+    #
+    # Many of our utility scripts have integrated documentation at their
+    # head.  This method will show the help-text to the caller.
+    #
+    def show_usage( filename )
+      show_help_or_usage( filename, false )
+    end
+
+    #
+    #  Show the help only
+    #
+    def show_help( filename )
+      show_help_or_usage( filename, true )
+    end
+
+    def show_help_or_usage( filename, help )
+
+      #
+      # Open the file, stripping the shebang line
+      #
+      lines = File.open(filename){|fh| fh.readlines}[1..-1]
+
+      found_synopsis = false
+
+      lines.each do |line|
+
+        line.chomp!
+        break if line.empty?
+
+        if help and !found_synopsis
+          found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+          next
+        end
+
+        puts line[2..-1].to_s
+        break if help and found_synopsis and line =~ /^#\s*$/
+      end
+
+    end
+
 
     #
     # This function uses the FileUtils mkdir_p command to make a directory.
@@ -409,9 +451,10 @@ module Symbiosis
       raise Errno::ENOLCK, "Unable to release lock -- #{err.to_s}"
     end
 
-    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock
+    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock, :show_help, :show_usage, :show_help_or_usage
 
   end
+
 
 end
 
