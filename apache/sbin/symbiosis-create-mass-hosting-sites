@@ -2,7 +2,7 @@
 #
 # NAME
 #  symbiosis-create-mass-hosting-sites -- Auto-configure Apache2 mass-hosted sites for Symbiosis
-# 
+#
 # SYNOPSIS
 #  symbiosis-create-mass-hosting-sites [ --ssl-template | -s <file>]
 #                               [ --non-ssl-template | -t <file> ]
@@ -70,8 +70,8 @@ $RELOAD=false
 # The root directory -- '/' by default.
 #
 root = "/"
-non_ssl_template = nil 
-ssl_template     = nil 
+non_ssl_template = nil
+ssl_template     = nil
 apache2_dir      = nil
 no_reload       = false
 
@@ -224,7 +224,7 @@ apache2_dir      = File.join(root, "/etc/apache2") if apache2_dir.nil?
 
       verbose "\tWriting configuration"
       config.write
-        
+
       # Definitely reload if we've rewritten the config.
       $RELOAD = true
 
