@@ -5,7 +5,6 @@
 #  symbiosis-create-sites -- Auto-configure Apache2 sites with specified IPs
 #
 # SYNOPSIS
-#
 #  symbiosis-create-sites [ --ssl-template | -s <file> ] 
 #                         [ --non-ssl-template | -t <file> ] 
 #                         [ --apache2-dir | -a <directory> ] 
@@ -55,14 +54,15 @@
 
 
 require 'getoptlong'
+require 'symbiosis/utils.rb'
 
 #
 #  Entry point to the code
 #
 $FORCE    = false
 $VERBOSE  = false
-help      = false
-manual    = false
+$help     = false
+$manual   = false
 
 #
 #  Do we need to reload apache?
@@ -107,9 +107,9 @@ opts.each do |opt, arg|
   when '--no-restart'
     no_reload = true
   when '--help'
-    help = true
+    $help = true
   when '--manual'
-    manual = true
+    $manual = true
   when '--verbose'
     $VERBOSE = true
   when '--force'
@@ -117,34 +117,21 @@ opts.each do |opt, arg|
   end
 end
 
+
 #
-# CAUTION! Here be quality kode.
+# Show the manual, or the help
 #
-if manual or help
+Symbiosis::Utils.show_usage( __FILE__ ) if  $help
+Symbiosis::Utils.show_manual( __FILE__ ) if  $manual
 
-  # Open the file, stripping the shebang line
-  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
 
-  found_synopsis = false
-
-  lines.each do |line|
-
-    line.chomp!
-    break if line.empty?
-
-    if help and !found_synopsis
-      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
-      next
-    end
-
-    puts line[2..-1].to_s
-
-    break if help and found_synopsis and line =~ /^#\s*$/
-
-  end
-
+#
+#  If either happened we can exit.
+#
+if ( $help or $manual )
   exit 0
 end
+
 
 def verbose(s)
   puts s if $VERBOSE
