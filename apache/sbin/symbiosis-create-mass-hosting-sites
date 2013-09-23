@@ -131,7 +131,7 @@ Symbiosis::Utils.show_usage( __FILE__ ) if  $manual
 if ( $help or $manual )
   exit 0
 end
-puts "OK"
+
 
 def verbose(s) ; puts s if $VERBOSE ; end
 
