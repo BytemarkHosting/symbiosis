@@ -14,11 +14,11 @@ export DH_VERBOSE=1
 #export DH_RUBY_GEMSPEC=gem.gemspec
 
 %:
-        dh $@ --buildsystem=ruby --with ruby
+	dh $@ --buildsystem=ruby --with ruby
 
 override_dh_auto_build-indep:
-        $(MAKE) docs
+	$(MAKE) docs
 
 override_dh_auto_clean:
-        $(MAKE) clean
+	$(MAKE) clean
 
