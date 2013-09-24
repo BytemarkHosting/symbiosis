@@ -3,8 +3,9 @@ Section: mail
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), ruby1.8, txt2man, cdbs
+Build-Depends: debhelper (>= 7.0.0), ruby1.8, txt2man
 Standards-Version: 3.9.1
+XS-Ruby-Versions: all
 
 Package: symbiosis-email
 Architecture: all
