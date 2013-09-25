@@ -102,7 +102,11 @@ cUtmp_read (int argc, VALUE * argv, VALUE self)
    */
   if (TYPE (filename) == T_STRING)
     {
-      utmpname (RSTRING (filename)->ptr);
+#ifdef RSTRING_PTR
+      utmpname (RSTRING_PTR(filename));
+#else
+      utmpname (RSTRING(filename)->ptr);
+#endif
     }
   else
     {
