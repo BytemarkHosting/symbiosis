@@ -21,7 +21,3 @@ override_dh_auto_build-indep:
 
 override_dh_auto_clean:
 	$(MAKE) clean
-<<<<<<< local
-=======
-
->>>>>>> other
