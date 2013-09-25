@@ -1,12 +1,23 @@
 #!/usr/bin/make -f
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
+#
+export DH_VERBOSE=1
+#
+# Uncomment to ignore all test failures (but the tests will run anyway)
+#export DH_RUBY_IGNORE_TESTS=all
+#
+#
+# Uncomment to ignore some test failures (but the tests will run anyway).
+# Valid values:
+#export DH_RUBY_IGNORE_TESTS=ruby1.8 ruby1.9.1 require-rubygems
+#
+# If you need to specify the .gemspec (eg there is more than one)
+#export DH_RUBY_GEMSPEC=gem.gemspec
 
-include /usr/share/cdbs/1/rules/debhelper.mk
+%:
+	dh $@ --buildsystem=ruby --with ruby
 
-build/symbiosis-monit::
-	make all 
+override_dh_auto_build-indep:
+	$(MAKE) all
 
-cleanbuilddir/symbiosis-monit::
-	make clean
-
+override_dh_auto_clean:
+	$(MAKE) clean

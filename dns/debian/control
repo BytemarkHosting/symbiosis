@@ -3,15 +3,16 @@ Section: net
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man, ruby1.8
+Build-Depends: debhelper (>= 7.0.0), gem2deb, txt2man, ruby
 Standards-Version: 3.9.1
+XS-Ruby-Versions: all
 
 Package: symbiosis-tinydns
 Replaces: bytemark-vhost-tinydns
 Conflicts: bytemark-vhost-tinydns
 Provides: bytemark-vhost-tinydns
 Architecture: all
-Depends: rsync, wget, unzip, ruby1.8, symbiosis-common (>= 2012:017), ${misc:Depends}
+Depends: rsync, wget, unzip, ruby, symbiosis-common (>= 2012:017), ${misc:Depends}
 Description: Automatic DNS record creation and uploading for Bytemark customers
  This package contains tools to create TinyDNS files which may be uploaded
  to the Bytemark DNS host.

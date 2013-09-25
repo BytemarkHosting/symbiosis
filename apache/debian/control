@@ -3,8 +3,9 @@ Section: web
 Priority: optional
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), apache2-prefork-dev, libcap-dev, cdbs, config-package-dev, php5-common, txt2man, ruby1.8
+Build-Depends: debhelper (>= 7.0.0), apache2-prefork-dev, libcap-dev, config-package-dev, php5-common, txt2man, gem2deb, ruby
 Standards-Version: 3.9.1
+XS-Ruby-Versions: all
 
 Package: libapache2-mod-vhost-bytemark
 Architecture: any

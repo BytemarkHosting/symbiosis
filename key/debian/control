@@ -3,8 +3,9 @@ Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), cdbs
+Build-Depends: debhelper (>= 7.0.0), gem2deb
 Standards-Version: 3.9.1
+XS-Ruby-Versions: all
 
 Package: symbiosis-key
 Replaces: bytemark-vhost-key

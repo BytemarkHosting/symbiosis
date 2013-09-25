@@ -3,9 +3,10 @@ Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), cdbs
+Build-Depends: debhelper (>= 7.0.0), gem2deb
 Standards-Version: 3.9.1
 Bugs: https://projects.bytemark.co.uk/projects/symbiosis/issues
+XS-Ruby-Version: all
 
 Package: symbiosis-webmail
 Architecture: all

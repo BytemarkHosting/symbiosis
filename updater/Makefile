@@ -2,6 +2,8 @@
 #  Makefile for the updater package
 #
 
+all: manpage
+
 nop:
 	@echo "Available targets are:"
 	@echo " "

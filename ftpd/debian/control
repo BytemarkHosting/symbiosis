@@ -3,8 +3,9 @@ Section: web
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), cdbs, ruby1.8, pure-ftpd-common, config-package-dev
+Build-Depends: debhelper (>= 7.0.0), gem2deb, ruby, pure-ftpd-common, config-package-dev
 Standards-Version: 3.9.1
+XS-Ruby-Versions: all
 
 Package: symbiosis-ftpd
 Architecture: all
