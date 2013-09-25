@@ -16,6 +16,6 @@ clean:
 
 test:
 	make -C exim4/
-
+	make -C dovecot/
 .PHONY: clean docs all test
 
