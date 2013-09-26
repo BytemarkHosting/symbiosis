@@ -1,4 +1,4 @@
-#!/usr/bin/ruby1.8
+#!/usr/bin/ruby
 #
 # NAME
 #  symbiosis-create-mass-hosting-sites -- Auto-configure Apache2 mass-hosted sites for Symbiosis
