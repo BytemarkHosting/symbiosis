@@ -339,10 +339,15 @@ module Symbiosis
         puts "\tUsing certificate signed by #{certificate.issuer.to_s} for #{self.name}" if $VERBOSE
 
       #
-      # If we can't verify -- raise an error.
+      # If we can't verify -- raise an error if strict_checking is enabled
       #
       else
-        raise OpenSSL::X509::CertificateError, "Certificate signature does not verify for #{self.name} -- maybe a bundle is missing?" 
+        msg =  "Certificate signature does not verify for #{self.name} -- maybe a bundle is missing?"
+        if strict_checking
+          raise OpenSSL::X509::CertificateError, msg
+        else
+          warn "\t#{msg}" if $VERBOSE
+        end
       end
 
       true
