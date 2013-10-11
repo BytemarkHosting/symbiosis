@@ -1,3 +1,9 @@
+symbiosis-backup (2013:1011) oldstable; urgency=low
+
+  * Make sure that pre-backup database scripts explicitly use ruby1.8.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 11 Oct 2013 17:28:40 +0100
+
 symbiosis-backup (2012:0912) oldstable; urgency=low
 
   * Updated mysql tests to pass now that the --databases arg has been removed.
