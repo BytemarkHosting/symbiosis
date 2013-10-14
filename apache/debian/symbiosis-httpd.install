@@ -1,6 +1,6 @@
 sbin                      usr/
 test.d                    etc/symbiosis/
 apache.d                  etc/symbiosis/
-lib/*                     usr/lib/ruby/1.8/
+lib/*                     usr/lib/ruby/vendor_ruby/
 monit.d/*                 etc/symbiosis/monit.d/
 bytemark/*                usr/share/symbiosis/static/
