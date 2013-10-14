@@ -1,6 +1,23 @@
+###########################################
+#
+# incrond snippet for symbiosis-firewall
+#
+###########################################
+
+#
+# Monitor the incoming, outgoing directories for changes.
+#
 /etc/symbiosis/firewall/incoming.d IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE /usr/sbin/symbiosis-firewall -s 5 load
 /etc/symbiosis/firewall/outgoing.d IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE /usr/sbin/symbiosis-firewall -s 5 load
+
+#
+# Monitor the whitelist and blacklist directories for changes.
+#
 /etc/symbiosis/firewall/whitelist.d IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE /usr/sbin/symbiosis-firewall -s 5 reload-whitelist
 /etc/symbiosis/firewall/blacklist.d IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE /usr/sbin/symbiosis-firewall -s 5 reload-blacklist
+
+#
+# Need to monitor attribute changes here, since we need the executable bit to be set.
+#
 /etc/symbiosis/firewall/local.d    IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ATTRIB /usr/sbin/symbiosis-firewall -s 5 load
 
