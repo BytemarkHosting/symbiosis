@@ -173,24 +173,24 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
     op.split("\n").each do |line|
       case line
-        when /^R:\s*([^\s]+) for (#{EMAIL_ADDRESS_REGEXP})$/
+        when /^R:\s*([^\s]+) for (#{EMAIL_ADDRESS_REGEXP})$/ then
           this_router = $1
           this_destination = $2
-        when /^#{EMAIL_ADDRESS_REGEXP}\s+->\s+(.*)$/:
+        when /^#{EMAIL_ADDRESS_REGEXP}\s+->\s+(.*)$/ then
           this_destination = $1 #f this_destination.nil?
-        when /^(#{EMAIL_ADDRESS_REGEXP})\s*$/:
+        when /^(#{EMAIL_ADDRESS_REGEXP})\s*$/ then
           this_destination = $1 #f this_destination.nil?
-        when /^\s+<--\s+(#{EMAIL_ADDRESS_REGEXP})\s*$/:
+        when /^\s+<--\s+(#{EMAIL_ADDRESS_REGEXP})\s*$/ then
           # do nothing
-        when /^\s+(router = ([^,]+), )?transport = ([^\s]+)\s*$/:
+        when /^\s+(router = ([^,]+), )?transport = ([^\s]+)\s*$/ then
           this_router = $2 unless $2.nil?
           this_transport = $3 #f this_transport.nil?
-        when /^mail to ([^\s]+) is discarded$/
+        when /^mail to ([^\s]+) is discarded$/ then 
           this_destination = ":blackhole:"
           this_transport = ":blackhole:"
-        when /^([^\s]+) cannot be resolved at this time:/
+        when /^([^\s]+) cannot be resolved at this time:/ then
           this_transport = ":defer:"
-        when /^([^\s]+) is undeliverable:/
+        when /^([^\s]+) is undeliverable:/ then
           this_transport = ":fail:"
       end
     end
