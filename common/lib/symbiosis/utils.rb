@@ -1,63 +1,12 @@
 require "fcntl"
 require "fileutils"
 
-
 module Symbiosis
 
   #
   # This module has a number of useful methods that are used everywhere.
   #
   module Utils
-
-    #
-    # Many of our utility scripts have integrated documentation at their
-    # head.
-    #
-    # This method will show the manual to the caller.
-    #
-    def show_manual( filename )
-      show_help_or_usage( filename, false )
-    end
-
-    #
-    # Many of our utility scripts have integrated documentation at their
-    # head.
-    #
-    # This method will show brief usage-information to the caller.
-    #
-    def show_usage( filename )
-      show_help_or_usage( filename, true )
-    end
-
-
-    #
-    #  Show either the manual, or the brief usage text.
-    #
-    def show_help_or_usage( filename, help )
-
-      #
-      # Open the file, stripping the shebang line
-      #
-      lines = File.open(filename){|fh| fh.readlines}[1..-1]
-
-      found_synopsis = false
-
-      lines.each do |line|
-
-        line.chomp!
-        break if line.empty?
-
-        if help and !found_synopsis
-          found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
-          next
-        end
-
-        puts line[2..-1].to_s
-        break if help and found_synopsis and line =~ /^#\s*$/
-      end
-
-    end
-
 
     #
     # This function uses the FileUtils mkdir_p command to make a directory.
@@ -460,10 +409,9 @@ module Symbiosis
       raise Errno::ENOLCK, "Unable to release lock -- #{err.to_s}"
     end
 
-    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock, :show_manual, :show_usage, :show_help_or_usage
+    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock
 
   end
-
 
 end
 

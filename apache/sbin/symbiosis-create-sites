@@ -5,9 +5,10 @@
 #  symbiosis-create-sites -- Auto-configure Apache2 sites with specified IPs
 #
 # SYNOPSIS
-#  symbiosis-create-sites [ --ssl-template | -s <file> ]
-#                         [ --non-ssl-template | -t <file> ]
-#                         [ --apache2-dir | -a <directory> ]
+#
+#  symbiosis-create-sites [ --ssl-template | -s <file> ] 
+#                         [ --non-ssl-template | -t <file> ] 
+#                         [ --apache2-dir | -a <directory> ] 
 #                         [ --force | -f ] [ --no-reload | -r ]
 #                         [ --help | -h ] [ --manual | -m ] [ --verbose | -v ]
 #
@@ -54,16 +55,14 @@
 
 
 require 'getoptlong'
-require 'symbiosis/utils.rb'
-
 
 #
 #  Entry point to the code
 #
 $FORCE    = false
 $VERBOSE  = false
-$help     = false
-$manual   = false
+help      = false
+manual    = false
 
 #
 #  Do we need to reload apache?
@@ -74,8 +73,8 @@ $RELOAD=false
 # The root directory -- '/' by default.
 #
 root = "/"
-non_ssl_template = nil
-ssl_template     = nil
+non_ssl_template = nil 
+ssl_template     = nil 
 apache2_dir      = nil
 no_reload       = false
 
@@ -108,9 +107,9 @@ opts.each do |opt, arg|
   when '--no-restart'
     no_reload = true
   when '--help'
-    $help = true
+    help = true
   when '--manual'
-    $manual = true
+    manual = true
   when '--verbose'
     $VERBOSE = true
   when '--force'
@@ -118,18 +117,32 @@ opts.each do |opt, arg|
   end
 end
 
+#
+# CAUTION! Here be quality kode.
+#
+if manual or help
 
-#
-# Show the manual, or the help
-#
-Symbiosis::Utils.show_usage( __FILE__ ) if  $help
-Symbiosis::Utils.show_manual( __FILE__ ) if  $manual
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
 
+  found_synopsis = false
 
-#
-#  If either happened we can exit.
-#
-if ( $help or $manual )
+  lines.each do |line|
+
+    line.chomp!
+    break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
+    puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
+  end
+
   exit 0
 end
 
@@ -191,7 +204,7 @@ Symbiosis::Domains.each do |domain|
     config        = Symbiosis::ConfigFiles::Apache.new(sites_available_file, "#")
     config.domain = domain
 
-    if !zz_mass_hosting_disabled and domain.ips.any?{|ip| primary_ips.include?(ip)}
+    if !zz_mass_hosting_disabled and domain.ips.any?{|ip| primary_ips.include?(ip)} 
       verbose "\tThis site is using the host's primary IPs -- it is covered by the mass-hosting config.  Skipping."
       next
     end
@@ -206,7 +219,7 @@ Symbiosis::Domains.each do |domain|
     #  If SSL is not enabled then we can skip
     #
     if ( domain.ssl_enabled? )
-      begin
+      begin 
         domain.ssl_verify
         config.template = ssl_template
 

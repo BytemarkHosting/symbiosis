@@ -41,7 +41,6 @@
 # Standard ruby
 #
 require 'getoptlong'
-require 'symbiosis/utils.rb'
 
 
 
@@ -49,8 +48,8 @@ require 'symbiosis/utils.rb'
 #  The options set by the command line.
 #
 template     = '/etc/symbiosis/apache.d/webalizer.conf.erb'
-$help        = false
-$manual      = false
+help         = false
+manual       = false
 $VERBOSE     = false
 $FORCE       = false
 prefix       = "/srv"
@@ -69,9 +68,9 @@ begin
   opts.each do |opt,arg|
     case opt
     when '--help'
-      $help = true
+      help = true
     when '--manual'
-      $manual = true
+      manual = true
     when '--verbose'
       $VERBOSE = true
     when '--force'
@@ -84,22 +83,36 @@ begin
   end
 rescue
   # any errors, show the help
-  $help = true
+  help = true
 end
 
 
+#
+# CAUTION! Here be quality kode.
+#
+if manual or help
 
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
 
-#
-# Show the manual, or the help
-#
-Symbiosis::Utils.show_usage( __FILE__ ) if  $help
-Symbiosis::Utils.show_manual( __FILE__ ) if  $manual
+  found_synopsis = false
 
-#
-#  If either happened we can exit.
-#
-if ( $help or $manual )
+  lines.each do |line|
+
+    line.chomp!
+    break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
+    puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
+  end
+
   exit 0
 end
 

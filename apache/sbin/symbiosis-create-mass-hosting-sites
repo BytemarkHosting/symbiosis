@@ -2,7 +2,7 @@
 #
 # NAME
 #  symbiosis-create-mass-hosting-sites -- Auto-configure Apache2 mass-hosted sites for Symbiosis
-#
+# 
 # SYNOPSIS
 #  symbiosis-create-mass-hosting-sites [ --ssl-template | -s <file>]
 #                               [ --non-ssl-template | -t <file> ]
@@ -52,15 +52,14 @@
 
 
 require 'getoptlong'
-require 'symbiosis/utils.rb'
 
 #
 #  Entry point to the code
 #
 $FORCE    = false
 $VERBOSE  = false
-$help     = false
-$manual   = false
+help      = false
+manual    = false
 
 #
 #  Do we need to reload apache?
@@ -71,8 +70,8 @@ $RELOAD=false
 # The root directory -- '/' by default.
 #
 root = "/"
-non_ssl_template = nil
-ssl_template     = nil
+non_ssl_template = nil 
+ssl_template     = nil 
 apache2_dir      = nil
 no_reload       = false
 
@@ -92,9 +91,9 @@ opts = GetoptLong.new(
 opts.each do |opt, arg|
   case opt
   when '--help'
-    $help = true
+    help = true
   when '--manual'
-    $manual = true
+    manual = true
   when '--verbose'
     $VERBOSE = true
   when '--template'
@@ -117,22 +116,34 @@ opts.each do |opt, arg|
   end
 end
 
-
-
 #
-# Show the manual, or the help
+# CAUTION! Here be quality kode.
 #
-Symbiosis::Utils.show_usage( __FILE__ ) if  $help
-Symbiosis::Utils.show_manual( __FILE__ ) if  $manual
+if manual or help
 
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
 
-#
-#  If either happened we can exit.
-#
-if ( $help or $manual )
+  found_synopsis = false
+
+  lines.each do |line|
+
+    line.chomp!
+    break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
+    puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
+  end
+
   exit 0
 end
-
 
 def verbose(s) ; puts s if $VERBOSE ; end
 
@@ -213,7 +224,7 @@ apache2_dir      = File.join(root, "/etc/apache2") if apache2_dir.nil?
 
       verbose "\tWriting configuration"
       config.write
-
+        
       # Definitely reload if we've rewritten the config.
       $RELOAD = true
 

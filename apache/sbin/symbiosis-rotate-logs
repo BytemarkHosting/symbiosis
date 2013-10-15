@@ -4,7 +4,7 @@
 #   symbiosis-rotate-logs - Rotate and prune Apache logs.
 #
 # SYNOPSIS
-#  symbiosis-rotate-logs [ -n | --max-rotations <n> ] [ -c | --compress-at <n> ]
+#  symbiosis-rotate-logs [ -n | --max-rotations <n> ] [ -c | --compress-at <n> ] 
 #                        [ --prefix | -p <directory> ] [ -h | --help ]
 #                        [-m | --manual] [ -v | --verbose ]
 #
@@ -39,14 +39,13 @@
 #
 require 'getoptlong'
 require 'fileutils'
-require 'symbiosis/utils.rb'
 
 
 #
 #  The options set by the command line.
 #
-$help        = false
-$manual      = false
+help         = false
+manual       = false
 $VERBOSE     = false
 max_rotations = 30
 prefix       = '/srv'
@@ -72,32 +71,47 @@ begin
     when '--prefix'
       prefix = arg
     when '--help'
-      $help = true
+      help = true
     when '--manual'
-      $manual = true
+      manual = true
     when '--verbose'
       $VERBOSE = true
     end
   end
 rescue
   # any errors, show the help
-  $help = true
+  help = true
 end
 
 
 #
-# Show the manual, or the help
+# CAUTION! Here be quality kode.
 #
-Symbiosis::Utils.show_usage( __FILE__ ) if  $help
-Symbiosis::Utils.show_manual( __FILE__ ) if  $manual
+if manual or help
 
-#
-#  If either happened we can exit.
-#
-if ( $help or $manual )
+  # Open the file, stripping the shebang line
+  lines = File.open(__FILE__){|fh| fh.readlines}[1..-1]
+
+  found_synopsis = false
+
+  lines.each do |line|
+
+    line.chomp!
+    break if line.empty?
+
+    if help and !found_synopsis
+      found_synopsis = (line =~ /^#\s+SYNOPSIS\s*$/)
+      next
+    end
+
+    puts line[2..-1].to_s
+
+    break if help and found_synopsis and line =~ /^#\s*$/
+
+  end
+
   exit 0
 end
-
 
 #
 # Symbiosis libraries -- required here so they're not needed during the build
@@ -163,7 +177,7 @@ Symbiosis::Domains.each(prefix) do |domain|
     next if entry == '.' or entry == '..'
 
     # skip files that don't match our expected pattern.
-    next unless ( entry =~ FILENAME_REGEXP )
+    next unless ( entry =~ FILENAME_REGEXP ) 
 
     # save the file
     results.push( entry )
@@ -240,7 +254,7 @@ Symbiosis::Domains.each(prefix) do |domain|
       # Compress the file, if needed.
       #
       if compress_at == num
-       system("gzip -9 #{dest}") or warn "Failed to compress #{dest}"
+       system("gzip -9 #{dest}") or warn "Failed to compress #{dest}" 
       end
     rescue Errno::EPERM => err
       warn "** Failed to rotate #{file} -- #{err.to_s}"
@@ -250,7 +264,7 @@ Symbiosis::Domains.each(prefix) do |domain|
       break
     end
   end
-
+  
   #
   # Restore back to root.
   #
@@ -267,13 +281,13 @@ if ( rotated )
   verbose( "Since we rotated we now restart the apache logger")
   Kernel.system( "killall -HUP symbiosis-apache-logger" )
   verbose( "Since we rotated we now generate statistics" )
-
+  
   #
   # Add similar arguments on to the generate-stats command as wot we received.
   #
   stats_args  = " --prefix #{prefix}"
   stats_args += " --verbose" if $VERBOSE
-  Kernel.system( "/usr/sbin/symbiosis-generate-stats #{stats_args}" )
+  Kernel.system( "/usr/sbin/symbiosis-generate-stats #{stats_args}" ) 
 end
 
 
