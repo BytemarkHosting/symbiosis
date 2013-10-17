@@ -214,7 +214,7 @@ class TestCrontabRecord < Test::Unit::TestCase
     assert_equal("do my stuff", crontab_record.command)
   end
 
-  def test_monthly
+  def test_annually
     %w(annually yearly).each do |d|
       crontab_record = Symbiosis::CrontabRecord.parse("@#{d} do my stuff")
       assert_equal([0], crontab_record.min)
