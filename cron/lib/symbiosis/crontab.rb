@@ -204,7 +204,7 @@ module Symbiosis
     private
 
     def parse(str)
-      str.each{|line|
+      str.split($/).each{|line|
         line.chomp!
 
         # Skip if line begins with a hash or is all spaces or empty.
