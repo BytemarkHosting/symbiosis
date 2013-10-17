@@ -4,10 +4,10 @@ blacklist:
     - 192.168.2.1/24
   by_hostname:
     - blacklisted.remote.domain
-    - *.blacklisted.domain
+    - "*.blacklisted.domain"
   by_sender:
     - blacklisted@remote.domain
-    - *@blacklisted.domain
+    - "*@blacklisted.domain"
 whitelist:
   # All these fall within the ranges defined in the blacklists above
   by_ip:
