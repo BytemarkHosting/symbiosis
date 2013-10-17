@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
+# encoding: UTF-8
 
-require 'iconv'
+require 'iconv' unless String.instance_methods.include?(:encode)
 require 'uri'
 require 'symbiosis/utils'
 require 'test/unit'
@@ -14,6 +15,9 @@ end
 class TcBackupsMysql < Test::Unit::TestCase
 
   def setup
+    #
+    # These are MySQL charsets, not ruby charsets.
+    #
     @charsets = %w(UTF8 LATIN1)
     @default_charset = "UTF8"
     @backup_dir = "/var/backups/mysql"
@@ -27,6 +31,8 @@ class TcBackupsMysql < Test::Unit::TestCase
     @defaults_file = "/etc/mysql/debian.cnf"
 
     @username = @password = nil
+    
+    @charset_map = {"UTF8" => "UTF-8", "LATIN1" => "ISO-8859-1"}
 
     parse_defaults_file(@defaults_file)
 
@@ -44,6 +50,16 @@ class TcBackupsMysql < Test::Unit::TestCase
   def has_mysql?
     defined? Mysql and
       @username and @password
+  end
+
+  def do_conv(to, from, str)
+    assert(str.is_a?(String), "#{str.inspect} is not a string")
+
+    if str.respond_to?(:encode)
+      return str.encode(@charset_map[to], @charset_map[from])
+    else
+      return Iconv.conv(@charset_map[to], @charset_map[from], str)
+    end
   end
 
   def parse_defaults_file(fn)
@@ -69,7 +85,7 @@ class TcBackupsMysql < Test::Unit::TestCase
   end
 
   def calculate_dump_name(database, charset=@default_charset)
-    File.join(@backup_dir, URI.escape(Iconv.conv(@default_charset,charset,database),/[^a-zA-Z0-9._-]/)) + ".sql.gz"
+    File.join(@backup_dir, URI.escape(do_conv(@default_charset,charset,database),/[^a-zA-Z0-9._-]/)) + ".sql.gz"
   end
 
   def create_db(database, charset=@default_charset)
@@ -92,6 +108,43 @@ class TcBackupsMysql < Test::Unit::TestCase
     dbh.close if dbh
   end
 
+  def do_test_db(charset, database, table, column, value, insert_data = false)
+    res = nil
+
+    msg = "Failure when " + (insert_data ? "populating" : "reconnecting to") + " MySQL DB to test backups."
+
+    assert_nothing_raised(msg) {
+      dbh = Mysql.new(nil, @username, @password)
+      dbh.query("SET CHARSET #{charset}")
+      dbh.query("SET NAMES #{charset}")
+      dbh.query "USE `#{database}`;"
+      if insert_data
+        dbh.query "CREATE TABLE `#{table}` (`#{column}` CHAR(20) CHARACTER SET #{charset});"
+        dbh.query "INSERT INTO `#{table}` (`#{column}`) VALUES (\"#{value}\");"
+      end
+      res = dbh.query "SELECT * FROM `#{table}`;"
+      dbh.close
+    }
+
+    #
+    # Make sure we've inserted the things properly
+    #
+    assert_equal(1, res.num_fields, "Mysql returned the wrong number of fields")
+    assert_equal(1, res.num_rows, "Mysql returned the wrong number of rows")
+
+    returned_col = res.fetch_fields.first.name.dup
+    #
+    # The MySQL library does not set the string encoding correctly for Ruby
+    # 1.9, so we have to force it.
+    #
+    returned_col.force_encoding(@charset_map[charset]) if returned_col.respond_to?(:force_encoding)
+
+    assert_equal(column, returned_col, "Mysql returned the wrong field name")
+
+    returned_val = res.fetch_row.first
+    returned_val.force_encoding(@charset_map[charset]) if returned_val.respond_to?(:force_encoding)
+    assert_equal(value,  returned_val, "Mysql returned the wrong value")
+  end
 
   #
   # This test does the following:
@@ -112,35 +165,18 @@ class TcBackupsMysql < Test::Unit::TestCase
     end
 
     @charsets.each do |charset|
-      database = Iconv.conv(charset, @default_charset, @database) + " #{charset}"
-      table = Iconv.conv(charset, @default_charset, @table)
-      column = Iconv.conv(charset, @default_charset, @column)
-      value = Iconv.conv(charset, @default_charset, @value)
+      database = do_conv(charset, @default_charset, @database +" #{charset}")
+      table = do_conv(charset, @default_charset, @table)
+      column = do_conv(charset, @default_charset, @column)
+      value = do_conv(charset, @default_charset, @value)
+
       res = nil
-
+    
       create_db(database, charset)
+      do_test_db(charset, database, table, column, value, true)
 
-      assert_nothing_raised("Failure when populating MySQL DB to test backups.") {
-        dbh = Mysql.new(nil, @username, @password)
-        dbh.query("SET CHARSET #{charset}")
-        dbh.query("SET NAMES #{charset}")
-        dbh.query "USE `#{database}`;"
-        dbh.query "CREATE TABLE `#{table}` (`#{column}` CHAR(20) CHARACTER SET #{charset});"
-        dbh.query "INSERT INTO `#{table}` (`#{column}`) VALUES (\"#{value}\");"
-        res = dbh.query "SELECT * FROM `#{table}`;"
-        dbh.close
-      }
-
-      #
-      # Make sure we've inserted the things properly
-      #
-      assert_equal(1, res.num_fields, "Mysql returned the wrong number of fields")
-      assert_equal(1, res.num_rows, "Mysql returned the wrong number of rows")
-      assert_equal(column, res.fetch_fields.first.name, "Mysql returned the wrong field name")
-      assert_equal(value,  res.fetch_row.first, "Mysql returned the wrong value")
-
-      system(@backup_script, Iconv.conv(@default_charset,charset,database))
-      assert_equal(0, $?, "#{@backup_script} returned non-zero.")
+      system(@backup_script, do_conv(@default_charset,charset,database))
+      assert_equal(0, $?.exitstatus, "#{@backup_script} returned non-zero.")
 
       drop_db(database, charset)
 
@@ -149,27 +185,11 @@ class TcBackupsMysql < Test::Unit::TestCase
 
       create_db(database, charset)
       system("zcat #{dump_name} | /usr/bin/mysql --defaults-file=#{@defaults_file} --default-character-set=#{charset} '#{database}'")
-      assert_equal(0, $?, "Failed to restore MySQL database from dump.")
+      assert_equal(0, $?.exitstatus, "Failed to restore MySQL database from dump.")
 
-      res = nil
+      do_test_db(charset, database, table, column, value)
 
-      assert_nothing_raised("Failure when reconnecting to MySQL DB to test backups.") {
-        dbh = Mysql.new(nil, @username, @password)
-        dbh.query("SET CHARSET #{charset};")
-        dbh.query("SET NAMES #{charset};")
-        dbh.query "USE `#{database}`;"
-        res = dbh.query "SELECT * FROM `#{table}`;"
-        dbh.close
-      }
-
-      #
-      # Make sure we've inserted the things properly
-      #
-      assert_equal(1, res.num_fields, "Mysql returned the wrong number of fields")
-      assert_equal(1, res.num_rows, "Mysql returned the wrong number of rows")
-      assert_equal(column, res.fetch_fields.first.name, "Mysql returned the wrong field name")
-      assert_equal(value,  res.fetch_row.first, "Mysql returned the wrong value")
-
+      drop_db(database, charset)
     end
 
   end
