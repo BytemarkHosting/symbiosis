@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require 'iconv'
+require 'iconv' unless String.instance_methods.include?(:encode)
 require 'uri'
 require 'etc'
 begin
@@ -16,8 +16,13 @@ require 'test/unit'
 class TcBackupsPostgres < Test::Unit::TestCase
 
   def setup
+    #
+    # These are postgres, not ruby charsets.
+    #
     @charsets = %w(UTF8 LATIN1)
     @default_charset = "UTF8"
+    @charset_map = {"UTF8" => "UTF-8", "LATIN1" => "ISO-8859-1"}
+
     @backup_dir = "/var/backups/postgresql"
     @backup_script = File.expand_path(File.dirname(__FILE__) + "/../backup.d/pre-backup.d/20-dump-postgres")
 
@@ -31,7 +36,7 @@ class TcBackupsPostgres < Test::Unit::TestCase
 
   def teardown
     @charsets.each do |charset|
-      database = Iconv.conv(charset, @default_charset, @database) + " #{charset}"
+      database = do_conv(charset, @default_charset, @database) + " #{charset}"
       drop_db(database, charset) if has_postgres?
       dump_name = calculate_dump_name(database)
       File.unlink(dump_name) if File.exists?(dump_name)
@@ -89,6 +94,16 @@ class TcBackupsPostgres < Test::Unit::TestCase
     return false
   end
 
+  def do_conv(to, from, str)
+    assert(str.is_a?(String), "#{str.inspect} is not a string")
+
+    if str.respond_to?(:encode)
+      return str.encode(@charset_map[to], @charset_map[from])
+    else
+      return Iconv.conv(@charset_map[to], @charset_map[from], str)
+    end
+  end
+
   #
   # This test does the following:
   #   * creates a DB
@@ -113,10 +128,10 @@ class TcBackupsPostgres < Test::Unit::TestCase
     # default charset and the one we're testing.
     #
     @charsets.each do |charset|
-      database = Iconv.conv(charset, @default_charset, @database) + " #{charset}"
-      table = Iconv.conv(charset, @default_charset, @table)
-      column = Iconv.conv(charset, @default_charset, @column)
-      value = Iconv.conv(charset, @default_charset, @value)
+      database = do_conv(charset, @default_charset, @database) + " #{charset}"
+      table = do_conv(charset, @default_charset, @table)
+      column = do_conv(charset, @default_charset, @column)
+      value = do_conv(charset, @default_charset, @value)
     
       chuid("postgres")
       assert_nothing_raised("Failure when creating a test Postgres DB") {
@@ -146,7 +161,7 @@ class TcBackupsPostgres < Test::Unit::TestCase
       assert_equal(column, res.fields[0], "postgres returned the wrong field name")
       assert_equal(value, res.getvalue(0,0).strip, "postgres returned the wrong value")
     
-      system(@backup_script, Iconv.conv(@default_charset,charset,database))
+      system(@backup_script, do_conv(@default_charset,charset,database))
       assert_equal(0, $?, "#{@backup_script} returned a non-zero exit code when dumping db.")
    
       drop_db(database, charset)
