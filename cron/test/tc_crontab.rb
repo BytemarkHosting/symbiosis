@@ -302,4 +302,12 @@ class TestCrontabRecord < Test::Unit::TestCase
     end 
   end
 
+  def test_return_sensible_error
+    today = DateTime.new(2011,10,1,0,0,0)
+    assert_raise(Symbiosis::CrontabFormatError) do
+      # This is missing a field.
+      Symbiosis::CrontabRecord.parse("*/5 * * * /usr/bin/php /srv/domain.co.uk/public/htdocs/cron.php")
+    end
+  end
+
 end
