@@ -96,10 +96,10 @@ EOF
     assert_equal("foo", @domain.dkim_selector)
   end
 
-  def test_dkim_public_key
+  def test_dkim_public_key_b64
     @domain.__send__(:set_param,"dkim.key", rsa_private_key_pem, @domain.config_dir)
     assert_equal(rsa_private_key_pem, @domain.dkim_key.to_pem)
-    assert_equal(rsa_public_key_txt, @domain.dkim_public_key_txt)
+    assert_equal(rsa_public_key_txt, @domain.dkim_public_key_b64)
   end
 
 end

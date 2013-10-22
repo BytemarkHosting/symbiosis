@@ -107,7 +107,7 @@ module Symbiosis
     #
     # This returns the Base64 encoded public DKIM key for use in a TXT record.
     #
-    def dkim_public_key_txt
+    def dkim_public_key_b64
       #
       # Ruby 1.8 uses a different output format for the DER encoded public key
       # to both OpenSSL and Ruby1.9+, so we have to construct the correct
