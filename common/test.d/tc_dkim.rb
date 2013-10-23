@@ -79,15 +79,17 @@ EOF
     # This should return (in order) the first component of mailname, hostname,
     # or # $(hostname)
     #
-    if File.exists?('/etc/mailname')
-      hostname = File.read("/etc/mailname")
-    elsif File.exists?('/etc/hostname')
-      hostname = File.read("/etc/hostname")
-    else
-      hostname = `hostname`
+    hostname = `uname -n`.chomp
+
+    unless hostname.include?(".")
+      require 'socket'
+      begin
+        hostname = Socket.gethostbyname(hostname).first
+      rescue SocketError
+        hostname = ""
+      end
     end
 
-    hostname = hostname.to_s.split($/).first.strip
     hostname = "default" if hostname.empty?
 
     assert_equal(hostname, @domain.dkim_selector)

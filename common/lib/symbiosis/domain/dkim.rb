@@ -1,6 +1,7 @@
 require 'symbiosis/domain'
 require 'openssl'
 require 'base64'
+require 'socket'
 require 'erb'
 
 module Symbiosis
@@ -67,40 +68,46 @@ module Symbiosis
     #
     def dkim_selector
       selector = get_param("dkim", self.config_dir)
+      selector_regex = /\b[a-z0-9-]+(\.[a-z0-9-]+)*\b/i
 
-      @dkim_selector = if selector.is_a?(String) and selector =~ /^[A-Za-z0-9.-]+$/
-        selector
-
-      elsif true === selector
-        #
-        # Try /etc/mailname
-        #
-        hostname = get_param("mailname", '/etc')
-
-        #
-        # Failing that, try /etc/hostname
-        #
-        unless hostname.is_a?(String)
-          hostname = get_param("hostname", '/etc')
-        end
-
-        #
-        # Fall back to a command, if needed.
-        #
-        unless hostname.is_a?(String)
-          hostname = `hostname`.chomp
-        end
-
-        #
-        # Take the first availble hostname, and default to "default" if empty.
-        #
-        hostname = hostname.to_s.split($/).first.strip
-        hostname = "default" if hostname.empty?
-        hostname
-
-      else
+      @dkim_selector = if selector.is_a?(String) and selector =~ selector_regex
+        $0.to_s
+  
+      elsif selector == false
         nil
 
+      else
+        #
+        # Here we mirror what exim4 does when it works out primary_hostname.
+        #
+        # "This variable contains the value set by primary_hostname in the
+        #  configuration file, or read by the uname() function. If uname()
+        #  returns a single-component name, Exim calls gethostbyname() (or
+        #  getipnodebyname() where available) in an attempt to acquire a fully
+        #  qualified host name."
+        #
+        # Try /proc/sys/kernel/hostname (which mirrors what uname returns)
+        #
+        hostname = get_param("hostname", '/proc/sys/kernel')
+
+        hostname = ""  unless hostname.is_a?(String) 
+        
+        hostname.chomp!
+
+        unless hostname.empty? or !hostname.include?(".")
+          begin
+            hostname = Socket.gethostbyname(hostname).first
+          rescue SocketError
+            hostname = ""
+          end
+        end
+
+        #
+        # Default to "default" if the hostname doesn't match the regex.  This
+        # should never happen (I don't think!).
+        #
+        hostname = "default" unless hostname =~ selector_regex
+        hostname
       end
     end
 
