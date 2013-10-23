@@ -1,3 +1,5 @@
+require 'symbiosis/domain/dkim'
+
 module Symbiosis
 
   class Domain
@@ -32,6 +34,42 @@ module Symbiosis
       raise ArgumentError, "expecting true or false" unless value.is_a?(TrueClass) or value.is_a?(FalseClass)
       set_param("bytemark-antispam", value, self.config_dir)
     end
+
+    #
+    # Returns true if a domain has SPF enabled.
+    #
+    def spf_enabled?
+      spf_record.is_a?(String)
+    end
+
+    alias has_spf? spf_enabled?
+
+    def spf_record
+      spf = get_param("spf", self.config_dir)
+      spf = "v=spf1 +a +mx ?all" if spf === true
+      if spf.is_a?(String)
+        self.tinydns_encode(spf)
+      else
+        nil
+      end
+    end
+
+    private
+
+    #
+    # Encodes a given string into a format suitable for consupmtion by TinyDNS
+    #
+    def tinydns_encode(s)
+      s.chars.collect{|c| c =~ /[ .=+?\w]/ ? c : c.bytes.collect{|b| "\\%03o" % b}.join}.join
+    end
+
+    #
+    # Decodes a given string from a format suitable for consupmtion by TinyDNS
+    # 
+    def tinydns_decode(s)
+      s.gsub(/(?:\\([0-7]{3,3})|.)/){|r| $1 ? [$1.oct].pack("c*") : r}
+    end
+
 
   end
 
