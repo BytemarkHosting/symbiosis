@@ -187,14 +187,19 @@ module Symbiosis
       return false unless File.exists?(fn) and File.readable?(fn)
 
       #
-      # Return true if the file is present and empty
+      # Read the file.
       #
-      return true if File.zero?(fn)
+      contents = safe_open(fn, File::RDONLY, opts){|fh| fh.read}.to_s
+      
+      #
+      # Return true if the file was empty
+      #
+      return true if contents.empty?
 
       #
       # Otherwise return the contents
       #
-      return safe_open(fn, File::RDONLY, opts){|fh| fh.read}.to_s
+      return contents
     end
 
     #
