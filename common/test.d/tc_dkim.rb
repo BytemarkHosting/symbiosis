@@ -8,7 +8,9 @@ class DkimTest < Test::Unit::TestCase
 
   def setup
     @prefix = Dir.mktmpdir("srv")
+    File.chown(1000,1000,@prefix)
     @prefix.freeze
+
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
   end
@@ -94,7 +96,7 @@ EOF
 
     assert_equal(hostname, @domain.dkim_selector)
 
-    @domain.__send__(:set_param,"dkim", "foo", @domain.config_dir)
+    @domain.__send__(:set_param, "dkim", "foo", @domain.config_dir)
     assert_equal("foo", @domain.dkim_selector)
   end
 
