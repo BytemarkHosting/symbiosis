@@ -12,6 +12,7 @@ class DnsTest < Test::Unit::TestCase
 
   def setup
     @prefix = Dir.mktmpdir("srv")
+    File.chown(1000, 1000, @prefix)
     @prefix.freeze
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
