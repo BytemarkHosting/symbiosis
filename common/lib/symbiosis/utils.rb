@@ -330,24 +330,32 @@ module Symbiosis
         end
 
         #
-        # Change the uid/gid as needed.
+        # Check to see if the file is writable, is a file, and opened for
+        # writing.  If so, we can set uid/gid/mode.
         #
-        if link_stat.writable? and
-         ((opts[:uid] and file_stat.uid != opts[:uid]) or 
-          (opts[:gid] and file_stat.gid != opts[:gid]))
-          #
-          # Change the owner if not already correct
-          #
-          fh.chown(opts[:uid], opts[:gid]) unless link_stat.symlink?
-        end
+        if ( link_stat.writable? and link_stat.file? and 
+           ( File::WRONLY == (fh.fcntl(Fcntl::F_GETFL) & File::WRONLY) or 
+             File::RDWR == (fh.fcntl(Fcntl::F_GETFL) & File::RDWR) ) )
 
-        if link_stat.writable? and opts[:mode]
           #
-          # Fix any permissions.
+          # Change the uid/gid as needed.
           #
-          fh.chmod(opts[:mode]) unless link_stat.symlink?
-        end
+          if ((opts[:uid] and file_stat.uid != opts[:uid]) or 
+              (opts[:gid] and file_stat.gid != opts[:gid]))
+            #
+            # Change the owner if not already correct
+            #
+            fh.chown(opts[:uid], opts[:gid])
+          end
 
+          if opts[:mode]
+            #
+            # Fix any permissions.
+            #
+            fh.chmod(opts[:mode])
+          end
+
+        end
       rescue ArgumentError, IOError, SystemCallError => err
 
         fh.close unless fh.nil? or fh.closed?
