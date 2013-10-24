@@ -68,10 +68,10 @@ module Symbiosis
     #
     def dkim_selector
       selector = get_param("dkim", self.config_dir)
-      selector_regex = /\b[a-z0-9-]+(\.[a-z0-9-]+)*\b/i
+      selector_regex = /\b([a-z0-9-]+(\.[a-z0-9-]+)*)\b/i
 
       @dkim_selector = if selector.is_a?(String) and selector =~ selector_regex
-        $0.to_s
+        $1.to_s
   
       elsif selector == false
         nil
