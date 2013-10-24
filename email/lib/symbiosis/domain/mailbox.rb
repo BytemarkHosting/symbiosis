@@ -133,6 +133,14 @@ module Symbiosis
         self.domain.create_dir(self.maildir, 0700) unless File.directory?(self.maildir)
 
         #
+        # Create all the subdirectories
+        #
+        %w(new cur tmp).each do |d|
+          sub_dir = File.join(self.maildir, d)
+          self.domain.create_dir(sub_dir, 0700) unless File.directory?(sub_dir)
+        end
+
+        #
         # Fetch the real quota, and set it to zero if none is set.
         #
         expected_size  = self.quota
