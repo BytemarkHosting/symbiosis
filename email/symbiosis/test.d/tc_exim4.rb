@@ -571,8 +571,8 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_router_system_aliases
     do_acl_setup()
 
-    if File.exists?('/etc/hostname')
-      this_hostname = File.read('/etc/hostname').chomp
+    if File.exists?('/proc/sys/kernel/hostname')
+      this_hostname = File.read('/proc/sys/kernel/hostname').chomp
     else
       this_hostname = "localhost"
     end
@@ -591,8 +591,8 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_router_mail_for_local_root
     do_acl_setup
 
-    if File.exists?('/etc/hostname')
-      this_hostname = File.read('/etc/hostname').chomp
+    if File.exists?('/proc/sys/kernel/hostname')
+      this_hostname = File.read('/proc/sys/kernel/hostname').chomp
     else
       this_hostname = "localhost"
     end
@@ -608,8 +608,8 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_postmaster_for_any_domains
     do_acl_setup
 
-    if File.exists?('/etc/hostname')
-      this_hostname = File.read('/etc/hostname').chomp
+    if File.exists?('/proc/sys/kernel/hostname')
+      this_hostname = File.read('/proc/sys/kernel/hostname').chomp
     else
       this_hostname = "localhost"
     end
@@ -648,8 +648,8 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_localhost_rewrite
     do_acl_setup
 
-    if File.exists?('/etc/hostname')
-      this_hostname = File.read('/etc/hostname').chomp
+    if File.exists?('/proc/sys/kernel/hostname')
+      this_hostname = File.read('/proc/sys/kernel/hostname').chomp
     end
 
     if this_hostname == "localhost"
