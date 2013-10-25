@@ -158,7 +158,6 @@ EOF
     encoded_spf_record = "ip6:2001:41c8:1:2:3::4 -all"
     encoded_spf_record = "v=spf1 ip6\\0721080\\072\\0728\\072800\\07268/96 -all"
     @domain.__send__(:set_param,"spf", spf_record, @domain.config_dir)
-    @domain.__send__(:tinydns_encode,spf_record)
     txt = config.generate_config
     spf_records = txt.split($/).select{|l| l =~ basic_spf_record_match}
     assert_not_equal([], spf_records, "SPF record(s) not found when custom SPF record was set")
@@ -167,9 +166,22 @@ EOF
     # The make sure our spf record is matched.
     #
     spf_records.each do |r|
-      assert_match(/^'#{Regexp.escape(@domain.name)}:#{Regexp.escape(spf_record.gsub(":","\\072"))}:/, r, "Default record is too strict, and might cause unexpected bounces")
+      assert_match(/^'#{Regexp.escape(@domain.name)}:#{Regexp.escape(spf_record.gsub(":",'\\\\072'))}:/, r)
     end
 
+  end
+
+  def test_bytemark_antispam
+    @domain.__send__(:set_param,"bytemark-antispam", true, @domain.config_dir)
+    config = Symbiosis::ConfigFiles::Tinydns.new(nil, "#")
+    config.domain = @domain
+    config.template = @dns_template
+    assert(@domain.uses_bytemark_antispam?)
+
+    txt = config.generate_config
+
+    assert_match(/^@#{Regexp.escape(@domain.name)}::a\.nospam\.bytemark\.co\.uk/,txt, "No line mentions a.nospam.bytemark.co.uk")
+    assert_match(/^@#{Regexp.escape(@domain.name)}::b\.nospam\.bytemark\.co\.uk/,txt, "No line mentions b.nospam.bytemark.co.uk")
   end
 
 end
