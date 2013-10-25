@@ -44,14 +44,12 @@ module Symbiosis
     # This returns the ERB interpreter class.
     #
     def self.erb
-      @erb
+      #
+      # We default to the PercentLineEruby interpreter, since this allows lines
+      # to start with %.
+      #
+      @erb || ::Erubis::PercentLineEruby
     end
- 
-    #
-    # We default to the PercentLineEruby interpreter, since this allows lines
-    # to start with %.
-    #
-    self.erb = ::Erubis::PercentLineEruby
 
     #
     # Set the domain -- potentially used in tests later, or in the template.
