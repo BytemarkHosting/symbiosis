@@ -25,6 +25,10 @@ fi
 #
 rm -f /etc/cron.hourly/create-dns 2>/dev/null >/dev/null || true
 
+#
+# Remove the old cron job
+#
+rm -f /etc/cron.d/symbiosis-tinydns 2>/dev/null >/dev/null || true
 
 #
 #  If we're not on a Bytemark host then we do nothing.
