@@ -12,8 +12,10 @@ module Symbiosis
     # Returns true if DKIM public and private keys are available, and match.
     #
     def dkim_enabled?
-      self.dkim_selector and self.dkim_key
+      self.dkim_selector.is_a?(String) and self.dkim_key.is_a?(OpenSSL::PKey::RSA)
     end
+
+    alias has_dkim? dkim_enabled?
 
     #
     # Returns the domains SSL key as an OpenSSL::PKey::RSA object, or nil if no
