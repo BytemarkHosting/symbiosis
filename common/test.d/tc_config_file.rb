@@ -8,7 +8,7 @@ class TestConfigFile < Test::Unit::TestCase
 
   def setup
     @template = Tempfile.new("tc_config_file-template-")
-    @template.puts("# Testing 1.. 2.. 3..\n# #{__FILE__}\n<%= $test_config_file_var %>\n\n")
+    @template.puts("# Testing 1.. 2.. 3..\n# #{__FILE__}\n<%= $test_config_file_var %>\n% if true\nFOO\n% else\nBAR\n% end\n")
     @template.flush
 
     @config = Tempfile.new("tc_config_file-config-")
@@ -26,7 +26,7 @@ class TestConfigFile < Test::Unit::TestCase
   end
 
   def test_generate_config
-    config =  "# Testing 1.. 2.. 3..\n# #{__FILE__}\n#{$test_config_file_var}\n\n"
+    config =  "# Testing 1.. 2.. 3..\n# #{__FILE__}\n#{$test_config_file_var}\nFOO\n"
     config += "# Checksum MD5 #{Digest::MD5.new.hexdigest(config)}\n"
 
     x = ConfigFile.new(@config.path)

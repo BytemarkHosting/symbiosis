@@ -1,5 +1,6 @@
 require 'digest/md5'
-require 'erb'
+require 'erubis'
+require 'erubis/engine/enhanced'
 require 'tempfile'
 require 'symbiosis/domain'
 
@@ -28,6 +29,29 @@ module Symbiosis
       @template = nil
       @domain = nil
     end
+
+    #
+    # Allow the ERB interpreter to be set by any subclass. This allows
+    # automatic escaping to be set up, for example.
+    #
+    def self.erb=(klazz)
+      raise ArgumentError unless klazz.is_a?(Class)
+      raise ArgumentError, "ERB class #{klazz.inspect} is not descended from Erubis::Eruby" unless klazz.ancestors.include?(Erubis::Eruby)
+      @erb = klazz
+    end
+  
+    #
+    # This returns the ERB interpreter class.
+    #
+    def self.erb
+      @erb
+    end
+ 
+    #
+    # We default to the PercentLineEruby interpreter, since this allows lines
+    # to start with %.
+    #
+    self.erb = ::Erubis::PercentLineEruby
 
     #
     # Set the domain -- potentially used in tests later, or in the template.
@@ -61,7 +85,7 @@ module Symbiosis
       #
       # Create a template object, and add a newline for good measure.
       #
-      config = ERB.new( content, 0, "%>" ).result( binding ) + "\n"
+      config = self.class.erb.new( content ).result( binding )
 
       #
       # Return our template + MD5.
