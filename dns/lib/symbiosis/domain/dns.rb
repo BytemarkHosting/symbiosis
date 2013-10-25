@@ -47,11 +47,8 @@ module Symbiosis
     def spf_record
       spf = get_param("spf", self.config_dir)
       spf = "v=spf1 +a +mx ?all" if spf === true
-      if spf.is_a?(String)
-        self.tinydns_encode(spf)
-      else
-        nil
-      end
+      spf = nil unless spf.is_a?(String)
+      spf
     end
 
     private
