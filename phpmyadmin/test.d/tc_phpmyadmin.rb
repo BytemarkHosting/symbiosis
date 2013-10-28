@@ -13,8 +13,10 @@ end
 
 class TestPhpMyAdmin < Test::Unit::TestCase
 
+  @@ip = Symbiosis::Host.primary_ip.to_s
+
   def setup
-    @ip = Symbiosis::Host.primary_ip.to_s
+    # NOP
   end
 
   def teardown
@@ -54,7 +56,7 @@ class TestPhpMyAdmin < Test::Unit::TestCase
   # Test that we redirected to the HTTPS site if we connect on port 80.
   #
   def test_phpmyadmin_http_redirect
-    http         = Net::HTTP.new( @ip, 80 )
+    http         = Net::HTTP.new( @@ip, 80 )
     http.use_ssl = false
 
     # Get the contents
@@ -71,7 +73,7 @@ class TestPhpMyAdmin < Test::Unit::TestCase
   # Test that we get a 401 if we don't supply a username/password.
   #
   def test_phpmyadmin_requires_basic_authentication
-    http     = Net::HTTP.new( @ip, 443 )
+    http     = Net::HTTP.new( @@ip, 443 )
     http.use_ssl   = true
 
     # disable "warning: peer certificate won't be verified in this SSL session."
@@ -91,7 +93,7 @@ class TestPhpMyAdmin < Test::Unit::TestCase
   # unauthenticated (even if no root password has been set) 
   #
   def test_root_login_fails_when_no_password_is_given
-    http     = Net::HTTP.new( @ip, 443 )
+    http     = Net::HTTP.new( @@ip, 443 )
     http.use_ssl   = true
 
     # disable "warning: peer certificate won't be verified in this SSL session."
@@ -127,7 +129,7 @@ class TestPhpMyAdmin < Test::Unit::TestCase
       return
     end
 
-    http     = Net::HTTP.new( @ip, 443 )
+    http     = Net::HTTP.new( @@ip, 443 )
     http.use_ssl   = true
 
     # disable "warning: peer certificate won't be verified in this SSL session."
@@ -163,7 +165,7 @@ class TestPhpMyAdmin < Test::Unit::TestCase
       return
     end
 
-    http     = Net::HTTP.new( @ip, 443 )
+    http     = Net::HTTP.new( @@ip, 443 )
     http.use_ssl   = true
 
     # disable "warning: peer certificate won't be verified in this SSL session."
