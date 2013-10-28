@@ -4,11 +4,12 @@
 require 'symbiosis/apache_logger'
 require 'socket'
 require 'test/unit'
+require 'tmpdir'
 
 class TestApacheLogger < Test::Unit::TestCase
 
   def setup
-    @prefix = ENV['TMP'] || "/tmp"
+    @prefix = Dir.mktmpdir("srv")
 
     #
     #  Create the domain
@@ -27,6 +28,11 @@ class TestApacheLogger < Test::Unit::TestCase
     #
     @domain1.destroy() unless @domain1.nil?
     @domain2.destroy() unless @domain2.nil?
+
+    #
+    # Remove the @prefix directory
+    #
+    FileUtils.remove_entry_secure @prefix
   end
 
   #
