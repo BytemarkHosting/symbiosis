@@ -1,3 +1,14 @@
+symbiosis-common (2013:1025) stable; urgency=low
+
+  * Rationalised how help and man pages were generated
+  * Changed ruby interpreter to /usr/bin/ruby everywhere
+  * Lack of bundle is now a warning rather than an outright fail during SSL
+    validation.
+  * Added DKIM support.
+  * Changed ERB interpreter to Erubis for configuration files.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 25 Oct 2013 10:10:40 +0100
+
 symbiosis-common (2013:0712) stable; urgency=low
 
   * Removed ruby-openssl dependency.

@@ -1,4 +1,4 @@
-#!/usr/bin/ruby1.8
+#!/usr/bin/ruby
 #
 # NAME
 #   symbiosis-generate-stats - Generate statistics for domains.

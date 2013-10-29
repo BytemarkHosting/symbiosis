@@ -204,7 +204,7 @@ module Symbiosis
     private
 
     def parse(str)
-      str.each{|line|
+      str.split($/).each{|line|
         line.chomp!
 
         # Skip if line begins with a hash or is all spaces or empty.
@@ -418,19 +418,43 @@ module Symbiosis
     private
 
     def parse_field(str, first, last)
-      str.split(",").map{|r|
-        r, every = r.split("/")
-        every = every ? every.to_i : 1
-        f,l = r.split("-")
+      str.split(",").map do |entry|
+        every, f, l = nil
+
+        #
+        # Split the field, assuming it looks like "0-9/4". 
+        #
+        if entry.strip =~ /(\*|\d+)(?:\-(\d+))?(?:\/(\d+))?/
+          f,l,every = [$1, $2, $3]
+          every = (every ? every.to_i : 1)
+          raise CrontabFormatError.new "Bad specifier #{every.inspect} in #{str.inspect}" if every < 1
+        else
+          raise CrontabFormatError.new "Bad entry #{entry.inspect} in field #{str.inspect}"
+        end
+
         range = if f == "*"
           first..last
         else
           l = f if l.nil?
+
           # make sure we have integers
-          f,l = [f,l].collect{|n| n.to_i}
-          # make sure everything is within ranges 
-          raise CrontabFormatError.new "out of range (#{f} for #{first}..#{last})" unless (first..last).include?(f)
-          raise CrontabFormatError.new "out of range (#{l} for #{first}..#{last})" unless (first..last).include?(l)
+          f,l = [f,l].collect do |n|
+
+            if n.is_a?(String)
+              # Make sure we're going to get a sensible answer
+              raise CrontabFormatError.new "Bad field #{n.inspect} in #{str}" unless n =~ /^\d+$/
+              n = n.to_i
+            end
+
+            # Make sure we've got an integer now
+            raise CrontabFormatError.new "Bad field #{n.inspect} in #{str}" unless n.is_a?(Integer)
+
+            # make sure everything is within ranges 
+            raise CrontabFormatError.new "out of range (#{n} for #{first}..#{last})" unless (first..last).include?(n)
+
+            n
+          end
+
           # deal with out-of-order ranges
           if l < f
             (f..last).to_a + (first..l).to_a
@@ -438,8 +462,10 @@ module Symbiosis
             f..l
           end
         end
+
         range.to_a.find_all{|i| (i - first) % every == 0}
-      }.flatten.sort.uniq
+
+      end.flatten.sort.uniq
     end
 
   end

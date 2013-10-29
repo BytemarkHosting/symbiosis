@@ -4,7 +4,7 @@
  Tests started at <%= start_time.iso8601 %>.
 
 % tests.each do |t|
- * <%= t.name %>: <%= t.success? ? "PASSED" : "FAILED: "+t.exitstatus %>
+ * <%= t.name %>: <%= t.success? ? "PASSED" : "FAILED: "+t.exitstatus.to_s %>
 % end 
 
  Tests finished at <%= finish_time.iso8601 %>.

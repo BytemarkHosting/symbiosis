@@ -61,6 +61,7 @@ databases.each do |database|
   cmd = %w(
     /usr/bin/mysqldump 
     --defaults-file=/etc/mysql/debian.cnf 
+    --events
     --opt
   )
 

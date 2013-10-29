@@ -1,4 +1,4 @@
-#!/usr/bin/ruby1.8
+#!/usr/bin/ruby
 
 require 'test/unit'
 require 'time'
@@ -67,13 +67,21 @@ class TestDovecot < Test::Unit::TestCase
     end
   end
 
-  def test_imap_auth_tls
-    # TODO: not implemented by net/imap library
+  def test_imap_auth_starttls
+    return unless Net::IMAP.instance_methods.include?(:starttls)
+ 
+    assert_nothing_raised do
+      imap = Net::IMAP.new('localhost', 143, false)
+      imap.starttls({:verify_mode => OpenSSL::SSL::VERIFY_NONE})
+      imap.authenticate('LOGIN', @mailbox_crypt.username, @mailbox_crypt.password)
+      imap.logout
+      imap.disconnect unless imap.disconnected?
+    end
   end
 
   def test_imap_auth_ssl
     assert_nothing_raised do
-      imap = Net::IMAP.new('localhost', 993, true)
+      imap = Net::IMAP.new('localhost', 993, true, nil, false) 
       imap.authenticate('LOGIN', @mailbox.username, @mailbox.password)
       imap.logout
       imap.disconnect unless imap.disconnected?
@@ -103,7 +111,13 @@ class TestDovecot < Test::Unit::TestCase
   end
 
   def test_pop3_auth_ssl
-    # TODO: not implemented by net/pop library
+    assert_nothing_raised do
+      Net::POP.enable_ssl({:verify_mode => OpenSSL::SSL::VERIFY_NONE})
+      pop = Net::POP.new('localhost', 995)
+      pop.set_debug_output STDOUT if $DEBUG
+      pop.start(@mailbox_crypt.username, @mailbox_crypt.password)
+      pop.finish
+    end
   end
 
   def test_deliver
@@ -215,7 +229,6 @@ EOF
     #
     new_files = Dir.glob(File.join(@mailbox.maildir, "new", "*")).length
     assert_equal(1, new_files, "Found #{new_files} messages in Maildir/new rather than just 1")
-
   end
 
   def test_deliver_with_sieve
@@ -229,7 +242,6 @@ EOF
 
     # Write the file.
     Symbiosis::Utils.set_param("sieve", sieve, @mailbox.directory)
-
 
     sender_address = "postmaster@#{@mailbox.domain.to_s}"
     rcpt_address   = @mailbox.username
@@ -285,41 +297,38 @@ EOF
     assert_equal(1, new_files, "Found #{new_files} messages in Maildir/.testing/new rather than just 1 after the quota has been exceeded.")
   end
 
+  #
+  # This is fugly, but required to drop privileges properly.
+  #
   def do_dovecot_delivery(sender_address, rcpt_address, msg, expected_code=0)
-    begin
+    fork do 
       #
       # Drop privileges
       #
       if 0 == Process.uid
-        Process::Sys.setegid(@domain.gid)
-        Process::Sys.seteuid(@domain.uid)
+        Process::Sys.setgid(@domain.gid)
+        Process::Sys.setuid(@domain.uid)
       end
 
-      %w(HOME).each do |e|
-        ENV["OLD_#{e}"] = ENV[e]
+      ENV.keys.each do |k|
+        ENV[k] = nil
       end
+      
       ENV['HOME'] = @mailbox.directory
+      ENV['USER'] = @mailbox.username
 
-      cmd = "/usr/lib/dovecot/deliver -k -f \"#{sender_address}\" -a \"#{rcpt_address}\""
+      cmd = "/usr/lib/dovecot/deliver -e -k -f \"#{sender_address}\" -a \"#{rcpt_address}\""
 
       IO.popen(cmd,"w+") do |pipe|
         pipe.puts msg
       end
 
-      assert_equal(expected_code, $?.exitstatus, "Dovecot deliver failed with the wrong exit code (#{$?.to_i})")
-    ensure
-      #
-      # Restore back to root.
-      #
-      if 0 == Process.uid
-        Process::Sys.seteuid(0)
-        Process::Sys.setegid(0)
-      end
-
-      %w(HOME).each do |e|
-        ENV[e] = ENV["OLD_#{e}"]
-      end
+      exit $?.exitstatus
     end
+
+    Process.wait
+
+    assert_equal(expected_code, $?.exitstatus, "Dovecot deliver failed with the wrong exit code (#{$?.to_i})")
   end
 
 end

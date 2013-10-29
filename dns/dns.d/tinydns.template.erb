@@ -65,3 +65,17 @@
 @<%= domain %>::mx.<%= domain %>:15:300
 
 % end
+% if domain.has_spf?
+#
+# SPF records
+#
+'<%= domain %>:<%= domain.spf_record %>:300
+
+% end
+% if domain.dkim_enabled?
+#
+# DKIM records
+#
+'<%= domain.dkim_selector %>._domainkey.<%= domain %>:v=DKIM1; k=rsa; p=<%= domain.dkim_public_key_b64 %>:300
+
+% end

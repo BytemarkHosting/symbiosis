@@ -1,6 +1,6 @@
 INSTALLATION
 
-1) Copy ./lib to /usr/lib/ruby/1.8
+1) Copy ./lib to /usr/lib/ruby/vendor_ruby
 2) Copy ./monit.d to somewhere sensible
 3) Copy ./bin/bytemark-service-monitor to /usr/sbin
 4) Add ./cron/bytemark-service-monitor to /etc/cron.d, making sure the sensible

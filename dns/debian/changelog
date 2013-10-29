@@ -1,3 +1,12 @@
+symbiosis-dns (2013:1025) stable; urgency=low
+
+  * Renamed package.
+  * Moved ERB interpreter to a custom Erubis one, to make tinydns-esque
+    escaping of variables "just work"(tm).
+  * Added SPF and bytemark_antispam test.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 25 Oct 2013 10:18:36 +0100
+
 symbiosis-tinydns (2013:0610) stable; urgency=low
 
   * Updated symbiosis-dns-generate to have a sleep option, as well as general

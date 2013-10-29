@@ -88,9 +88,13 @@ module Symbiosis
         r.nil? ? nil : r['timestamp']
       end
 
+      #
+      # Removes old records from the database, that are were created more than
+      # n_days ago.
+      #
       def clean(n_days = 30, now = Time.now)
         from = (now.to_i - n_days*24*3600)
-        @dbh.execute("DELETE FROM #{@tbl_name} WHERE timestamp <= ? ", from)
+        @dbh.execute("DELETE FROM #{@tbl_name} WHERE timestamp < ? ", from)
       end
 
     end

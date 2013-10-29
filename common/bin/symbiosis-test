@@ -1,4 +1,4 @@
-#!/usr/bin/ruby1.8
+#!/usr/bin/ruby
 #
 # NAME
 #
@@ -64,6 +64,11 @@ else
 end
 
 FileUtils.chdir(dir)
+
+#
+# Add the test directory to the load path
+#
+$LOAD_PATH << dir
 
 Dir.glob(File.join(dir,"t*.rb")).each do |test|
   require test

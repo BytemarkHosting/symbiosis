@@ -1,14 +1,16 @@
-#!/usr/bin/ruby1.8
+#!/usr/bin/ruby
 #
 #
 require 'symbiosis/apache_logger'
 require 'socket'
 require 'test/unit'
+require 'tmpdir'
 
 class TestApacheLogger < Test::Unit::TestCase
 
   def setup
-    @prefix = ENV['TMP'] || "/tmp"
+    @prefix = Dir.mktmpdir("srv")
+    File.chown(1000,1000,@prefix)
 
     #
     #  Create the domain
@@ -27,12 +29,17 @@ class TestApacheLogger < Test::Unit::TestCase
     #
     @domain1.destroy() unless @domain1.nil?
     @domain2.destroy() unless @domain2.nil?
+
+    #
+    # Remove the @prefix directory
+    #
+    FileUtils.remove_entry_secure @prefix
   end
 
   #
   # Not sure if this is a good thing to do.
   #
-  def eventmachine(timeout = 1)
+  def eventmachine(timeout = 30)
     Timeout::timeout(timeout) do
       EM.run do
         yield

@@ -2,5 +2,6 @@ sbin                  usr/
 dns.d                 etc/symbiosis/
 bug.report            usr/share/bug/symbiosis-tinydns/control
 exim4                 etc/
+test.d                etc/symbiosis
 
 

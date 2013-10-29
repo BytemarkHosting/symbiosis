@@ -214,7 +214,7 @@ class TestCrontabRecord < Test::Unit::TestCase
     assert_equal("do my stuff", crontab_record.command)
   end
 
-  def test_monthly
+  def test_annually
     %w(annually yearly).each do |d|
       crontab_record = Symbiosis::CrontabRecord.parse("@#{d} do my stuff")
       assert_equal([0], crontab_record.min)
@@ -300,6 +300,14 @@ class TestCrontabRecord < Test::Unit::TestCase
     %w(year mon day hour min).each do |m|
       assert_equal(expected.__send__(m), actual.__send__(m), "#{m} is should be #{expected.__send__(m)} in #{actual.to_s}")
     end 
+  end
+
+  def test_return_sensible_error
+    today = DateTime.new(2011,10,1,0,0,0)
+    assert_raise(Symbiosis::CrontabFormatError) do
+      # This is missing a field.
+      Symbiosis::CrontabRecord.parse("*/5 * * * /usr/bin/php /srv/domain.co.uk/public/htdocs/cron.php")
+    end
   end
 
 end

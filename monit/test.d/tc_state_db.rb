@@ -178,12 +178,12 @@ class TestStateDb < Test::Unit::TestCase
     end
 
     results = @statedb.all_results_for(test)
-    assert(20, results.length)
+    assert_equal(20, results.length)
 
     @statedb.clean(10, at)
 
     results = @statedb.all_results_for(test)
-    assert(10, results.length)
+    assert_equal(10, results.length)
 
   end
 
