@@ -48,7 +48,7 @@ module Symbiosis
       # We default to the PercentLineEruby interpreter, since this allows lines
       # to start with %.
       #
-      @erb || ::Erubis::PercentLineEruby
+      @erb ||= ::Erubis::PercentLineEruby
     end
 
     #
