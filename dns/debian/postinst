@@ -11,26 +11,6 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
-#  Remove old and obsolete files/directories.
-#
-if [ -e /etc/bytemark.dns.template ]; then
-    rm -f /etc/bytemark.dns.template
-fi
-if [ -d /etc/bytemark-vhost/dns.d ]; then
-    rm -rf /etc/bytemark-vhost/dns.d
-fi
-
-#
-#  Remove the cron.hourly script
-#
-rm -f /etc/cron.hourly/create-dns 2>/dev/null >/dev/null || true
-
-#
-# Remove the old cron job
-#
-rm -f /etc/cron.d/symbiosis-tinydns 2>/dev/null >/dev/null || true
-
-#
 #  If we're not on a Bytemark host then we do nothing.
 #
 if [ "$(/usr/bin/is-bytemark-ip)" == "0" ] ; then
@@ -72,9 +52,6 @@ if [ -e /etc/exim4/Makefile -a -e /etc/exim4/symbiosis.d/00-header ]; then
 fi
 
 #
-#  Reload Apache
-#
-#
 #  If we have a /root/BytemarkDNS.zip file then we're OK.
 #
 if [ !  -d /root/BytemarkDNS ]; then
@@ -88,21 +65,6 @@ if [ !  -d /root/BytemarkDNS ]; then
     #
     cd /root && unzip -o BytemarkDNS.zip
 fi
-
-
-#
-#  If there are files on the system with the old names regenerate them.
-#
-for i in /srv/*/config/dns/zone*; do
-    if [ -e $i ]; then
-        rm -f $i
-    fi
-done
-
-#
-#  Now regenerate and re-upload all DNS files.
-#
-symbiosis-dns-generate
 
 #DEBHELPER#
 exit 0
