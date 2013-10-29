@@ -10,6 +10,7 @@ class TestApacheLogger < Test::Unit::TestCase
 
   def setup
     @prefix = Dir.mktmpdir("srv")
+    File.chown(1000,1000,@prefix)
 
     #
     #  Create the domain
@@ -38,7 +39,7 @@ class TestApacheLogger < Test::Unit::TestCase
   #
   # Not sure if this is a good thing to do.
   #
-  def eventmachine(timeout = 1)
+  def eventmachine(timeout = 30)
     Timeout::timeout(timeout) do
       EM.run do
         yield
