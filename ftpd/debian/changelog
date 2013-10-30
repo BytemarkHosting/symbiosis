@@ -1,3 +1,10 @@
+symbiosis-ftpd (2013:1030) stable; urgency=low
+
+  * Converted packaging to debhelper/gem2deb from cdbs.
+  * Made package ruby-version agnostic.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 30 Oct 2013 14:27:07 +0000
+
 symbiosis-ftpd (2012:0926) stable; urgency=low
 
   * Updated the FTP library to use Symbiosis::Domain#public_dir.
