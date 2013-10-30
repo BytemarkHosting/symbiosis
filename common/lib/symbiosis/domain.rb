@@ -207,7 +207,7 @@ module Symbiosis
           begin
             ip = IPAddr.new(l.strip)
             @ip_addresses << ip
-          rescue ArgumentError => err
+          rescue ArgumentError
             # should probably warn at this point..
           end
         end
@@ -360,7 +360,7 @@ module Symbiosis
           #
           # Split
           #
-          this_prefix, this_domain = File.split(entry)
+          this_domain = File.split(entry).last
 
           #
           # Don't want dotfiles.
