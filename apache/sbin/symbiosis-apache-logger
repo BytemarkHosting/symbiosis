@@ -36,11 +36,10 @@
 #
 # AUTHOR
 #
-#  Patrick J Cherry <patrick@bytemark.co.uk> 
+#  Patrick J Cherry <patrick@bytemark.co.uk>
 #
 
 require 'getoptlong'
-
 
 #
 # The options set by the command line.  These are all global variables.
@@ -49,11 +48,12 @@ $help         = false
 $manual       = false
 $VERBOSE      = false
 $max_files    = 50
-$default_log  = "/var/log/apache2/zz-mass-hosting.log"
+$default_filename  = "/var/log/apache2/zz-mass-hosting.log"
 $sync         = false
 $log_filename = "access.log"
 $uid          = nil
 $gid          = nil
+@prefix       = "/srv"
 
 opts = GetoptLong.new(
   [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
@@ -96,7 +96,7 @@ end
 #
 # This is the default log name
 #
-$default_log = File.expand_path(ARGV.pop) if ARGV.size > 0
+$default_filename = File.expand_path(ARGV.pop) if ARGV.size > 0
 
 #
 # CAUTION! Here be quality kode.
@@ -158,6 +158,37 @@ def do_close_all(fhs)
 end
 
 
+#
+# Opens a log file, returning the filehandle.  Takes options of :uid, :gid,
+# :sync.  If the parent directory is missing, it will be created.
+#
+def do_open_log(log, opts = {})
+  begin
+    #
+    # Set up a couple of things before we open the file.  This will make
+    # sure the ownerships are correct.
+    #
+    begin
+      parent_dir = File.dirname(log)
+      warn "#{$0}: Creating directory #{parent_dir}" if $VERBOSE
+      Symbiosis::Utils.mkdir_p(parent_dir, :uid => opts[:uid], :gid => opts[:gid], :mode => 0755)
+    rescue Errno::EEXIST
+      # ignore
+    end
+
+    warn "#{$0}: Opening log file #{log}" if $VERBOSE
+    filehandle = Symbiosis::Utils.safe_open(log, "a+", :mode => 0644, :uid => opts[:uid], :gid => opts[:gid] )
+    filehandle.sync = opts[:sync]
+
+  rescue StandardError => err
+    filehandle = nil
+    warn "#{$0}: Caught #{err}" if $VERBOSE
+  end
+
+  filehandle
+end
+
+
 
 ########################################################################
 #
@@ -175,7 +206,7 @@ end
 
 if $uid and $gid
   begin
-    Process::Sys.setgid($gid) 
+    Process::Sys.setgid($gid)
     Process::Sys.setuid($uid)
   rescue Errno::EPERM => err
     warn "#{$0}: Unable to drop privileges from #{Process.uid}:#{Process.gid} to #{$uid}:#{$gid}"
@@ -185,7 +216,7 @@ end
 
 ########################################################################
 
-processing_thread = Thread.new do 
+processing_thread = Thread.new do
   #
   # Set up our finish-up and close-filehandles flags
   #
@@ -203,20 +234,24 @@ processing_thread = Thread.new do
   # Our filehandle store is an array of File objects.
   #
   filehandles = []
-  
+
+  #
+  # This is cache of domain names to Symbiosis::Domain objects
+  #
+  domain_objects = Hash.new{|h,domain| h[domain] = Symbiosis::Domains.find(domain.to_s, @prefix || "/srv")}
+
   #
   # Set up some default file-handle options.
   #
-  default_filehandle_opts = {:mode => 0644}
-  default_filehandle_opts[:uid] = $uid unless $uid.nil? 
-  default_filehandle_opts[:gid] = $gid unless $gid.nil? 
-  
+  default_filehandle_opts = {}
+  default_filehandle_opts[:uid] = $uid unless $uid.nil?
+  default_filehandle_opts[:gid] = $gid unless $gid.nil?
+  default_filehandle_opts[:sync] = $sync
+
   #
-  # Open a default file for all non-matching domains.
+  # Sort out the default filehandle
   #
-  warn "#{$0}: Opening default log file #{$default_log}" if $VERBOSE 
-  default_filehandle = Symbiosis::Utils.safe_open($default_log,'a+',default_filehandle_opts)
-  default_filehandle.sync = $sync
+  default_filehandle = do_open_log($default_filename, default_filehandle_opts)
 
   #
   # This is our buffer-processing loop.
@@ -232,6 +267,11 @@ processing_thread = Thread.new do
         # Close all the filehandles.
         #
         do_close_all(filehandles + [default_filehandle])
+
+        #
+        # Reset our domain objects cache
+        #
+        domain_objects = Hash.new{|h,domain| h[domain] = Symbiosis::Domains.find(domain.to_s, @prefix || "/srv")}
 
         #
         # Reset our flag.
@@ -255,7 +295,7 @@ processing_thread = Thread.new do
     # Shift the first entry off the beginning of the buffer.
     #
     line = buffer.shift
- 
+
     #
     # Split the line into a domain name, and the rest of the line.  The domain is
     # always the first field.  This is supplied by the REMOTE USER so suitable
@@ -275,9 +315,16 @@ processing_thread = Thread.new do
 
     #
     # Find our domain.  This finds www and non-www prefixes, and returns nil
-    # unless the domain is sane.  We can only do this if we're root.
+    # unless the domain is sane.
     #
-    if 0 == Process.uid and (domain = Symbiosis::Domains.find(domain_name))
+    domain = domain_objects[domain_name]
+
+    #
+    # If we've found the domain, and are either running as root, or as the
+    # domain's uid/gid then continue.
+    #
+    if domain and [0, domain.uid].include?(Process.uid) and [0, domain.gid].include?(Process.gid)
+
       #
       # Fetch the log filename
       #
@@ -291,7 +338,7 @@ processing_thread = Thread.new do
       #
       # Remove the filehandle from the arry (we'll add it back later)
       #
-      filehandles.delete(filehandle) 
+      filehandles.delete(filehandle)
 
       #
       # If no filehandle was found, or the filehandle we've found is duff,
@@ -301,60 +348,45 @@ processing_thread = Thread.new do
         #
         # Make sure we don't open more than 50 file handles.
         #
-        if filehandles.length >= $max_files
+        while filehandles.length >= $max_files
           other_filehandle = filehandles.pop
-          other_filehandle.close
+          other_filehandle.close if other_filehandle.is_a?(File) and not other_filehandle.closed?
         end
 
-        begin
-          #
-          # Set up a couple of things before we open the file.  This will make
-          # sure the ownerships are correct.
-          #
-          begin
-            warn "#{$0}: Creating directory #{File.dirname(log_filename)}" if $VERBOSE 
-            Symbiosis::Utils.mkdir_p(File.dirname(log_filename), :uid => domain.uid, :gid => domain.gid, :mode => 0755)
-          rescue Errno::EEXIST
-            # ignore
-          end
-
-          warn "#{$0}: Opening log file #{log_filename}" if $VERBOSE 
-          filehandle = Symbiosis::Utils.safe_open(log_filename, "a+", :mode => 0644, :uid => domain.uid, :gid => domain.gid )
-          filehandle.sync = $sync
-
-        rescue StandardError => err
-          filehandle = nil
-          warn "#{$0}: Caught #{err}" if $VERBOSE
-        end
-
+        filehandle = do_open_log(log_filename, {:uid => domain.uid, :gid => domain.gid, :sync => $sync})
       end
 
     end
 
-    if filehandle.nil? 
+    if filehandle.is_a?(File) and not filehandle.closed?
+      #
+      # Add the filehandle onto our array.
+      #
+      filehandles << filehandle
+
+      #
+      # Write the log, but without the domain on the front.
+      #
+      filehandle.write(line_without_domain_name)
+    else
       warn "#{$0}: No file handle found -- logging to default file for #{domain.inspect}" if $VERBOSE and domain.is_a?(Symbiosis::Domain)
 
       #
       # Make sure the default filehandle is open.
       #
       if default_filehandle.nil? or default_filehandle.closed?
-        warn "#{$0}: Opening default log file #{$default_log}" if $VERBOSE 
-        default_filehandle = Symbiosis::Utils.safe_open($default_log,'a+', default_filehandle_opts)
-        default_filehandle.sync = $sync
+        default_filehandle = do_open_log($default_filename, default_filehandle_opts)
       end
-      #
-      # Write the unadulterated line to the default log.
-      #
-      default_filehandle.write(line)
-    else
-      #
-      # Add the filehandle onto our array.
-      #
-      filehandles << filehandle
-      #
-      # Write the log, but without the domain on the front.
-      #
-      filehandle.write(line_without_domain_name)
+
+      if default_filehandle.is_a?(File) and not default_filehandle.closed?
+        #
+        # Write the unadulterated line to the default log.
+        #
+        default_filehandle.write(line)
+      else
+        STDERR.puts line
+      end
+
     end
 
   end # End of the loop.
@@ -369,7 +401,7 @@ end
 #
 %w(HUP USR1).each do |sig|
   trap(sig) do
-    warn "#{$0}: Caught #{sig}" if $VERBOSE 
+    warn "#{$0}: Caught #{sig}" if $VERBOSE
     processing_thread['close_filehandles'] = true
   end
 end
@@ -379,7 +411,7 @@ end
 #
 %w(QUIT TERM INT).each do |sig|
   trap(sig) do
-    warn "#{$0}: Caught #{sig}" if $VERBOSE 
+    warn "#{$0}: Caught #{sig}" if $VERBOSE
     processing_thread['finish_now'] = true
     processing_thread.join
     exit 0
