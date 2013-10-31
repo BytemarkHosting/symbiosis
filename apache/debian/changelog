@@ -1,3 +1,10 @@
+symbiosis-httpd (2013:0607) oldstable; urgency=low
+
+  * Re-visited symbiosis-apache-logger to not barf so much when
+    files/directories disappear.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 31 Oct 2013 12:30:20 +0000
+
 symbiosis-httpd (2013:0606) oldstable; urgency=low
 
   * Added better support for disabling the automatic apache2 configuration
