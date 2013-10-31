@@ -33,8 +33,10 @@ if log_use_fancy_output; then
   U="$($TPUT sgr0)"
 else
   B=''
+  L=''
   Y=''
   N=''
+  U=''
 fi
 
 case "${1:-''}" in
