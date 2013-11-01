@@ -22,6 +22,18 @@ module Symbiosis
     NAME_REGEXP = /^[a-z0-9-]+\.([a-z0-9-]+\.?)+$/i
 
     #
+    # Create a Domain given a directory.
+    #
+    def self.from_directory(directory)
+      raise Errno::ENOENT, directory unless File.exists?(directory)
+
+      directory = File.expand_path(directory)
+      prefix, name = File.split(directory)
+
+      self.new(name, prefix)
+    end
+
+    #
     # Creates a new domain object.  If no name is set a random domain name is
     # generated, based on 10 characters in the imaginary <code>.test</code> TLD.
     #
@@ -330,6 +342,11 @@ module Symbiosis
       results = []
 
       #
+      # Add in our directory base name.
+      #
+      results << File.split(self.directory).last
+
+      #
       # If our domain is real, see what symlinks are pointing at it.
       #
       if File.directory?(self.directory)  
@@ -377,7 +394,7 @@ module Symbiosis
       #
       # Now run through the results, adding "www." to each if there is nothing el
       #
-      ([self.name] + results).each do |this_domain|
+      results.each do |this_domain|
         next if this_domain =~ /^www\./
 
         #
@@ -400,6 +417,8 @@ module Symbiosis
         #
         results << this_domain
       end
+
+      results.delete(self.name)
 
       results.sort.uniq
     end

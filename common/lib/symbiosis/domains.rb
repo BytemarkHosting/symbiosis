@@ -40,7 +40,19 @@ module Symbiosis
       # www. and one without, assuming /srv/www.domain and /srv/domain both
       # exist.
       #
-      possibles = all(prefix).select{|d| domain == d.name or domain =~ /\.#{d.name}$/}
+      # Check for domain, and (random.prefix.)?www.domain.
+      #
+      possibles = [domain, domain.sub(/^(.*\.)?www\./,"")].collect do |possible|
+        dir = File.join(prefix, possible)
+        next unless File.directory?(dir)
+
+        begin
+          Domain.from_directory(dir)
+        rescue ArgumentError => err
+          warn err.to_s
+        end
+
+      end.compact
 
       #
       # Nothing found, return nil
@@ -58,6 +70,7 @@ module Symbiosis
       until domain.nil?
         match = possibles.find{|d| d.name == domain}
         return match unless match.nil?
+
         #
         # Split the domain into a prefix, and the remainder.
         #

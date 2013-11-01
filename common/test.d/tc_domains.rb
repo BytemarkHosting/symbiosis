@@ -1,7 +1,6 @@
 require 'test/unit'
 require 'tmpdir'
 require 'symbiosis/domains'
-require 'pp'
 
 class TestDomain < Test::Unit::TestCase
 
@@ -16,7 +15,6 @@ class TestDomain < Test::Unit::TestCase
   def teardown
     FileUtils.rm_rf(@prefix) if File.directory?(@prefix)
   end
-  
 
   def test_all
     domains = []
@@ -40,6 +38,7 @@ class TestDomain < Test::Unit::TestCase
 
     found = Domains.find(".")
     assert_nil(found, "Domains#find found a domain when nothing should exist.")
+
     #
     # Test finding evil domains
     #
@@ -86,7 +85,6 @@ class TestDomain < Test::Unit::TestCase
     assert_kind_of(Domain, found, "Domains#find returned the wrong class")
     assert_equal(domain.name, found.name, "Domains#find found a domain other than the one were were looking for.")
 
-
     #
     # Try to find a domain with a random prefix.
     #
@@ -101,6 +99,17 @@ class TestDomain < Test::Unit::TestCase
 
     assert_kind_of(Domain, random_www_found, "Domains#find returned the wrong class")
     assert_equal(www_domain.name, www_found.name, "Domains#find found a domain other than the one were were looking for.")
+
+    #
+    # Try and find one that is an alias.
+    #
+    symlink_domain = "www2."+domain.name
+    File.symlink(domain.directory, File.join(@prefix, symlink_domain))
+    found = Domains.find(symlink_domain, @prefix)
+
+    assert_equal(3, Symbiosis::Domains.all(@prefix).length, "Wrong number of domains returned by Domains#all)")
+    assert_equal(symlink_domain, found.name, "Domains#find found a domain other than the one were were looking for.")
+    assert(found.aliases.include?(domain.name), "Domains#find did not return a domain with the correct aliases")
   end
 
   def test_include?
