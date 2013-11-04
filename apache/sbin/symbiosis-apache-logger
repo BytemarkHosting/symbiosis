@@ -140,6 +140,11 @@ require 'symbiosis/utils'
 def do_close_all(fhs)
   fhs.flatten.each do |fh|
     #
+    # Make sure we only try to close file handles
+    #
+    next unless fh.is_a?(File) 
+
+    #
     # Don't try to close stuff that is already closed.
     #
     next if fh.closed?
