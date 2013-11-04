@@ -1,9 +1,45 @@
 require 'symbiosis/domains'
 require 'symbiosis/utils'
 require 'eventmachine'
+require 'pp'
 
 module Symbiosis
-class ApacheLogger < EventMachine::Protocols::LineAndTextProtocol
+class ApacheLogger < EventMachine::Connection
+
+  def initialize(opts = {})
+    #
+    # This is cache of domain names to Symbiosis::Domain objects
+    #
+    @domain_objects ||= Hash.new{|h,k| h[k] = Symbiosis::Domains.find(k, self.prefix)}
+    @sync_io            = false
+    @max_filehandles    = 50
+    @log_filename       = "access.log"
+    @default_filehandle = nil
+    @default_filename   = "/var/log/apache2/zz-mass-hosting.log"
+    @sync_io  = false
+    @uid      = nil
+    @gid      = nil
+    @prefix   = "/srv"
+    @filehandles = []
+
+    opts.each do |meth, value|
+      meth = (meth.to_s + "=").to_sym
+      if self.respond_to?(meth)
+        self.__send__(meth, value)
+      else
+        raise ArgumentError, "Unrecognised parameter #{meth.to_s}"
+      end
+    end
+
+    super
+  end
+
+  #
+  # Return the domain prefix
+  #
+  def prefix
+    @prefix ||= "/srv"
+  end
 
   #
   # Set the Symbiosis::Domain prefix
@@ -12,18 +48,21 @@ class ApacheLogger < EventMachine::Protocols::LineAndTextProtocol
     @prefix = p
   end
 
+  def default_filename ; @default_filename ; end
+  def default_filename=(d) ; @default_filename=d ; end
+
   #
   # Return our array of filehandles
   #
   def filehandles
-    @filehandles ||= []
+    @filehandles
   end
 
   #
   # Return the log filename
   #
   def log_filename
-    @log_filename ||= "access.log"
+    @log_filename
   end
 
   #
@@ -41,7 +80,7 @@ class ApacheLogger < EventMachine::Protocols::LineAndTextProtocol
   # this maximum is exceeded the least-used filehandle is closed.
   #
   def max_filehandles
-    @max_filehandles ||= 50
+    @max_filehandles
   end
 
   #
@@ -49,9 +88,12 @@ class ApacheLogger < EventMachine::Protocols::LineAndTextProtocol
   # Defaults to 50.
   #
   def max_filehandles=(n)
-    @max_filehandles = n
+    @max_filehandles = n.to_i
   end
 
+  #
+  # Open logs synchronously
+  #
   def sync_io
     (@sync_io === true) || false
   end
@@ -60,8 +102,58 @@ class ApacheLogger < EventMachine::Protocols::LineAndTextProtocol
     @sync_io = (tf === true)
   end
 
-  def default_filehandle_opts
-    @default_filehandle_opts ||= {:mode => 0644}
+  #
+  # Set the default gid
+  #
+  def gid=(g) ; @gid = g end
+  def gid; @gid ; end
+
+  #
+  # Set the default uid
+  #
+  def uid=(u) ; @uid = u ; end
+  def uid ; @uid ; end
+  
+  # 
+  # Opens a log file, returning a filehandle, or nil if it wasn't able to.  It
+  # also tried to create any parent directories.
+  #
+  def open_log(log, opts={})
+    begin
+      #
+      # Set a default uid/gid.
+      #
+      opts = {:uid => self.uid, :gid => self.gid}.merge(opts)
+
+      #
+      # Set up a couple of things before we open the file.  This will make
+      # sure the ownerships are correct.
+      #
+      begin
+        parent_dir = File.dirname(log)
+        warn "#{$0}: Creating directory #{parent_dir}" if $VERBOSE
+        Symbiosis::Utils.mkdir_p(parent_dir, :uid => (opts[:uid] || self.uid), :gid => (opts[:gid] || self.gid) , :mode => 0755)
+      rescue Errno::EEXIST
+        # ignore
+      end
+  
+      warn "#{$0}: Opening log file #{log}" if $VERBOSE
+      filehandle = Symbiosis::Utils.safe_open(log, "a+", :mode => 0644, :uid => opts[:uid], :gid => opts[:gid] )
+      filehandle.sync = opts[:sync]
+  
+    rescue StandardError => err
+      filehandle = nil
+      warn "#{$0}: Caught #{err}" if $VERBOSE
+    end
+  
+    filehandle
+  end
+
+  def receive_data(data)
+    (@buff = "") << data
+    @buff.split($/).each do |l|
+      receive_line(l)
+    end
   end
 
   #
@@ -76,16 +168,6 @@ class ApacheLogger < EventMachine::Protocols::LineAndTextProtocol
     # Make sure the line is a string
     #
     line = line.to_s
-
-    #
-    # Magic lines to use when testing.
-    #
-    case line
-      when "unbind and stop"
-        unbind_and_stop
-      when "close filehandles and resume"
-        close_filehandles_and_resume
-    end
 
     #
     # Split the line into a domain name, and the rest of the line.  The domain is
@@ -108,8 +190,8 @@ class ApacheLogger < EventMachine::Protocols::LineAndTextProtocol
     # Find our domain.  This finds www and non-www prefixes, and returns nil
     # unless the domain is sane.
     #
-    domain =  Symbiosis::Domains.find(domain_name, @prefix || "/srv")
-
+    domain = @domain_objects[domain_name]
+    
     #
     # Make sure the domain has been found, and the Process UID/GID matches the
     # domain UID/GID, or it is root.
@@ -143,49 +225,12 @@ class ApacheLogger < EventMachine::Protocols::LineAndTextProtocol
           other_filehandle.close
         end
 
-        begin
-          #
-          # Set up a couple of things before we open the file.  This will make
-          # sure the ownerships are correct.
-          #
-          begin
-            warn "#{$0}: Creating directory #{File.dirname(log_filename)}" if $VERBOSE 
-            Symbiosis::Utils.mkdir_p(File.dirname(log_filename), :uid => domain.uid, :gid => domain.gid, :mode => 0755)
-          rescue Errno::EEXIST
-            # ignore
-          end
-
-          warn "#{$0}: Opening log file #{log_filename}" if $VERBOSE 
-          filehandle = Symbiosis::Utils.safe_open(log_filename, "a+", :mode => 0644, :uid => domain.uid, :gid => domain.gid)
-          filehandle.sync = self.sync_io
-
-        rescue StandardError => err
-          filehandle = nil
-          warn "#{$0}: Caught #{err}" if $VERBOSE
-        end
-
+        filehandle = open_log(log_filename, {:uid => domain.uid, :gid => domain.gid, :sync => self.sync_io})
       end
 
     end
 
-    if filehandle.nil? 
-      warn "#{$0}: No file handle found -- logging to default file for #{domain.inspect}" if $VERBOSE and domain.is_a?(Symbiosis::Domain)
-
-      #
-      # Make sure the default filehandle is open.
-      #
-      if default_filehandle.nil? or default_filehandle.closed?
-        warn "#{$0}: Opening default log file #{self.default_log}" if $VERBOSE 
-        default_filehandle = Symbiosis::Utils.safe_open(self.default_log,'a+', self.default_filehandle_opts)
-        default_filehandle.sync = self.sync_io
-      end
-
-      #
-      # Write the unadulterated line to the default log.
-      #
-      default_filehandle.puts(line)
-
-    else
+    if filehandle.is_a?(File) and not filehandle.closed?
       #
       # Add the filehandle onto our array.
       #
@@ -195,6 +240,25 @@ class ApacheLogger < EventMachine::Protocols::LineAndTextProtocol
       # Write the log, but without the domain on the front.
       #
       filehandle.puts(line_without_domain_name)
+    else
+      warn "#{$0}: No file handle found -- logging to default file for #{domain.inspect}" if $VERBOSE and domain.is_a?(Symbiosis::Domain)
+
+      #
+      # Make sure the default filehandle is open.
+      #
+      if @default_filehandle.nil? or @default_filehandle.closed?
+        warn "#{$0}: Opening default log file #{self.default_filename}" if $VERBOSE 
+        @default_filehandle = open_log(self.default_filename, {:uid => self.uid, :gid => self.gid})
+      end
+
+      if @default_filehandle.is_a?(File) and not @default_filehandle.closed?
+        #
+        # Write the unadulterated line to the default log.
+        #
+        @default_filehandle.puts(line)
+      else 
+        STDERR.puts line
+      end
     end
 
   end
@@ -202,10 +266,10 @@ class ApacheLogger < EventMachine::Protocols::LineAndTextProtocol
   #
   # Close all the file handles the class has open
   #
-  def close_filehandles(resume_afterwards = false)
-    self.pause unless self.paused?
+  def close_filehandles
+    self.pause
 
-    self.filehandles.flatten.each do |fh|
+    ([@default_filehandle] + self.filehandles).flatten.each do |fh|
       #
       # Don't try to close stuff that is already closed.
       #
@@ -223,11 +287,11 @@ class ApacheLogger < EventMachine::Protocols::LineAndTextProtocol
       end
     end
 
-    self.resume if (resume_afterwards === true)
   end
 
   def close_filehandles_and_resume
-    close_filehandles(true)
+    self.close_filehandles
+    self.resume 
   end
 
   def unbind

@@ -49,10 +49,8 @@ help          = false
 manual        = false
 $VERBOSE      = false
 logger_args   = Hash.new
-$sync         = false
-$log_filename = "access.log"
-$uid          = nil
-$gid          = nil
+uid          = nil
+gid          = nil
 
 opts = GetoptLong.new(
   [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
@@ -75,15 +73,15 @@ begin
     when '--verbose'
       $VERBOSE = true
     when "--sync"
-      logger_args[:sync] = true
+      logger_args[:sync_io] = true
     when "--max-files"
       logger_args[:max_files] = arg.to_i
     when "--log-filename"
       logger_args[:log_filename] = arg
     when "--uid"
-      $uid = arg.to_i
+      uid = arg.to_i
     when "--gid"
-      $gid = arg.to_i
+      gid = arg.to_i
     end
   end
 rescue => err
@@ -95,8 +93,7 @@ end
 #
 # This is the default log name
 #
-logger_args[:default_log] = File.expand_path(ARGV.pop) if ARGV.size > 0
-
+logger_args[:default_filename] = File.expand_path(ARGV.pop) if ARGV.size > 0
 
 #
 # Show the manual, or the help
@@ -116,31 +113,39 @@ end
 #
 # Drop privs.  Make sure either both UID/GID are set, or neither.
 #
-unless [$uid, $gid].all?{|x| x.nil?} or [$uid, $gid].all?{|x| x.is_a?(Integer)}
+unless [uid, gid].all?{|x| x.nil?} or [uid, gid].all?{|x| x.is_a?(Integer)}
   warn "#{$0}: Both UID and GID must be either unset or integers -- unsetting"
-  $uid = $gid = nil
+  uid = gid = nil
 end
 
 unless 0 == Process.uid
   warn "#{$0}: Unable to drop privileges if not running as root."
-  $uid = $gid = nil
+  uid = gid = nil
 end
 
-if $uid and $gid
+if uid and gid
   begin
-    Process::Sys.setgid($gid) 
-    Process::Sys.setuid($uid)
+    Process::Sys.setgid(gid) 
+    Process::Sys.setuid(uid)
   rescue Errno::EPERM => err
-    warn "#{$0}: Unable to drop privileges from #{Process.uid}:#{Process.gid} to #{$uid}:#{$gid}"
-    $uid = $gid = nil
+    warn "#{$0}: Unable to drop privileges from #{Process.uid}:#{Process.gid} to #{uid}:#{gid}"
+    uid = gid = nil
   end
+end
+
+#
+# Set up the logger uid/gid.
+#
+if uid and gid
+  logger_args[:uid] = uid 
+  logger_args[:gid] = gid
 end
 
 require 'symbiosis/apache_logger'
 require 'eventmachine'
 
 EventMachine.run do
-  logger = EventMachine.attach($stdin, Symbiosis::ApacheLogger)
+  logger = EventMachine.attach($stdin, Symbiosis::ApacheLogger, logger_args)
 
   #
   # trap HUP -- reopen all files.
