@@ -1,3 +1,10 @@
+symbiosis-httpd (2013:0608) oldstable; urgency=low
+
+  * Added check to make sure filehandles can be closed before trying to close
+    them.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 04 Nov 2013 10:10:09 +0000
+
 symbiosis-httpd (2013:0607) oldstable; urgency=low
 
   * Re-visited symbiosis-apache-logger to not barf so much when
