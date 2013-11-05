@@ -64,6 +64,7 @@ databases.each do |database|
     --opt
   )
 
+  cmd << "--events" if "mysql" == database
   cmd << "--skip-lock-tables" if "information_schema" == database
   cmd << "'#{database}' | gzip -9c"
 
