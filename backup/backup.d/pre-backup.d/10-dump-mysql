@@ -1,4 +1,4 @@
-#!/usr/bin/ruby 
+#!/usr/bin/ruby1.8
 #
 #  This script is designed to dump all the MySQL databases upon
 # the local system.
@@ -26,6 +26,25 @@ File.executable?("/usr/sbin/mysqld")    or exit 0
 File.executable?("/usr/bin/mysql")      or exit 0
 File.executable?("/usr/bin/mysqldump")  or exit 0
 File.readable?("/etc/mysql/debian.cnf") or exit 0
+
+#
+# Should we dump the events table?  This is only possible with mysqldump >=
+# 5.1.8.  Default to "no".
+#
+dump_events_table = false
+
+#
+# Fetch mysqldump version
+#
+mysqldump_version_string = IO.popen("/usr/bin/mysqldump --version"){|io| io.readlines}.first
+
+if mysqldump_version_string =~ /Distrib (\d+\.\d+\.\d+)/
+  mysqldump_version = $1.split(".").collect{|x| x.to_i }
+  min_mysqldump_version = [5,1,8]
+  dump_events_table = (mysqldump_version[0] > 5 or
+     (mysqldump_version[0] == 5 and mysqldump_version[1] > 1) or
+     (mysqldump_version[0] == 5 and mysqldump_version[1] == 1 and mysqldump_version[2] >= 8))
+end
 
 #
 # Default to utf8.
@@ -61,10 +80,10 @@ databases.each do |database|
   cmd = %w(
     /usr/bin/mysqldump 
     --defaults-file=/etc/mysql/debian.cnf 
-    --events
     --opt
   )
 
+  cmd << "--events" if "mysql" == database and dump_events_table
   cmd << "--skip-lock-tables" if "information_schema" == database
   cmd << "'#{database}' | gzip -9c"
 
