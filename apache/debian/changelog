@@ -1,3 +1,9 @@
+symbiosis-httpd (2013:1111) stable; urgency=low
+
+  * Updated apache templates to disallow indexes on non-mass-hosted domains.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 11 Nov 2013 17:15:32 +0000
+
 symbiosis-httpd (2013:0917) stable; urgency=low
 
   * New EventMachine-based apache logger.
