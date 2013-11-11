@@ -50,6 +50,13 @@ NameVirtualHost <%= ip %>:80
         </Location>
 
         #
+        # Disable indexes by default on the top-level.
+        #
+        <LocationMatch "^/+$">
+                Options -Indexes
+        </LocationMatch>
+
+        #
         #  We need to log the virtual hostname the incoming request was
         # made against, so that the cron-job in /etc/cron.daily may generate
         # statistics for each domain.
