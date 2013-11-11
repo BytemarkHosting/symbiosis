@@ -1,3 +1,9 @@
+symbiosis-httpd (2013:0609) oldstable; urgency=low
+
+  * Removed indexes on default directories from non-mass-hosted websites.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 11 Nov 2013 17:14:46 +0000
+
 symbiosis-httpd (2013:0608) oldstable; urgency=low
 
   * Added check to make sure filehandles can be closed before trying to close
