@@ -1,3 +1,9 @@
+symbiosis-backup (2013:1012) oldstable; urgency=low
+
+  * Added --events flag to mysqldump.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 12 Nov 2013 15:03:41 +0000
+
 symbiosis-backup (2013:1011) oldstable; urgency=low
 
   * Make sure that pre-backup database scripts explicitly use ruby1.8.
