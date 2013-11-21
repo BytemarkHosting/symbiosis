@@ -1,3 +1,11 @@
+symbiosis-email (2013:0607) oldstable; urgency=low
+
+  * Added in some better resource limits to exim4.
+  * Added in firewall patterns to catch hosts that are getting AUTH LOGIN 
+    failures due to lack of SSL, i.e. password brute-forcing things
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 21 Nov 2013 16:37:17 +0000
+
 symbiosis-email (2013:0606) oldstable; urgency=high
 
   * Removed use_shell from the dovecot lda transport in exim4.
