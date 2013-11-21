@@ -1,0 +1,15 @@
+# These patterns are specific to exim logs.
+#
+#  The file we scan for patterns
+#
+file = /var/log/exim4/mainlog
+
+#
+# All Exim4 ports
+#
+ports = 25,465,587
+
+#
+# Catch "TLS Required" messages
+#
+\[__IP__\] rejected AUTH LOGIN: SSL or TLS encryption required when authenticating.
