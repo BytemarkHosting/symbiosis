@@ -289,19 +289,7 @@ class ApacheLogger < EventMachine::Connection
 
   end
 
-  def close_filehandles_and_resume
-    self.close_filehandles
-    self.resume 
-  end
-
-  def unbind
-    self.close_filehandles
-  end
-
-  def unbind_and_stop
-    self.unbind
-    EM.stop
-  end
+  alias unbind close_filehandles
 
 end
 end
