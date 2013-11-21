@@ -1,0 +1,24 @@
+#
+# This option specifies the maximum number of simultaneous incoming SMTP calls
+# that Exim will accept, defaulting to 20.
+#
+smtp_accept_max = 100
+
+#
+# This option restricts the number of simultaneous IP connections from a single
+# host (strictly, from a single IP address) to the Exim daemon, defaults to
+# unset.
+#
+smtp_accept_max_per_host = 10
+
+#
+# When smtp_accept_max is set greater than zero, this option specifies a number
+# of SMTP connections that are reserved for connections from the hosts that are
+# specified in smtp_reserve_hosts. We use the relay_from_hosts list here, such
+# that the local machine can almost always relay mail and symbiosis-monit keeps
+# working, and doesn't try to restart exim4 when connection limits have been
+# used up.
+#
+smtp_reserve_hosts  = +relay_from_hosts
+smtp_accept_reserve = 10
+
