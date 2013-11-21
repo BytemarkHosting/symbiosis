@@ -5,6 +5,7 @@ require 'symbiosis/apache_logger'
 require 'socket'
 require 'test/unit'
 require 'tmpdir'
+require 'tempfile'
 
 class TestApacheLogger < Test::Unit::TestCase
 
@@ -105,7 +106,10 @@ class TestApacheLogger < Test::Unit::TestCase
         test_lines.each do |d, l|
           w.puts "#{d.name} #{l}"
         end
-        logger.close_filehandles_and_resume
+
+        logger.close_filehandles
+        logger.resume
+
         test_lines.each do |d, l|
           w.puts "#{d.name} #{l}"
         end
@@ -114,7 +118,7 @@ class TestApacheLogger < Test::Unit::TestCase
       #
       # Then, we run our asserts
       #
-      assert_proc = proc { logger.unbind_and_stop }
+      assert_proc = proc { logger.unbind ; EM.stop }
 
       EM.defer(test_proc, assert_proc)
     end
