@@ -154,7 +154,8 @@ EventMachine.run do
     trap(sig) do
       warn "#{$0}: Caught #{sig}" if $VERBOSE 
       EventMachine.next_tick do
-        logger.close_filehandles(true) 
+        logger.close_filehandles
+        logger.resume
       end
     end
   end
@@ -166,9 +167,9 @@ EventMachine.run do
     trap(sig) do
       warn "#{$0}: Caught #{sig}" if $VERBOSE 
       EventMachine.next_tick do
-        logger.close_filehandles(true) 
+        logger.close_filehandles
+        EventMachine.stop
       end
-      EventMachine.stop
       exit 0
     end
   end  
