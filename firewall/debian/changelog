@@ -1,3 +1,9 @@
+symbiosis-firewall (2013:0612) oldstable; urgency=low
+
+  * Fixed typo in symbiosis-firewall-blacklist.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 22 Nov 2013 16:00:37 +0000
+
 symbiosis-firewall (2013:0611) oldstable; urgency=low
 
   * Configure the firewall not to run duing ifup/down if the interface is the
