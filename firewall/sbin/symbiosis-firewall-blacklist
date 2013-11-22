@@ -122,7 +122,7 @@ begin
     when '--expire-after'
       expire_after = arg.to_i
     when '--block-after'
-      block-after = arg.to_i
+      block_after = arg.to_i
     end
   end
 rescue
