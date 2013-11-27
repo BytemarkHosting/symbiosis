@@ -1,4 +1,4 @@
-symbiosis-firewall (2013:0612) oldstable; urgency=low
+symbiosis-firewall (2013:0613) oldstable; urgency=low
 
   * Fixed typo in symbiosis-firewall-blacklist.
   * Updated symbiosis-firewall-whitelist to better cope with corrupted wtmp
