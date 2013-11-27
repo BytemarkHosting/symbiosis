@@ -1,8 +1,6 @@
 #!/usr/bin/make -f
 #
 
-#!/usr/bin/make -f
-
 DEB_DIVERT_EXTENSION = .dpkg-symbiosis
 DEB_TRANSFORM_FILES_symbiosis-httpd += /etc/php5/apache2/php.ini.dpkg-symbiosis
 DEB_TRANSFORM_FILES_symbiosis-httpd += /etc/apache2/ports.conf.dpkg-symbiosis
@@ -12,8 +10,8 @@ ifneq ($(wildcard /usr/share/php5/php.ini-production),)
 	DEB_CHECK_FILES_SOURCE_/etc/php5/apache2/php.ini.dpkg-symbiosis = \ /usr/share/php5/php.ini-production
 endif
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/rules/config-package.mk
+%:
+	dh $@
 
 build/symbiosis-httpd::
 	make docs
