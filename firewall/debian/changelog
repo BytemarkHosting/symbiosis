@@ -1,8 +1,10 @@
 symbiosis-firewall (2013:0612) oldstable; urgency=low
 
   * Fixed typo in symbiosis-firewall-blacklist.
+  * Updated symbiosis-firewall-whitelist to better cope with corrupted wtmp
+    files.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 22 Nov 2013 16:00:37 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 27 Nov 2013 10:09:53 +0000
 
 symbiosis-firewall (2013:0611) oldstable; urgency=low
 
