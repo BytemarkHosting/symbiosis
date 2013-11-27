@@ -194,9 +194,14 @@ end
 updated=false
 
 #
+# Time we started this run
+#
+time_now = Time.now
+
+#
 # Expiry is measured in days.
 #
-expire_before = Time.now - ( expire_after * ( 24 * 60 * 60 ) )
+expire_before = time_now - ( expire_after * ( 24 * 60 * 60 ) )
 
 #
 # Check to see when we were last run.
@@ -216,7 +221,24 @@ FileUtils.touch(stamp_file)
 # Fetch the IP addresses
 #
 Symbiosis::Utmp.read(wtmp_file).each do |entry|
+  #
+  # Only interested in USER_PROCESS types.
+  #
+  next unless entry['type'] == 7
 
+  #
+  # Make sure the entry isn't in the future
+  #
+  next unless at < time_now
+
+  #
+  # Make sure the record isn't already expired.
+  #
+  next unless at > expire_before
+
+  #
+  # Fetch the IP
+  #
   begin
     ip = Symbiosis::IPAddr.new(entry['ip'].to_s)
   rescue ArgumentError
@@ -225,12 +247,6 @@ Symbiosis::Utmp.read(wtmp_file).each do |entry|
     #
     next
   end
-  at = entry['time']
-
-  #
-  # Make sure the record isn't already expired.
-  #
-  next unless at > expire_before
 
   #
   # Mask IPv6 to /64s.
