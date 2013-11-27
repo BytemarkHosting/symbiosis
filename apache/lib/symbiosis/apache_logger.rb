@@ -271,6 +271,11 @@ class ApacheLogger < EventMachine::Connection
 
     ([@default_filehandle] + self.filehandles).flatten.each do |fh|
       #
+      # Don't try and close things that aren't Files
+      #
+      next unless fh.is_a?(File)
+
+      #
       # Don't try to close stuff that is already closed.
       #
       next if fh.closed?
