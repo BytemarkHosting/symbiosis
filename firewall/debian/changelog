@@ -1,3 +1,9 @@
+symbiosis-firewall (2013:0614) stable; urgency=low
+
+  * Fixed typo in symbiosis-firewall-whitelist.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 28 Nov 2013 10:37:32 +0000
+
 symbiosis-firewall (2013:0613) oldstable; urgency=low
 
   * Fixed typo in symbiosis-firewall-blacklist.
