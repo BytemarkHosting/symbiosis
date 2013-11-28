@@ -73,9 +73,9 @@ if ARGV.length > 0
 
   ips = ARGV.collect do |arg| 
     begin
-      IPAddr.new(arg)
-    rescue ArgumentError
-      warn "Could not parse '#{arg}' as an IP address"
+      Symbiosis::IPAddr.new(arg)
+    rescue ArgumentError => err
+      warn "Could not parse '#{arg.inspect}' as an IP address #{err.to_s}"
       # do nothing
       nil
     end
