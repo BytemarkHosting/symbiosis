@@ -1,8 +1,9 @@
 symbiosis-firewall (2013:0614) stable; urgency=low
 
   * Fixed typo in symbiosis-firewall-whitelist.
+  * Added ruby1.8 to the build dependencies.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 28 Nov 2013 10:37:32 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 28 Nov 2013 11:04:26 +0000
 
 symbiosis-firewall (2013:0613) oldstable; urgency=low
 
