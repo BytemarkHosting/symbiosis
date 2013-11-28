@@ -3,7 +3,7 @@ Section: net
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man, ruby-pkg-tools, ruby-dev, ruby1.8-dev
+Build-Depends: debhelper (>= 7.0.0), cdbs, txt2man, ruby-pkg-tools, ruby-dev, ruby1.8-dev, ruby1.8
 Standards-Version: 3.9.1
 
 Package: symbiosis-firewall
