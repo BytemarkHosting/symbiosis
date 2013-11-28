@@ -229,6 +229,7 @@ Symbiosis::Utmp.read(wtmp_file).each do |entry|
   #
   # Make sure the entry isn't in the future
   #
+  at = entry['time']
   next unless at < time_now
 
   #
