@@ -3,13 +3,12 @@ Section: mail
 Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), txt2man, exim4-daemon-heavy, dovecot-core, dovecot-managesieved, gem2deb
+Build-Depends: debhelper (>= 7.0.0), ruby1.8, txt2man, cdbs
 Standards-Version: 3.9.1
-XS-Ruby-Versions: all
 
 Package: symbiosis-email
 Architecture: all
-Depends: symbiosis-common (>= 2012:0221), exim4-daemon-heavy, dovecot-sieve, dovecot-managesieved, dovecot-imapd, dovecot-pop3d, adduser, make, clamav-daemon, clamav-freshclam, spamassassin, ruby, ${misc:Depends}
+Depends: symbiosis-common (>= 2012:0221), exim4-daemon-heavy, dovecot-sieve, dovecot-managesieved, dovecot-imapd, dovecot-pop3d, ruby1.8, adduser, make, clamav-daemon, clamav-freshclam, spamassassin, ${misc:Depends}
 Recommends: symbiosis-webmail
 Replaces: bytemark-vhost-email, symbiosis-monit (<< 2011:1206), symbiosis-test
 Breaks:  symbiosis-monit (<< 2011:1206)
