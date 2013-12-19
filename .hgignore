@@ -34,9 +34,7 @@ Sources.gz
 #
 #  Apache
 #
-./apache/*/.libs/mod_vhost_bytemark.la
-./apache/*/.libs/mod_vhost_bytemark.lai
-./apache/*/.libs/mod_vhost_bytemark.o
+./apache/*/.libs/*
 ./apache/debian/libapache2-mod-ruid/
 ./apache/debian/libapache2-mod-vhost-bytemark
 ./apache/debian/symbiosis-httpd-static/
