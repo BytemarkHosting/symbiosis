@@ -13,15 +13,11 @@ endif
 %:
 	dh $@
 
-build/symbiosis-httpd::
-	make docs
+override_dh_auto_build:
+	$(MAKE) docs
+	cd vhost-alias && $(MAKE)
+	dh_auto_build
 
-cleanbuilddir/symbiosois-httpd::
-	make clean
-
-build/libapache2-mod-vhost-bytemark::
-	cd vhost-alias && make
-
-cleanbuilddir/libapache2-mod-vhost-bytemark::
-	cd vhost-alias && make clean
-
+override_dh_auto_clean:
+	$(MAKE) clean
+	dh_auto_clean
