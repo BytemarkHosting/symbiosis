@@ -27,7 +27,8 @@ address_directory:
   # and See if a per-domain quota has been set.
   #  a) Use the per-user quota if set
   #  b) Use the per-domain quota if set
-  #  c) Use a zero quota
+  #  c) Use the site-wide quota if set
+  #  d) Use a zero quota
   #
   # If the quota is in the correct format, use a lookup table to find the
   # correct multiplier for the integer, and mulitply it up appropriately.
@@ -38,7 +39,12 @@ address_directory:
               { \
                 ${if exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/mailbox-quota} \
                   {${readfile{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/mailbox-quota}}} \
-                  {0} \
+                  { \
+                    ${if exists{ETC_DIR/exim4/mailbox-quota} \
+                      {${readfile{ETC_DIR/exim4/mailbox-quota}}} \
+                      {0} \
+                    } \
+                  } \
                 } \
               } \
             } \
