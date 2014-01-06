@@ -1,0 +1,30 @@
+# This router handles forwards for local users
+local_users_forward:
+  debug_print = "R: local_users_forward for $local_part@$domain"
+  driver = redirect
+  domains = $primary_hostname
+  check_local_user
+  local_parts = ! root : ! admin
+  local_part_suffix = +*
+  local_part_suffix_optional
+  # Make sure the files exists to avoid awkward failures
+  condition  = ${if exists{$home/.forward}}
+  file  = $home/.forward
+  # Set permissions for any actions we might take
+  user  = $local_user_uid 
+  group = $local_user_gid
+  directory_transport = address_directory_without_quotas 
+  file_transport = address_file
+  pipe_transport = address_pipe
+  reply_transport = address_reply
+  # these two are required to allow :fail:, :defer: to work
+  allow_fail
+  allow_defer
+  allow_filter
+  # Syntax errors do not prevent delivery.
+  skip_syntax_errors
+  # This stops this router from trying to change uid/gid whilst verifying the
+  # address by skipping this router.  The address will get validated by the
+  # next router.
+  no_verify
+
