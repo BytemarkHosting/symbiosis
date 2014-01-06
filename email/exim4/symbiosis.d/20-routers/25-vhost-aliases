@@ -11,6 +11,9 @@ vhost_aliases:
   # Set permissions for any actions we might take
   user  = ${extract{uid}{${stat:VHOST_DIR/$domain}}}
   group = ${extract{gid}{${stat:VHOST_DIR/$domain}}}
+  # Set the home directory for the router/transport.
+  router_home_directory    = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part
+  transport_home_directory = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part
   # Preserve the domain if the aliases are unqualified.
   qualify_preserve_domain = true
   directory_transport = address_directory

@@ -3,7 +3,6 @@ dovecot_lda:
   driver = pipe
   command = /usr/lib/dovecot/deliver -e -k \
             -f "$sender_address" -a "$original_local_part@$original_domain"
-  home_directory = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part/
   environment = USER=$local_part@$domain
   log_output
   log_defer_output

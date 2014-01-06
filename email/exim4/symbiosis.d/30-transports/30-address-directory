@@ -15,7 +15,7 @@ address_directory:
   #
   # Make sure we only have one quota for the whole mailbox
   #
-  quota_directory    = VHOST_DIR/${domain}/VHOST_MAILBOX_DIR/${local_part}/Maildir/
+  quota_directory    = ${home}/Maildir/
   #
   # The maildir++ spec says that message size should be tagged to the end of
   # each maildir file, so we better make sure we do it.

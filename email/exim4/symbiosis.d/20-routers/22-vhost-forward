@@ -11,6 +11,9 @@ vhost_forward:
   # Set permissions for any actions we might take
   user  = ${extract{uid}{${stat:VHOST_DIR/$domain}}}
   group = ${extract{gid}{${stat:VHOST_DIR/$domain}}}
+  # Set the home directory for any routers/transports.
+  router_home_directory    = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part
+  transport_home_directory = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part
   directory_transport = address_directory
   file_transport = address_file
   pipe_transport = address_pipe
