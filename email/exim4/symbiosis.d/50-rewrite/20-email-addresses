@@ -1,0 +1,5 @@
+#
+# This rewrites local users email addresses.
+#
+*@$primary_hostname ${lookup{${local_part}}lsearch{/etc/email-addresses}{$value}fail} Ffrs
+

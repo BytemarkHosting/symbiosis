@@ -1,8 +1,0 @@
-#
-# This writes all email address to @localhost to @$primary_hostname.
-#
-# e.g. root@localhost becomes root@example.vm.bytemark.co.uk
-#
-
-*@localhost          $1@$primary_hostname         E
-
