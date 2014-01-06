@@ -30,6 +30,8 @@ vhost_aliases:
 vhost_aliases_check:
   debug_print = "R: vhost_aliases_check for $local_part@$domain"
   driver = accept
+  local_part_suffix = +*
+  local_part_suffix_optional
   condition  = ${if and{\
 	{exists{VHOST_DIR/$domain/config/aliases}}\
         {eq{${lookup{$local_part}lsearch{VHOST_DIR/$domain/config/aliases}{yes}}}{yes}}\
