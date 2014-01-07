@@ -110,7 +110,7 @@ class TestApacheLogger < Test::Unit::TestCase
         logger.close_filehandles
         logger.resume
 
-        test_lines.each do |d, l|
+        test_lines2.each do |d, l|
           w.puts "#{d.name} #{l}"
         end
       }
@@ -127,7 +127,8 @@ class TestApacheLogger < Test::Unit::TestCase
     # If we get this far, open the domain's access logs and look for foo and bar.  Mash the test lines into a hash.
     #
     log_line_hash = Hash.new{|h,k| h[k] = []}
-    test_lines.each do |d, l|
+
+    (test_lines + test_lines2).each do |d, l|
       log_line_hash[d] << l
     end
 
