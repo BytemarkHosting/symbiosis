@@ -1,7 +1,7 @@
 # This transport is used for handling vacation autoreplies.
 
-vacation:
-  debug_print = "T: vacation for $local_part@$domain to $return_path"
+vhost_vacation:
+  debug_print = "T: vhost_vacation for $local_part@$domain to $return_path"
   driver   = autoreply
   file     = ${home}/vacation 
   log      = ${home}/vacation.log

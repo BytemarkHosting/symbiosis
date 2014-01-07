@@ -14,14 +14,14 @@ local_users_vacation:
                 { match{$h_precedence:}{(?i)bulk|list|junk} }\
                 { match{$h_auto-submitted:}{(?i)auto-generated|auto-replied} }\
               } {no}{yes}}
-  require_files = $home/vacation
+  require_files = $home/.vacation
   # This line is used to match normal bulk mail senders &c.
   senders = "!^server@.*:^daemon@.*:^root@.*:^listserv@.*:^majordomo@.*:\
              !^.*-request@.*:!^owner-[^@]+@.*:!^mailer-daemon@.*"
   # Set permissions for any actions we might take
   user  = ${local_user_uid}
   group = ${local_user_gid}
-  transport = vacation
+  transport = local_users_vacation
   unseen
   no_verify
 
