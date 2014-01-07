@@ -42,6 +42,13 @@ class TestApacheLogger < Test::Unit::TestCase
   #
   def eventmachine(timeout = 30)
     Timeout::timeout(timeout) do
+      #
+      # Catch all eventmachine errors
+      #
+      EM.error_handler{ |e|
+        flunk (["Error raised during EM loop: #{e.message}: #{e.to_s}"]+e.backtrace).join("\n")
+      }
+
       EM.run do
         yield
       end
