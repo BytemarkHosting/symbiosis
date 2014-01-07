@@ -7,6 +7,8 @@ MAIL FROM:<anyone@remote.domain>
 250 
 RCPT TO:<alias_check1@local.domain>
 250
+RCPT TO:<alias_check1+randomsuffix@local.domain>
+250
 # Check we won't accept mail for unknown aliases
 RCPT TO:<alias_check2r@local.domain>
 550 Unknown user
