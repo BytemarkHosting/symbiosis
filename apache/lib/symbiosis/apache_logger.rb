@@ -152,6 +152,8 @@ class ApacheLogger < EventMachine::Connection
   def receive_data(data)
     (@buff = "") << data
     @buff.split($/).each do |l|
+      # Don't log empty lines
+      next if l.empty?
       receive_line(l)
     end
   end
