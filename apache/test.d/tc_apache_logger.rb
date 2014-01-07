@@ -154,7 +154,7 @@ class TestApacheLogger < Test::Unit::TestCase
     
       # And that we can read it.
       logged_lines = File.readlines(access_log).collect{|l| l.to_s.chomp}
-      assert_equal(logged_lines, lines)
+      assert_equal(lines, logged_lines)
     end
 
   end
