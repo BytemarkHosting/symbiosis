@@ -507,6 +507,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
     alias_fn = File.join(@vhost_dir, domain, "config", "aliases")
     aliases = [
       [ "alias_test1", "test1@remote.domain", nil, nil ],
+      [ "alias_test1+randomextension", "test1@remote.domain", nil, nil ],
       [ "alias_test2", "|/a-really-secure-programme", "vhost_aliases", "address_pipe" ],
       [ "alias_test3", "/straight/to/a/file", "vhost_aliases", "address_file" ],
       [ "alias_test4", "/straight/to/a/directory/", "vhost_aliases", "address_directory" ],
