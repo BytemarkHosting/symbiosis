@@ -114,8 +114,10 @@ class TestApacheLogger < Test::Unit::TestCase
           w.puts "#{d.name} #{l}"
         end
 
-        logger.close_filehandles
-        logger.resume
+        EM.next_tick do
+          logger.close_filehandles
+          logger.resume 
+        end
 
         test_lines2.each do |d, l|
           w.puts "#{d.name} #{l}"
