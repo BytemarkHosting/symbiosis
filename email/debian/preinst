@@ -28,7 +28,7 @@ install|upgrade)
   fi
 esac
 
-sed -i /etc/exim4/exim4.conf 's/AES_256:AES_128:3DES:ARCFOUR_128/${if =={$received_port}{25}\\\n\t\t\t{NORMAL:%COMPAT}\\\n\t\t\t{SECURE128}}/g'
+sed -i 's/AES_256:AES_128:3DES:ARCFOUR_128/${if =={$received_port}{25}\\\n\t\t\t{NORMAL:%COMPAT}\\\n\t\t\t{SECURE128}}/g' /etc/exim4/exim4.conf
 
 #DEBHELPER#
 exit 0
