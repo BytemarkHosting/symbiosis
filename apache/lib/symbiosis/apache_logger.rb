@@ -224,7 +224,7 @@ class ApacheLogger < EventMachine::Connection
         #
         if self.filehandles.length >= self.max_filehandles
           other_filehandle = self.filehandles.pop
-          other_filehandle.close
+          other_filehandle.close unless other_filehandle.closed?
         end
 
         filehandle = open_log(log_filename, {:uid => domain.uid, :gid => domain.gid, :sync => self.sync_io})
