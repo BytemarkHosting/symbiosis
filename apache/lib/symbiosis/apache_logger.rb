@@ -269,7 +269,7 @@ class ApacheLogger < EventMachine::Connection
   # Close all the file handles the class has open
   #
   def close_filehandles
-    self.pause
+    self.pause unless self.paused?
 
     ([@default_filehandle] + self.filehandles).flatten.each do |fh|
       #
