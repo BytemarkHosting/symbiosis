@@ -73,7 +73,7 @@ if ARGV.length > 0
 
   ips = ARGV.collect do |arg| 
     begin
-      IPAddr.new(arg)
+      Symbiosis::IPAddr.new(arg)
     rescue ArgumentError
       warn "Could not parse '#{arg}' as an IP address"
       # do nothing
