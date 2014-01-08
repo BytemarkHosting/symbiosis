@@ -1,6 +1,6 @@
 # This router handles actual local_user addresses
-local_user_mailbox:
-  debug_print = "R: local_user_mailbox for $local_part@$domain"
+local_users_mailbox:
+  debug_print = "R: local_users_mailbox for $local_part@$domain"
   driver = redirect
   domains = $primary_hostname
   check_local_user
