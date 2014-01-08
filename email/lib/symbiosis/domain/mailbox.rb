@@ -39,6 +39,44 @@ module Symbiosis
         @mailboxes_dir = mailboxes_dir
         @encrypt_password = true
         @password      = nil
+        @local_user    = nil
+      end
+
+      #
+      # Sets the local_user parameter, which is used for local mailboxes.
+      #
+      def local_user=(u)
+        raise ArgumentError unless u.is_a?(Struct::Passwd)
+        @local_user = u
+      end
+
+      #
+      # Return the local_user (if set).
+      #
+      def local_user
+        @local_user
+      end
+
+      #
+      # Return the UID for this mailbox
+      #
+      def uid
+        if self.local_user.is_a?(Struct::Passwd)
+          self.local_user.uid
+        else
+          self.domain.uid
+        end
+      end
+
+      #
+      # Return the GID for this mailbox
+      #
+      def gid
+        if self.local_user.is_a?(Struct::Passwd)
+          self.local_user.gid
+        else
+          self.domain.gid
+        end
       end
 
       #
@@ -49,10 +87,25 @@ module Symbiosis
       end
 
       #
+      # If the local_user is set, then this returns ".", otherwise it returns "".
+      #
+      def dot
+        if self.local_user.is_a?(Struct::Passwd)
+          "."
+        else
+          ""
+        end
+      end
+
+      #
       # Returns the directory for the mailbox
       #
       def directory
-        File.join(self.domain.directory, self.mailboxes_dir, self.local_part)
+        if self.local_user.is_a?(Struct::Passwd)
+          @local_user.dir
+        else
+          File.join(self.domain.directory, self.mailboxes_dir, self.local_part)
+        end
       end
 
       #
@@ -91,7 +144,7 @@ module Symbiosis
           ans = nil
         end
 
-        set_param("quota", q, self.directory)
+        set_param(self.dot + "quota", q, self.directory)
 
         ans
       end
@@ -102,8 +155,7 @@ module Symbiosis
       #
       def quota
         quota = nil
-        param = get_param("quota",self.directory)
-
+        param = get_param(self.dot + "quota",self.directory)
 
         unless param.is_a?(String)
           quota = nil
@@ -224,7 +276,7 @@ module Symbiosis
           #
           # Now open the temp file, and write
           #
-          safe_open(tmpfile, File::WRONLY|File::CREAT, :mode => 0644, :uid => self.domain.uid, :gid => self.domain.gid) do |fh|
+          safe_open(tmpfile, File::WRONLY|File::CREAT, :mode => 0644, :uid => self.uid, :gid => self.gid) do |fh|
             #
             # Truncate the file and write.
             #
@@ -256,7 +308,11 @@ module Symbiosis
       # Returns the name of the mailbox password file.
       #
       def password_file
-        File.join(self.directory,"password")
+        if @local_user
+          File.join(self.directory,".password")
+        else
+          File.join(self.directory,"password")
+        end
       end
 
       #
@@ -268,7 +324,7 @@ module Symbiosis
           #
           # Read the password
           #
-          param = get_param("password", self.directory, :mode => 0600)
+          param = get_param(self.dot + "password", self.directory, :mode => 0600)
 
           unless param.is_a?(String)
             @password = nil
@@ -289,10 +345,12 @@ module Symbiosis
         @password = pw
         self.create
 
+        p_dir, p_file = File.split(self.password_file)
+
         if @encrypt_password
-          set_param("password", self.domain.crypt_password(@password), self.directory, :mode => 0600)
+          set_param(self.dot + "password", self.domain.crypt_password(@password), self.directory, :mode => 0600)
         else
-          set_param("password", @password, self.directory, :mode => 0600)
+          set_param(self.dot + "password", @password, self.directory, :mode => 0600)
         end
 
         return @password
@@ -323,7 +381,8 @@ module Symbiosis
     end
 
     #
-    # return all the mailboxes for this domain
+    # Return all the mailboxes for this domain. This method is not thread-safe,
+    # I don't think.
     #
     def mailboxes(mailboxes_dir = "mailboxes")
       results = []
@@ -344,6 +403,47 @@ module Symbiosis
         next unless Mailbox.valid_local_part?(local_part)
 
         results << Mailbox.new(local_part, self, mailboxes_dir)
+      end
+
+      primary_hostname = Socket.gethostname
+
+      #
+      # If this is the primary hostname, then add in more local mailboxes
+      #
+      if primary_hostname == self.name
+        while (user = Etc.getpwent) do
+          #
+          # Skip is this username is admin
+          # 
+          next if user.name == "admin"
+
+          #
+          # Skip if the it is a system user
+          #
+          next unless user.uid >= 1000
+
+          #
+          # Make sure it is a valid local part
+          #
+          next unless Mailbox.valid_local_part?(user.name)
+
+          #
+          # Make sure $HOME exists.
+          #
+          next unless File.directory?(user.dir)
+
+          #
+          # If we've already got this name, skip.
+          #
+          next if results.any?{|mailbox| mailbox.local_part == user.name}
+
+          this_mailbox = Mailbox.new(user.name, self)
+          this_mailbox.local_user = user
+          
+          results << this_mailbox
+        end
+
+        Etc.endpwent
       end
 
       results
