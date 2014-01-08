@@ -13,7 +13,7 @@ local_users_forward:
   # Set permissions for any actions we might take
   user  = $local_user_uid 
   group = $local_user_gid
-  directory_transport = address_directory_without_quotas 
+  directory_transport = address_directory
   file_transport = address_file
   pipe_transport = address_pipe
   reply_transport = address_reply
