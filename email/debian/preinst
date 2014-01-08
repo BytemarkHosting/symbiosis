@@ -11,14 +11,27 @@ for file in 50-rewrite/10-localhost-rewrite ; do
    "2013:0731" -- "$@"
 done
 
+case "$1" in
+    install|upgrade)
+    #
+    # Move the exim4 config out of the way when upgrading (it will be regenerated later)
+    #
+    if [ -e /etc/exim4/exim4.conf ] ; then
+      echo "I: Moving exim4.conf out of the way to prevent breakage on upgrade"
+      mv -vf /etc/exim4/exim4.conf /etc/exim4/exim4.conf.symbiosis-old
+    fi
+    ;;
 
-#
-# Move the exim4 config out of the way when upgrading (it will be regenerated later)
-#
-if [ -e /etc/exim4/exim4.conf ] ; then
-  echo "I: Moving exim4.conf out of the way to prevent breakage on upgrade"
-  mv -vf /etc/exim4/exim4.conf /etc/exim4/exim4.conf.symbiosis-old
-fi
+    abort-upgrade)
+    ;;
+
+    *)
+        echo "preinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+
 
 #DEBHELPER#
 exit 0
