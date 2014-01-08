@@ -1,6 +1,20 @@
+symbiosis-email (2014:0108) precise; urgency=low
+
+  * Added support for local mailboxes in exim4.
+  * Added tests for local mailboxes in exim4.
+  * Updated preinst to remove obsolete files.
+  * Updated preinst to blitz exim4.conf before upgrades to prevent upgrade
+    failure.
+  * Fixed failure when validating vhost aliases with an optional suffix.
+  * New exim4 log patterns for firewall.
+  * Updated resource control limits to allow more simulataneous connections.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Jan 2014 12:36:19 +0000
+
 symbiosis-email (2013:0731) stable; urgency=low
 
-  * Removed dovecot-managesieved and dovecot-sieve as dependencies, added dovecot-sieve in their place.
+  * Removed dovecot-managesieved and dovecot-sieve as dependencies, added
+    dovecot-sieve in their place.
 
  -- John Hackett <jhackett@bytemark.co.uk>  Wed, 31 Jul 2013 13:47:00 +0100
 
