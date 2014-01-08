@@ -2,31 +2,23 @@
 
 set -e
 
-# Prepare to move a conffile without triggering a dpkg question
-prep_mv_conffile() {
-    local PKGNAME="$1"
-    local CONFFILE="$2"
+#
+# This makes sure old config files are removed without dpkg prompts
+#
+for file in 50-rewrite/10-localhost-rewrite ; do
+ dpkg-maintscript-helper rm_conffile \
+   /etc/exim4/symbiosis.d/$file \
+   "2013:0731" -- "$@"
+done
 
-    [ -e "$CONFFILE" ] || return 0
 
-    local md5sum="$(md5sum $CONFFILE | sed -e 's/ .*//')"
-    local old_md5sum="$(dpkg-query -W -f='${Conffiles}' $PKGNAME | \
-            sed -n -e "\' $CONFFILE ' { s/ obsolete$//; s/.* //; p }")"
-    if [ "$md5sum" = "$old_md5sum" ]; then
-        rm -f "$CONFFILE"
-    fi
-}
-
-case "$1" in
-install|upgrade)
-  if dpkg --compare-versions "$2" le "$LASTVERSION"; then
-    for pkg in bytemark-vhost-email symbiosis-email ; do   
-      for fn in `dpkg-query -W -f='${Conffiles}' $pkg | grep '/etc/exim4/bytemark-vhost.d' |  cut -f 2 -d ' '` ; do
-        prep_mv_conffile $pkg $fn
-      done
-    done
-  fi
-esac
+#
+# Move the exim4 config out of the way when upgrading (it will be regenerated later)
+#
+if [ -e /etc/exim4/exim4.conf ] ; then
+  echo "I: Moving exim4.conf out of the way to prevent breakage on upgrade"
+  mv -vf /etc/exim4/exim4.conf /etc/exim4/exim4.conf.symbiosis-old
+fi
 
 #DEBHELPER#
 exit 0
