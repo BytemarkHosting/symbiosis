@@ -27,6 +27,33 @@ class TestDovecot < Test::Unit::TestCase
     @domain.destroy unless $DEBUG
   end
 
+  def fetch_test_user
+    test_user = nil
+    begin
+      test_user = Etc.getpwnam("symbiosis-test")
+    rescue ArgumentError
+      # do nothing
+    end
+    test_user
+  end
+
+  def fetch_hostname
+    if File.exists?('/proc/sys/kernel/hostname')
+      File.read('/proc/sys/kernel/hostname').chomp
+    else
+      "localhost"
+    end
+  end
+
+  def do_skip
+    if self.respond_to?(:skip)
+      skip msg
+    else
+      puts "Skipping #{self.method_name} -- #{msg}"
+    end
+    return nil
+  end
+
   def test_imap_capabilities
     capabilities = []
     assert_nothing_raised do
@@ -44,6 +71,24 @@ class TestDovecot < Test::Unit::TestCase
     assert_nothing_raised do
       imap = Net::IMAP.new('localhost', 143, false)
       imap.login(@mailbox.username, @mailbox.password)
+      imap.logout
+      imap.disconnect unless imap.disconnected?
+    end
+  end
+
+  def test_imap_auth_plain_local_user
+    test_user = fetch_test_user
+    return do_skip "No test user" if test_user.nil?
+
+    hostname = fetch_hostname
+    username = test_user.name + "@" + hostname
+    password = Symbiosis::Utils.random_string
+
+    File.open(File.join(test_user.dir,".password"),"w+"){|fh| fh.puts password}
+
+    assert_nothing_raised do
+      imap = Net::IMAP.new('localhost', 143, false)
+      imap.login(username, password)
       imap.logout
       imap.disconnect unless imap.disconnected?
     end
@@ -120,9 +165,9 @@ class TestDovecot < Test::Unit::TestCase
     end
   end
 
-  def test_deliver
-    sender_address = "postmaster@#{@mailbox.domain.to_s}"
-    rcpt_address   = @mailbox.username
+  def do_test_deliver(mailbox)
+    sender_address = "postmaster@#{mailbox.domain.name}"
+    rcpt_address   = mailbox.username
     msg =<<EOF
 Return-Path: #{sender_address}
 Envelope-To: #{rcpt_address}
@@ -135,12 +180,36 @@ Testing 1.2.3..
 Symbiosis Test
 EOF
 
-    do_dovecot_delivery(sender_address, rcpt_address, msg)
+    do_dovecot_delivery(sender_address, rcpt_address, msg, 0, mailbox)
 
-    new_files = Dir.glob(File.join(@mailbox.maildir, "new", "*")).length
+    new_files = Dir.glob(File.join(mailbox.maildir, "new", "*")).length
     assert_equal(1, new_files, "Found #{new_files} messages in Maildir/new rather than just 1")
   end
   
+  def do_setup_local_mailbox(test_user)
+    hostname = fetch_hostname
+    mailbox = Symbiosis::Domains.find_mailbox(test_user.name + "@" + hostname)
+
+    #
+    # AWOOGA.
+    #
+    FileUtils.rm_rf(mailbox.maildir)
+
+    return mailbox
+  end
+
+  def test_deliver
+    do_test_deliver(@mailbox)
+  end
+
+  def test_deliver_local_user
+    test_user = fetch_test_user
+    return do_skip "No test user" if test_user.nil?
+    mailbox = do_setup_local_mailbox(test_user)
+
+    do_test_deliver(mailbox)
+  end
+
   def test_imap_quotas
     #
     # IMAP quotas are done in units of kibibytes, apparently.
@@ -177,20 +246,20 @@ EOF
     assert_equal(50, quota.quota.to_i)
   end
 
-  def test_deliver_with_quotas
+  def do_test_deliver_with_quotas(mailbox)
     #
     # IMAP quotas are done in units of kibibytes, apparently.
     #
-    @mailbox.quota = "50ki"
-    assert_equal(51200, @mailbox.quota, "Mailbox quota not set correctly.")
+    mailbox.quota = "50ki"
+    assert_equal(51200, mailbox.quota, "Mailbox quota not set correctly.")
 
     #
     # An IMAP/POP3 login should trigger this normally.
     #
     @mailbox.rebuild_maildirsize
 
-    sender_address = "postmaster@#{@mailbox.domain.to_s}"
-    rcpt_address   = @mailbox.username
+    sender_address = "postmaster@#{mailbox.domain.to_s}"
+    rcpt_address   = mailbox.username
     msg =<<EOF
 Return-Path: #{sender_address}
 Envelope-To: #{rcpt_address}
@@ -211,13 +280,13 @@ EOF
     #
     # Make sure we've got the right number of messages in new/
     #
-    new_files = Dir.glob(File.join(@mailbox.maildir, "new", "*")).length
+    new_files = Dir.glob(File.join(mailbox.maildir, "new", "*")).length
     assert_equal(1, new_files, "Found #{new_files} messages in Maildir/new rather than just 1")
 
     #
     # Now make our message unfeasably long
     #
-    msg += "x"*@mailbox.quota
+    msg += "x"*mailbox.quota
 
     #
     # Deliver should return a temporary failure message.
@@ -227,12 +296,15 @@ EOF
     #
     # And nothing should be delivered.
     #
-    new_files = Dir.glob(File.join(@mailbox.maildir, "new", "*")).length
+    new_files = Dir.glob(File.join(mailbox.maildir, "new", "*")).length
     assert_equal(1, new_files, "Found #{new_files} messages in Maildir/new rather than just 1")
   end
+  
+  def test_deliver_with_quotas
+    do_test_deliver_with_quotas(@mailbox)
+  end
 
-  def test_deliver_with_sieve
-    @mailbox.create
+  def do_test_deliver_with_sieve(mailbox)
     sieve =<<EOF
 require "fileinto";
 
@@ -241,10 +313,10 @@ stop;
 EOF
 
     # Write the file.
-    Symbiosis::Utils.set_param("sieve", sieve, @mailbox.directory)
+    Symbiosis::Utils.set_param(mailbox.dot + "sieve", sieve, mailbox.directory)
 
-    sender_address = "postmaster@#{@mailbox.domain.to_s}"
-    rcpt_address   = @mailbox.username
+    sender_address = "postmaster@#{mailbox.domain.to_s}"
+    rcpt_address   = mailbox.username
     msg =<<EOF
 Return-Path: #{sender_address}
 Envelope-To: #{rcpt_address}
@@ -260,64 +332,111 @@ EOF
     #
     # Now deliver our message
     #
-    do_dovecot_delivery(sender_address, rcpt_address, msg)
+    do_dovecot_delivery(sender_address, rcpt_address, msg, 0, mailbox)
 
     #
     # And nothing should be delivered to the inbox.
     #
-    new_files = Dir.glob(File.join(@mailbox.maildir, "new", "*")).length
+    new_files = Dir.glob(File.join(mailbox.maildir, "new", "*")).length
     assert_equal(0, new_files, "Found #{new_files} messages in Maildir/new rather than 0")
 
     #
     # It should be delivered to the "testing" box.
     #
-    new_files = Dir.glob(File.join(@mailbox.maildir, ".testing", "new", "*")).length
+    new_files = Dir.glob(File.join(mailbox.maildir, ".testing", "new", "*")).length
     assert_equal(1, new_files, "Found #{new_files} messages in Maildir/.testing/new rather than just 1")
+  end
+
+  def test_deliver_with_sieve
+    @mailbox.create
+    do_test_deliver_with_sieve(@mailbox)
+  end
+
+  def test_deliver_with_sieve_for_local_users
+    test_user = fetch_test_user
+    return do_skip "No test user" if test_user.nil?
+    mailbox = do_setup_local_mailbox(test_user)
+    sieve_file = File.join(mailbox.directory, ".sieve")
+
+    do_test_deliver_with_sieve(mailbox)
+  ensure
+    File.unlink(sieve_file) if File.exists?(sieve_file)
+  end
+
+  def do_test_deliver_with_sieve_and_quota(mailbox)
+    mailbox.create
+    sieve =<<EOF
+require "fileinto";
+
+fileinto "testing";
+stop;
+EOF
+
+    # Write the file.
+    Symbiosis::Utils.set_param(mailbox.dot + "sieve", sieve, mailbox.directory)
+
+    sender_address = "postmaster@#{mailbox.domain.to_s}"
+    rcpt_address   = mailbox.username
+    msg =<<EOF
+Return-Path: #{sender_address}
+Envelope-To: #{rcpt_address}
+Date: #{Time.now.rfc2822}
+From: #{sender_address}
+To: #{rcpt_address}
+
+Testing 1.2.3..
+--
+Symbiosis Test
+EOF
 
     #
     # Now create a quota 
     #
-    @mailbox.quota = "5ki"
-    @mailbox.rebuild_maildirsize
+    mailbox.quota = "5ki"
+    mailbox.rebuild_maildirsize
     
     # 
     # And make our message VERY long.
     # 
-    msg += "x"*@mailbox.quota
+    msg += "x"*mailbox.quota
 
     #
     # And try to deliver again, this should temp fail.
     #
-    do_dovecot_delivery(sender_address, rcpt_address, msg, 75)
+    do_dovecot_delivery(sender_address, rcpt_address, msg, 75, mailbox)
 
     #
     # And nothing should be delivered.
     #
-    new_files = Dir.glob(File.join(@mailbox.maildir, ".testing", "new", "*")).length
-    assert_equal(1, new_files, "Found #{new_files} messages in Maildir/.testing/new rather than just 1 after the quota has been exceeded.")
+    new_files = Dir.glob(File.join(mailbox.maildir, ".testing", "new", "*")).length
+    assert_equal(0, new_files, "Found #{new_files} messages in Maildir/.testing/new rather than just 1 after the quota has been exceeded.")
+  end
+
+  def test_deliver_with_sieve_and_quota
+    do_test_deliver_with_sieve_and_quota(@mailbox)
   end
 
   #
   # This is fugly, but required to drop privileges properly.
   #
-  def do_dovecot_delivery(sender_address, rcpt_address, msg, expected_code=0)
+  def do_dovecot_delivery(sender_address, rcpt_address, msg, expected_code=0, mailbox = @mailbox)
     fork do 
       #
       # Drop privileges
       #
       if 0 == Process.uid
-        Process::Sys.setgid(@domain.gid)
-        Process::Sys.setuid(@domain.uid)
+        Process::Sys.setgid(mailbox.gid)
+        Process::Sys.setuid(mailbox.uid)
       end
 
       ENV.keys.each do |k|
         ENV[k] = nil
       end
       
-      ENV['HOME'] = @mailbox.directory
-      ENV['USER'] = @mailbox.username
+      ENV['HOME'] = mailbox.directory
+      ENV['USER'] = mailbox.username
 
-      cmd = "/usr/lib/dovecot/deliver -e -k -f \"#{sender_address}\" -a \"#{rcpt_address}\""
+      cmd = "/usr/lib/dovecot/deliver -e -k -f \"#{sender_address}\" -d \"#{rcpt_address}\""
 
       IO.popen(cmd,"w+") do |pipe|
         pipe.puts msg
