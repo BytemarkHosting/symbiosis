@@ -2,7 +2,8 @@ dovecot_lda:
   debug_print = "T: dovecot_lda for $local_part@$domain"
   driver = pipe
   command = /usr/lib/dovecot/deliver -e -k \
-            -f "$sender_address" -a "$original_local_part@$original_domain"
+            -f "$sender_address" -a "$original_local_part@$original_domain" \
+            -d "$local_part@$domain"
   environment = USER=$local_part@$domain
   log_output
   log_defer_output
