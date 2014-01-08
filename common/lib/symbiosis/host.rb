@@ -165,7 +165,7 @@ module Symbiosis
       spaces = []
       ips.each do |ip|
         begin
-          ip = IPAddr.new(ip) if ip.is_a?(String)
+          ip = IPAddr.new(ip.to_s) unless ip.is_a?(IPAddr)
         rescue ArgumentError => err
           # This will be caught in the next conditional.
         end
