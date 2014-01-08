@@ -651,7 +651,10 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
   def test_router_local_users_forward
     test_user = fetch_test_user
-    do_skip "No test user" if test_user.nil?
+    if test_user.nil?
+      do_skip "No test user" 
+      return
+    end
 
     lp = test_user.name
     domain = fetch_hostname 
@@ -674,7 +677,10 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
   def test_router_local_users_forward_sieve
     test_user = fetch_test_user
-    do_skip "No test user" if test_user.nil?
+    if test_user.nil?
+      do_skip "No test user" 
+      return
+    end
 
     lp = test_user.name
     domain = fetch_hostname 
@@ -697,7 +703,10 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
   def test_router_local_users_vacation
     test_user = fetch_test_user
-    do_skip "No test user" if test_user.nil?
+    if test_user.nil?
+      do_skip "No test user" 
+      return
+    end
 
     lp = test_user.name
     domain = fetch_hostname 
@@ -716,7 +725,10 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
   def test_router_local_user_mailbox
     test_user = fetch_test_user
-    do_skip "No test user" if test_user.nil?
+    if test_user.nil?
+      do_skip "No test user" 
+      return
+    end
 
     lp = test_user.name
     domain = fetch_hostname 
