@@ -140,19 +140,10 @@ for dir in ${!directories_to_move[*]} ; do
   if [ -d "$src" ] ; then
     echo "I: Moving left over Dovecot configuration files from $src to $target"
     [ -f $src/.placeholder ] && rm $src/.placeholder
-    find $src -type f -exec mv -v \{\} $target \;
+    find $src -type f \! -name '*.dpkg-remove' -exec mv -v \{\} $target \;
   fi
 done
 
-#
-# Now remove empty directories.
-#
-for dir in ${!directories_to_move[*]} ; do
-  src="/etc/dovecot/symbiosis.d/$dir"
-  if [ -d "$src" ] ; then
-    find $src -type d -empty -exec rmdir \{\} \;
-  fi
-done
 }
 
 case "$1" in
