@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e
+
+case "$1" in
+    install)
+      # do nothing
+    ;;
+
+    upgrade)
+      #
+      # Bodge this since in the Symbiosis squeeze amd64 image at Bytemark, this
+      # file was accidentally left in place.
+      #
+      if [ -f /var/lib/python/python2.6_already_installed ] ; then
+        dpkg -s python-minimal-2.6 > /dev/null 2>&1 || rm -f /var/lib/python/python2.6_already_installed
+      fi
+
+    ;;
+
+    abort-upgrade)
+    ;;
+
+    *)
+        echo "preinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+
+#DEBHELPER#
+
+exit 0
