@@ -20,6 +20,7 @@ $(conf): test
 # directory has at least that bit.
 #
 $(conf_tmp): distclean Makefile $(snippets) $(CURDIR)/$(snippets_dir)/00-header
+	@touch $(conf_tmp)
 	@for s in $(snippets) ; do \
 	    echo "# ------------------------------------------------------------------------------" >>  $(conf_tmp)  ;\
 	    echo "# $$s" >> $(conf_tmp)  ;\

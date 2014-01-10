@@ -16,6 +16,7 @@ $(conf): check
 	@mv -fb $(conf_tmp) $(conf)
 
 $(conf_tmp): distclean Makefile $(snippets)
+	@touch $(conf_tmp)
 	@for s in $(snippets) ; do \
 	    echo "# ------------------------------------------------------------------------------" >>  $(conf_tmp)  ;\
 	    echo "# $$s" >> $(conf_tmp)  ;\
