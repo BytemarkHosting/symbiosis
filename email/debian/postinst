@@ -133,11 +133,18 @@ function do_upgrade() {
 
     # Make sure the target directory exists.
     mkdir -p $target
+    
+    # Remove the directory if it is empty.
+    rmdir --ignore-fail-on-non-empty $src
 
+    # If it isn't empty, move the files
     if [ -d "$src" ] ; then
       echo "I: Moving left over Dovecot configuration files from $src to $target"
       find $src -type f -exec mv -v \{\} $target \;
     fi
+
+    # And try again.
+    rmdir --ignore-fail-on-non-empty $src
   done
 
 }  
