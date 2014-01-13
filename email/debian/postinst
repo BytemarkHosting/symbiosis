@@ -141,12 +141,14 @@ function do_upgrade() {
     if [ -d "$src" ] ; then
       echo "I: Moving left over Dovecot configuration files from $src to $target"
       find $src -type f -exec mv -v \{\} $target \;
+
+      # 
+      # and try again.
+      #    
+      rmdir --ignore-fail-on-non-empty $src
     fi
 
-    # And try again.
-    rmdir --ignore-fail-on-non-empty $src
   done
-
 }  
 
 #
