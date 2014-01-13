@@ -1,18 +1,14 @@
 Source: symbiosis-backup
 Section: web
 Priority: extra
-Maintainer: Steve Kemp <steve@bytemark.co.uk>
-Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
+Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), gem2deb
 Standards-Version: 3.9.1
 XS-Ruby-Versions: all
 
 Package: symbiosis-backup
-Replaces: bytemark-vhost-simple-backup
-Conflicts: bytemark-vhost-simple-backup
-Provides: bytemark-vhost-simple-backup
 Architecture: all
-Depends: backup2l, ruby, symbiosis-common (>>2011:1216), ${misc:Depends}
+Depends: backup2l, ruby, symbiosis-common (>= 2014:0113), ${misc:Depends}
 Recommends: ruby-mysql, ruby-pg
 Description: Automatically backup your files
  This package configures backup2l to backup your data.

@@ -1,3 +1,12 @@
+symbiosis-backup (2014:0113) stable; urgency=low
+
+  * Updated dependencies for wheezy.
+  * New maintainer and uploaders.
+  * Altered backup regieme to use 2 levels, and 5 backups per levels,
+    resulting in 30 days between full backups, as opposed to 584.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 16:44:07 +0000
+
 symbiosis-backup (2012:0912) stable; urgency=low
 
   * Updated mysql tests to pass now that the --databases arg has been removed.
