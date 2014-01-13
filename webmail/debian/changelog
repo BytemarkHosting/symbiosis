@@ -1,3 +1,11 @@
+symbiosis-webmail (2014:0113) stable; urgency=low
+
+  * Remove spurious bug.reports file.
+  * Updated maintainers/uploaders.
+  * Updated control/rules not to use gem2deb needlessly.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 17:20:03 +0000
+
 symbiosis-webmail (2013:0610) stable; urgency=low
 
   * Updated webmail packages to check for apache2ctl before trying to restart
