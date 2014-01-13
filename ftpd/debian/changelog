@@ -1,3 +1,10 @@
+symbiosis-ftpd (2014:0113) stable; urgency=low
+
+  * Updated dependencies.
+  * Updated maintainer and uploaders.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 17:06:50 +0000
+
 symbiosis-ftpd (2013:1030) stable; urgency=low
 
   * Converted packaging to debhelper/gem2deb from cdbs.
