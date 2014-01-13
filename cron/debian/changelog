@@ -1,3 +1,9 @@
+symbiosis-cron (2014:0113) stable; urgency=low
+
+  * Updated maintainer and uploaders.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 17:02:27 +0000
+
 symbiosis-cron (2012:0327) stable; urgency=low
 
   * Fixed Symbiosis to be a module rather than a class in symbiosis/crontab. 
