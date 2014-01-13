@@ -1,3 +1,10 @@
+symbiosis-api-doc (2014:0113) stable; urgency=low
+
+  * Updated maintainer/uploaders.
+  * Removed useless gem2deb requirement.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 17:21:19 +0000
+
 symbiosis-api-doc (2012:0529) stable; urgency=low
 
   * Initial release.

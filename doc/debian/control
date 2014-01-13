@@ -1,11 +1,10 @@
 Source: symbiosis-api-doc
 Section: doc
 Priority: extra
-Maintainer: Steve Kemp <steve@bytemark.co.uk>
-Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
+Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0)
 Standards-Version: 3.9.1
-XS-Ruby-Versions: all
 
 Package: symbiosis-api-doc
 Architecture: all
