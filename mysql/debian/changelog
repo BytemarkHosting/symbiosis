@@ -1,3 +1,11 @@
+symbiosis-mysql (2014:0113) stable; urgency=low
+
+  * Updated maintainer, uploaders.
+  * Removed usage for gem2deb etc.
+  * Updated dependencies.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 17:09:23 +0000
+
 symbiosis-mysql (2013:0712) stable; urgency=low
 
   * Updated to use package mysql-server (installs 5.5) instead of mysql-server-5.1

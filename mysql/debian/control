@@ -1,15 +1,14 @@
 Source: symbiosis-mysql
 Section: web
 Priority: extra
-Maintainer: Steve Kemp <steve@bytemark.co.uk>
-Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), gem2deb, config-package-dev, mysql-common
+Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>
+Build-Depends: debhelper (>= 7.0.0), config-package-dev, mysql-common
 Standards-Version: 3.9.1
-XS-Ruby-Versions: all
 
 Package: symbiosis-mysql
 Architecture: all
-Depends: mysql-server, ruby, symbiosis-common, ${misc:Depends}
+Depends: mysql-server, ruby, symbiosis-common (>= 2014:0113), ${misc:Depends}
 Replaces: bytemark-vhost-mysql, symbiosis-monit (<< 2011:1206)
 Provides: bytemark-vhost-mysql
 Conflicts: bytemark-vhost-mysql
