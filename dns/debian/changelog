@@ -1,3 +1,10 @@
+symbiosis-dns (2014:0113) stable; urgency=low
+
+  * Updated maintainer and uploaders.
+  * Updated symbiosis-common dependency.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 17:04:03 +0000
+
 symbiosis-dns (2013:1025) stable; urgency=low
 
   * Renamed package.
