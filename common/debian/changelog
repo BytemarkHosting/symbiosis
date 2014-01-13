@@ -1,3 +1,9 @@
+symbiosis-common (2014:0113) stable; urgency=low
+
+  * Updated maintainer and uploaders information.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 16:45:59 +0000
+
 symbiosis-common (2013:1025) stable; urgency=low
 
   * Rationalised how help and man pages were generated
