@@ -2,27 +2,28 @@ Source: bytemark-symbiosis
 Section: web
 Priority: extra
 Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0)
 Standards-Version: 3.9.1
 
 Package: bytemark-symbiosis
 Architecture: all
-Depends: symbiosis-key (>= 2014:0101), 
-  symbiosis-updater (>= 2014:0101),
+Depends: symbiosis-key (>= 2014:0113), 
+  symbiosis-updater (>= 2014:0113),
   ${misc:Depends}
-Recommends: symbiosis-backup (>= 2014:0101),
-  symbiosis-common (>= 2014:0101),
-  symbiosis-cron (>= 2014:0101),
-  symbiosis-email (>= 2014:0101),
-  symbiosis-firewall (>= 2014:0101), 
-  symbiosis-ftpd (>= 2014:0101),
-  symbiosis-httpd (>= 2014:0101), 
-  symbiosis-monit (>= 2014:0101), 
-  symbiosis-mysql (>= 2014:0101),
-  symbiosis-pam (>= 2014:0101), 
-  symbiosis-phpmyadmin (>= 2014:0101), 
-  symbiosis-dns (>= 2014:0101), 
-  symbiosis-webmail (>= 2014:0101),
+Recommends: symbiosis-backup (>= 2014:0113),
+  symbiosis-common (>= 2014:0113),
+  symbiosis-cron (>= 2014:0113),
+  symbiosis-email (>= 2014:0113),
+  symbiosis-firewall (>= 2014:0113), 
+  symbiosis-ftpd (>= 2014:0113),
+  symbiosis-httpd (>= 2014:0113), 
+  symbiosis-monit (>= 2014:0113), 
+  symbiosis-mysql (>= 2014:0113),
+  symbiosis-pam (>= 2014:0113), 
+  symbiosis-phpmyadmin (>= 2014:0113), 
+  symbiosis-dns (>= 2014:0113), 
+  symbiosis-webmail (>= 2014:0113),
   openssh-server
 Description: An easy, complete, and Debian-friendly server administration system
  This package is a metapackage which will pull in each package which
