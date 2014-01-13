@@ -1,15 +1,15 @@
 Source: symbiosis-monit
 Section: web
 Priority: extra
-Maintainer: Steve Kemp <steve@bytemark.co.uk>
-Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
+Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), txt2man, gem2deb, ruby
 Standards-Version: 3.9.1
 XS-Ruby-Versions: all
 
 Package: symbiosis-monit
 Architecture: all
-Depends: ruby1.8, cron, libsqlite3-ruby1.8, liblog4r-ruby1.8, procps, symbiosis-common (>= 2012:0301), ${misc:Depends}
+Depends: ruby1.8, cron, libsqlite3-ruby1.8, liblog4r-ruby1.8, procps, symbiosis-common (>= 2014:0113), ${misc:Depends}
 Replaces: bytemark-vhost-monit
 Conflicts: bytemark-vhost-monit
 Provides: bytemark-vhost-monit
