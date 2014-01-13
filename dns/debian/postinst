@@ -38,15 +38,19 @@ if [ -e /etc/exim4/Makefile -a -e /etc/exim4/symbiosis.d/00-header ]; then
     #
     #  Rebuild exim4
     #
-    cd /etc/exim4 && make
+    cd /etc/exim4
 
     #
-    #  Restart exim4
+    # Don't fail the whole install if make fails.
     #
-    if which invoke-rc.d >/dev/null 2>&1; then
+    if make ; then
+
+        #
+        #  Restart exim4
+        #
         invoke-rc.d exim4 reload
     else
-        /etc/init.d/exim4 reload
+        echo "W: Rebuild of exim4 configuration failed."
     fi
 
 fi
