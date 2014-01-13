@@ -1,34 +1,29 @@
 Source: bytemark-symbiosis
 Section: web
 Priority: extra
-Maintainer: Steve Kemp <steve@bytemark.co.uk>
-Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), gem2deb
+Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
+Build-Depends: debhelper (>= 7.0.0)
 Standards-Version: 3.9.1
-XS-Ruby-Versions: all
 
 Package: bytemark-symbiosis
 Architecture: all
-Depends: symbiosis-key (>= 2012:0222), 
-  symbiosis-updater (>= 2012:0222),
+Depends: symbiosis-key (>= 2014:0101), 
+  symbiosis-updater (>= 2014:0101),
   ${misc:Depends}
-Recommends: symbiosis-backup (>= 2012:0222),
-  symbiosis-common (>= 2012:0222),
-  symbiosis-cron (>= 2012:0222),
-  symbiosis-email (>= 2012:0222),
-  symbiosis-firewall (>= 2012:0222), 
-  symbiosis-ftpd (>= 2012:0222),
-  symbiosis-httpd (>= 2012:0222), 
-  symbiosis-monit (>= 2012:0222), 
-  symbiosis-mysql (>= 2012:0222),
-  symbiosis-pam (>= 2012:0222), 
-  symbiosis-phpmyadmin (>= 2012:0222), 
-  symbiosis-dns (>= 2012:0222), 
-  symbiosis-webmail (>= 2012:0222),
+Recommends: symbiosis-backup (>= 2014:0101),
+  symbiosis-common (>= 2014:0101),
+  symbiosis-cron (>= 2014:0101),
+  symbiosis-email (>= 2014:0101),
+  symbiosis-firewall (>= 2014:0101), 
+  symbiosis-ftpd (>= 2014:0101),
+  symbiosis-httpd (>= 2014:0101), 
+  symbiosis-monit (>= 2014:0101), 
+  symbiosis-mysql (>= 2014:0101),
+  symbiosis-pam (>= 2014:0101), 
+  symbiosis-phpmyadmin (>= 2014:0101), 
+  symbiosis-dns (>= 2014:0101), 
+  symbiosis-webmail (>= 2014:0101),
   openssh-server
-Replaces: bytemark-vhost
-Conflicts: bytemark-vhost
-Provides: bytemark-vhost
 Description: An easy, complete, and Debian-friendly server administration system
  This package is a metapackage which will pull in each package which
  is a component of the Bytemark Symbiosis system.
@@ -40,4 +35,12 @@ Description: An easy, complete, and Debian-friendly server administration system
   * FTP hosting.
   * Email hosting (and webmail).
 
-
+Package: symbiosis-pam
+Architecture: all
+Depends: libpam-tmpdir, wbritish | wordlist, libpam-cracklib, ${misc:Depends}
+Description: PAM configuration metapackage for Sybmbiosis
+ This is a metapackage which depends on the various PAM modules to help
+ maintain your machine's security.
+ .
+ Currently it enforces checks for weak passwords, against libcrack, and
+ per-user temporary directories, using pam-tmpdir.
