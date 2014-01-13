@@ -8,7 +8,7 @@ set -e
 
 function do_upgrade() {
 
-  ##### Exim4 config adjustments ################ 
+  ##### Exim4 config adjustments ################
   #
   # Array of config files to remove
   #
@@ -127,29 +127,36 @@ function do_upgrade() {
   directories_to_move["140-dictionary-server-settings"]="80-dict-settings"
   directories_to_move["150-plugin-settings"]="90-plugin-settings"
 
-  for dir in ${!directories_to_move[*]} ; do
+  #
+  # For each directory, remove it, making sure we do
+  # 130-authentication-processes last, since it has a subdirectory.
+  #
+  for dir in ${!directories_to_move[*]} "130-authentication-processes" ; do
     src="/etc/dovecot/symbiosis.d/$dir"
     target="/etc/dovecot/symbiosis.d/${directories_to_move[$dir]}"
 
     # Make sure the target directory exists.
     mkdir -p $target
-    
-    # Remove the directory if it is empty.
-    rmdir --ignore-fail-on-non-empty $src
+
+    # Make sure the source directory exists before removal.
+    if [ -d "$src" ] ; then
+      # Remove the directory if it is empty.
+      rmdir --ignore-fail-on-non-empty $src
+    fi
 
     # If it isn't empty, move the files
     if [ -d "$src" ] ; then
       echo "I: Moving left over Dovecot configuration files from $src to $target"
       find $src -type f -exec mv -v \{\} $target \;
 
-      # 
+      #
       # and try again.
-      #    
+      #
       rmdir --ignore-fail-on-non-empty $src
     fi
 
   done
-}  
+}
 
 #
 # Skip, if we are not in "configure" state
@@ -180,7 +187,7 @@ fi
 #
 #  Add the user
 #
-adduser clamav Debian-exim 
+adduser clamav Debian-exim
 
 #
 # Set the TMPDIR variable for clamav.
