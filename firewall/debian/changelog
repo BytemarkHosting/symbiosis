@@ -1,3 +1,10 @@
+symbiosis-firewall (2014:0113) stable; urgency=low
+
+  * Updated dependencies.
+  * Updateded maintainer and uploaders. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 17:05:58 +0000
+
 symbiosis-firewall (2013:0711) stable; urgency=low
 
   * Changing build tag + added ruby1.8 dependency.
