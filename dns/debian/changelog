@@ -1,3 +1,9 @@
+symbiosis-dns (2014:0115) stable; urgency=low
+
+  * Added provides symbiosis-tinydns.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 15 Jan 2014 09:57:16 +0000
+
 symbiosis-dns (2014:0113) stable; urgency=low
 
   * Updated maintainer and uploaders.
