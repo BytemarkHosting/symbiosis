@@ -1,0 +1,5 @@
+#
+# Helo accept junk hosts setting, for apple mail users
+#
+
+helo_accept_junk_hosts = ${if eq{$received_port}{25}{}{*}}
