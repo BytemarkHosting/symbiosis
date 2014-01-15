@@ -1,10 +1,10 @@
-  # This userdb entry is for use by the LDA which doesn't work with "prefetch"
-  # 
-  # http://wiki.dovecot.org/PasswordDatabase/CheckPassword
-  userdb {
-    # Path for checkpassword binary
-    driver = checkpassword 
-    args = /usr/sbin/symbiosis-check-mailbox-password
-  }
+# This userdb entry is for use by the LDA which doesn't work with "prefetch"
+# 
+# http://wiki2.dovecot.org/AuthDatabase/CheckPassword
+userdb {
+  # Path for checkpassword binary
+  driver = checkpassword 
+  args = /usr/sbin/symbiosis-check-mailbox-password
+}
 
 

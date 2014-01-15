@@ -1,4 +1,4 @@
-  # Space separated list of wanted authentication mechanisms:
-  #   plain login cram-md5 digest-md5 ntlm rpa apop anonymous gssapi
-  auth_mechanisms = plain login
+# Space separated list of wanted authentication mechanisms:
+#   plain login cram-md5 digest-md5 ntlm rpa apop anonymous gssapi
+auth_mechanisms = plain login
 

@@ -83,7 +83,7 @@ function do_upgrade() {
   files_to_move["130-authentication-processes/50-auth-default/85-userdb-checkpasswd"]="30-authentication/85-userdb-checkpasswd"
   files_to_remove+=("130-authentication-processes/50-auth-default/90-user")
   files_to_move["130-authentication-processes/50-auth-default/95-socket-listen"]="30-authentication/90-service-auth"
-  files_to_move["130-authentication-processes/50-auth-default/99-footer"]="30-authentication/99-footer"
+  files_to_remove+=("130-authentication-processes/50-auth-default/99-footer")
   files_to_move["140-dictionary-server-settings/00-header"]="80-dict-settings/00-header "
   files_to_move["140-dictionary-server-settings/99-footer"]="80-dict-settings/99-footer"
   files_to_move["150-plugin-settings/00-header"]="90-plugin-settings/00-header"
