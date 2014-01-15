@@ -1,3 +1,9 @@
+symbiosis-email (2013:0608) stable; urgency=low
+
+  * Updated helo check for apple mail/bt internet.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 15 Jan 2014 16:17:42 +0000
+
 symbiosis-email (2013:0607) oldstable; urgency=low
 
   * Added in some better resource limits to exim4.
