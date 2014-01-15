@@ -10,6 +10,7 @@ XS-Ruby-Versions: all
 Package: symbiosis-dns
 Architecture: all
 Depends: rsync, wget, unzip, ruby-interpreter, symbiosis-common (>= 2014:0113), ${misc:Depends}
+Provides: symbiosis-tinydns
 Description: Automatic DNS record creation and uploading for Bytemark customers
  This package contains tools to create TinyDNS files which may be uploaded
  to the Bytemark DNS host.
