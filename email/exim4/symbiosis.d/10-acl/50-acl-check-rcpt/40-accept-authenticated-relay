@@ -4,5 +4,4 @@
   # any black list tests.
 
   accept  authenticated = *
-          control       = submission/domain=
-
+          control       = submission/domain=${if eq{${domain:$authenticated_id}}{}{$primary_hostname}{}}
