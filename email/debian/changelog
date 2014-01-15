@@ -1,3 +1,10 @@
+symbiosis-email (2014:0115) stable; urgency=low
+
+  * Fixed up helo check for authorized connections.
+  * Fixed up vacaction messages to use sensible reply_to/from headers.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 15 Jan 2014 16:19:42 +0000
+
 symbiosis-email (2014:0113) stable; urgency=low
 
   * Updated maintainer and uploaders.
