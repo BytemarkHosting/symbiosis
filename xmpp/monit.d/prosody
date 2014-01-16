@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+require 'symbiosis/monitor/check'
+
+class ProsodyCheck < Symbiosis::Monitor::Check
+
+  def initialize
+    super
+    @process.pidfile = "/var/run/prosody/prosody.pid"
+    @process.initscript = "/etc/init.d/prosody"
+    @name = "lua5.1"
+  end
+
+  def do_check
+    return SystemExit::EX_CONFIG unless initscript_ok?
+
+    r = do_process_check
+    self.restart if SystemExit::EX_TEMPFAIL == r
+    return r unless 0 == r
+
+    return 0 
+  end
+
+end
+
+exit ProsodyCheck.new.do_check if $0 == __FILE__
+

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+for i in {client,server} ; do
+  fn="/etc/symbiosis/firewall/incoming.d/50-xmpp-$i"
+  if [ -f "$fn" ] && [ -z "$(<$fn)" ] ; then
+    echo "I: Removing XMPP $i firewall rule..."
+    rm "$fn"
+  fi
+done
+
+#
+#  Rebuild dovecot
+#
+if [ -e /etc/dovecot/Makefile ] ; then
+    cd /etc/dovecot && make
+fi
+
+#
+#  Restart all deamons
+#
+for i in prosody dovecot; do
+  invoke-rc.d $i restart
+done
+
+#DEBHELPER#
+exit 0

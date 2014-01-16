@@ -1,0 +1,13 @@
+#
+# This snippet sets up a listener for the dovecot authentication server for use
+# by Prosody.
+#
+
+service auth {
+  unix_listener auth-client {
+    path = /var/run/prosody/dovecot-auth
+    mode = 0666
+  }
+  user = prosody
+}
+

@@ -1,0 +1,4 @@
+dovecot.d/*   /etc/dovecot/symbiosis.d
+monit.d       /etc/symbiosis/
+templates.d/* /etc/symbiosis/xmpp.d
+sbin/*        /usr/sbin

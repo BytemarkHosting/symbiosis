@@ -1,0 +1,15 @@
+Source: symbiosis-xmpp
+Section: net
+Priority: extra
+Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>
+Build-Depends: debhelper (>= 7.0.0), gem2deb, txt2man
+Standards-Version: 3.9.1
+XS-Ruby-Versions: all
+
+Package: symbiosis-xmpp
+Architecture: all
+Depends: symbiosis-common (>= 2014:0113), symbiosis-email, prosody, prosody-mod-auth-dovecot
+Recommends: symbiosis-monit
+Description: Add XMPP (Jabber) support to Symbiosis
+ Temporary description.

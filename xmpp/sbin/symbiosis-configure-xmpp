@@ -1,0 +1,248 @@
+#!/usr/bin/ruby
+#
+# NAME
+#
+#  symbiosis-configure-xmpp -- Auto-configure prosody for XMPP
+#
+# SYNOPSIS
+#  symbiosis-configure-xmpp [ --template | -t <file> ] 
+#                         [ --prosody-dir | -a <directory> ] 
+#                         [ --force | -f ] [ --no-reload | -r ]
+#                         [ --help | -h ] [ --manual | -m ] [ --verbose | -v ]
+#
+# OPTIONS
+#
+# --template, -t <file>      Specify the template file for SSL sites.
+#                            Defaults to /etc/symbiosis/xmpp.d/prosody.template.erb
+#
+# --prosody-dir, -a <directory>  Specify the location of the prosody
+#                                configuration directory. Defaults to
+#                                /etc/prosody.
+#
+# --force, -f       Force the re-creation of all sites.
+#
+# --no-reload, -r   Do not reload prosody even if changes have taken place.
+#
+# --manual, -m      Show the manual for this script.
+#
+# --help, -h        Show brief usage instructions for this script.
+#
+# --verbose, -v     Show debugging information.
+#
+# USAGE
+#
+# This script is designed to iterate over the domains hosted upon a Symbiosis
+# system, and configure Prosody virtual hosts for each one.
+#
+# This script can be disabled by creating the file
+# /etc/symbiosis/xmpp.d/disabled. This will also prevent any further package
+# updates from recreating these sites in the prosody configuration. However it
+# will not disable any sites that are currently in place. These should be
+# removed manually.
+#
+# AUTHOR
+#
+#   Patrick Cherry <patrick@bytemark.co.uk>
+#
+
+
+require 'getoptlong'
+require 'symbiosis/utils'
+
+#
+#  Entry point to the code
+#
+$FORCE    = false
+$VERBOSE  = false
+help      = false
+manual    = false
+
+#
+#  Do we need to reload prosody?
+#
+$RELOAD=false
+
+#
+# The root directory -- '/' by default.
+#
+root = "/"
+template     = nil 
+prosody_dir  = nil
+no_restart   = false
+
+opts = GetoptLong.new(
+         [ '--help',             '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--manual',           '-m', GetoptLong::NO_ARGUMENT ],
+         [ '--verbose',          '-v', GetoptLong::NO_ARGUMENT ],
+         [ '--force',            '-f', GetoptLong::NO_ARGUMENT ],
+         [ '--no-restart',       '-N', GetoptLong::NO_ARGUMENT],
+         [ '--template',         '-t', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--prosody-dir',      '-p', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--root-dir',         '-r', GetoptLong::REQUIRED_ARGUMENT ]
+       )
+
+begin
+  opts.each do |opt, arg|
+    case opt
+    when '--template'
+      template = arg
+    when '--prosody-dir'
+      prosody_dir = arg
+    when '--root'
+      root = arg
+    when '--no-restart'
+      no_restart = true
+    when '--help'
+      help = true
+    when '--manual'
+      manual = true
+    when '--verbose'
+      $VERBOSE = true
+    when '--force'
+      $FORCE = true
+    end
+  end
+rescue => err
+  # any errors, show the help
+  warn err.to_s
+  help = true
+end
+
+
+#
+# Show the manual, or the help
+#
+Symbiosis::Utils.show_usage( __FILE__ ) if  help
+Symbiosis::Utils.show_manual( __FILE__ ) if manual
+
+
+#
+#  If either happened we can exit.
+#
+if ( help or manual )
+  exit 0
+end
+
+
+def verbose(s)
+  puts s if $VERBOSE
+end
+
+#
+# Disable creation of mass hosting sites.
+#
+if File.exists?("/etc/symbiosis/xmpp.d/disabled")
+  verbose "Symbiosis automatic prosody configuration disabled. Exiting."
+  exit 0
+end
+
+#
+# Requirements after the help clause has finished.
+#
+require 'erb'
+require 'symbiosis/domains'
+require 'symbiosis/domain/ssl'
+require 'symbiosis/config_files/prosody'
+
+#
+# Set the default paths.
+#
+template         = File.join(root, "/etc/symbiosis/xmpp.d/prosody.template.erb") if template.nil?
+prosody_dir      = File.join(root, "/etc/prosody") if prosody_dir.nil?
+
+#
+# Any arguments on the command line specify which domains to do.
+#
+domains_to_configure = ARGV
+
+#
+#  For each domain.
+#
+Symbiosis::Domains.each do |domain|
+
+  verbose "Domain: #{domain.name} "
+
+  next unless domains_to_configure.empty? or domains_to_configure.include?(domain.name)
+
+  if domain.is_alias?
+    verbose "\t#{domain.symlink} is a link to #{domain.directory}.  Skipping."
+    next
+  end
+
+  begin
+    available_file = File.join(prosody_dir, "conf.avail","#{domain.name}.cfg.lua")
+    enabled_file   = File.join(prosody_dir, "conf.d","#{domain.name}.cfg.lua")
+
+    config        = Symbiosis::ConfigFiles::Prosody.new(available_file, "--")
+    config.domain = domain
+    config.template = template
+
+    #
+    #  If there is already a site enabled we only
+    # need to touch it if one of the SSL-files is more
+    # recent than the generated file.
+    #
+    #  e.g. User adds /config/ssl.combined and a site
+    # is generated but broken because a mandatory bundle is missing.
+    #
+
+    if ( $FORCE )
+      verbose "\tForcing re-creation of configuration due to --force."
+
+    elsif config.exists?
+
+      if config.changed?
+        verbose "\tNot updating configuration, as it has been edited by hand."
+        next
+
+      elsif config.outdated?
+        verbose "\tRe-creating configuration as it is out of date."
+
+      else
+        verbose "\tConfiguration is up-to date."
+        next
+
+      end
+
+    else
+      verbose "\tConfiguring site for the first time"
+
+      end
+
+    #
+    # This gets prosody to check the configuration using a temporary file.
+    #
+    if config.ok?
+
+      verbose "\tWriting configuration"
+      config.write
+
+      # Definitely reload if we've rewritten the config.
+      $RELOAD = true
+
+      unless config.enabled?(enabled_file)
+        verbose "\tEnabling site"
+        config.enable(enabled_file, $FORCE)
+      end
+
+    else
+      verbose "\tProsody has rejected the new configuration -- no changes have been made."
+    end
+
+  rescue StandardError => err
+    #
+    # Rescue errors for this domain, but continue for others.
+    #
+    warn "\tUnable to configure prosody for #{domain.name} because #{err.to_s} (#{err.class.to_s})"
+    verbose "\t"+err.backtrace.join("\n\t")
+  end
+end
+
+#
+#  All done.
+#
+if ( $RELOAD and !no_restart )
+  verbose "Restarting Prosody"
+
+  system( "/etc/init.d/prosody restart" )
+end

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -e
+
+#
+# Add firewall rules
+#
+for i in {client,server} ; do
+  fn="/etc/symbiosis/firewall/incoming.d/50-xmpp-$i"
+  if [ -d $(dirname $fn) ] ; then
+    echo "I: Adding XMPP $i firewall rule..."
+    touch "$fn"
+  fi
+done
+
+#
+#  Rebuild dovecot
+#
+if [ -e /etc/dovecot/Makefile ] ; then
+    cd /etc/dovecot && make
+fi
+
+#
+#  Restart all daemons
+#
+for i in prosody dovecot; do
+  invoke-rc.d $i restart
+done
+
+#DEBHELPER#
+exit 0
