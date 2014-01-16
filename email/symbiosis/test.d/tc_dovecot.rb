@@ -45,7 +45,7 @@ class TestDovecot < Test::Unit::TestCase
     end
   end
 
-  def do_skip
+  def do_skip(msg)
     if self.respond_to?(:skip)
       skip msg
     else
