@@ -9,7 +9,7 @@ XS-Ruby-Versions: all
 
 Package: symbiosis-monit
 Architecture: all
-Depends: ruby1.8, cron, libsqlite3-ruby1.8, liblog4r-ruby1.8, procps, symbiosis-common (>= 2014:0113), ${misc:Depends}
+Depends: ruby | ruby-interpreter, cron, ruby-sqlite3, ruby-log4r, procps, symbiosis-common (>= 2014:0113), ${misc:Depends}
 Replaces: bytemark-vhost-monit
 Conflicts: bytemark-vhost-monit
 Provides: bytemark-vhost-monit
