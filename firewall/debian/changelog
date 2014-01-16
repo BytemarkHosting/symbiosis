@@ -1,8 +1,9 @@
 symbiosis-firewall (2014:0116) stable; urgency=low
 
+  * Updated incrond to use /usr/bin/ruby 
   * Fixed missing variable in symbiosis-firewall-whitelist.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 16 Jan 2014 14:53:17 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 16 Jan 2014 16:39:12 +0000
 
 symbiosis-firewall (2014:0113) stable; urgency=low
 
