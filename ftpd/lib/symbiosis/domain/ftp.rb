@@ -4,145 +4,149 @@ require 'symbiosis/domain'
 module Symbiosis
 
   class Domain
+    class FTPUser
 
-    #
-    # Returns the FTP username, i.e. the domain name.
-    #
-    def ftp_username
-      self.name
-    end
+      attr_accessor :username,:password,:dir,:mode
 
-    #
-    # Returns the FTP chroot directory.  Currently defaults to
-    # the domain's public directory.
-    #
-    def ftp_chroot_dir
-      File.join(self.public_dir, "./")
-    end
+      def initialize(username, domain, password, dir=domain.public_dir, mode="rw", quota=0)
+        raise ArgumentError, "Not a Domain" unless domain.is_a?(Symbiosis::Domain)
+        raise ArgumentError, "No Password" if password.nil? or password.length == 0
+        raise ArgumentError, "No Username" if username.nil? or username.length == 0
 
-    #
-    # Returns the name of the FTP password file.
-    #
-    def ftp_password_file
-      File.join(self.config_dir,"ftp-password")
-    end
-
-    #
-    # Checks to see if FTP has been enabled for this domain.
-    #
-    def ftp_enabled?
-      File.readable?(self.ftp_password_file)
-    end
-
-    #
-    # Returns the FTP password as a string, or nil if no password could be
-    # found.
-    #
-    def ftp_password
-      @ftp_password ||= nil
-
-      if @ftp_password.nil?
-        if self.ftp_enabled?
-          #
-          # Read the password
-          #
-          param = get_param("ftp-password", self.config_dir, {:mode => 0600})
-
-          unless param.is_a?(String)
-            @ftp_password = nil
-          else
-            @ftp_password = param.split($/).first.strip
-          end
+        @domain = domain
+        @username = username
+        @password = password
+        @dir = dir || (File.join(@domain.public_dir,"./"))
+        unless @dir.start_with? "/"
+          @dir = File.join(@domain.public_dir,@dir,"./")
         end
+        @mode = mode || "rw"
+        @quota = Symbiosis::Utils.parse_quota(quota || 0)
       end
 
-      @ftp_password
-    end
-
-    #
-    # Set the FTP password.  Plaintext is for testing only, really.
-    #
-    def ftp_password=(f, plaintext = false)
-      @ftp_password = f
-
-      if plaintext
-        set_param("ftp-password", @ftp_password, self.config_dir, {:mode => 0600})
-      else
-        set_param("ftp-password", crypt_password(@ftp_password), self.config_dir, {:mode => 0600})
+      def uid
+        @domain.uid
       end
 
-      return @ftp_password
-    end
-    
-    #
-    # Return the FTP quota.  Uses Symbiois::Utils#parse_quota to do the
-    # parsing.  Returns an Integer, or nil if no quota was set.
-    #
-    def ftp_quota
-      if ! defined? @ftp_quota or @ftp_quota.nil?
-        if self.ftp_enabled?
-          #
-          # Read the quota
-          #
-          param = get_param("ftp-quota",self.config_dir)
+      def quota
+        @quota.to_i
+      end
 
-          unless param.is_a?(String)
-            @ftp_quota = nil
-          else
-            begin
-              @ftp_quota = parse_quota(param)
-            rescue ArgumentError => err
-              @ftp_quota = nil
+      def quota=(q)
+        @quota = Symbiosis::Utils.parse_quota(q)
+      end
+
+      def gid
+        @domain.gid
+      end
+
+      def to_s
+        [@username,@password,@dir,@mode,quota].join(":")
+      end
+
+      def save!
+        users_file = File.join(@domain.config_dir,Symbiosis::Domain::FTP_MULTI_USER_FILENAME)
+
+        if @domain.ftpusers.find{|u|u.username == self.username}
+          # then there's already a user which matches, update it
+          Symbiosis::Utils.safe_open(users_file,"a+") do |uf|
+            Symbiosis::Utils.lock(uf)
+            buf = uf.readlines.map do |u|
+              tst_user = FTPUser.create_from_string(@domain,u)
+              if tst_user.username == self.username
+                self.to_s # if same username, overwrite with self
+              else
+                u # otherwise just leave it untouched
+              end
+            end
+            uf.rewind
+            uf.truncate(0) # mandatory
+            p buf
+            buf.each do |f|
+              uf.puts f
             end
           end
+        else
+          # then we need to add it
+          Symbiosis::Utils.safe_open(users_file,"a+") do |uf|
+            Symbiosis::Utils.lock(uf)
+            uf.puts(self.to_s)
+          end
         end
       end
 
-      @ftp_quota
-    end
-
-    #
-    # Sets the quota.  Uses Symbiois::Utils#parse_quota to check it can be
-    # parsed.  Returns the parsed Integer, or nil if no quota was set.
-    #     
-    #
-    def ftp_quota=(q)
-      if q.nil?
-        @ftp_quota = nil
-      else
-        @ftp_quota = parse_quota(q)
-      end
-
-      set_param("ftp-quota", q, self.config_dir)
-
-      return @ftp_quota
-    end
-   
-    #
-    # Check the password, and create the chroot'd directory if the password
-    # check succeeds.
-    #
-    # Raises an ArgumentError if the password is wrong.
-    #
-    # Returns true on success.
-    #
-    def ftp_login(password)
-      #
-      # Do the password check.
-      #
-      if true === check_password(password, self.ftp_password)
-
-        #
-        # OK, we've successfully logged in.  Create the directory
-        #
-        create_dir(File.expand_path(ftp_chroot_dir)) unless File.directory?(ftp_chroot_dir)
-
-        return true
-      else
-        return false
+      def self.create_from_string(domain, s)
+        raise ArgumentError unless domain.is_a?(Symbiosis::Domain)
+        (suser, spasswd, sdir, smode, squota) = s.strip.split(":",5)
+        return FTPUser.new(suser, domain, spasswd, sdir, smode, squota)
       end
     end
 
+    FTP_MULTI_USER_FILENAME = "ftp-users"
+    FTP_SINGLE_USER_FILENAME = "ftp-password"
+    FTP_SINGLE_USER_QUOTA_FILENAME = "ftp-quota"
+
+    def ftp_multi_user?
+      # Does this domain use the new "multi user" config file format?
+      File.exists?(File.join(self.config_dir,FTP_MULTI_USER_FILENAME))
+    end
+
+    def ftp_single_user?
+      # Does this domain use the old single ftp-password file?
+      return false if ftp_multi_user? # old format has lower precedence
+      File.exists?(File.join(self.config_dir,FTP_SINGLE_USER_FILENAME))
+    end
+
+    def ftp_mode
+      if ftp_multi_user?
+        :multi
+      elsif ftp_single_user?
+        :single
+      else
+        :none
+      end
+    end
+
+    def ftp_quota(username=self.name)
+      ftpusers.find{|u|u.username == username}.quota
+    end
+
+    def ftp_login(password,username=self.name)
+      ftpusers.find do |u|
+        u.username == username and check_password(password,u.password)
+      end
+    end
+
+    def ftp_enabled?
+      ftp_multi_user? or ftp_single_user?
+    end
+
+    def ftpusers
+      users = []
+      if ftp_multi_user?
+        users = []
+        safe_open(File.join(self.config_dir, FTP_MULTI_USER_FILENAME)) do |uf|
+          uf.lines.each do |l|
+            users << Domain::FTPUser.create_from_string(self, l)
+          end
+        end
+        return users
+      elsif ftp_single_user? # go with the crappy old-style way
+        passwd = Utils.safe_open(File.join(self.config_dir, FTP_SINGLE_USER_FILENAME)) do |pf|
+          pf.read.strip
+        end
+        quota_file = File.join(self.config_dir, FTP_SINGLE_USER_QUOTA_FILENAME)
+        quota = nil
+        if File.exists?(quota_file)
+          quota = Utils.safe_open(quota_file) do |qf|
+            qf.read.strip
+          end
+        end
+        users << Domain::FTPUser.new(self.name,self, passwd,self.public_dir,"rw",quota)
+        return users
+      else
+        return []
+      end
+    end
   end
-
 end
