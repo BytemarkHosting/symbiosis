@@ -227,6 +227,11 @@ Symbiosis::Utmp.read(wtmp_file).each do |entry|
   next unless entry['type'] == 7
 
   #
+  # Fetch the time the entry was logged at.
+  #
+  at = entry['time']
+
+  #
   # Make sure the entry isn't in the future
   #
   next unless at < time_now
