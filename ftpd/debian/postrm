@@ -1,20 +1,27 @@
 #!/bin/bash
+
 set -e
 
-#
-#  Remove the linked certificate if we have one, and the associated TLS file.
-#
-if [ -L /etc/ssl/private/pure-ftpd.pem ]; then
+if [ "$1" = "purge" ] ; then
+  #
+  #  Remove the linked certificate if we have one, and the associated TLS file.
+  #
+  if [ -L /etc/ssl/private/pure-ftpd.pem ]; then
     rm /etc/ssl/private/pure-ftpd.pem
     rm -f /etc/pure-ftpd/conf/TLS
-fi
+  fi
 
-#
-# Remove from the rc levels.
-#
-if [ "$1" = "purge" ] ; then
+  #
+  # Remove from the rc levels.
+  #
   update-rc.d pure-authd remove > /dev/null 
+
+  #
+  # And restart pure-ftpd.
+  #
+  invoke-rc.d pure-ftpd restart 
 fi
 
 #DEBHELPER#
+
 exit 0
