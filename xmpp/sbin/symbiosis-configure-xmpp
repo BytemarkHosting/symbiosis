@@ -160,9 +160,17 @@ domains_to_configure = ARGV
 #
 Symbiosis::Domains.each do |domain|
 
+  next unless domains_to_configure.empty? or domains_to_configure.include?(domain.name)
+
   verbose "Domain: #{domain.name} "
 
-  next unless domains_to_configure.empty? or domains_to_configure.include?(domain.name)
+  #
+  # Skip domains without XMPP.
+  #
+  unless domain.has_xmpp?
+    verbose "\tHas not had XMPP enabled.  Skipping."
+    next
+  end
 
   if domain.is_alias?
     verbose "\t#{domain.symlink} is a link to #{domain.directory}.  Skipping."
