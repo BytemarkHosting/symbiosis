@@ -1,4 +1,4 @@
-symbiosis-ftpd (2012:0927) stable; urgency=low
+symbiosis-ftpd (2012:0927) oldstable; urgency=low
 
   * Fixed pre/postrm scripts not to stop pure-authd unless this package is
     being removed or purged, otherwise upgrades break.
