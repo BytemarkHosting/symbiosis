@@ -1,3 +1,10 @@
+symbiosis-ftpd (2012:0927) stable; urgency=low
+
+  * Fixed pre/postrm scripts not to stop pure-authd unless this package is
+    being removed or purged, otherwise upgrades break.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 17 Jan 2014 14:49:42 +0000
+
 symbiosis-ftpd (2012:0926) oldstable; urgency=low
 
   * Updated the FTP library to use Symbiosis::Domain#public_dir.
