@@ -19,7 +19,13 @@ class ProsodyCheck < Symbiosis::Monitor::Check
     return SystemExit::EX_CONFIG unless initscript_ok?
 
     r = do_process_check
-    self.restart if SystemExit::EX_TEMPFAIL == r
+
+    if SystemExit::EX_TEMPFAIL == r 
+      should_be_running ? self.start : self.stop
+    end
+
+    return 0 unless should_be_running
+
     return r unless 0 == r
 
     return 0 
