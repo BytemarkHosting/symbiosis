@@ -141,7 +141,7 @@ end
 #
 require 'erb'
 require 'symbiosis/domains'
-require 'symbiosis/domain/ssl'
+require 'symbiosis/domain/xmpp'
 require 'symbiosis/config_files/prosody'
 
 #
