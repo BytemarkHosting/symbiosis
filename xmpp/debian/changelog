@@ -1,5 +1,5 @@
-symbiosis-xmpp (2014:0117) stable; urgency=low
+symbiosis-xmpp (2014:0118) stable; urgency=low
 
   * Initial release. (Closes: #4276)
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 17 Jan 2014 12:21:38 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Sat, 18 Jan 2014 07:23:55 +0000
