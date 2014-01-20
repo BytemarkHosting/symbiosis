@@ -386,7 +386,7 @@ module Symbiosis
             # Roll on time to the beginning of the next week, and add the first day.
             time = time + (7 - time.wday + wday.first)
           else
-            time = time >> (wday.first - time.wday)
+            time = time + (wday.first - time.wday)
           end
         end
 
