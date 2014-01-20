@@ -292,6 +292,17 @@ class TestCrontabRecord < Test::Unit::TestCase
   end
 
   #
+  # There was a typo which occured when calculating the next due date during
+  # crontab tests.
+  #
+  def test_ticket_569757
+    crontab_record = Symbiosis::CrontabRecord.parse("30 7 * * 5 /do/some/stuff")
+    now = DateTime.new(2014,1,15,17,0,0)
+
+    assert_equal_date(DateTime.new(2014,1,17,7,30,0), crontab_record.next_due(now))
+  end
+
+  #
   # This checks the date, to the nearest minute.
   #
   def assert_equal_date(expected, actual)
