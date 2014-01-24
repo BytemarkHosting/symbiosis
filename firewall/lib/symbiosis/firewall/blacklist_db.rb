@@ -14,7 +14,6 @@ module Symbiosis
         # hmm.. maybe we should deal with this a bit better?
         #
         @dbh = SQLite3::Database.new(database)
-        @dbh.type_translation = true
         @tbl_name = "blacklist"
         create_table
       end
@@ -22,14 +21,16 @@ module Symbiosis
       def set_count_for(ip, cnt, timestamp = Time.now)
         @dbh.execute("INSERT INTO #{@tbl_name}
           VALUES (?, ?, ?)",
-          ip.to_s, timestamp.to_i, cnt
+          [ip.to_s, timestamp.to_i, cnt]
         )
 
         @count = cnt
       end
 
       def get_count_for(ip, timestamp = (Time.now - 48*3600))
-        cnt = @dbh.execute("SELECT SUM(count) FROM #{@tbl_name} WHERE ip = ? AND timestamp >= ?", ip.to_s, timestamp.to_i).flatten.first
+        cnt = @dbh.execute("SELECT SUM(count) FROM #{@tbl_name} 
+          WHERE ip = ?  AND timestamp >= ?", 
+          [ip.to_s, timestamp.to_i]).flatten.first
 
         return cnt.to_i
       end
@@ -48,6 +49,7 @@ module Symbiosis
               )"
         @dbh.execute(sql)
       end
+
     end
 
   end

@@ -21,7 +21,6 @@ module Symbiosis
         @lines = []
 
         @dbh = SQLite3::Database.new(database)
-        @dbh.type_translation = true
         @tbl_name = "logtail"
         create_table
       end
@@ -50,7 +49,7 @@ module Symbiosis
       def pos=(new_pos)
         @dbh.execute("INSERT OR REPLACE INTO #{@tbl_name}
           VALUES (?, ?, ?)",
-          self.filename, self.identifier, new_pos
+          [self.filename, self.identifier, new_pos]
         )
 
         @pos = new_pos
@@ -60,9 +59,12 @@ module Symbiosis
         return 0 if self.identifier.nil?
         return @pos unless @pos.nil?
 
-        pos = @dbh.execute("SELECT pos FROM #{@tbl_name} WHERE filename = ? AND identifier = ? LIMIT 0,1", self.filename, self.identifier).flatten.first
+        pos = @dbh.execute("SELECT pos FROM #{@tbl_name}
+          WHERE filename = ? AND identifier = ? LIMIT 0,1", 
+          [self.filename, self.identifier]).flatten.first
+
         pos = 0 if pos.nil?
-        @pos = pos
+        @pos = pos.to_i
       end
       
       def readlines
