@@ -99,7 +99,7 @@ module Symbiosis
             begin
               logtail = Logtail.new(pattern.logfile, @logtail_db)
               loglines = logtail.readlines
-            rescue Errno::ENOENT => err
+            rescue Errno::ENOENT
               #
               # Do nothing if the log file doesn't exist.
               #

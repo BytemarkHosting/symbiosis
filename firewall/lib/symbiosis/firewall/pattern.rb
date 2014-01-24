@@ -73,7 +73,7 @@ module Symbiosis
 
             begin
               ip = IPAddr.new(ip)
-            rescue ArgumentError => err
+            rescue ArgumentError
               warn "Failed to parse IP #{ip.inspect}"
             end
 
