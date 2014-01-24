@@ -2,8 +2,10 @@ symbiosis-cron (2012:0328) oldstable; urgency=low
 
   * Fixed by whereby records involving weekdays would not be shown correctly
     during "test" mode.
+  * Fixed stat of domain directories and crontab files to make sure symlinks
+    are skipped.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 20 Jan 2014 16:48:30 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 24 Jan 2014 12:00:37 +0000
 
 symbiosis-cron (2012:0327) oldstable; urgency=low
 
