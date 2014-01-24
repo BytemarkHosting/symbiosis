@@ -122,19 +122,19 @@ module Symbiosis
       #
       # Create our stack of directories in real life.
       #
-      stack.each do |dir|
+      stack.each do |sdir|
         begin
           #
           # If a symlink (or anything else) is in the way, an EEXIST exception
           # is raised.
           #
-          Dir.mkdir(dir, options[:mode])
+          Dir.mkdir(sdir, options[:mode])
         rescue Errno::EEXIST => err
           #
           # If there is a directory in our way, skip and move on.  This could
           # be a TOCTTOU problem.
           #
-          next if File.directory?(dir)
+          next if File.directory?(sdir)
 
           #
           # Otherwise barf.
@@ -148,7 +148,7 @@ module Symbiosis
         # condition where the attacker replaces our new directory with a
         # symlink to a file he can't read, only to have us chown it.
         #
-        File.lchown(options[:uid], options[:gid], dir)
+        File.lchown(options[:uid], options[:gid], sdir)
       end
 
       return dir
