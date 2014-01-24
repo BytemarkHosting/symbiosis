@@ -73,12 +73,6 @@ void process_crontab( char *crontab_path, char *domain_path, struct passwd *usr 
         exit(-1);
     }
 
-    int i,j;
-    for (i = 0, j = 0; i < ngroups; i++) 
-    {
-        
-    }
-
     /**
      * Set environment and args 
      */
