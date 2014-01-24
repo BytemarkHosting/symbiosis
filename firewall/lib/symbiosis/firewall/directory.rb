@@ -1,4 +1,5 @@
 require 'symbiosis/firewall/template'
+require 'symbiosis/domain'
 require 'resolv-replace'
 
 module Symbiosis
@@ -261,9 +262,18 @@ module Symbiosis
           template.chain = self.chain unless self.chain.nil?
 
           #
-          # File.readlines always returns an array, one element per line, even for dos-style files.
+          # File.readlines always returns an array, one element per line, even
+          # for dos-style files.  Reject hostnames that start with "#" or are
+          # empty strings.
           #
-          hostnames = File.readlines( File.join( self.path, entry ) ).collect{|l| l.chomp.strip}
+          hostnames = []
+          File.readlines( File.join( self.path, entry ) ).each do |l|
+            hostname = l.chomp.strip
+            next if hostname.empty? 
+            next if hostname =~ /^#/
+
+            hostnames << hostname
+          end
 
           #
           # Add a dummy address of nil if there are no hostnames in the list
@@ -360,22 +370,17 @@ module Symbiosis
           end
 
           #
-          # Now see if the file contains any lines for ports
+          # Now see if the file contains any lines for ports Tidy port list,
+          # removing empty lines, and stripping out white space.
           #
-          ports = File.readlines(File.join(self.path, file))
+          ports = []
+          File.readlines( File.join( self.path, file ) ).each do |l|
+            port = l.chomp.strip
+            next if port.empty?
+            next unless port =~ /^(0-9+|all)$/
 
-          #
-          # Tidy port list, removing empty lines, and stripping out white
-          # space.
-          #
-          ports = ports.collect do |port|
-            port = port.chomp.strip
-            if port.empty?
-              nil
-            else
-              port
-            end
-          end.compact
+            ports << port
+          end
          
           #
           # Now we have our sanitised list, if the list is empty, assume all
