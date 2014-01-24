@@ -377,7 +377,7 @@ module Symbiosis
           File.readlines( File.join( self.path, file ) ).each do |l|
             port = l.chomp.strip
             next if port.empty?
-            next unless port =~ /^(0-9+|all)$/
+            next unless port =~ /^([a-z0-9]+|all)$/
 
             ports << port
           end
