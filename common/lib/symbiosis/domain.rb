@@ -75,11 +75,14 @@ module Symbiosis
       # If the directory exists, then check that we're not following a symlink.
       #
       if File.directory?(@directory)
+        
+        directory_stat = File.stat(@directory)
+
         #
         # Redirect elsewhere if we have a symlink.  Expand it up relative to
         # @prefix.
         #
-        if File.lstat(@directory).ino != File.stat(@directory).ino
+        if File.lstat(@directory).ino != directory_stat.ino
           #
           # Deal with multiple layers of indirection with an inode comparison
           # would work better.  This will only work within the prefix
@@ -88,7 +91,7 @@ module Symbiosis
           #
           # Work out which inode we're pointed at.  Use stat so we follow the link.
           #
-          target_inode = File.stat(@directory).ino
+          target_inode = directory_stat.ino
 
           #
           # Now find a matching entry inode.
@@ -110,38 +113,45 @@ module Symbiosis
             #
             @symlink   = @directory
             @directory = new_directory
+            directory_stat = File.stat(@directory)
           end
         end
 
-        @uid  = File.stat(@directory).uid
-        @user = Etc.getpwuid(@uid).name
-        raise ArgumentError, "#{@directory} owned by a system user (UID less than 1000)" if @uid < 1000
-
-        @gid = File.stat(@directory).gid
-        @group = Etc.getgrgid(@gid).name
-        raise ArgumentError, "#{@directory} owned by a system group (GID less than 1000)" if @gid < 1000
+        #
+        # Set the uid/gid for the domain.
+        #
+        @uid = directory_stat.uid 
+        @gid = directory_stat.gid
       else
         #
-        # Otherwise assume admin.
+        # If this is a system proces, use the prefix owner, if poss, admin
+        # otherwise.
         #
         if Process.uid < 1000
-          @user = @group = "admin"
-          #
-          # This will raise an argument error if "admin" user/group cannot be found
-          #
-          @uid = Etc.getpwnam(@user).uid
-          @gid = Etc.getgrnam(@group).gid
+          prefix_stat = File.stat(@prefix)
+
+          if prefix_stat.uid < 1000
+            @uid = Etc.getpwnam("admin").uid
+            @gid = Etc.getpwnam("admin").gid
+          else
+            @uid = prefix_stat.uid
+            @gid = prefox_stat.gid
+          end
+
         else
           #
           # This is good for testing.
           #
           @uid   = Process.uid
-          @user  = Etc.getpwuid(@uid).name
-          # User's default group.
           @gid   = Etc.getpwuid(@uid).gid
-          @group = Etc.getgrgid(@gid).name
         end
       end
+
+      @user = Etc.getpwuid(@uid).name
+      raise ArgumentError, "#{@directory} owned by a system user (UID less than 1000)" if @uid < 1000
+
+      @group = Etc.getgrgid(@gid).name
+      raise ArgumentError, "#{@directory} owned by a system group (GID less than 1000)" if @gid < 1000
     end
 
     #
