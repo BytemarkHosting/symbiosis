@@ -114,6 +114,10 @@ module Symbiosis
         @domain.gid
       end
 
+      def is_single_user?
+        self.domain.name == self.username
+      end
+
       def to_s
         [self.username, self.password, self.chroot_dir, self.quota].join(":")
       end
@@ -162,7 +166,7 @@ module Symbiosis
     # the domain's public directory.
     #
     def ftp_chroot_dir
-      File.join(domain.public_dir, "./")
+      File.join(self.public_dir, "./")
     end
 
     #
