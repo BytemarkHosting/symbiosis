@@ -1,4 +1,3 @@
-man/symbiosis-create-sites.man
-man/symbiosis-create-mass-hosting-sites.man
-man/symbiosis-apache-logger.man
-man/symbiosis-generate-stats.man
+man/symbiosis-httpd-configure.man
+man/symbiosis-httpd-logger.man
+man/symbiosis-httpd-generate-stats.man

@@ -69,10 +69,9 @@ for mod in vhost_alias ; do
 done
 
 #
-# Now create the mass-hosting snippets
+# Reconfigure apache.
 #
-symbiosis-create-mass-hosting-sites --no-reload --verbose
-symbiosis-create-sites              --no-reload --verbose
+symbiosis-httpd-configure --no-reload --verbose
 
 #
 # Now relink any sites that were removed earlier
@@ -103,6 +102,11 @@ fi
 # Remove /etc/cron.hourly/create-ssl-sites as well
 if [ -e /etc/cron.hourly/create-ssl-sites ] ; then
   rm -f /etc/cron.hourly/create-ssl-sites
+fi
+
+# symbiosis-create-sites was renamed to symbiosis-httpd-configure in Wheezy.
+if [ -e /etc/cron.hourly/symbiosis-create-sites ] ; then
+  rm -f /etc/cron.hourly/symbiosis-create-sites
 fi
 
 # Remove the old make-logs script too.
