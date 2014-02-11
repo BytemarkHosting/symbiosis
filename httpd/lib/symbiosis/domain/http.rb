@@ -63,6 +63,68 @@ module Symbiosis
       File.join(self.public_dir, "cgi-bin")
     end
 
+    #
+    # This returns a Symbiosis::ConfigFiles::Apache object for this domain.
+    #
+    def apache_configuration(ssl_template, non_ssl_template, apache2_dir='/etc/apache2')
+      #
+      #
+      sites_available_file = File.join(apache2_dir, "sites-available","#{self.name}.conf")
+
+      config        = Symbiosis::ConfigFiles::Apache.new(sites_available_file, "#")
+      config.domain = self
+
+      if !Symbiosis::Domains.zz_mass_hosting and self.ips.any?{|ip| primary_ips.include?(ip)}
+        verbose "\tThis site is using the host's primary IPs -- it is covered by the mass-hosting config."
+        return nil
+      end
+
+      document_root = File.join(self.directory,"public","htdocs")
+
+      unless File.directory?(document_root)
+        verbose "\tThe document root #{document_root} does not exist."
+        return nil
+      end
+
+      #
+      #  If SSL is not enabled then we can skip
+      #
+      if ( self.ssl_enabled? )
+        begin
+          self.ssl_verify
+          config.template = ssl_template
+
+          verbose "\tSSL is enabled -- using SSL template"
+
+        rescue OpenSSL::OpenSSLError => err
+          #
+          # This catches any OpenSSL problem, and allows us to revert to non-ssl hosting.
+          #
+
+          warn "SSL configuration for #{self.name} is broken -- #{err.to_s} (#{err.class.to_s})"
+
+          if self.ssl_mandatory?
+            #
+            # If this domain is SSL-only, do not reconfigure it with the non-SSL
+            # template.
+            #
+            verbose "\tSSL is enabled and mandatory, but mis-configured.  Skipping."
+            return nil
+          end
+
+          verbose "\tSSL is enabled but mis-configured -- using non-SSL template."
+          config.template = non_ssl_template
+        end
+      else
+        config.template = non_ssl_template
+
+        verbose "\tSSL is not enabled -- using non-SSL template"
+      end
+
+
+      return config
+    end
+
   end
 
 end
