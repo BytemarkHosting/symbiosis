@@ -1,3 +1,9 @@
+symbiosis-httpd (2014:0211) stable; urgency=low
+
+  * Updated package to use more normal command names.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 11 Feb 2014 15:46:51 +0000
+
 symbiosis-httpd (2014:0113) stable; urgency=low
 
   * Changed maintainer and uploaders.
