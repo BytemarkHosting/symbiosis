@@ -1,3 +1,9 @@
+symbiosis-firewall (2014:0211) stable; urgency=low
+
+  * Removed comments in incron.d snippet.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 11 Feb 2014 15:24:03 +0000
+
 symbiosis-firewall (2014:0116) stable; urgency=low
 
   * Updated incrond to use /usr/bin/ruby 
