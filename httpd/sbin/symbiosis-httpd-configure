@@ -2,10 +2,10 @@
 #
 # NAME
 #
-#  symbiosis-create-sites -- Auto-configure Apache2 sites with specified IPs
+#  symbiosis-httpd-configure -- Auto-configure Apache2 sites with specified IPs
 #
 # SYNOPSIS
-#  symbiosis-create-sites [ --ssl-template | -s <file> ] 
+#  symbiosis-httpd-configure [ --ssl-template | -s <file> ] 
 #                         [ --non-ssl-template | -t <file> ] 
 #                         [ --apache2-dir | -a <directory> ] 
 #                         [ --force | -f ] [ --no-reload | -r ]
@@ -24,6 +24,14 @@
 # --apache2-dir, -a <directory>  Specify the location of the apache2
 #                                configuration directory. Defaults to
 #                                /etc/apache2.
+#
+# --mass-ssl-template, -S <file>   Specify the template file for mass-hosted SSL
+#                                  sites. Defaults to
+#                                  /etc/symbiosis/apache.d/zz-mass-hosting.ssl.template.erb
+#
+# --mass-non-ssl-template, -T <file>  Specify the template file for mass-hosted
+#                                     non-SSL sites. Defaults to
+#                                     /etc/symbiosis/apache.d/zz-mass-hosting.template.erb
 #
 # --force, -f       Force the re-creation of all sites.
 #
@@ -75,6 +83,8 @@ $RELOAD=false
 root = "/"
 non_ssl_template = nil 
 ssl_template     = nil 
+mass_non_ssl_template = nil 
+mass_ssl_template     = nil 
 apache2_dir      = nil
 no_reload       = false
 
@@ -87,6 +97,8 @@ opts = GetoptLong.new(
          [ '--no-restart',       '-N', GetoptLong::NO_ARGUMENT],
          [ '--ssl-template',     '-s', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--non-ssl-template', '-t', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--mass-ssl-template',     '-S', GetoptLong::REQUIRED_ARGUMENT ],
+         [ '--mass-non-ssl-template', '-T', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--apache2-dir',      '-a', GetoptLong::REQUIRED_ARGUMENT ],
          [ '--root-dir',         '-r', GetoptLong::REQUIRED_ARGUMENT ]
        )
@@ -98,6 +110,10 @@ begin
       ssl_template = arg
     when '--non-ssl-template'
       non_ssl_template = arg
+    when '--mass-ssl-template'
+      mass_ssl_template = arg
+    when '--mass-non-ssl-template'
+      mass_non_ssl_template = arg
     when '--apache2-dir'
       apache2_dir = arg
     when '--root'
@@ -123,13 +139,11 @@ rescue => err
   help = true
 end
 
-
 #
 # Show the manual, or the help
 #
 Symbiosis::Utils.show_usage( __FILE__ ) if  help
 Symbiosis::Utils.show_manual( __FILE__ ) if manual
-
 
 #
 #  If either happened we can exit.
@@ -138,35 +152,48 @@ if ( help or manual )
   exit 0
 end
 
-
 def verbose(s)
   puts s if $VERBOSE
 end
 
 #
+# Requirements after the help clause has finished.
+#
+require 'symbiosis/domains'
+require 'symbiosis/domains/http'
+require 'symbiosis/domain/ssl'
+require 'symbiosis/domain/http'
+require 'symbiosis/config_files/apache'
+
+#
 # Disable creation of mass hosting sites.
 #
-if File.exists?("/etc/symbiosis/apache.d/disabled")
+unless Symbiosis::Domains.apache_configuration_enabled?
   verbose "Symbiosis automatic apache configuration disabled. Exiting."
   exit 0
 end
 
-zz_mass_hosting_disabled = File.exists?("/etc/symbiosis/apache.d/disabled.zz-mass-hosting")
-verbose "Symbiosis automatic mass-hosting configuration disabled.  Configuring all sites." if zz_mass_hosting_disabled
+#
+# Perform this check just once.
+#
+apache_mass_hosting_enabled = Symbiosis::Domains.apache_mass_hosting_enabled?
 
-#
-# Requirements after the help clause has finished.
-#
-require 'erb'
-require 'symbiosis/domains'
-require 'symbiosis/domain/ssl'
-require 'symbiosis/config_files/apache'
+unless apache_mass_hosting_enabled
+  verbose "Symbiosis automatic mass-hosting configuration disabled. Explicitly configuring all sites."
+end
 
 #
 # Set the default paths.
 #
 non_ssl_template = File.join(root, "/etc/symbiosis/apache.d/non_ssl.template.erb") if non_ssl_template.nil?
 ssl_template     = File.join(root, "/etc/symbiosis/apache.d/ssl.template.erb") if ssl_template.nil?
+
+#
+# Mass hosting paths.
+#
+mass_non_ssl_template = File.join(root, "/etc/symbiosis/apache.d/zz-mass-hosting.template.erb") if mass_non_ssl_template.nil?
+mass_ssl_template     = File.join(root, "/etc/symbiosis/apache.d/zz-mass-hosting.ssl.template.erb") if mass_ssl_template.nil?
+
 apache2_dir      = File.join(root, "/etc/apache2") if apache2_dir.nil?
 
 #
@@ -176,73 +203,41 @@ domains_to_configure = ARGV
 
 primary_ips = [Symbiosis::Host.primary_ipv4, Symbiosis::Host.primary_ipv6]
 
+configurations = []
+
 #
 #  For each domain.
 #
 Symbiosis::Domains.each do |domain|
-
-  verbose "Domain: #{domain.name} "
-
-  next unless domains_to_configure.empty? or domains_to_configure.include?(domain.name)
+  verbose "Domain: #{domain.name}"
 
   if domain.is_alias?
     verbose "\t#{domain.symlink} is a link to #{domain.directory}.  Skipping."
     next
   end
 
+  if apache_mass_hosting_enabled and domain.ips.any?{|ip| primary_ips.include?(ip)} 
+    verbose "\tThis site is using the host's primary IPs -- it is covered by the mass-hosting config.  Skipping."
+    next
+  end
+
+  configurations << domain.apache_configuration(ssl_template, non_ssl_template, apache2_dir)
+end
+
+#
+# Now see to the mass hosting stuff.
+#
+if apache_mass_hosting_enabled
+  #
+  # For each template.
+  #
+  [mass_non_ssl_template, mass_ssl_template].each do |template|
+    configurations << Symbiosis::Domains.apache_configuration(template, apache2_dir)
+  end
+end
+
+configurations.each do |config|
   begin
-    sites_available_file = File.join(apache2_dir, "sites-available","#{domain.name}.conf")
-    sites_enabled_file   = File.join(apache2_dir, "sites-enabled","#{domain.name}.conf")
-
-    config        = Symbiosis::ConfigFiles::Apache.new(sites_available_file, "#")
-    config.domain = domain
-
-    if !zz_mass_hosting_disabled and domain.ips.any?{|ip| primary_ips.include?(ip)} 
-      verbose "\tThis site is using the host's primary IPs -- it is covered by the mass-hosting config.  Skipping."
-      next
-    end
-
-    document_root = File.join(domain.directory,"public","htdocs")
-    unless File.directory?(document_root)
-      verbose "\tThe document root #{document_root} does not exist.  Skipping"
-      next
-    end
-
-    #
-    #  If SSL is not enabled then we can skip
-    #
-    if ( domain.ssl_enabled? )
-      begin 
-        domain.ssl_verify
-        config.template = ssl_template
-
-        verbose "\tSSL is enabled -- using SSL template"
-
-      rescue OpenSSL::OpenSSLError => err
-        #
-        # This catches any OpenSSL problem, and allows us to revert to non-ssl hosting.
-        #
-
-        warn "SSL configuration for #{domain.name} is broken -- #{err.to_s} (#{err.class.to_s})"
-
-        if domain.ssl_mandatory?
-          #
-          # If this domain is SSL-only, do not reconfigure it with the non-SSL
-          # template.
-          #
-          verbose "\tSSL is enabled and mandatory, but mis-configured.  Skipping."
-          next
-        end
-
-        verbose "\tSSL is enabled but mis-configured -- using non-SSL template."
-        config.template = non_ssl_template
-      end
-    else
-      config.template = non_ssl_template
-
-      verbose "\tSSL is not enabled -- using non-SSL template"
-    end
-
     #
     #  If there is already a site enabled we only
     # need to touch it if one of the SSL-files is more
@@ -251,7 +246,9 @@ Symbiosis::Domains.each do |domain|
     #  e.g. User adds /config/ssl.combined and a site
     # is generated but broken because a mandatory bundle is missing.
     #
+    verbose "Configuration: #{File.basename(config.filename)}"
 
+    sites_enabled_file = config.filename.sub("sites-available", "sites-enabled")
 
     if ( $FORCE )
       verbose "\tForcing re-creation of configuration due to --force."
@@ -274,7 +271,7 @@ Symbiosis::Domains.each do |domain|
     else
       verbose "\tConfiguring site for the first time"
 
-      end
+    end
 
     #
     # This gets apache2 to check the configuration using a temporary file.
@@ -296,12 +293,11 @@ Symbiosis::Domains.each do |domain|
       verbose "\tApache has rejected the new configuration -- no changes have been made."
     end
 
-  rescue StandardError => err
     #
     # Rescue errors for this domain, but continue for others.
     #
-    warn "\tUnable to configure site for #{domain.name} because #{err.to_s} (#{err.class.to_s})"
-    verbose "\t"+err.backtrace.join("\n\t")
+  rescue StandardError => err
+    warn "\tUnable to configure site for #{tmpl} because #{err.to_s}"
   end
 end
 
