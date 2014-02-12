@@ -1,4 +1,2 @@
-usr/sbin/symbiosis-check-mailbox-password /usr/sbin/checkpassword
-usr/sbin/symbiosis-check-mailbox-password /usr/sbin/symbiosis_checkpassword
-usr/share/man/man1/symbiosis-check-mailbox-password.1.gz usr/share/man/man1/checkpassword.1.gz
-usr/share/man/man1/symbiosis-check-mailbox-password.1.gz usr/share/man/man1/symbiosis_checkpassword.1.gz 
+usr/sbin/symbiosis-email-check-password  usr/sbin/symbiosis-check-mailbox-password
+usr/share/man/man1/symbiosis-email-check-password.1.gz usr/share/man/man1/symbiosis-check-mailbox-password.1.gz

@@ -20,7 +20,7 @@ class TestCheckpassword < Test::Unit::TestCase
     # Are we in the source directory?
     #
     %w(../../sbin/ /usr/sbin).each do |path|
-      checkpassword = File.join(File.expand_path(path),"symbiosis-check-mailbox-password")
+      checkpassword = File.join(File.expand_path(path),"symbiosis-email-check-password")
       break if File.executable?(checkpassword)
     end
     op = ""
