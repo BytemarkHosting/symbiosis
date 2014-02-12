@@ -1,5 +1,5 @@
 # Path to the password-checking executable
-AUTHD_PROGRAM=/usr/sbin/symbiosis-check-ftp-password
+AUTHD_PROGRAM=/usr/sbin/symbiosis-ftpd-check-password
 
 # Path to the socket
 AUTHD_SOCKET=/var/run/pure-ftpd/pure-authd.sock
