@@ -135,7 +135,7 @@ module Symbiosis
             @gid = Etc.getpwnam("admin").gid
           else
             @uid = prefix_stat.uid
-            @gid = prefox_stat.gid
+            @gid = prefix_stat.gid
           end
 
         else
