@@ -1,5 +1,4 @@
 require 'symbiosis/domain'
-require 'symbiosis/domains/http'
 
 module Symbiosis
 
