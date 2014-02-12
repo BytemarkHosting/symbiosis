@@ -7,7 +7,7 @@ nop:
 	@echo " docs      - Create manpages for scripts in sbin."
 	@echo " "
 
-docs: man/symbiosis-configure-xmpp.man
+docs: man/symbiosis-xmpp-configure.man
 
 man/%.man: ./sbin/%
 	[ -d man ] || mkdir man

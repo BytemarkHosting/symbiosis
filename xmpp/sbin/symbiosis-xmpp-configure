@@ -2,10 +2,10 @@
 #
 # NAME
 #
-#  symbiosis-configure-xmpp -- Auto-configure prosody for XMPP
+#  symbiosis-xmpp-configure -- Auto-configure prosody for XMPP
 #
 # SYNOPSIS
-#  symbiosis-configure-xmpp [ --template | -t <file> ] 
+#  symbiosis-xmpp-configure [ --template | -t <file> ] 
 #                         [ --prosody-dir | -a <directory> ] 
 #                         [ --force | -f ] [ --no-reload | -r ]
 #                         [ --help | -h ] [ --manual | -m ] [ --verbose | -v ]

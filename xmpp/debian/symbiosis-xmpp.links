@@ -1,1 +1,1 @@
-usr/sbin/symbiosis-configure-xmpp  etc/cron.hourly/symbiosis-configure-xmpp
+usr/sbin/symbiosis-xmpp-configure  etc/cron.hourly/symbiosis-xmpp-configure
