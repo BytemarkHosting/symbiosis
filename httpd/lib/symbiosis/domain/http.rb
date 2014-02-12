@@ -1,4 +1,5 @@
 require 'symbiosis/domain'
+require 'symbiosis/domains/http'
 
 module Symbiosis
 
@@ -68,16 +69,11 @@ module Symbiosis
     #
     def apache_configuration(ssl_template, non_ssl_template, apache2_dir='/etc/apache2')
       #
+      # Sets up the config file name
       #
-      sites_available_file = File.join(apache2_dir, "sites-available","#{self.name}.conf")
-
-      config        = Symbiosis::ConfigFiles::Apache.new(sites_available_file, "#")
+      config_file   = File.join(apache2_dir, "sites-available","#{self.name}.conf")
+      config        = Symbiosis::ConfigFiles::Apache.new(config_file, "#")
       config.domain = self
-
-      if !Symbiosis::Domains.zz_mass_hosting and self.ips.any?{|ip| primary_ips.include?(ip)}
-        verbose "\tThis site is using the host's primary IPs -- it is covered by the mass-hosting config."
-        return nil
-      end
 
       document_root = File.join(self.directory,"public","htdocs")
 
@@ -100,7 +96,6 @@ module Symbiosis
           #
           # This catches any OpenSSL problem, and allows us to revert to non-ssl hosting.
           #
-
           warn "SSL configuration for #{self.name} is broken -- #{err.to_s} (#{err.class.to_s})"
 
           if self.ssl_mandatory?
