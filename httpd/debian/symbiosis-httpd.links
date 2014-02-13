@@ -8,3 +8,5 @@ usr/sbin/symbiosis-httpd-rotate-logs                etc/cron.daily/symbiosis-rot
 usr/share/man/man1/symbiosis-httpd-rotate-logs.1.gz usr/share/man/man1/symbiosis-rotate-logs.1.gz
 usr/sbin/symbiosis-httpd-logger                     usr/sbin/symbiosis-apache-logger
 usr/share/man/man1/symbiosis-httpd-logger.1.gz      usr/share/man/man1/symbiosis-apache-logger.1.gz
+usr/sbin/symbiosis-httpd-generate-stats                usr/sbin/symbiosis-generate-stats
+usr/share/man/man1/symbiosis-httpd-generate-stats.1.gz usr/share/man/man1/symbiosis-generate-stats.1.gz
