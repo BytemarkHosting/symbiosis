@@ -1,4 +1,5 @@
 require 'symbiosis/domain'
+require 'symbiosis/domain/ssl'
 
 module Symbiosis
 
