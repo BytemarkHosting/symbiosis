@@ -14,7 +14,7 @@ module Symbiosis
       include Symbiosis::Utils
 
 
-      attr_reader :username, :domain, :password, :chroot_dir, :quota
+      attr_reader :username, :domain, :password
 
       def initialize(username, domain, password, chroot_dir=nil, quota=nil)
         self.domain = domain
