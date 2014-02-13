@@ -1,2 +1,3 @@
+etc/pure-ftpd/conf/ExtAuth etc/pure-ftpd/auth/60ext
 usr/sbin/symbiosis-ftpd-check-password  usr/sbin/symbiosis-check-ftp-password
 usr/share/man/man1/symbiosis-ftpd-check-password.1.gz usr/share/man/man1/symbiosis-check-ftp-password.1.gz
