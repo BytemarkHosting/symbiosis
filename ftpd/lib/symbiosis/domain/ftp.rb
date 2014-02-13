@@ -98,7 +98,7 @@ module Symbiosis
         elsif q.is_a?(String)
           begin
             @quota =  Symbiosis::Utils.parse_quota(q)
-          rescue ArgumentError => err
+          rescue ArgumentError
             @quota = nil
           end
         end
