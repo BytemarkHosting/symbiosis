@@ -201,17 +201,28 @@ if [ "$makessl" == "1" ]; then
       [ -e /etc/ssl/ssl.$i ] && mv /etc/ssl/ssl.$i /etc/ssl/ssl.$i.dpkg-old
     done
 
-    echo "Creating new SSL key"
+    #
+    # Grab the hostname
+    #
+    hostname=$(cat /proc/sys/kernel/hostname)
 
-    #
-    #  Make the key
-    #
-    openssl req -subj "/C=GB/ST=England/L=York/CN=$HOSTNAME" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
+    if [ -n "$hostname" ] ; then
+      #
+      #  Make the cert + key
+      #
+      echo "I: Generating a new SSL certificate for $hostname"
+      openssl req -subj "/C=GB/ST=England/L=York/CN=$hostname" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
 
-    #
-    #  Combine Cert + Key
-    #
-    cat /etc/ssl/ssl.key /etc/ssl/ssl.crt > /etc/ssl/ssl.combined
+      #
+      #  Combine Cert + Key
+      #
+      cat /etc/ssl/ssl.key /etc/ssl/ssl.crt > /etc/ssl/ssl.combined
+    else
+      #
+      # No hostname, no certificate
+      #
+      echo "W: Could not work out hostname to generate a self-signed SSL certificate."
+    fi
 fi
 
 #
