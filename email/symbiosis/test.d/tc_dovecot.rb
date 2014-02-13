@@ -360,7 +360,7 @@ EOF
 
     do_test_deliver_with_sieve(mailbox)
   ensure
-    File.unlink(sieve_file) if File.exists?(sieve_file)
+    File.unlink(sieve_file) if sieve_file and File.exists?(sieve_file)
   end
 
   def do_test_deliver_with_sieve_and_quota(mailbox)
