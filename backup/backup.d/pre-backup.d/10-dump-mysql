@@ -84,7 +84,8 @@ databases.each do |database|
   )
 
   cmd << "--events" if "mysql" == database and dump_events_table
-  cmd << "--skip-lock-tables" if "information_schema" == database
+  # debian-sys-maint doesn't have permission to lock these tables.
+  cmd << "--skip-lock-tables" if %w(performance_schema information_schema).include?(database)
   cmd << "'#{database}' | gzip -9c"
 
   Symbiosis::Utils.safe_open(dump, "a+") do |fh|
