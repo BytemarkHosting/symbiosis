@@ -20,7 +20,7 @@ symbiosis-email (2014:0113) stable; urgency=low
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 17:04:46 +0000
 
-symbiosis-email (2014:0108) precise; urgency=low
+symbiosis-email (2014:0108) stable; urgency=low
 
   * Added support for local mailboxes in exim4.
   * Added tests for local mailboxes in exim4.
