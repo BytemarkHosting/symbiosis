@@ -1,3 +1,10 @@
+symbiosis-key (2014:0214) stable; urgency=low
+
+  * Removed DH_VERBOSE flag.
+  * Added bug control.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 12:55:13 +0000
+
 symbiosis-key (2012:0813) stable; urgency=low
 
   * Updated Bytemark apt signing key.
