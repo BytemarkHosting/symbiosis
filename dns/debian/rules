@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 #
-export DH_VERBOSE=1
+# export DH_VERBOSE=1
 #
 # Uncomment to ignore all test failures (but the tests will run anyway)
 #export DH_RUBY_IGNORE_TESTS=all
