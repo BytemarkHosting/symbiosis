@@ -1,3 +1,9 @@
+symbiosis-xmpp (2014:0215) stable; urgency=low
+
+  * Fixed dovecot socket permissions (ugh).
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 17:32:49 +0000
+
 symbiosis-xmpp (2014:0214) stable; urgency=low
 
   * Added bug control.
