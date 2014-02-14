@@ -1,4 +1,4 @@
-symbiosis-mysql (2014:0214) precise; urgency=low
+symbiosis-mysql (2014:0214) stable; urgency=low
 
   * Added bug control.
 
