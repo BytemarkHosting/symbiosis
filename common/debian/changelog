@@ -1,3 +1,11 @@
+symbiosis-common (2014:0214) stable; urgency=low
+
+  * Added bug control.
+  * Updated postinst to make fewer assumptions about hostnames.
+  * Santised Symbiosis::Domain around uid/gids.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 12:57:15 +0000
+
 symbiosis-common (2014:0117) stable; urgency=low
 
   * Updated symbiosis-password-test to check all FTP user passwords.
