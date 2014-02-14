@@ -1,3 +1,11 @@
+symbiosis-ftpd (2014:0214) stable; urgency=low
+
+  * Tidied up FTP postrm not to stop pure-authd.
+  * Added bug control.
+  * Renamed symbiosis-check-ftp-password to symbiosis-ftpd-check-password.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 11:22:59 +0000
+
 symbiosis-ftpd (2014:0117) stable; urgency=low
 
   * Added subuser support for FTP.
