@@ -1,6 +1,17 @@
+symbiosis-firewall (2014:0214) stable; urgency=low
+
+  * Removed DH_VERBOSE flag in rules.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 13:11:04 +0000
+
 symbiosis-firewall (2014:0211) stable; urgency=low
 
   * Removed comments in incron.d snippet.
+  * Updated db libraries to fix warnings.
+  * Empty hostnames/ports are now ignored.
+  * Added more tests to IPDirectory class.
+  * Accept service names in blacklist files.
+  * Added bug control.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 11 Feb 2014 15:24:03 +0000
 
