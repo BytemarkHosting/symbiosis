@@ -1,3 +1,10 @@
+symbiosis-backup (2014:0214) stable; urgency=low
+
+  * Added skip-lock-tables for mysql performance_schema.
+  * Removed DH_VERBOSE flag
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 12:54:19 +0000
+
 symbiosis-backup (2014:0116) stable; urgency=low
 
   * Updated shebang of pre-backup mysql script
