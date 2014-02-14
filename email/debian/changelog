@@ -1,3 +1,12 @@
+symbiosis-email (2014:0214) stable; urgency=low
+
+  * Updated dovecot tests to work.
+  * Added bug control.
+  * renamed symbiosis-check-mailbox-password symbiosis-email-check-password.
+  * removed DH_VERBOSE flag in rules.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 13:05:19 +0000
+
 symbiosis-email (2014:0115) stable; urgency=low
 
   * Fixed up helo check for authorized connections.
