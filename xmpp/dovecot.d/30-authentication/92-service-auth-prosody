@@ -8,6 +8,6 @@ service auth {
     path = /var/run/prosody/dovecot-auth
     mode = 0666
   }
-  user = prosody
+  user = root
 }
 
