@@ -2,8 +2,9 @@ symbiosis-dns (2014:0214) stable; urgency=low
 
   * Added replaces/conflicts with symbiosis-tinydns.
   * Added bug control. 
+  * Removed DH_VERBOSE from rules. 
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 11:28:48 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 13:08:57 +0000
 
 symbiosis-dns (2014:0115) stable; urgency=low
 
