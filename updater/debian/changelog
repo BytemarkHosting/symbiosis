@@ -1,3 +1,9 @@
+symbiosis-updater (2014:0214) stable; urgency=low
+
+  * Added bug control.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 11:26:41 +0000
+
 symbiosis-updater (2014:0113) stable; urgency=low
 
   * Removed gem2deb usage.
