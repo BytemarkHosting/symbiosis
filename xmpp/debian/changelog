@@ -1,3 +1,10 @@
+symbiosis-xmpp (2014:0214) stable; urgency=low
+
+  * Added bug control.
+  * Renamed symbiosis-configure-xmpp to symbiosis-xmpp-configure.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 11:25:06 +0000
+
 symbiosis-xmpp (2014:0118) stable; urgency=low
 
   * Initial release. (Closes: #4276)
