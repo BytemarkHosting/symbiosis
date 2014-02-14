@@ -1,3 +1,9 @@
+symbiosis-monit (2014:0214) stable; urgency=low
+
+  * Added bug control.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 11:35:25 +0000
+
 symbiosis-monit (2014:0116) stable; urgency=low
 
   * Removed references to ruby1.8 in favour of "ruby".
