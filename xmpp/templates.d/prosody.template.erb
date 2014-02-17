@@ -26,7 +26,7 @@ VirtualHost "<%=domain %>"
   -- This allows prosody to authenticate via Dovecot.
   --
   authentication = "dovecot"
-  dovecot_auth_socket = "/var/run/prosody/dovecot-auth"
+  dovecot_auth_socket = "/var/run/dovecot/auth-client"
   auth_append_host    = true
 
 
