@@ -1,3 +1,10 @@
+symbiosis-httpd (2014:0217) precise; urgency=low
+
+  * Tidied away old lenny command.
+  * Removed old cronjob.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 17 Feb 2014 11:47:13 +0000
+
 symbiosis-httpd (2014:0214) stable; urgency=low
 
   * Added further links to old commands.
