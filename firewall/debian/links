@@ -1,8 +1,2 @@
-usr/sbin/symbiosis-firewall           usr/bin/firewall
-usr/sbin/symbiosis-firewall-whitelist usr/bin/firewall-whitelist
-usr/sbin/symbiosis-firewall-blacklist usr/bin/firewall-blacklist
-usr/share/man/man1/symbiosis-firewall.1.gz           usr/share/man/man1/firewall.1.gz
-usr/share/man/man1/symbiosis-firewall-whitelist.1.gz usr/share/man/man1/firewall-whitelist.1.gz
-usr/share/man/man1/symbiosis-firewall-blacklist.1.gz usr/share/man/man1/firewall-blacklist.1.gz
 usr/sbin/symbiosis-firewall           etc/network/if-up.d/symbiosis-firewall
 usr/sbin/symbiosis-firewall           etc/network/if-down.d/symbiosis-firewall
