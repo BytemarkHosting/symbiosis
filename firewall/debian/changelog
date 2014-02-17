@@ -1,8 +1,9 @@
 symbiosis-firewall (2014:0217) stable; urgency=low
 
   * Removed old lenny command symlinks.
+  * Removed extra spaces from incron.d snippet.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 17 Feb 2014 11:43:54 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 17 Feb 2014 11:57:02 +0000
 
 symbiosis-firewall (2014:0214) stable; urgency=low
 
