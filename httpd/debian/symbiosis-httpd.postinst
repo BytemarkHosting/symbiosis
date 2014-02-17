@@ -114,6 +114,11 @@ if [ -e /etc/cron.daily/make-logs ] ; then
   rm -f /etc/cron.daily/make-logs
 fi
 
+# Remove old rotate-logs cronjob.
+if [ -e /etc/cron.daily/symbiosis-rotate-logs ] ; then
+  rm -f /etc/cron.daily/symbiosis-rotate-logs
+fi
+
 #
 # Remove the old tc_ssl_configuration.rb script
 #
