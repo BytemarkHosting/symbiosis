@@ -1,5 +1,5 @@
-/etc/symbiosis/firewall/incoming.d  IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR           /usr/sbin/symbiosis-firewall -s 5 load
-/etc/symbiosis/firewall/outgoing.d  IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR           /usr/sbin/symbiosis-firewall -s 5 load
-/etc/symbiosis/firewall/whitelist.d IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR           /usr/sbin/symbiosis-firewall -s 5 reload-whitelist
-/etc/symbiosis/firewall/blacklist.d IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR           /usr/sbin/symbiosis-firewall -s 5 reload-blacklist
-/etc/symbiosis/firewall/local.d     IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR,IN_ATTRIB /usr/sbin/symbiosis-firewall -s 5 load
+/etc/symbiosis/firewall/incoming.d IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR /usr/sbin/symbiosis-firewall -s 5 load
+/etc/symbiosis/firewall/outgoing.d IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR /usr/sbin/symbiosis-firewall -s 5 load
+/etc/symbiosis/firewall/whitelist.d IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR /usr/sbin/symbiosis-firewall -s 5 reload-whitelist
+/etc/symbiosis/firewall/blacklist.d IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR /usr/sbin/symbiosis-firewall -s 5 reload-blacklist
+/etc/symbiosis/firewall/local.d IN_NO_LOOP,IN_CREATE,IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR,IN_ATTRIB /usr/sbin/symbiosis-firewall -s 5 load
