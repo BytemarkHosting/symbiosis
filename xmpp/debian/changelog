@@ -1,8 +1,9 @@
 symbiosis-xmpp (2014:0217) stable; urgency=low
 
   * Altered auth to use the same Dovecot socket as exim.
+  * Removed old dovecot config.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 17 Feb 2014 09:52:10 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 17 Feb 2014 11:10:48 +0000
 
 symbiosis-xmpp (2014:0215) stable; urgency=low
 
