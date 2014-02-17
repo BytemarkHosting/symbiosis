@@ -2,6 +2,11 @@
 
 set -e
 
+#
+# Make sure this file gets installed with the correct permissions
+#
+/usr/sbin/dpkg-statoverride --add root root 0440 /etc/sudoers.d/symbiosis
+
 case "$1" in
     install)
       # do nothing

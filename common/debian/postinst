@@ -61,24 +61,6 @@ if ( grep ^adm: /etc/group 2>/dev/null >/dev/null ); then
 fi
 
 #
-#  If we don't have the sudoers file setup then configure it
-#
-if [ -e /etc/sudoers ]; then
-
-    #
-    #  Not already present?
-    #
-    if ( ! grep ^admin /etc/sudoers 2>/dev/null >/dev/null ); then
-
-        #
-        #  Add it.
-        #
-        echo 'admin ALL = (ALL) ALL' >> /etc/sudoers
-    fi
-fi
-
-
-#
 # Make sure /etc/symbiosis exists
 #
 [ -d /etc/symbiosis ] || mkdir -p /etc/symbiosis

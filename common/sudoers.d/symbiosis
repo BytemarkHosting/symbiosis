@@ -1,0 +1,4 @@
+#
+# This allows the Admin user sudo access.
+#
+admin ALL = (ALL) ALL
