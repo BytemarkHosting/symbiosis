@@ -1,3 +1,10 @@
+symbiosis-common (2014:0217) stable; urgency=low
+
+  * Added dependency on sudo.
+  * Altered the way symbiosis manages sudo access for the admin user.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 17 Feb 2014 10:12:17 +0000
+
 symbiosis-common (2014:0214) stable; urgency=low
 
   * Added bug control.
