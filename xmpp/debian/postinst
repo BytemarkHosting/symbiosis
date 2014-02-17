@@ -10,6 +10,7 @@ for i in {client,server} ; do
   if [ -d $(dirname $fn) ] ; then
     echo "I: Adding XMPP $i firewall rule..."
     touch "$fn"
+    chown admin:admin "$fn"
   fi
 done
 
