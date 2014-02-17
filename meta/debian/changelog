@@ -1,3 +1,10 @@
+bytemark-symbiosis (2014:0214) stable; urgency=low
+
+  * Added bug control.
+  * Added recommended use of XMPP pacakge.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 17 Feb 2014 10:16:03 +0000
+
 bytemark-symbiosis (2014:0113) stable; urgency=low
 
   * Moved pam package into this source tree.

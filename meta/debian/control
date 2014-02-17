@@ -24,6 +24,7 @@ Recommends: symbiosis-backup (>= 2014:0113),
   symbiosis-phpmyadmin (>= 2014:0113), 
   symbiosis-dns (>= 2014:0113), 
   symbiosis-webmail (>= 2014:0113),
+  symbiosis-xmpp (>= 2014:0113),
   openssh-server
 Description: An easy, complete, and Debian-friendly server administration system
  This package is a metapackage which will pull in each package which
