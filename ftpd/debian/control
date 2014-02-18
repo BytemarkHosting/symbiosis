@@ -3,7 +3,7 @@ Section: web
 Priority: extra
 Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
 Uploaders: John Hackett <john.hackett@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), gem2deb, ruby, pure-ftpd-common, config-package-dev
+Build-Depends: debhelper (>= 7.0.0), gem2deb, ruby, pure-ftpd-common
 Standards-Version: 3.9.1
 XS-Ruby-Versions: all
 
