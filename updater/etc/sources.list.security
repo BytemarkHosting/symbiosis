@@ -1,20 +1,20 @@
 #
-# Squeeze distribution of Debian GNU/Linux
+# Wheezy distribution of Debian GNU/Linux
 #
-deb     http://mirror.bytemark.co.uk/debian/     squeeze main contrib non-free
+deb     http://mirror.bytemark.co.uk/debian/     wheezy main contrib non-free
 
 #
-# Squeeze updates
+# Wheezy updates
 #
-deb     http://mirror.bytemark.co.uk/debian/     squeeze-updates main contrib non-free
+deb     http://mirror.bytemark.co.uk/debian/     wheezy-updates main contrib non-free
 
 #
 #  Bytemark Symbiosis Packages
 #
-deb     http://symbiosis.bytemark.co.uk/squeeze/ ./
+deb     http://symbiosis.bytemark.co.uk/wheezy-rc2/ ./
 
 #
 # Security updates
 #
-deb     http://security.debian.org/ squeeze/updates  main contrib non-free
+deb     http://security.debian.org/ wheezy/updates  main contrib non-free
 
