@@ -1,3 +1,10 @@
+symbiosis-firewall (2014:0218) stable; urgency=low
+
+  * Updated postinst to chown the firewall directory to admin:admin, rather
+    than 1000:1000.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 18 Feb 2014 13:16:33 +0000
+
 symbiosis-firewall (2014:0217) stable; urgency=low
 
   * Removed old lenny command symlinks.
