@@ -197,7 +197,7 @@ fi
 #
 # Chown the firewall directory.
 #
-chown -R 1000:1000 $PREFIX
+chown -R admin:admin $PREFIX
 
 #
 #  Reload the firewall unless we're in a chroot.
