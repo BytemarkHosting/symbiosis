@@ -126,6 +126,50 @@ if [ -e /etc/symbiosis/test.d/tc_ssl_configuration.rb ] ; then
   rm -f /etc/symbiosis/test.d/tc_ssl_configuration.rb
 fi
 
+######################################
+#
+# Divert config files.  This is cribbed from config-package-dev.
+#
+######################################
+
+mangle_config() {
+  package=symbiosis-httpd
+  file="$1"
+  ourfile="$file.dpkg-symbiosis"
+  theirfile="$file.dpkg-symbiosis-orig"
+
+  #
+  # Add the diversion, if it doesn't exist.
+  #
+  if ! dpkg-divert --list "$package" | \
+
+    grep -xFq "diversion of $file to $theirfile by $package"; then
+    dpkg-divert --divert "$theirfile" --rename --package "$package" --add "$file"
+
+  fi
+
+  #
+  # Now add the link in, unless it is already in place.
+  #
+  if [ ! -L "$file" ] && [ ! -e "$file" ]; then
+
+    ln -s "$(basename "$ourfile")" "$file"
+
+  elif [ ! -L "$file" ] || \
+       [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
+         "$(readlink "$file")" != "$(basename "$theirfile")" ]; then
+
+    echo "E: $file is not linked to either $(basename "$ourfile") or $(basename "$theirfile")" >&2
+
+  fi
+}
+
+if [ "$1" = configure ] ; then
+  mangle_config /etc/apache2/conf.d/security
+  mangle_config /etc/php5/apache2/php.ini
+  mangle_config /etc/apache2/ports.conf
+fi
+
 #DEBHELPER#
 
 #

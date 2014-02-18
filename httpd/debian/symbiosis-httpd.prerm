@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "$1" == "upgrade" ] ; then
+if [ "$1" = "upgrade" ] ; then
   #
   #  Do nothing for upgrades.
   #
@@ -24,14 +24,40 @@ a2dismod  mod_vhost_bytemark  >/dev/null 2>/dev/null
 a2dismod  vhost_alias         >/dev/null 2>/dev/null
 
 #
-# Restart
+# Remove mangled configurations.
 #
-if which invoke-rc.d >/dev/null 2>&1; then
-    invoke-rc.d apache2 restart
-else
-    /etc/init.d/apache2 restart
+
+unmangle_config() {
+  file="$1"
+  ourfile="$file.dpkg-symbiosis"
+  theirfile="$file.dpkg-symbiosis-orig"
+  package=symbiosis-httpd
+
+  if [ ! -L "$file" ] || \
+     [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
+       "$(readlink "$file")" != "$(basename "$theirfile")" ]; then
+    echo "E: $file is not linked to either $(basename "$ourfile") or $(basename "$theirfile")" >&2
+  else
+    rm -f "$file"
+  fi
+
+  if [ ! -L "$file" ] && [ ! -e "$file" ]; then
+    dpkg-divert --remove --rename --package "$package" "$file"
+  else
+    echo "Not removing diversion of $file by $package" >&2
+  fi
+}
+
+if [ "$1" = "remove" ]; then
+  unmangle_config /etc/php5/apache2/php.ini 
+  unmangle_config /etc/apache2/ports.conf 
+  unmangle_config /etc/apache2/conf.d/security 
 fi
 
-
 #DEBHELPER#
-exit 0
+
+#
+# Restart
+#
+invoke-rc.d apache2 restart
+
