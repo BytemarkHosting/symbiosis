@@ -44,7 +44,7 @@ fi
 
 case "$1" in
     'start')
-       [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+       log_action_msg "System configured with $DESC."
        cat <<EOF
 = = = = = = = = = = = = = = = = = = = = = = = = =${B}${L}
   _ _____   _______ ___ __  __   _   ___ _  __
@@ -66,17 +66,11 @@ EOF
        ;;
 
     'stop')
-       [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
-       [ "$VERBOSE" != no ] && log_end_msg 0
+       log_action_msg "Thanks for using $DESC!"
        ;;
 
-    'restart'|'reload'|'force-reload')
-       set +e; $SELF stop; set -e
-       $SELF start
-       ;;
-
-    'status')
-       log_action_msg "$SCRIPTNAME does not manage any services."
+    'restart'|'reload'|'force-reload'|'status')
+       log_action_msg "System configured with $DESC."
        ;;
 
     *)
