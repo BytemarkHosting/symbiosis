@@ -8,21 +8,24 @@
 # Should-Stop:       sshd
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Alert the user that symbiosis is active.
-# Description:       Inform the user that Bytemark Symbiosis system is installed.
+# Short-Description: Alerts the user that the system is using Bytemark Symbiosis.
+# Description:       Alerts the user that the system is using Bytemark Symbiosis using fancy ascii art.
 ### END INIT INFO
 #
+# Author: Patrick J Cherry <patrick@bytemark.co.uk>
+#
 
-set -e
-set -u
+NAME="bytemark-symbiosis"
+DESC="Bytemark Symbiosis"
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+SCRIPTNAME=/etc/init.d/$NAME
 
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
 . /lib/lsb/init-functions
-
-# Safeguard (relative paths, core dumps..)
-cd /
-umask 077
-
-SELF=$(cd $(dirname $0); pwd -P)/$(basename $0)
 
 # Allows us to use COLOURS!
 if log_use_fancy_output; then
@@ -39,11 +42,10 @@ else
   U=''
 fi
 
-case "${1:-''}" in
-  'start')
-        log_daemon_msg "Starting symbiosis init" "symbiosis"
-        log_end_msg 0
-        cat <<EOF
+case "$1" in
+    'start')
+       [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+       cat <<EOF
 = = = = = = = = = = = = = = = = = = = = = = = = =${B}${L}
   _ _____   _______ ___ __  __   _   ___ _  __
  (_) _ ) \\ / /_   _| __|  \\/  | /_\\ | _ \\ |/ /
@@ -60,24 +62,25 @@ case "${1:-''}" in
 ${U}
 = = = = = = = = = = = = = = = = = = = = = = = = =
 EOF
+       [ "$VERBOSE" != no ] && log_end_msg 0
        ;;
 
-  'stop')
-       log_daemon_msg "Stopping symbiosis init" "symbiosis"
-        log_end_msg 0
+    'stop')
+       [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+       [ "$VERBOSE" != no ] && log_end_msg 0
        ;;
 
-  'restart'|'reload'|'force-reload')
+    'restart'|'reload'|'force-reload')
        set +e; $SELF stop; set -e
        $SELF start
        ;;
 
-  'status')
-        log_action_msg "symbiosis is running."
-         ;;
+    'status')
+       log_action_msg "$SCRIPTNAME does not manage any services."
+       ;;
 
-  *)
-       echo "Usage: $SELF start|stop|restart|reload|force-reload|status"
+    *)
+       echo "Usage: $SCRIPTNAME start|stop|restart|reload|force-reload|status"
        exit 1
        ;;
 esac
