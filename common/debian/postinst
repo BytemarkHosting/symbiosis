@@ -23,6 +23,12 @@ if [ "$1" != "configure" ]; then
 fi
 
 
+#
+# Double check this file gets installed with the correct permissions
+#
+/usr/sbin/dpkg-statoverride --add --update root root 0440 /etc/sudoers.d/symbiosis
+
+
 
 #
 #  Shadow passwords must be on.
