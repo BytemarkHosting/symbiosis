@@ -2,9 +2,9 @@ bytemark-symbiosis (2014:0218) stable; urgency=low
 
   * Updated init script to start after SSH.
   * Added lsb-base dependency.
-  * General init script tidy-up. 
+  * General init script tidy-up, and tinker. 
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 18 Feb 2014 14:00:52 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 18 Feb 2014 14:08:55 +0000
 
 bytemark-symbiosis (2014:0214) stable; urgency=low
 
