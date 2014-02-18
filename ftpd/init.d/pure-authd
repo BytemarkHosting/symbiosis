@@ -7,6 +7,8 @@
 # Default-Stop:      0 1 6
 # Short-Description: Pure FTPD authentication daemon initscript
 # Description:       Starts and stops pure-authd 
+# X-Start-Before:    pure-ftpd
+# X-Stop-After:      pure-ftpd
 #                 
 ### END INIT INFO
 
@@ -28,13 +30,20 @@ SCRIPTNAME=/etc/init.d/$NAME
 [ -x "$DAEMON" ] || exit 0
 
 AUTHD_PROGRAM=""
-AUTHD_SOCKET="/var/run/pure-ftpd/pure-authd.sock"
+AUTHD_SOCKET=""
+
+if [ -f "/etc/pure-ftpd/conf/ExtAuth" ] ; then
+  AUTHD_SOCKET=$(cat /etc/pure-ftpd/conf/ExtAuth)
+fi
 
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
 # Make sure the authd program exists and is executable
 [ -x $AUTHD_PROGRAM ] || exit 1
+
+# Make sure the authd socket option is set 
+[ -n "$AUTHD_SOCKET" ] || exit 1
 
 # Load the VERBOSE setting and other rcS variables
 . /lib/init/vars.sh
@@ -48,6 +57,14 @@ AUTHD_SOCKET="/var/run/pure-ftpd/pure-authd.sock"
 #
 do_start()
 {
+  #
+  # Make sure our run directory exists before starting.
+  #
+  AUTHD_SOCKET_DIR="$(dirname "$AUTHD_SOCKET")"
+  if [ -n "$AUTHD_SOCKET_DIR" ] && [ ! -d "$AUTHD_SOCKET_DIR" ] ; then
+    mkdir -p "$AUTHD_SOCKET_DIR"
+  fi
+
 	# Return
 	#   0 if daemon has been started
 	#   1 if daemon was already running
@@ -103,19 +120,19 @@ do_reload() {
 
 case "$1" in
   start)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+	log_daemon_msg "Starting $DESC" "$NAME"
 	do_start
 	case "$?" in
-		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+		0|1) log_end_msg 0 ;;
+		2) log_end_msg 1 ;;
 	esac
 	;;
   stop)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+	log_daemon_msg "Stopping $DESC" "$NAME"
 	do_stop
 	case "$?" in
-		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+		0|1) log_end_msg 0 ;;
+		2) log_end_msg 1 ;;
 	esac
 	;;
   #reload|force-reload)

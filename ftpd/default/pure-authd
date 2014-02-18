@@ -1,6 +1,7 @@
 # Path to the password-checking executable
 AUTHD_PROGRAM=/usr/sbin/symbiosis-ftpd-check-password
 
-# Path to the socket
-AUTHD_SOCKET=/var/run/pure-ftpd/pure-authd.sock
+# Path to the socket.  This is normally read from /etc/pure-ftpd/conf/ExtAuth.
+# 
+# AUTHD_SOCKET=/var/run/pure-ftpd/pure-authd.sock
 
