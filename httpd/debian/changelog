@@ -1,9 +1,10 @@
-symbiosis-httpd (2014:0217) precise; urgency=low
+symbiosis-httpd (2014:0218) stable; urgency=low
 
   * Tidied away old lenny command.
   * Removed old cronjob.
+  * Moved back to gem2deb, fixing order in the control file.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 17 Feb 2014 11:47:13 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 18 Feb 2014 18:28:56 +0000
 
 symbiosis-httpd (2014:0214) stable; urgency=low
 
