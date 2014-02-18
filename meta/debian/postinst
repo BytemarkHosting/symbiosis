@@ -30,14 +30,5 @@ To access the Bytemark Symbiosis documentation, please visit:
 EOF
 fi
 
-#
-#  Remove our obsolete vhost init script.
-#
-if [ -e /etc/init.d/bytemark-vhost ]; then
-    update-rc.d -f bytemark-vhost remove
-    rm /etc/init.d/bytemark-vhost
-fi
-
-
 #DEBHELPER#
 exit 0

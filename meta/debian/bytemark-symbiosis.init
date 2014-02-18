@@ -4,12 +4,12 @@
 # Provides:          bytemark-symbiosis
 # Required-Start:    $syslog
 # Required-Stop:     $syslog
-# Should-Start:      $network $named $time
-# Should-Stop:       $network $named $time
+# Should-Start:      sshd
+# Should-Stop:       sshd
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Alert the user that symbiosis is active.
-# Description:       Inform the user that Bytemark Symbiosis system is installe.
+# Description:       Inform the user that Bytemark Symbiosis system is installed.
 ### END INIT INFO
 #
 
