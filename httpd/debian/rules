@@ -1,17 +1,8 @@
 #!/usr/bin/make -f
 #
 
-DEB_DIVERT_EXTENSION = .dpkg-symbiosis
-DEB_TRANSFORM_FILES_symbiosis-httpd += /etc/php5/apache2/php.ini.dpkg-symbiosis
-DEB_TRANSFORM_FILES_symbiosis-httpd += /etc/apache2/ports.conf.dpkg-symbiosis
-DEB_TRANSFORM_FILES_symbiosis-httpd += /etc/apache2/conf.d/security.dpkg-symbiosis
-
-ifneq ($(wildcard /usr/share/php5/php.ini-production),)
-	DEB_CHECK_FILES_SOURCE_/etc/php5/apache2/php.ini.dpkg-symbiosis = \ /usr/share/php5/php.ini-production
-endif
-
 %:
-	dh $@
+	dh $@ --buildsystem=ruby --with ruby
 
 override_dh_auto_build:
 	$(MAKE) docs
