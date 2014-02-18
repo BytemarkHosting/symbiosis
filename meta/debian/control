@@ -10,6 +10,7 @@ Package: bytemark-symbiosis
 Architecture: all
 Depends: symbiosis-key (>= 2012:0813), 
   symbiosis-updater (>= 2014:0113),
+  lsb-base (>= 3.0-6),
   ${misc:Depends}
 Recommends: symbiosis-backup (>= 2014:0113),
   symbiosis-common (>= 2014:0113),
