@@ -54,7 +54,11 @@ fi
 # Update default runlevels.
 #
 if [ -x "/etc/init.d/pure-authd" ]; then
-  update-rc.d pure-authd defaults >/dev/null
+  if [ -n "$(which insserv)" ] ; then
+    insserv pure-authd
+  else
+    update-rc.d pure-authd defaults >/dev/null
+  fi
 fi
 
 #
