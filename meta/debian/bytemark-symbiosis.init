@@ -62,7 +62,6 @@ case "$1" in
 ${U}
 = = = = = = = = = = = = = = = = = = = = = = = = =
 EOF
-       [ "$VERBOSE" != no ] && log_end_msg 0
        ;;
 
     'stop')
