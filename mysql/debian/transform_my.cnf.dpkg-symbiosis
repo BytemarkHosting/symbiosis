@@ -1,8 +1,0 @@
-#!/bin/sed -f
-
-#
-# Comment out bind-address
-#
-s/^bind-address[ \t]*=[ \t]*127.0.0.1/# \0/
-s/^bind-address[ \t]*=[ \t]*::1/# \0/
-

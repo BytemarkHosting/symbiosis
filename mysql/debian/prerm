@@ -1,0 +1,48 @@
+#!/bin/bash
+
+set -e
+
+if [ "$1" = "upgrade" ] ; then
+  #
+  #  Do nothing for upgrades.
+  #
+  echo "I: Skipping removal."
+  exit 0
+fi
+
+#
+# Remove mangled configurations.
+#
+
+unmangle_config() {
+  file="$1"
+  ourfile="$file.dpkg-symbiosis"
+  theirfile="$file.dpkg-symbiosis-orig"
+  package=symbiosis-mysql
+
+  if [ ! -L "$file" ] || \
+     [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
+       "$(readlink "$file")" != "$(basename "$theirfile")" ]; then
+    echo "E: $file is not linked to either $(basename "$ourfile") or $(basename "$theirfile")" >&2
+  else
+    rm -f "$file"
+  fi
+
+  if [ ! -L "$file" ] && [ ! -e "$file" ]; then
+    dpkg-divert --remove --rename --package "$package" "$file"
+  else
+    echo "Not removing diversion of $file by $package" >&2
+  fi
+}
+
+if [ "$1" = "remove" ]; then
+  unmangle_config /etc/mysql/my.cnf
+fi
+
+#DEBHELPER#
+
+#
+# Restart MySQL
+#
+invoke-rc.d mysql restart
+
