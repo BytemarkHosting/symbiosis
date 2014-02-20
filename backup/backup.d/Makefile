@@ -25,7 +25,7 @@ check: $(conf_tmp)
 	@bash -c "set -e ; . $(conf_tmp)"
 
 distclean:
-	@rm -f $(conf_tmp)
+	@rm -f $(conf_tmp) $(conf)
 
 clean:
 	@rm -f $(conf)
