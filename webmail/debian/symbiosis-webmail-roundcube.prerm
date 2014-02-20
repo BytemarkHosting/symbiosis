@@ -8,14 +8,42 @@ set -e
 update-alternatives --remove symbiosis-webmail /var/lib/roundcube/
 
 #
-# Restart apache2 if apache2ctl exists and is executable.
+# Remove mangled configurations.
 #
-if [ -x /usr/sbin/apache2ctl ] ; then
-  #
-  #  Restart Apache2.
-  #
-  invoke-rc.d apache2 force-reload || true
+unmangle_config() {
+  file="$1"
+  package="$2"
+
+  ourfile="$file.dpkg-symbiosis"
+  theirfile="$file.dpkg-symbiosis-orig"
+
+  if [ ! -L "$file" ] || \
+     [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
+       "$(readlink "$file")" != "$(basename "$theirfile")" ]; then
+    echo "E: $file is not linked to either $(basename "$ourfile") or $(basename "$theirfile")" >&2
+  else
+    rm -f "$file"
+  fi
+
+  if [ ! -L "$file" ] && [ ! -e "$file" ]; then
+    dpkg-divert --remove --rename --package "$package" "$file"
+  else
+    echo "Not removing diversion of $file by $package" >&2
+  fi
+}
+
+if [ "$1" = "remove" ]; then
+  unmangle_config /etc/roundcube/main.inc.php symbiosis-webmail-roundcube
 fi
 
 #DEBHELPER#
+
+#
+#  Restart Apache2.
+#
+invoke-rc.d apache2 force-reload
+
+#DEBHELPER#
+
 exit 0
+
