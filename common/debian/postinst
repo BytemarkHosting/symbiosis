@@ -13,7 +13,6 @@
 
 set -e
 
-
 #
 # Skip, if we are not in "configure" state
 #
@@ -21,7 +20,6 @@ if [ "$1" != "configure" ]; then
         echo "I: Skipping configuration"
         exit 0
 fi
-
 
 #
 # Double check this file gets installed with the correct permissions
@@ -34,8 +32,6 @@ fi
 #  Shadow passwords must be on.
 #
 shadowconfig on 2>/dev/null >/dev/null
-
-
 
 #
 #  If there isn't an admin account add it.
@@ -50,7 +46,6 @@ if ( ! grep ^admin: /etc/passwd 2>/dev/null >/dev/null ); then
     #
     usermod -p "$(grep root /etc/shadow | cut -f 2 -d :)" admin
 fi
-
 
 #
 #  Add group if missing
@@ -70,30 +65,6 @@ fi
 # Make sure /etc/symbiosis exists
 #
 [ -d /etc/symbiosis ] || mkdir -p /etc/symbiosis
-
-#
-#  If we have a plaintext password stored in a previous location then
-# we should move it to the new location.
-#
-passwd=""
-for i in /etc/bytemark-vhost/.vhost.pass /etc/.vhost.pass ; do
-    if [ -e $i ]; then
-        if [ -s $i ]; then
-            cat $i > /etc/symbiosis/.passwd
-        fi
-        rm -f $i
-    fi
-done
-
-#
-#  If we have a stored password, in plaintext no less, ensure that
-# it isn't visible to the world.
-#
-if [ -e /etc/symbiosis/.passwd ]; then
-    chown root:root /etc/symbiosis/.passwd
-    chmod 0600      /etc/symbiosis/.passwd
-fi
-
 
 #
 # Find the hostname.
@@ -155,7 +126,6 @@ if [ -e /etc/ssl/ssl.combined ] ; then
   fi
 fi
 
-
 #
 #  Now test the current cert to see if it came from a
 # bytemark imager machine
@@ -181,7 +151,6 @@ else
     #
     makessl=1
 fi
-
 
 if [ "$makessl" == "1" ]; then
 
@@ -213,11 +182,6 @@ if [ "$makessl" == "1" ]; then
     fi
 fi
 
-#
-# Finally add our magic IP adding script to if-up.d, and as a cronjob
-#
-ln -sf /usr/sbin/symbiosis-configure-ips /etc/network/if-up.d/
-ln -sf /usr/sbin/symbiosis-configure-ips /etc/cron.hourly/
-
 #DEBHELPER#
+
 exit 0
