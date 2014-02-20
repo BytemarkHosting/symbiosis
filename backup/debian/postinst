@@ -1,89 +1,69 @@
 #!/bin/bash
-##
-##  The post-install script needs to do two things:
-##
-##    1.  If this is a migration, then configure it.
-##
-##    2.  Otherwise force a rebuild
-##
+#
+#  The post-install script needs to do two things:
+#
+#    1.  If this is a migration, then configure it.
+#
+#    2.  Otherwise force a rebuild
+#
 ###
 
 set -e
 
-
-##
-## Skip, if we are not in "configure" state
-##
+#
+# Skip, if we are not in "configure" state
+#
 if [ "$1" != "configure" ]; then
         echo "I: Skipping configuration"
         exit 0
 fi
 
-##
-##  The backup2l configuration file.
-##
+#
+#  The backup2l configuration file.
+#
 conf=/etc/backup2l.conf
 
 #
-#  The default directories to backup
+#  Finally, regardless of whether we're upgrading or not, we
+# trigger a rebuild
 #
-SRCLIST=(/etc /root /srv /home /var/mail /var/lib /usr/local /var/backups/mysql)
-
-##
-##  If we're migrated then we'll have the file /etc/backup2l.conf
-## be a symlink to the generated file.
-##
-##  So we test to see if the file exists and is a symlink.
-##
-if ( ! test -e $conf -a -h $conf ) ; then
-    echo "UPGRADING"
-
-    #
-    # We know that the conf file isn't our expected symlink.
-    #
-    mv $conf $conf.old >/dev/null 2>/dev/null || true
-
-    #
-    # Source the file to find the backup directories.
-    #
-    . $conf.old
-fi
-
-
-#
-#  Ensure our list of directories is setup
-#
-perl -pi -e "s!#SRCLIST#!${SRCLIST[*]}!g" /etc/symbiosis/backup.d/conf.d/10-directories.conf
-
-
-##
-##  Finally, regardless of whether we're upgrading or not, we
-## trigger a rebuild
-##
 cd /etc/symbiosis/backup.d/ && make
 
+######################################
+#
+# Divert config files.  This is cribbed from config-package-dev.
+#
+######################################
 
-##
-##  Now link the backup2 configuration file with the generated one
-##
-ln -sf /etc/symbiosis/backup.d/backup2l.conf $conf
-
+package="symbiosis-backup"
+ourfile="/etc/symbiosis/backup.d/backup2l.conf" 
+theirfile="$conf.dpkg-symbiosis-orig"
 
 #
-#  Obsolete files?  Remove them
+# Add the diversion, if it doesn't exist.
 #
-if [ -d /etc/bytemark-vhost/backup.d ]; then
-    rm -rf  /etc/bytemark-vhost/backup.d
+if ! dpkg-divert --list "$package" | \
+  grep -xFq "diversion of $conf to $theirfile by $package"; then
+
+  dpkg-divert --divert "$theirfile" --rename --package "$package" --add "$conf"
+
 fi
-for i in upload-backup download-backup dump-mysql ; do
-    if [ -e /etc/symbiosis/backup.d/pre-backup.d/$i ]; then
-        rm /etc/symbiosis/backup.d/pre-backup.d/$i
-    fi
-    if [ -e /etc/symbiosis/backup.d/post-backup.d/$i ]; then
-        rm /etc/symbiosis/backup.d/post-backup.d/$i
-    fi
-done
 
+#
+# Now add the link in, unless it is already in place.
+#
+if [ ! -L "$conf" ] && [ ! -e "$conf" ]; then
+
+  ln -s "$ourfile" "$conf"
+
+elif [ ! -L "$conf" ] || \
+     [ "$(readlink "$conf")" != "$ourfile" -a \
+       "$(readlink "$conf")" != "$(basename "$theirfile")" ]; then
+
+  echo "E: $conf is not linked to either "$ourfile" or "$theirfile"" >&2
+
+fi
 
 #DEBHELPER#
+
 exit 0

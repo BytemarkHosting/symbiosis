@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -e
+
+#
+# Remove mangled configurations.
+#
+file="/etc/backup2l.conf"
+ourfile="/etc/symbiosis/backup.d/backup2l.conf" 
+theirfile="$file.dpkg-symbiosis-orig"
+package="symbiosis-backup"
+
+if [ ! -L "$file" ] || \
+   [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
+     "$(readlink "$file")" != "$(basename "$theirfile")" ]; then
+  echo "E: $file is not linked to either $(basename "$ourfile") or $(basename "$theirfile")" >&2
+else
+  rm -f "$file"
+fi
+
+if [ ! -L "$file" ] && [ ! -e "$file" ]; then
+  dpkg-divert --remove --rename --package "$package" "$file"
+else
+  echo "Not removing diversion of $file by $package" >&2
+fi
+
+#
+# Clean up the build, if it is a purge.
+#
+if [ "$1" = "purge" ] ; then
+  cd /etc/symbiosis/backup.d/ && make distclean
+fi
+
+#DEBHELPER#
+
+exit 0
+
