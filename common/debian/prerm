@@ -14,17 +14,6 @@
 set -e
 
 #
-# Remove the symlinks we installed
-#
-if [ -L /etc/network/if-up.d/symbiosis-configure-ips ] ; then
-  rm -f /etc/network/if-up.d/symbiosis-configure-ips
-fi
-
-if [ -L /etc/cron.hourly/symbiosis-configure-ips ] ; then
-  rm -f /etc/cron.hourly/symbiosis-configure-ips
-fi
-
-#
 # Remove the statoverride
 #
 /usr/sbin/dpkg-statoverride --remove /etc/sudoers.d/symbiosis
