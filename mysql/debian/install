@@ -1,1 +1,2 @@
-monit.d/*            etc/symbiosis/monit.d
+monit.d              etc/symbiosis
+mysql                etc
