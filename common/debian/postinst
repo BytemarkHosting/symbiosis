@@ -1,15 +1,5 @@
 #!/bin/bash
 #
-#  This script has the task of performing the "common" post-install
-# setup for all the Symbiosis packages.
-#
-#  It shouldn't do anything too package-specific, as that is a task
-# for the specific packages, but global actions are good.
-#
-#
-# Steve
-# --
-#
 
 set -e
 
@@ -29,157 +19,89 @@ if ( ! /usr/sbin/dpkg-statoverride --list /etc/sudoers.d/symbiosis > /dev/null )
 fi
 
 #
-#  Shadow passwords must be on.
+# Shadow passwords must be on.
 #
-shadowconfig on 2>/dev/null >/dev/null
+shadowconfig on
 
 #
 #  If there isn't an admin account add it.
 #
 if ( ! grep ^admin: /etc/passwd 2>/dev/null >/dev/null ); then
 
-    echo "Adding 'admin' account"
-    useradd  --home=/srv admin --shell=/bin/bash
+  echo "Adding 'admin' account"
+  adduser --home=/srv --shell=/bin/bash --no-create-home --disabled-login --gecos='Symbiosis Administrator,,,' admin
 
-    #
-    #  Now set the password for admin to that used by root if it isn't there
-    #
-    usermod -p "$(grep root /etc/shadow | cut -f 2 -d :)" admin
+  #
+  #  Now set the password for admin to that used by root if it isn't there
+  #
+  usermod -p "$(grep root /etc/shadow | cut -f 2 -d :)" admin
+
+  #
+  #  If we have an adm group - which we shold - add the admin user to it.
+  #
+  if ( getent group adm >/dev/null ); then
+    adduser admin adm
+  fi
 fi
 
 #
-#  Add group if missing
+# Add a stat override for the /srv directory.
 #
-if ( ! grep ^admin: /etc/group 2>/dev/null >/dev/null ); then
-    addgroup admin
+if ( ! /usr/sbin/dpkg-statoverride --list /srv > /dev/null ) ; then
+  /usr/sbin/dpkg-statoverride --add --update admin admin 2755 /srv
 fi
 
 #
-#  If we have an adm group - which we shold - add the admin user to it.
+# Find the hostname, if not set already.
 #
-if ( grep ^adm: /etc/group 2>/dev/null >/dev/null ); then
-    adduser admin adm  >/dev/null 2>/dev/null || true
-fi
-
-#
-# Make sure /etc/symbiosis exists
-#
-[ -d /etc/symbiosis ] || mkdir -p /etc/symbiosis
-
-#
-# Find the hostname.
-#
-if [ -f /etc/hostname ] ; then
-  HOSTNAME=$(< /etc/hostname)
-else
-  HOSTNAME=$(hostname --fqdn)
+if [ -z "$HOSTNAME" ] ; then
+  if [ -f /etc/hostname ] ; then
+    HOSTNAME=$(< /etc/hostname)
+  else
+    HOSTNAME=$(hostname --fqdn)
+  fi
 fi
 
 #
 #  If there are no existing directories beneath /srv/ create a default.
 #
-if [ $(ls -l /srv/ | grep ^d | wc -l) -lt 1 ] ; then
-    #
-    # Roots
-    #
-    mkdir -p /srv/$HOSTNAME/public/htdocs
-    mkdir -p /srv/$HOSTNAME/mailboxes/root
+if [ -n "$HOSTNAME" -a "$(find /srv -maxdepth 1 -mindepth 1 -type d | wc -l)" = "0" ] ; then
+  #
+  # Create the standard directories
+  #
+  mkdir -p /srv/$HOSTNAME/public/htdocs
+  mkdir -p /srv/$HOSTNAME/config
+  mkdir -p /srv/$HOSTNAME/mailboxes/root
 
-    #
-    #  If we have a password then set it for the mailbox.
-    #
-    if [ -s /etc/symbiosis/.passwd ]; then
-        /usr/bin/symbiosis-encrypt-password /etc/symbiosis/.passwd > /srv/$HOSTNAME/mailboxes/root/password
-    fi
-
-    chown    admin:admin /srv/
-    chown -R admin:admin /srv/$HOSTNAME
+  chown -R admin:admin /srv/$HOSTNAME
 fi
 
 #
-#  Flag to see if we need to make the key
+# Generate SSL certificates.
 #
-makessl=0
+if ! [ -e /etc/ssl/ssl.crt -a -e /etc/ssl/ssl.key ]; then
 
-#
-# Rename ssl.pem to ssl.crt, and link back to the .pem, just in case.
-#
-if [ -e /etc/ssl/ssl.pem ] ; then
-  if [ -e /etc/ssl/ssl.crt ] ; then
-    mv /etc/ssl/ssl.pem /etc/ssl/ssl.pem.old
+  for i in key crt cobined ; do
+    [ -e /etc/ssl/ssl.$i ] && mv /etc/ssl/ssl.$i /etc/ssl/ssl.$i.dpkg-old
+  done
+
+  if [ -n "$HOSTNAME" ] ; then
+    #
+    #  Make the cert + key
+    #
+    echo "I: Generating a new SSL certificate for $HOSTNAME"
+    openssl req -subj "/C=GB/ST=England/L=York/CN=$HOSTNAME" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
+
+    #
+    #  Combine Cert + Key
+    #
+    cat /etc/ssl/ssl.key /etc/ssl/ssl.crt > /etc/ssl/ssl.combined
   else
-    mv /etc/ssl/ssl.pem /etc/ssl/ssl.crt
+    #
+    # No hostname, no certificate
+    #
+    echo "W: Could not work out hostname to generate a self-signed SSL certificate."
   fi
-  ln -s /etc/ssl/ssl.crt /etc/ssl/ssl.pem
-fi
-
-#
-# If ssl.combined exists, and either the key or crt do not, then split it.
-#
-if [ -e /etc/ssl/ssl.combined ] ; then
-  if [ ! -e /etc/ssl/ssl.key ] ; then
-    openssl rsa -out /etc/ssl/ssl.key -in /etc/ssl/ssl.combined > /dev/null
-  fi
-
-  if [ ! -e /etc/ssl/ssl.crt ] ; then
-    openssl x509 -out /etc/ssl/ssl.crt -in /etc/ssl/ssl.combined > /dev/null
-  fi
-fi
-
-#
-#  Now test the current cert to see if it came from a
-# bytemark imager machine
-#
-if [ -e /etc/ssl/ssl.crt -a -e /etc/ssl/ssl.key ]; then
-
-    #
-    # Get the issuer
-    #
-    issue=$(openssl x509 -noout -in /etc/ssl/ssl.crt  -subject | sed -e 's#.*CN=\([^/]\+\).*#\1#')
-
-    #
-    # If the issuer is a Bytemark imager then re-make it.  If the moduli of the crt and key do not match, remake it.
-    #
-    if [ "$issue" = "imager.bytemark.co.uk" -o "$issue" = "imager1.bytemark.co.uk" -o "$issue" = "imager2.bytemark.co.uk" -o "$issue" = "imager3.bytemark.co.uk" ]; then
-      makessl=1
-    elif [ "$(openssl rsa -noout -modulus -in /etc/ssl/ssl.key)" != "$(openssl x509 -noout -modulus -in /etc/ssl/ssl.crt)" ] ; then
-      makessl=1
-    fi
-else
-    #
-    #  No cert.  We need to make it.
-    #
-    makessl=1
-fi
-
-if [ "$makessl" == "1" ]; then
-
-    for i in key crt combined ; do
-      [ -e /etc/ssl/ssl.$i ] && mv /etc/ssl/ssl.$i /etc/ssl/ssl.$i.dpkg-old
-    done
-
-    #
-    # Grab the hostname
-    #
-    hostname=$(cat /proc/sys/kernel/hostname)
-
-    if [ -n "$hostname" ] ; then
-      #
-      #  Make the cert + key
-      #
-      echo "I: Generating a new SSL certificate for $hostname"
-      openssl req -subj "/C=GB/ST=England/L=York/CN=$hostname" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
-
-      #
-      #  Combine Cert + Key
-      #
-      cat /etc/ssl/ssl.key /etc/ssl/ssl.crt > /etc/ssl/ssl.combined
-    else
-      #
-      # No hostname, no certificate
-      #
-      echo "W: Could not work out hostname to generate a self-signed SSL certificate."
-    fi
 fi
 
 #DEBHELPER#

@@ -1,22 +1,43 @@
 #!/bin/bash
 #
-#  This script has the task of performing the "common" post-install
-# setup for all the Symbiosis packages.
-#
-#  It shouldn't do anything too package-specific, as that is a task
-# for the specific packages, but global actions are good.
-#
-#
-# Steve
-# --
 #
 
 set -e
 
-#
-# Remove the statoverride
-#
-/usr/sbin/dpkg-statoverride --remove /etc/sudoers.d/symbiosis
+if ( /usr/sbin/dpkg-statoverride --list /etc/sudoers.d/symbiosis > /dev/null 2>&1 ) ; then 
+  #
+  # Remove the statoverride
+  #
+  /usr/sbin/dpkg-statoverride --remove /etc/sudoers.d/symbiosis
+fi
+
+if ( /usr/sbin/dpkg-statoverride --list /srv > /dev/null 2>&1 ) ; then 
+  #
+  # Remove the statoverride
+  #
+  /usr/sbin/dpkg-statoverride --remove /srv
+fi
+
+if [ "purge" = "$1" ] ; then
+  #
+  # Remove admin account and group
+  #
+  if [ getent passwd admin >/dev/null 2>&1 ] ; then
+    deluser admin
+  fi
+
+  # We won't delete the SSL key/crt.
+
+  #
+  # Return /srv to its original state.
+  #
+  if [ -d /srv ] ; then
+    chown root:root /srv
+    chmod 0755 /srv
+  fi
+
+fi
 
 #DEBHELPER#
+
 exit 0
