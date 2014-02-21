@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+PREFIX=/etc/symbiosis/firewall
+
+#
+# Add a stat override for the firewall directory.
+#
+if ( ! /usr/sbin/dpkg-statoverride --list "$PREFIX" > /dev/null ) ; then
+  /usr/sbin/dpkg-statoverride --add --update admin admin 2755 "$PREFIX"
+fi
+
+#
+# Add a stat override for each firewall sub directory.
+#
+for dir in incoming outgoing local whitelist blacklist ; do 
+  if ( ! /usr/sbin/dpkg-statoverride --list "$PREFIX/$dir.d" > /dev/null ) ; then
+    /usr/sbin/dpkg-statoverride --add --update admin admin 2755 "$PREFIX/$dir.d"
+  fi
+done
+
+#DEBHELPER#
+
+exit 0

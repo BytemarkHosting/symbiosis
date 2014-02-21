@@ -1,7 +1,12 @@
 sbin                  usr/
-patterns.d/           etc/symbiosis/firewall
+patterns.d            etc/symbiosis/firewall
 rule.d                usr/share/symbiosis/firewall
 action.d              usr/share/symbiosis/firewall
 test.d                etc/symbiosis
-incron.d/             etc/
+incron.d              etc/
 monit.d               etc/symbiosis
+incoming.d            etc/symbiosis/firewall
+outgoing.d            etc/symbiosis/firewall
+local.d               etc/symbiosis/firewall
+whitelist.d           etc/symbiosis/firewall
+blacklist.d           etc/symbiosis/firewall
