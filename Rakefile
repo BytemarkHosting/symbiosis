@@ -10,6 +10,7 @@ DEB_BUILD_ARCH = ENV["BUILD_ARCH"] || `dpkg-architecture -qDEB_BUILD_ARCH`.chomp
 DISTRO   = (ENV["DISTRO"]   || "debian").downcase
 RELEASE  = (ENV["RELEASE"]  || "stable").downcase
 REPONAME = (ENV["REPONAME"] || "symbiosis").downcase
+PARALLEL_BUILD = ENV.has_key?("PARALLEL_BUILD")
 
 #
 # Monkey patch rake to output on stdout like normal people
@@ -49,6 +50,8 @@ def available_build_archs
     @has_sautobuild = false
     archs = [DEB_BUILD_ARCH] 
   end
+
+  archs -= ["source"]
 
   @available_build_archs = archs
 end
@@ -250,7 +253,8 @@ end
 #
 # Generate the Packages file
 #
-file "Packages" => packages do |t|
+
+file "Packages" => [(PARALLEL_BUILD ? "pkg:parallel:all" : "pkg:all" )] do |t|
   sh "dpkg-scanpackages -m . /dev/null > #{t.name}.new"
   FileUtils.mv("#{t.name}.new", t.name, :force => true)
 end
@@ -258,7 +262,7 @@ end
 #
 # Generate the Sources file
 #
-file "Sources" => source_changess + dscs do |t| 
+file "Sources" => [(PARALLEL_BUILD ? "pkg:parallel:genchanges" : "pkg:genchanges" )] do |t|
   sh "dpkg-scansources . /dev/null > #{t.name}.new"
   FileUtils.mv("#{t.name}.new", t.name, :force => true)
 end
@@ -426,10 +430,18 @@ namespace :pkg do
     task :clean         => "pkg:#{pkg[:source]}:clean"
     task :clobber       => "pkg:#{pkg[:source]}:clobber"
     task :dependencies  => "pkg:#{pkg[:source]}:dependencies"
+    
+    multitask "parallel:all"           => "pkg:#{pkg[:source]}:all"
+    multitask "parallel:genchanges"    => "pkg:#{pkg[:source]}:genchanges"
+    multitask "parallel:source"        => "pkg:#{pkg[:source]}:source"
+    multitask "parallel:buildpackage"  => "pkg:#{pkg[:source]}:buildpackage"
+    multitask "parallel:clean"         => "pkg:#{pkg[:source]}:clean"
+    multitask "parallel:clobber"       => "pkg:#{pkg[:source]}:clobber"
+    multitask "parallel:dependencies"  => "pkg:#{pkg[:source]}:dependencies"
 
     namespace pkg[:source] do
       
-      task :source => ["clean"] do |t|
+      task :source do |t|
         #
         # Make sure the documentation is build before creating the source tgz
         # for any documentation package.
@@ -438,7 +450,7 @@ namespace :pkg do
         sh "dpkg-source -b #{pkg[:dir]}"
       end
 
-      task :genchanges => ["clean", pkg[:dsc]] do 
+      task :genchanges => [pkg[:dsc]] do 
         sh "cd #{pkg[:dir]} && dpkg-genchanges -S > ../#{pkg[:source_changes]}"
       end
 
@@ -493,7 +505,7 @@ namespace :pkg do
         raise "Need to install the following packages to build #{pkg[:source]}:\n  #{missing_build_deps.join(" ")}" unless missing_build_deps.empty?
       end 
 
-      task :all  => %w(dependencies clean)+pkg[:packages]
+      task :all  => pkg[:packages]
     end
 
   end
