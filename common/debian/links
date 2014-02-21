@@ -1,2 +1,2 @@
-usr/sbin/symbiosis-configure-ips etc/network/if-up.d/
-usr/sbin/symbiosis-configure-ips etc/cron.hourly/
+usr/sbin/symbiosis-configure-ips etc/network/if-up.d/symbiosis-configure-ips
+usr/sbin/symbiosis-configure-ips etc/cron.hourly/symbiosis-configure-ips
