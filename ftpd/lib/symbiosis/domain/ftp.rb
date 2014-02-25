@@ -13,7 +13,6 @@ module Symbiosis
       #
       include Symbiosis::Utils
 
-
       attr_reader :username, :domain, :password
 
       def initialize(username, domain, password, chroot_dir=nil, quota=nil)
@@ -219,7 +218,21 @@ module Symbiosis
       fusers = []
 
       lines.each do |l|
-        (fuser, fpasswd, fdir, fquota) = l.strip.split(":",5)
+        #
+        # Skip comments
+        #
+        next if l =~ /^#/
+
+        # 
+        # Split the line, replacing empty bits with nil
+        #
+        (fuser, fpasswd, fdir, fquota) = l.strip.split(":",4).map{|x| x.empty? ? nil : x}
+
+        #
+        # Not interested in users with no usernames.
+        #
+        next if fuser.nil?
+
         fusers << FTPUser.new(fuser+"@"+self.name, self, fpasswd, fdir, fquota)
       end
 
