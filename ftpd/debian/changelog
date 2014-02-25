@@ -4,8 +4,9 @@ symbiosis-ftpd (2014:0218) stable; urgency=low
   * Updated pure-authd init script to ensure the directory that contains the
     socket exists before starting.
   * Ensure single-domain FTP login gets chrooted correctly.
+  * Skip comments in ftp-users file. 
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 25 Feb 2014 14:51:56 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 25 Feb 2014 16:17:22 +0000
 
 symbiosis-ftpd (2014:0214) stable; urgency=low
 
