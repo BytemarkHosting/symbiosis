@@ -6,6 +6,7 @@
 require 'symbiosis/domain/ftp'
 require 'net/ftp'
 require 'test/unit'
+require 'tempfile'
 require 'pp'
 
 class TestFTP < Test::Unit::TestCase
@@ -169,6 +170,112 @@ class TestFTP < Test::Unit::TestCase
     tests.each_with_index do |test,i|
       expected = test[0]
       assert_equal(expected, users[i].quota)
+    end
+  end
+  
+  def test_quota_enforcement
+    password = Symbiosis::Utils.random_string()
+    quota_file = File.join(@domain.config_dir,"ftp-quota")
+    # 
+    # Now try and write too much.
+    #
+    Symbiosis::Utils.safe_open(@domain.ftp_password_file,"a+") do |f|
+      f.truncate(0)
+      f.puts password
+    end
+    
+    Symbiosis::Utils.safe_open(quota_file,"a+") do |f|
+      f.truncate(0)
+      f.puts (1000)
+    end
+
+    Net::FTP.open('localhost') do |ftp|
+      assert_nothing_raised("FTP single user login failed.")  do
+        ftp.login( @domain.name, password )
+      end
+
+      fh = Tempfile.new("x")
+      fh.print("x"*1000)
+      fh.flush
+
+      assert_nothing_raised("FTP single user quota incorrectly being enforced.") do
+        ftp.putbinaryfile(fh.path, "test1")
+      end
+
+      assert_raise(Net::FTPPermError, "FTP single user quota not being enforced.") do
+        ftp.putbinaryfile(fh.path, "test2")
+      end
+
+      fh.close
+    end
+  end
+
+
+  def test_user_quota_enforcement
+    password = Symbiosis::Utils.random_string()
+    # 
+    # Now try and write too much.
+    #
+    Symbiosis::Utils.safe_open(@domain.ftp_users_file,"a+") do |f|
+      f.truncate(0)
+      f.puts "test:#{password}:arse:1000"
+    end
+
+    Net::FTP.open('localhost') do |ftp|
+      assert_nothing_raised("FTP multi user login failed.")  do
+        ftp.login( "test@"+@domain.name, password )
+      end
+
+      fh = Tempfile.new("x")
+      fh.print("x"*1000)
+      fh.flush
+
+      assert_nothing_raised("FTP multi user quota incorrectly being enforced.") do
+        ftp.putbinaryfile(fh.path, "test1")
+      end
+
+      assert_raise(Net::FTPPermError, "FTP multi user quota not being enforced.") do
+        ftp.putbinaryfile(fh.path, "test2")
+      end
+
+      fh.close
+    end
+  end
+
+  def test_chroot
+    password = Symbiosis::Utils.random_string()
+
+    Symbiosis::Utils.safe_open(@domain.ftp_password_file,"a+") do |f|
+      f.truncate(0)
+      f.puts password
+    end
+
+    Net::FTP.open('localhost') do |ftp|
+      assert_nothing_raised("FTP single user login failed.") do
+        ftp.login( @domain.name, password )
+      end
+
+      assert_raise(Net::FTPPermError, "FTP single user chroot not being enforced.") do
+        ftp.chdir('/etc/')
+      end
+    end
+  end
+
+  def test_user_chroot
+    password = Symbiosis::Utils.random_string()
+    
+    Symbiosis::Utils.safe_open(@domain.ftp_users_file,"a+") do |f|
+      f.puts "test:#{password}::"
+    end
+
+    Net::FTP.open('localhost') do |ftp|
+      assert_nothing_raised("FTP multi user login failed.")  do
+        ftp.login( "test@"+@domain.name, password )
+      end
+
+      assert_raise(Net::FTPPermError, "FTP multi user chroot not being enforced.") do
+        ftp.chdir('/etc/')
+      end
     end
   end
 end
