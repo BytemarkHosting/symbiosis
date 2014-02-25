@@ -240,7 +240,7 @@ module Symbiosis
         passwd = param.split($/).first.strip
       end
 
-      return FTPUser.new(self.name, self, passwd, self.public_dir, nil)
+      return FTPUser.new(self.name, self, passwd, self.ftp_chroot_dir, nil)
     end
 
   end
