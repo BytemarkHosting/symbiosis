@@ -4,8 +4,9 @@ symbiosis-common (2014:0217) stable; urgency=low
   * Altered the way symbiosis manages sudo access for the admin user.
   * Added double check for stat-override in postinst.
   * Updated dpkg-statoverride commands to have checks before exec.
+  * Updated config file class to use custom erubis parse.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 19 Feb 2014 09:28:14 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 25 Feb 2014 16:54:47 +0000
 
 symbiosis-common (2014:0214) stable; urgency=low
 
