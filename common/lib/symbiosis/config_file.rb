@@ -16,6 +16,21 @@ module Symbiosis
   #
   class ConfigFile
 
+    #
+    # This class only exists to get around the annoying "@prefixrexp" not
+    # defined warnings due to missing bits in the actual erubis code.
+    #
+    class Eruby < ::Erubis::Eruby
+      include Erubis::PercentLineEnhancer
+
+      def init_generator(properties={})
+        super
+        @prefixchar = properties[:prefixchar] || '%'
+        @prefixrexp = properties[:prefixrexp] || Regexp.compile("^#{@prefixchar}(.*?\\r?\\n)")
+      end
+
+    end
+
     attr_reader :comment_char, :filename, :template, :domain
 
     #
@@ -39,7 +54,7 @@ module Symbiosis
       raise ArgumentError, "ERB class #{klazz.inspect} is not descended from Erubis::Eruby" unless klazz.ancestors.include?(Erubis::Eruby)
       @erb = klazz
     end
-  
+
     #
     # This returns the ERB interpreter class.
     #
@@ -48,7 +63,7 @@ module Symbiosis
       # We default to the PercentLineEruby interpreter, since this allows lines
       # to start with %.
       #
-      @erb ||= ::Erubis::PercentLineEruby
+      @erb ||= Eruby
     end
 
     #
