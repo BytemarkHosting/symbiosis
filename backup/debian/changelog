@@ -1,3 +1,10 @@
+symbiosis-backup (2014:0226) stable; urgency=low
+
+  * make distclean now removes all generated files.
+  * Cleaned up postinst/prerm not to overwrite stuff/clean
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 26 Feb 2014 15:49:19 +0000
+
 symbiosis-backup (2014:0214) stable; urgency=low
 
   * Added skip-lock-tables for mysql performance_schema.
