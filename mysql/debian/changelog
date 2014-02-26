@@ -1,8 +1,9 @@
 symbiosis-mysql (2014:0219) stable; urgency=low
 
   * Mangle my.cnf as needed.
+  * Fixed up install locations
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 19 Feb 2014 21:04:19 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 26 Feb 2014 15:48:34 +0000
 
 symbiosis-mysql (2014:0214) stable; urgency=low
 
