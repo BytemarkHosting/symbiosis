@@ -1,3 +1,9 @@
+symbiosis-webmail (2014:0226) stable; urgency=low
+
+  * Moved roundcube config to correct place.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 26 Feb 2014 15:46:45 +0000
+
 symbiosis-webmail (2014:0214) stable; urgency=low
 
   * Added bug control.
