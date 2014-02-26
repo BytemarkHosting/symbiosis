@@ -1,3 +1,9 @@
+symbiosis-key (2014:0226) stable; urgency=low
+
+  * Added new repositories key.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 26 Feb 2014 11:54:01 +0000
+
 symbiosis-key (2014:0214) stable; urgency=low
 
   * Removed DH_VERBOSE flag.
