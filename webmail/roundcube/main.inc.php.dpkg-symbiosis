@@ -45,4 +45,10 @@ if ( array_search("managesieve", $rcmail_config['plugins']) === false ) {
    * Set the default port to 4190.
    */
   $rcmail_config['managesieve_port'] = 4190;
+
+  /**
+   * Make sure mailbox names are encoded in UTF-8 for dovecot (see
+   * http://wiki2.dovecot.org/Pigeonhole/Sieve/Troubleshooting)
+   */
+  $rcmail_config['managesieve_mbox_encoding'] = 'UTF-8';
 }
