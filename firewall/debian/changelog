@@ -1,3 +1,9 @@
+symbiosis-firewall (2014:0313) stable; urgency=medium
+
+  * Make sure the firewall load script has sbin in its path.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 13 Mar 2014 16:09:07 +0000
+
 symbiosis-firewall (2014:0226) stable; urgency=low
 
   * Tidied up the postinstall for the better, I hope.
