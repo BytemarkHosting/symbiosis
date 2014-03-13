@@ -16,8 +16,13 @@ set -e
 #
 # Be verbose
 #
-set -v
+set -x
 % end
+
+#
+# Make sure we have /sbin on our path
+#
+export PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
 
 #
 # If we don't have a module-aware kernel we're out of luck.
