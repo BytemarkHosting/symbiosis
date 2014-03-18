@@ -19,13 +19,13 @@ docs: man/symbiosis-encrypt-password.man  man/is-bytemark-ip.man  man/symbiosis-
 clean:
 	$(RM) -r man
 
-test: test1.8 test1.9.1
+test: test1.9.1 test2.0
 
 test1.9.1:
 	ruby1.9.1 ./bin/symbiosis-test  test.d/	
 
-test1.8:
-	ruby1.8 ./bin/symbiosis-test  test.d/	
+test2.0:
+	ruby2.0 ./bin/symbiosis-test  test.d/	
 
 .PHONY: test clean all docs
  
