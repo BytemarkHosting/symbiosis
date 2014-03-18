@@ -7,13 +7,13 @@ man/%.man: ./sbin/%
 
 docs: man/symbiosis-dns-generate.man
 
-test: test1.8 test1.9.1
-
-test1.8:
-	ruby1.8 ../common/bin/symbiosis-test test.d
+test: test1.9.1 test2.0
 
 test1.9.1:
 	ruby1.9.1 ../common/bin/symbiosis-test test.d
+
+test2.0:
+	ruby2.0 ../common/bin/symbiosis-test test.d
 
 clean:
 	$(RM) -r man
