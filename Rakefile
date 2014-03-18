@@ -4,7 +4,7 @@ require 'fileutils'
 require 'rake/clean'
 require 'digest'
 require 'pp'
-
+ 
 DEBEMAIL = ENV["DEBEMAIL"] || "symbiosis@bytemark.co.uk"
 DEB_BUILD_ARCH = ENV["BUILD_ARCH"] || `dpkg-architecture -qDEB_BUILD_ARCH`.chomp
 DISTRO   = (ENV["DISTRO"]   || "debian").downcase
