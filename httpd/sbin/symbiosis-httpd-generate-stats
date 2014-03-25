@@ -178,7 +178,22 @@ Symbiosis::Domains.each(prefix) do |domain|
   #
   # Write the config if we need to.
   #
-  config.write if write_config
+  if write_config
+    begin
+      #
+      # Make sure /srv/domain/config exists
+      #
+      Symbiosis::Utils.mkdir_p(domain.config_dir) 
+
+      #
+      # And write
+      #
+      config.write
+    rescue StandardError => ex
+      verbose "\tCaught #{ex.to_s} when writing configuration"
+      next
+    end
+  end
 
   #
   # OK now we need to look for a logfile, or two.
