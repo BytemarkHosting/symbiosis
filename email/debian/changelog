@@ -1,4 +1,10 @@
-symbiosis-email (2013:0608) stable; urgency=low
+symbiosis-email (2013:0609) oldstable; urgency=low
+
+  * Force SMTP connections to Google servers to be IPv4 only.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 01 Apr 2014 16:53:44 +0100
+
+symbiosis-email (2013:0608) oldstable; urgency=low
 
   * Updated helo check for apple mail/bt internet.
 
