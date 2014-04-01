@@ -1,0 +1,12 @@
+#
+# Google apply super-strict criteria to machines sending mail over IPv6.  Hosts
+# must have accurate reverse DNS, as well as pass either a DKIM or SPF check.
+# Since it is not easy to set up either SPF or DKIM in the Squeeze version of
+# Symbiosis, we just restrict relaying to IPv4 by forcing DNS lookups of MX
+# records in the google namespace to be IPv4 only.
+# 
+# See https://support.google.com/mail/answer/81126#authentication for Google's
+# mean policy to IPv6 adopters.
+#
+dns_ipv4_lookup = *.google.com : *.googlemail.com
+
