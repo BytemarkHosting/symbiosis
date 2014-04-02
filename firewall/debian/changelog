@@ -1,4 +1,4 @@
-symbiosis-firewall (2013:0615) stable; urgency=medium
+symbiosis-firewall (2013:0615) oldstable; urgency=low
 
   * Removed comments from incrond snippet.
 
