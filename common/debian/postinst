@@ -90,7 +90,7 @@ if ! [ -e /etc/ssl/ssl.crt -a -e /etc/ssl/ssl.key ]; then
     #  Make the cert + key
     #
     echo "I: Generating a new SSL certificate for $HOSTNAME"
-    openssl req -subj "/C=GB/ST=England/L=York/CN=$HOSTNAME" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
+    openssl req -subj "/C=GB/ST=England/L=York/CN=$HOSTNAME" -new -x509 -days 3650 -nodes -newkey rsa:4096 -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
 
     #
     #  Combine Cert + Key
