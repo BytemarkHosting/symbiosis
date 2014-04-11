@@ -22,10 +22,10 @@ clean:
 test: test1.8 test1.9.1
 
 test1.9.1:
-	ruby1.9.1 ./bin/symbiosis-test  test.d/	
+	ruby1.9.1 -I lib ./bin/symbiosis-test  test.d/	
 
 test1.8:
-	ruby1.8 ./bin/symbiosis-test  test.d/	
+	ruby1.8 -I lib ./bin/symbiosis-test  test.d/	
 
 .PHONY: test clean all docs
  
