@@ -211,4 +211,40 @@ class TestDomain < Test::Unit::TestCase
     end
   end
 
+  def test_ips
+    Dir.mktmpdir do |prefix|
+      #
+      # This shouldn't happen (tm).
+      #
+      assert(File.directory?(prefix), "Temporary directory missing")
+
+      domain = Domain.new(nil, prefix)
+      FileUtils.mkdir_p(File.join(prefix, domain.name, "config"))
+
+      assert(File.directory?(domain.config_dir))
+
+      #
+      # Write the "ips" file.
+      #
+      File.open(File.join(domain.config_dir, "ips"),"w+") do |fh|
+        fh.puts "# comment\nnot.a.reall.address\n1.2.3.4\n2001:41c8::1\n"
+      end
+
+      ips = %w(1.2.3.4 2001:41c8::1).map{|i| Symbiosis::IPAddr.new(i)}
+
+      assert_equal(domain.ips, ips)
+      
+      #
+      # Now if we write the "ip" file, then just those IPs work.
+      #
+      File.open(File.join(domain.config_dir, "ip"),"w+") do |fh|
+        fh.puts "1.2.3.5\n2001:41c8::2\n"
+      end
+
+      ips = %w(1.2.3.5 2001:41c8::2).map{|i| Symbiosis::IPAddr.new(i)}
+
+      assert_equal(domain.ips, ips)
+    end
+  end
+
 end

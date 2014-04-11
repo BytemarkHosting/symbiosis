@@ -220,17 +220,30 @@ module Symbiosis
     # Return all this domain's IPs (IPv4 and 6) as an array.  If none have been
     # set, then the host's primary IPv4 and IPv6 addresses are returned.
     #
+    # This will use config/ip, or config/ips if config/ip is missing.  The
+    # documentation should only ever refer to config/ip.
+    #
     def ips
-      param = get_param("ip",self.config_dir)
-      @ip_addresses = []
+      ip_addresses = []
 
-      if param.is_a?(String)     
-        param.split.each do |l|
+      param = get_param("ip", self.config_dir)
+      param = get_param("ips",self.config_dir) unless param.is_a?(String)
+
+      if param.is_a?(String)
+        param.to_s.split($/).each do |l|
+          l = l.strip
+
+          # Skip empty lines
+          next if l.empty?
+
+          # Skip commented lines
+          next if l =~ /^#/
+
           begin
-            ip = IPAddr.new(l.strip)
-            @ip_addresses << ip
+            ip = IPAddr.new(l)
+            ip_addresses << ip
           rescue ArgumentError
-            # should probably warn at this point..
+            warn "Unable to parse #{l} as an IP address for #{self.name}" if $VERBOSE
           end
         end
       end
@@ -238,17 +251,15 @@ module Symbiosis
       #
       # If no IP addresses were found, use the primary IPs.
       #
-      if @ip_addresses.empty?
-        @ip_addresses << Symbiosis::Host.primary_ipv4
-        @ip_addresses << Symbiosis::Host.primary_ipv6
+      if ip_addresses.empty?
+        ip_addresses << Symbiosis::Host.primary_ipv4
+        ip_addresses << Symbiosis::Host.primary_ipv6
       end
 
       #
-      # Remove nils.
+      # Return our array without nils.
       #
-      @ip_addresses = @ip_addresses.compact
-
-      @ip_addresses
+      ip_addresses.compact
     end
 
     #
