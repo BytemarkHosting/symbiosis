@@ -1,7 +1,14 @@
   # Before we embark on DNS black lists, we will always accept the mail if the
   # host IP or address is white listed by a domain
-  accept  hosts         = +whitelisted_hosts
-          log_message   = IP/hostname locally whitelisted
+  accept  hosts = : +whitelisted_hosts_by_ip
+          log_message = IP locally whitelisted
+
+  #
+  # Don't bother doing an RDNS lookup for hosts in the RFC1918 ranges (makes
+  # tests much faster).
+  #
+  accept  hosts = !+private_addresses : +whitelisted_hosts_by_hostname
+          log_message = Hostname locally whitelisted
 
   # Accept if the sender address is on a local whitelist
   accept  senders       = +whitelisted_senders

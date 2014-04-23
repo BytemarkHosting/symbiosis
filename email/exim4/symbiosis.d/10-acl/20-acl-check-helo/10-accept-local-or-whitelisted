@@ -1,4 +1,10 @@
   # Accept if the source is local SMTP (i.e. not over TCP/IP). We do this by
   # testing for an empty sending host field.
-  accept  hosts = : +whitelisted_hosts
+  accept  hosts = : +whitelisted_hosts_by_ip
+
+  #
+  # Don't bother doing an RDNS lookup for hosts in the RFC1918 ranges (makes
+  # tests much faster).
+  #
+  accept  hosts = +private_addresses : +whitelisted_hosts_by_hostname
 

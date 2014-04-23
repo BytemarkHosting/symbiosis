@@ -20,9 +20,6 @@ vhost_no_local_mail:
   mx_domains = +vhost_domains
   transport = remote_smtp
   same_domain_copy_routing = yes
-  # ignore private rfc1918 and APIPA addresses
-  ignore_target_hosts = 0.0.0.0 : 127.0.0.0/8 : 192.168.0.0/16 :\
-                        172.16.0.0/12 : 10.0.0.0/8 : 169.254.0.0/16 :\
-                        255.255.255.255
+  ignore_target_hosts = +private_addresses
   no_more
 
