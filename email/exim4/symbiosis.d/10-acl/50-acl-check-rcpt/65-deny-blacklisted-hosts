@@ -1,7 +1,12 @@
-  # Similarly, we will deny the message if the host IP or name is on a local
-  deny    hosts         = +blacklisted_hosts
+  # Similarly, we will deny the message if the host IP is on a local blacklist
+  deny    hosts         = +blacklisted_hosts_by_ip
           message       = The IP or hostname used when connecting is locally blacklisted.
-          log_message   = IP/hostname locally blacklisted
+          log_message   = IP locally blacklisted
+  
+  # Similarly, we will deny the message if the hostname is on a local blacklist (and not in an private range)
+  deny    hosts         = !+private_addresses : +blacklisted_hosts_by_ip
+          message       = The IP or hostname used when connecting is locally blacklisted.
+          log_message   = Hostname locally blacklisted
 
   # OK, now we check whether the sender address is on a local blacklist
   deny    senders       = +blacklisted_senders
