@@ -23,7 +23,8 @@ local_ip: 192.168.0.1
 local_domains: 
   - local.domain
   - other.domain
-  - bytemark.co.uk
+  - no-local-mail.domain
+  - my-brilliant-site.com
 rewrite_domains:
   symlinked.domain: local.domain
 remote_ip: 192.168.4.1

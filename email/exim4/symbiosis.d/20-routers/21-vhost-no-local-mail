@@ -6,6 +6,10 @@ vhost_no_local_mail:
   driver = dnslookup
   domains = +vhost_domains
   condition  = ${if and{ \
+                 {or { \
+                   {eq{$sender_host_address}{}} \
+                   {match_ip{$sender_host_address}{+relay_from_hosts}} \
+                 }} \
                  {!exists{VHOST_DIR/$domain/VHOST_MAILBOX_DIR/}} \
                  {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/default_forward}} \
                  {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/aliases}} \

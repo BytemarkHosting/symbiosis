@@ -434,6 +434,26 @@ class Exim4ConfigTest < Test::Unit::TestCase
     do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip']+".587", script)
   end
 
+  def test_no_relaying_for_non_local_domains
+    # setup the acl
+    do_acl_setup()
+
+    # This first script should work from localhost, and relay_ips, but not from other IPs.
+    script = [    
+      ["EHLO remote.domain", 250],
+      ["MAIL FROM:<anyone@remote.domain>", 250],
+      ["RCPT TO:<anyone@no-local-mail.domain>", 250]
+    ]
+     
+    do_exim4_bh("127.0.0.1", "127.0.0.1", script)
+
+    relay_ip = @acl_config['relay_from_hosts'].first
+    do_exim4_bh(relay_ip, @acl_config['local_ip'], script)
+
+    script[-1][-1] = 550
+    do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip'], script)
+  end
+
   ################################################################################
   # ROUTERS
   ################################################################################
