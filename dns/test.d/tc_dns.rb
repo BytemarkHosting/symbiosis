@@ -184,4 +184,14 @@ EOF
     assert_match(/^@#{Regexp.escape(@domain.name)}::b\.nospam\.bytemark\.co\.uk/,txt, "No line mentions b.nospam.bytemark.co.uk")
   end
 
+  def test_srv_generation
+    target = "\\000\\012\\000d\\023\\304\\003pbx\\007example\\003com\\000"
+    target_decoded = @domain.__send__(:tinydns_decode, target)
+
+    result = @domain.srv_record_for(10,100,5060,"pbx.example.com")
+    result_decoded = @domain.__send__(:tinydns_decode, result)
+
+    assert_equal(target_decoded,result_decoded)
+  end
+
 end
