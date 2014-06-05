@@ -36,6 +36,13 @@ module Symbiosis
           else
             line = line.gsub("__IP__","(?:::ffff:)?([0-9a-fA-F:\.]+(?:/[0-9]+)?)")
 
+            # 
+            # Make sure there is anchor at one end of the regexp
+            #
+            unless line =~ /^\^/ or line =~ /\$$/
+              line += "$"
+            end
+
             @patterns << Regexp.new(line)
           end
 
