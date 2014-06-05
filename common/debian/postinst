@@ -40,7 +40,7 @@ if ( ! grep ^admin: /etc/passwd 2>/dev/null >/dev/null ); then
   #  If we have an adm group - which we shold - add the admin user to it.
   #
   if ( getent group adm >/dev/null ); then
-    adduser admin adm
+    adduser admin adm > /dev/null
   fi
 fi
 
