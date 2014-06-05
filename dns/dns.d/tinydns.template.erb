@@ -79,3 +79,22 @@
 '<%= domain.dkim_selector %>._domainkey.<%= domain %>:v=DKIM1; k=rsa; p=<%= domain.dkim_public_key_b64 %>:300
 
 % end
+% if domain.has_xmpp?
+#
+# SRV records for XMPP.
+#
+:_xmpp-client._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,5222, domain) %>:300
+:_xmpp-server._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,5269, domain) %>:300
+
+% end
+%if domain.mailboxes.length > 0
+#
+# SRV records for various mail services
+#
+:_submission._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,587, "mail."+domain) %>:300
+:_imap._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,143, "mail."+domain) %>:300
+:_imaps._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,993, "mail."+domain) %>:300
+:_pop3._tcp.<%= domain %>:33:<%= domain.srv_record_for(10,5,110, "mail."+domain) %>:300
+:_pop3s._tcp.<%= domain %>:33:<%= domain.srv_record_for(10,5,995, "mail."+domain) %>:300
+
+% end
