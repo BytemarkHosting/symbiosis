@@ -1,3 +1,11 @@
+symbiosis-updater (2012:0223) oldstable; urgency=medium
+
+  * Added squeeze-lts to the security sources list.
+  * Use postinst to add squeeze-lts to sources list, required for the updater
+    to work.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 06 Jun 2014 10:12:15 +0100
+
 symbiosis-updater (2012:0222) oldstable; urgency=low
 
   * Updated copyright dates and documentation links.
