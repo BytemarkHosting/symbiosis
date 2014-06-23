@@ -465,7 +465,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
     #
     # First test without DKIM
     #
-    do_exim4_bt("test@example.com", "test@example.com", "dnslookup", "remote_smtp", "test@"+domain)
+    do_exim4_bt("test@bytemark.co.uk", "test@bytemark.co.uk", "dnslookup", "remote_smtp", "test@"+domain)
 
     #
     # Now put dummy files in place, and test again.
@@ -473,12 +473,12 @@ class Exim4ConfigTest < Test::Unit::TestCase
     FileUtils.touch(File.join(@vhost_dir, domain, "config", "dkim"))
     FileUtils.touch(File.join(@vhost_dir, domain, "config", "dkim.key"))
 
-    do_exim4_bt("test@example.com", "test@example.com", "dnslookup_with_dkim", "remote_smtp_with_dkim", "test@"+domain)
+    do_exim4_bt("test@bytemark.co.uk", "test@bytemark.co.uk", "dnslookup_with_dkim", "remote_smtp_with_dkim", "test@"+domain)
   end
 
 
   def test_router_dnslookup
-    do_exim4_bt("test@example.com", "test@example.com", "dnslookup", "remote_smtp")
+    do_exim4_bt("test@bytemark.co.uk", "test@bytemark.co.uk", "dnslookup", "remote_smtp")
   end
 
 #  def test_router_vhost_rewrites
