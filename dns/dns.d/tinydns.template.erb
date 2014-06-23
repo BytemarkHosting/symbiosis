@@ -50,13 +50,13 @@
 # Tag my real records so only Bytemark can see them.  The IP is defined above,
 # so not needed here.
 #
-@<%= domain %>::mx.<%= domain %>:5:::nospam
+@<%= domain %>::mx.<%= domain %>:5:300::nospam
 
 #
 # Tell the rest of the world to go via Bytemark
 #
-@<%= domain %>::a.nospam.bytemark.co.uk:5:::world
-@<%= domain %>::b.nospam.bytemark.co.uk:10:::world
+@<%= domain %>::a.nospam.bytemark.co.uk:5:300::world
+@<%= domain %>::b.nospam.bytemark.co.uk:10:300::world
 
 % else
 #
