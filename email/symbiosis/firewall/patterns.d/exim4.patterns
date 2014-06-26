@@ -12,4 +12,4 @@ ports = 25,465,587
 #
 # Catch "TLS Required" messages
 #
-\[__IP__\] rejected AUTH LOGIN: SSL or TLS encryption required when authenticating.
+\[__IP__\] rejected AUTH LOGIN: SSL or TLS encryption required when authenticating.$
