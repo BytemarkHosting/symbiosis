@@ -479,6 +479,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
 
   def test_router_dnslookup
+    do_acl_setup
     remote_domain = @acl_config['remote_domain']
     do_exim4_bt("test@#{remote_domain}", "test@#{remote_domain}", "dnslookup", "remote_smtp")
   end
