@@ -28,7 +28,8 @@ local_domains:
 rewrite_domains:
   symlinked.domain: local.domain
 remote_ip: 192.168.4.1
-remote_domain: remote.domain
+# I'm guessing we'll never host gmail.
+remote_domain: gmail.com 
 local_users:
   - username: local.user@local.domain
     password: password
