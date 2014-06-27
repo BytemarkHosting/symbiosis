@@ -1,3 +1,10 @@
+symbiosis-email (2014:0627) stable; urgency=medium
+
+  * Added further tests to exim4 delivery
+  * Fixed firewall patterns (CVE-2014-3979)
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jun 2014 19:17:21 +0100
+
 symbiosis-email (2014:0214) stable; urgency=low
 
   * Updated dovecot tests to work.
