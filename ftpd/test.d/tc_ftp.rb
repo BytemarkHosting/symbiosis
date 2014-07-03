@@ -74,11 +74,18 @@ class TestFTP < Test::Unit::TestCase
         f.puts password_data
       end
 
-      # assert_nothing_raised("FTP single user login failed with #{crypted} passwd.")  do
-        Net::FTP.open('localhost') do |ftp|
-          ftp.login( @domain.name, password )
+      assert_nothing_raised("FTP single user login failed with #{crypted} passwd.")  do
+        attempt = 0
+        begin
+          Net::FTP.open('localhost') do |ftp|
+            ftp.login( @domain.name, password )
+          end
+        rescue Errno::EBADF => err
+          raise err if attempt > 1
+          attempt += 1
+          retry
         end
-      # end
+      end
     end
   end
 
