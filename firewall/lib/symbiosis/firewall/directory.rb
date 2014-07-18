@@ -237,6 +237,11 @@ module Symbiosis
 
         Dir.entries( self.path ).sort.each do |entry|
 
+          #
+          # Ignore files that are left over by from dpkg
+          #
+          next if entry =~ /\.dpkg-[a-z0-9]+$/
+
           next unless entry =~ /^([0-9]*)-(.*)$/
           name = $2
 
