@@ -26,9 +26,7 @@ unmangle_config() {
   fi
 
   if [ ! -L "$file" ] && [ ! -e "$file" ]; then
-    dpkg-divert --remove --rename --package "$package" "$file"
-  else
-    echo "Not removing diversion of $file by $package" >&2
+    ucf "$theirfile" "$file"
   fi
 }
 

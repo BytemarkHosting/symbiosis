@@ -28,16 +28,8 @@ mangle_config() {
   ourfile="$file.dpkg-symbiosis"
   theirfile="$file.dpkg-symbiosis-orig"
 
-  #
-  # Add the diversion, if it doesn't exist.
-  #
-  if ! dpkg-divert --list "$package" | \
-
-    grep -xFq "diversion of $file to $theirfile by $package"; then
-    dpkg-divert --divert "$theirfile" --rename --package "$package" --add "$file"
-
-  fi
-
+  ucf --purge "$file"
+  mv -f "$file" "$theirfile"
   #
   # Now add the link in, unless it is already in place.
   #
