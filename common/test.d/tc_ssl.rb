@@ -84,11 +84,16 @@ class SSLTest < Test::Unit::TestCase
   #
   # Returns a new certificate given a key
   #
-  def do_generate_crt(domain, key=nil, ca_cert=nil, ca_key=nil, subject_alt_name=nil)
+  def do_generate_crt(domain, options={})
     #
     # Generate a key if none has been specified
     #
-    key = do_generate_key if key.nil?
+    key = options[:key] ? options[:key] : do_generate_key
+    ca_cert = options[:ca_cert]
+    ca_key = options[:ca_key]
+    subject_alt_name = options[:subject_alt_name]
+    options[:not_before] ||= Time.now
+    options[:not_after] ||= Time.now + 60
 
     #
     # Check CA key and cert
@@ -119,8 +124,8 @@ class SSLTest < Test::Unit::TestCase
       crt.issuer   = ca_cert.subject
     end
     crt.public_key = csr.public_key
-    crt.not_before = Time.now
-    crt.not_after  = Time.now + 60
+    crt.not_before = options[:not_before]
+    crt.not_after  = options[:not_after]
     #
     # Make sure we increment the serial for each regeneration, to make sure
     # there are differences when regenerating a certificate for a new domain.
@@ -163,9 +168,9 @@ class SSLTest < Test::Unit::TestCase
   #
   # Returns a key and certificate
   #
-  def do_generate_key_and_crt(domain, ca_cert=nil, ca_key=nil)
-    key = do_generate_key
-    return [key, do_generate_crt(domain, key, ca_cert, ca_key)]
+  def do_generate_key_and_crt(domain, options={})
+    options[:key] = do_generate_key
+    return [options[:key], do_generate_crt(domain, options)]
   end
 
   ####
@@ -294,21 +299,25 @@ class SSLTest < Test::Unit::TestCase
     # Generate a key and cert
     #
     key, crt = do_generate_key_and_crt(@domain.name)
+    oldcrt = do_generate_crt(@domain.name, {
+      :key => key,
+      :not_before => Time.now - 200,
+      :not_after => Time.now + 10 })
 
     #
     # Write the certificate in various forms
     #
-    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem+key.to_pem}
+    File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write oldcrt.to_pem+key.to_pem}
     File.open(@domain.directory+"/config/ssl.key","w+"){|fh| fh.write crt.to_pem+key.to_pem}
-    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write crt.to_pem}
-    File.open(@domain.directory+"/config/ssl.cert","w+"){|fh| fh.write crt.to_pem}
-    File.open(@domain.directory+"/config/ssl.pem","w+"){|fh| fh.write crt.to_pem}
+    File.open(@domain.directory+"/config/ssl.crt","w+"){|fh| fh.write oldcrt.to_pem}
+    File.open(@domain.directory+"/config/ssl.cert","w+"){|fh| fh.write oldcrt.to_pem}
+    File.open(@domain.directory+"/config/ssl.pem","w+"){|fh| fh.write oldcrt.to_pem}
 
     #
-    # Combined is preferred
+    # Newest is preferred
     #
-    assert_equal( %w(combined key crt cert pem).collect{|ext| @domain.directory+"/config/ssl."+ext},
-                   @domain.ssl_available_certificate_files)
+    assert_equal(  @domain.directory+"/config/ssl.key",
+                   @domain.ssl_available_certificate_files.first)
 
     #
     # If a combined file contains a non-matching cert+key, don't return it
@@ -316,8 +325,7 @@ class SSLTest < Test::Unit::TestCase
     new_key = do_generate_key
     File.open(@domain.directory+"/config/ssl.combined","w+"){|fh| fh.write crt.to_pem + new_key.to_pem}
 
-    assert_equal( %w(key crt cert pem).collect{|ext| @domain.directory+"/config/ssl."+ext},
-                  @domain.ssl_available_certificate_files )
+    assert(!@domain.ssl_available_certificate_files.include?(@domain.directory+"/config/ssl.combined"))
   end
 
   def test_ssl_available_key_files
@@ -487,7 +495,10 @@ class SSLTest < Test::Unit::TestCase
     # Generate a key and cert
     #
     key = do_generate_key
-    crt = do_generate_crt(@domain.name, key, ca_cert, ca_key)
+    crt = do_generate_crt(@domain.name, {
+      :key     => key,
+      :ca_cert => ca_cert,
+      :ca_key  => ca_key })
 
     #
     # Write a combined cert
@@ -521,7 +532,10 @@ class SSLTest < Test::Unit::TestCase
     # Generate a key and cert
     #
     key = do_generate_key
-    crt = do_generate_crt(@domain.name, key, ca_cert, ca_key)
+    crt = do_generate_crt(@domain.name, {
+      :key     => key,
+      :ca_cert => ca_cert,
+      :ca_key  => ca_key })
 
     #
     # Write a combined cert
@@ -554,7 +568,9 @@ class SSLTest < Test::Unit::TestCase
     third_domain.create
 
     key = do_generate_key
-    crt = do_generate_crt(@domain.name, key, nil, nil, other_domain.name)
+    crt = do_generate_crt(@domain.name, {
+      :key => key,
+      :subject_alt_name => other_domain.name })
 
     #
     # This should verify.
@@ -582,7 +598,7 @@ class SSLTest < Test::Unit::TestCase
  
 
     key = do_generate_key
-    crt = do_generate_crt("*."+@domain.name, key)
+    crt = do_generate_crt("*."+@domain.name, {:key => key})
 
     #
     # This should verify.
