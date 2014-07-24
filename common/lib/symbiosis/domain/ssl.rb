@@ -217,12 +217,12 @@ module Symbiosis
       # before their start time or after their expiry time.
       #
       now = Time.now
-      certificate_files = certificates.reverse.sort_by { |fn, cert|
+      certificate_files = certificates.sort_by { |fn, cert|
         score = cert.not_after.to_i
         score -= not_before.to_i if cert.not_before > now
         score -= now.to_i if now > cert.not_after
-        score
-      }.reverse.map { |fn, cert| fn }
+        -score
+      }.map { |fn, cert| fn }
 
       [certificate_files, key_files]
     end
