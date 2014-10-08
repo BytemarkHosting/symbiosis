@@ -129,7 +129,7 @@ class ApacheLogger < EventMachine::Connection
       # Set up a couple of things before we open the file.  This will make
       # sure the ownerships are correct.
       #
-      if File.exists?(File.dirname(File.dirname(log)))
+      if File.exists?(File.dirname(File.dirname(File.dirname(log))))
         begin
           parent_dir = File.dirname(log)
           warn "#{$0}: Creating directory #{parent_dir}" if $VERBOSE
@@ -255,7 +255,7 @@ class ApacheLogger < EventMachine::Connection
       #
       if @default_filehandle.nil? or @default_filehandle.closed?
         warn "#{$0}: Opening default log file #{self.default_filename}" if $VERBOSE 
-        @default_filehandle = open_log(self.default_filename, {:uid => self.uid, :gid => self.gid})
+        @default_filehandle = open_log(self.default_filename, {:domain => domain, :uid => self.uid, :gid => self.gid})
       end
 
       if @default_filehandle.is_a?(File) and not @default_filehandle.closed?
