@@ -11,7 +11,7 @@ deb     http://mirror.bytemark.co.uk/debian/     wheezy-updates main contrib non
 #
 #  Bytemark Symbiosis Packages
 #
-deb     http://symbiosis.bytemark.co.uk/wheezy-rc2/ ./
+deb     http://symbiosis.bytemark.co.uk/wheezy-rc3/ ./
 
 #
 # Security updates

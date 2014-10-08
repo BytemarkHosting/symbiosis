@@ -11,13 +11,6 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
-#  Make sure we notify the local sysadmin
-#
-if [ ! -e /etc/symbiosis/updater ]; then
-    echo "EMAIL=root" >/etc/symbiosis/updater
-fi
-
-#
 #  remove old config file
 #
 if [ -e /etc/update-packages.conf ]; then
