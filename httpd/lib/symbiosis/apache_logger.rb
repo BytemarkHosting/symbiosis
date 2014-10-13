@@ -129,7 +129,10 @@ class ApacheLogger < EventMachine::Connection
       # Set up a couple of things before we open the file.  This will make
       # sure the ownerships are correct.
       #
-      if File.exists?(File.dirname(File.dirname(File.dirname(log))))
+      if opts[:domain] && (File.exists?(opts[:domain].directory) ||
+        opts[:domain].directory.split('/').zip(log.split('/')).any? { |a,b|
+          a != b }
+        )
         begin
           parent_dir = File.dirname(log)
           warn "#{$0}: Creating directory #{parent_dir}" if $VERBOSE
@@ -232,7 +235,7 @@ class ApacheLogger < EventMachine::Connection
           other_filehandle.close unless other_filehandle.closed?
         end
 
-        filehandle = open_log(log_filename, {:uid => domain.uid, :gid => domain.gid, :sync => self.sync_io})
+        filehandle = open_log(log_filename, {:domain => domain, :uid => domain.uid, :gid => domain.gid, :sync => self.sync_io})
       end
 
     end
