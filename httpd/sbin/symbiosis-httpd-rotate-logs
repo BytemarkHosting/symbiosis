@@ -1,10 +1,10 @@
 #!/usr/bin/ruby
 #
 # NAME
-#   symbiosis-rotate-logs - Rotate and prune Apache logs.
+#   symbiosis-httpd-rotate-logs - Rotate and prune Apache logs.
 #
 # SYNOPSIS
-#  symbiosis-rotate-logs [ -n | --max-rotations <n> ] [ -c | --compress-at <n> ] 
+#  symbiosis-httpd-rotate-logs [ -n | --max-rotations <n> ] [ -c | --compress-at <n> ] 
 #                        [ --prefix | -p <directory> ] [ -h | --help ]
 #                        [-m | --manual] [ -v | --verbose ]
 #
@@ -266,15 +266,19 @@ end
 # If we did anything then we need to reload
 #
 if ( rotated )
-  verbose( "Since we rotated we now restart the apache logger")
-  Kernel.system( "killall -HUP symbiosis-apache-logger" )
-  verbose( "Since we rotated we now generate statistics" )
+  #
+  # TODO:  Really we want to send HUP to those processes which have the
+  # logfiles we've rotated open, rather than blindly stabbing things.
+  #
+  verbose( "Since we rotated we now restart the httpd logger")
+  Kernel.system( "killall -HUP symbiosis-httpd-logger" )
   
   #
   # Add similar arguments on to the generate-stats command as wot we received.
   #
   stats_args  = " --prefix #{prefix}"
   stats_args += " --verbose" if $VERBOSE
+  verbose( "Since we rotated we now generate statistics" )
   Kernel.system( "/usr/sbin/symbiosis-generate-stats #{stats_args}" ) 
 end
 
