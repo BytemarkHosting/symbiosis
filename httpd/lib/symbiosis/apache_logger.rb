@@ -11,11 +11,12 @@ class ApacheLogger < EventMachine::Connection
       @prefix = prefix
       @cache_time = cache_time
       @cache = {}
+      @clock = clock
       @clock ||= Proc.new { Time.now }
     end
 
     def [](k)
-      unless @cache[k] && @cache[k].last + @cache_time < @clock.call
+      if @cache[k] && @cache[k].last + @cache_time < @clock.call
         @cache[k] = [ Symbiosis::Domains.find(k, @prefix), @clock.call ]
       end
       @cache[k].first
