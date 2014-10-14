@@ -7,15 +7,15 @@ module Symbiosis
 class ApacheLogger < EventMachine::Connection
 
   class DomainCache
-    def initialize(prefix, timeout=10, clock=nil)
+    def initialize(prefix, cache_time=10, clock=nil)
       @prefix = prefix
-      @timeout = timeout
+      @cache_time = cache_time
       @cache = {}
       @clock ||= Proc.new { Time.now }
     end
 
     def [](k)
-      unless @cache[k] && @cache[k].last + timeout < @clock.call
+      unless @cache[k] && @cache[k].last + @cache_time < @clock.call
         @cache[k] = [ Symbiosis::Domains.find(k, @prefix), @clock.call ]
       end
       @cache[k].first
