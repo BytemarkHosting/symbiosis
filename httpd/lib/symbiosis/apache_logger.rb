@@ -6,11 +6,27 @@ require 'pp'
 module Symbiosis
 class ApacheLogger < EventMachine::Connection
 
+  class DomainCache
+    def initialize(prefix, timeout=10, clock=nil)
+      @prefix = prefix
+      @timeout = timeout
+      @cache = {}
+      @clock ||= Proc.new { Time.now }
+    end
+
+    def [](k)
+      unless @cache[k] && @cache[k].last + timeout < @clock.call
+        @cache[k] = [ Symbiosis::Domains.find(k, @prefix), @clock.call ]
+      end
+      @cache[k].first
+    end
+  end
+
   def initialize(opts = {})
     #
     # This is cache of domain names to Symbiosis::Domain objects
     #
-    @domain_objects ||= Hash.new{|h,k| h[k] = Symbiosis::Domains.find(k, self.prefix)}
+    @domain_objects ||= DomainCache.new(self.prefix)
     @sync_io            = false
     @max_filehandles    = 50
     @log_filename       = "access.log"
