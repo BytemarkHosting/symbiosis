@@ -58,5 +58,5 @@ tls_require_ciphers      = ${if =={$received_port}{25}\
                            {SECURE128}}
 #gnutls_require_kx        = DHE_RSA:DHE_DSS:RSA
 #gnutls_require_mac       = MD5:SHA1
-#gnutls_require_protocols = SSL3:TLS1
+gnutls_require_protocols = TLS1
 
