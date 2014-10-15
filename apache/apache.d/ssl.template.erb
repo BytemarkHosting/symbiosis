@@ -44,7 +44,7 @@ NameVirtualHost <%= ip %>:80
         #
         # Sane SSL ciphers.
         #
-        SSLCipherSuite ALL:!LOW:!SSLv2:!EXP:!aNULL
+        SSLCipherSuite TLSv1:!LOW:!EXP:!aNULL:!eNULL
 
         #
         # And some options

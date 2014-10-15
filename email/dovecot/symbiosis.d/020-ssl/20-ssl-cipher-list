@@ -2,4 +2,4 @@
 # Disallow rubbish ciphers
 #
 
-ssl_cipher_list = ALL:!LOW:!SSLv2:!EXP:!aNULL
+ssl_cipher_list = TLSv1:!LOW:!EXP:!aNULL:!eNULL
