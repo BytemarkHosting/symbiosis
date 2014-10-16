@@ -44,13 +44,17 @@ NameVirtualHost <%= ip %>:80
         #
         # Sane SSL ciphers.
         #
-        SSLCipherSuite TLSv1:!LOW:!EXP:!aNULL:!eNULL
+        SSLCipherSuite ALL:!LOW:!SSLv2:!EXP:!aNULL
+
+        #
+        # Ban ancient protocols.
+        #
+        SSLProtocol  All -SSLv2 -SSLv3
 
         #
         # And some options
         #
         SSLOptions +StrictRequire
-
 
         #
         #  Allow users to override settings via .htaccess
