@@ -28,6 +28,11 @@ NameVirtualHost <%= ip %>:443
         SSLCipherSuite ALL:!LOW:!SSLv2:!EXP:!aNULL
 
         #
+        # Ban ancient protocols
+        #
+        SSLProtocol ALL -SSLv2 -SSLv3
+
+        #
         # And some options
         #
         SSLOptions +StrictRequire
