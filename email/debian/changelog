@@ -1,3 +1,9 @@
+symbiosis-email (2013:0610) oldstable; urgency=medium
+
+  * Removed SSLv3 from Exim4 following CVE-2014-3566.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 16 Oct 2014 17:32:57 +0100
+
 symbiosis-email (2013:0609) oldstable; urgency=low
 
   * Force SMTP connections to Google servers to be IPv4 only.
