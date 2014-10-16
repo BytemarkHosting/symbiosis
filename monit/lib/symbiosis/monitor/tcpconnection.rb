@@ -33,7 +33,7 @@ module Symbiosis
           if @ssl
             ssl_sock = OpenSSL::SSL::SSLSocket.new(
               sock,
-              OpenSSL::SSL::SSLContext.new("SSLv3_client")
+              OpenSSL::SSL::SSLContext.new("TLSv1_client")
             )
             ssl_sock.sync_close = true
             ssl_sock.connect
