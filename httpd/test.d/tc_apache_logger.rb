@@ -85,16 +85,21 @@ class TestApacheLogger < Test::Unit::TestCase
     domain.create
     name = domain.name
     times = []
+
     clock = Proc.new { times.shift }
     cache = Symbiosis::ApacheLogger::DomainCache.new(@prefix, 10, clock)
-    times += [0, 0]
+
+    times += [0]
     assert(cache[name],
       "Symbiosis::ApacheLogger::DomainCache failed to find domain")
+ 
     domain.destroy
+
     times += [1]
     assert(cache[name],
       "Symbiosis::ApacheLogger::DomainCache failed to cache domain")
-    times += [100, 100]
+
+    times += [100]
     assert(cache[name].nil?,
       "Symbiosis::ApacheLogger::DomainCache failed to expire cache")
   end
@@ -103,22 +108,33 @@ class TestApacheLogger < Test::Unit::TestCase
     #
     #  Create the domain
     #
-    10.times do 
-     @domains << Symbiosis::Domain.new(nil, @prefix)
+    10.times do |i| 
+     @domains << Symbiosis::Domain.new("existent-#{i}.com", @prefix)
     end
     @domains.each{|d| d.create }
 
-    @domains << Symbiosis::Domain.new(nil, @prefix)
+    #
+    # We'll delete this domain half-way
+    #
+    to_delete = Symbiosis::Domain.new("deleted.com", @prefix)
+    to_delete.create
+    @domains << to_delete
+
+    #
+    # Add a non-existent domain to the mis
+    #
+    non_existent = Symbiosis::Domain.new("non-existent.com", @prefix)
+    @domains << non_existent
 
     test_lines = []
     test_lines2 = []
 
-    10.times do
-      test_lines  += @domains.collect{|d| [d, Symbiosis::Utils.random_string(40)] }
-      test_lines2 += @domains.collect{|d| [d, Symbiosis::Utils.random_string(40)] }
+    10.times do |i|
+      test_lines  += @domains.collect{|d| [d, "#{i} " + Symbiosis::Utils.random_string(40)] }
+      test_lines2 += @domains.collect{|d| [d, "#{10+i} " + Symbiosis::Utils.random_string(40)] }
     end
 
-    args = {:sync_io => false, :prefix => @prefix, :default_filename => @default_filename, :max_filehandles => 4}
+    args = {:sync_io => true, :prefix => @prefix, :default_filename => @default_filename, :max_filehandles => 4, :cache_time => 1}
 
     self.eventmachine do
       r,w = IO.pipe
@@ -137,6 +153,9 @@ class TestApacheLogger < Test::Unit::TestCase
           logger.close_filehandles
           logger.resume 
         end
+
+        sleep 1
+        to_delete.destroy
 
         test_lines2.each do |d, l|
           w.puts "#{d.name} #{l}"
@@ -157,7 +176,16 @@ class TestApacheLogger < Test::Unit::TestCase
     log_line_hash = Hash.new{|h,k| h[k] = []}
 
     (test_lines + test_lines2).each do |d, l|
-      log_line_hash[d] << l
+      #
+      # We expect the last 10 lines of the deleted domain to appear, and all
+      # the non-existent ones in the shared access log.
+      #
+      if [non_existent, to_delete].include?(d)
+        next if to_delete == d and l =~ /^\d /
+        log_line_hash[non_existent] << "#{d.name} #{l}"
+      else
+        log_line_hash[d] << l
+      end
     end
 
     log_line_hash.each do |d, lines|
@@ -168,7 +196,6 @@ class TestApacheLogger < Test::Unit::TestCase
       else
         # When we write to the default log, the domain is still attached.
         access_log = @default_filename
-        lines = lines.collect{|l| "#{d.name} #{l}"}
       end
 
       assert(File.exists?(access_log), "Access log #{access_log} for #{d.name} not found")
@@ -177,6 +204,9 @@ class TestApacheLogger < Test::Unit::TestCase
       logged_lines = File.readlines(access_log).collect{|l| l.to_s.chomp}
       assert_equal(lines, logged_lines)
     end
+
+    assert(!File.directory?(non_existent.directory), "Non-existent domain's directory created.")
+    assert(!File.directory?(to_delete.directory), "Non-existent domain's directory created.")
 
   end
 

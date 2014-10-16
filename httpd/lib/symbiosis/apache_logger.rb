@@ -16,18 +16,20 @@ class ApacheLogger < EventMachine::Connection
     end
 
     def [](k)
-      if !@cache[k] || @cache[k].last + @cache_time < @clock.call
-        @cache[k] = [ Symbiosis::Domains.find(k, @prefix), @clock.call ]
+      now = @clock.call
+
+      domain, cached_at = @cache[k]
+
+      if ( !domain.is_a?(Symbiosis::Domain) or !cached_at.is_a?(now.class) or ( cached_at + @cache_time ) <= now )
+        domain    = Symbiosis::Domains.find(k, @prefix)
+        @cache[k] = [ domain, now ]
       end
-      @cache[k].first
+
+      domain
     end
   end
 
   def initialize(opts = {})
-    #
-    # This is cache of domain names to Symbiosis::Domain objects
-    #
-    @domain_objects ||= DomainCache.new(self.prefix)
     @sync_io            = false
     @max_filehandles    = 50
     @log_filename       = "access.log"
@@ -38,6 +40,7 @@ class ApacheLogger < EventMachine::Connection
     @gid      = nil
     @prefix   = "/srv"
     @filehandles = []
+    @cache_time = 60
 
     opts.each do |meth, value|
       meth = (meth.to_s + "=").to_sym
@@ -47,6 +50,11 @@ class ApacheLogger < EventMachine::Connection
         raise ArgumentError, "Unrecognised parameter #{meth.to_s}"
       end
     end
+
+    #
+    # This is cache of domain names to Symbiosis::Domain objects
+    #
+    @domain_objects ||= DomainCache.new(self.prefix, self.cache_time)
 
     super
   end
@@ -130,6 +138,12 @@ class ApacheLogger < EventMachine::Connection
   #
   def uid=(u) ; @uid = u ; end
   def uid ; @uid ; end
+ 
+  #
+  # Set the cache time
+  #
+  def cache_time=(n); @cache_time = n; end
+  def cache_time; @cache_time; end
   
   # 
   # Opens a log file, returning a filehandle, or nil if it wasn't able to.  It
@@ -146,26 +160,18 @@ class ApacheLogger < EventMachine::Connection
       # Set up a couple of things before we open the file.  This will make
       # sure the ownerships are correct.
       #
-      if opts[:domain] && (File.exists?(opts[:domain].directory) ||
-        opts[:domain].directory.split('/').zip(log.split('/')).any? { |a,b|
-          a != b }
-        )
-        begin
-          parent_dir = File.dirname(log)
-          warn "#{$0}: Creating directory #{parent_dir}" if $VERBOSE
-          Symbiosis::Utils.mkdir_p(parent_dir, :uid => (opts[:uid] || self.uid), :gid => (opts[:gid] || self.gid) , :mode => 0755)
-        rescue Errno::EEXIST
-          # ignore
-        end
-      else
-        # Don't recreate removed domains.
-        log = nil
+      begin
+        parent_dir = File.dirname(log)
+        warn "#{$0}: Creating directory #{parent_dir}" if $VERBOSE
+        Symbiosis::Utils.mkdir_p(parent_dir, :uid => opts[:uid], :gid => self.gid, :mode => 0755)
+      rescue Errno::EEXIST
+        # ignore
       end
-  
+
       warn "#{$0}: Opening log file #{log}" if $VERBOSE
-      filehandle = log.nil? ? File.open('/dev/null', 'a+') : Symbiosis::Utils.safe_open(log, "a+", :mode => 0644, :uid => opts[:uid], :gid => opts[:gid] )
+      filehandle = Symbiosis::Utils.safe_open(log, "a+", :mode => 0644, :uid => opts[:uid], :gid => opts[:gid])
       filehandle.sync = opts[:sync]
-  
+
     rescue StandardError => err
       filehandle = nil
       warn "#{$0}: Caught #{err}" if $VERBOSE
@@ -218,7 +224,7 @@ class ApacheLogger < EventMachine::Connection
     # unless the domain is sane.
     #
     domain = @domain_objects[domain_name]
-    
+   
     #
     # Make sure the domain has been found, and the Process UID/GID matches the
     # domain UID/GID, or it is root.
@@ -252,7 +258,7 @@ class ApacheLogger < EventMachine::Connection
           other_filehandle.close unless other_filehandle.closed?
         end
 
-        filehandle = open_log(log_filename, {:domain => domain, :uid => domain.uid, :gid => domain.gid, :sync => self.sync_io})
+        filehandle = open_log(log_filename, {:uid => domain.uid, :gid => domain.gid, :sync => self.sync_io})
       end
 
     end
@@ -275,7 +281,7 @@ class ApacheLogger < EventMachine::Connection
       #
       if @default_filehandle.nil? or @default_filehandle.closed?
         warn "#{$0}: Opening default log file #{self.default_filename}" if $VERBOSE 
-        @default_filehandle = open_log(self.default_filename, {:domain => domain, :uid => self.uid, :gid => self.gid})
+        @default_filehandle = open_log(self.default_filename)
       end
 
       if @default_filehandle.is_a?(File) and not @default_filehandle.closed?
