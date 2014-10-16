@@ -1,3 +1,9 @@
+symbiosis-ftpd (2012:0928) oldstable; urgency=medium
+
+  * Updated firewall patterns to anchor at start of line.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 16 Oct 2014 17:34:42 +0100
+
 symbiosis-ftpd (2012:0927) oldstable; urgency=low
 
   * Fixed pre/postrm scripts not to stop pure-authd unless this package is
