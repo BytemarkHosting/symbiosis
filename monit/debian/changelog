@@ -1,3 +1,9 @@
+symbiosis-monit (2014:1017) stable; urgency=medium
+
+  *  Use TLSv1 rather than SSLv3 as the context when testing SSL connections.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 17 Oct 2014 10:34:20 +0100
+
 symbiosis-monit (2014:0214) stable; urgency=low
 
   * Added bug control.

@@ -1,3 +1,9 @@
+symbiosis-email (2014:1017) stable; urgency=medium
+
+  * Disable SSLv3 in Exim4 and Dovecot (CVE-2014-3566).
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 17 Oct 2014 10:31:03 +0100
+
 symbiosis-email (2014:0627) stable; urgency=medium
 
   * Added further tests to exim4 delivery

@@ -1,3 +1,12 @@
+symbiosis-httpd (2014:1017) stable; urgency=medium
+
+  * Fixed up httpd logger to stop it recreating deleted domains.
+  * Fixed up httpd generate stats to create the configuration directory.
+  * Fixed httpd log rotate script to send HUP to the correct processes.
+  * Disabled SSLv3 from list of allowed protocols (CVE-2014-3566).
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 17 Oct 2014 10:35:25 +0100
+
 symbiosis-httpd (2014:0218) stable; urgency=low
 
   * Tidied away old lenny command.
