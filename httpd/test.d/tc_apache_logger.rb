@@ -154,7 +154,7 @@ class TestApacheLogger < Test::Unit::TestCase
           logger.resume 
         end
 
-        sleep 1
+        sleep 2
         to_delete.destroy
 
         test_lines2.each do |d, l|
