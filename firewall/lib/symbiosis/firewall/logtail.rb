@@ -75,7 +75,25 @@ module Symbiosis
           fh.pos = self.pos
 
           while !fh.eof? 
-            @lines << fh.gets
+            untrusted_line = fh.gets
+            if untrusted_line.respond_to?(:valid_encoding?)
+              untrusted_line.force_encoding(Encoding::UTF_8)
+              trusted_line = if untrusted_line.valid_encoding?
+                untrusted_line
+              else
+                untrusted_line.force_encoding(Encoding::ASCII_8BIT).
+                  encode(Encoding::UTF_8,
+                    :invalid => :replace,
+                    :undef => :replace,
+                    :replace => '')
+              end
+            else
+              require 'iconv'
+
+              ic ||= Iconv.new('UTF-8//IGNORE', 'UTF-8')
+              trusted_line = ic.iconv(untrusted_line + ' ')[0..-2]
+            end
+            @lines << trusted_line
           end
 
           #
