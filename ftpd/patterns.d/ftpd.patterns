@@ -17,5 +17,5 @@ ports = 21
 #
 #  The rule(s) we match
 #
-ftp login failure from IP: __IP__ username:
-^(.+? ){4}pure-ftpd: \(\?@__IP__\) \[WARNING\] Authentication failed for
+# We ignore the first four fields.
+^\S+ \S+ \S+ \S+ pure-ftpd: \(\?@__IP__\) \[WARNING\] Authentication failed for 
