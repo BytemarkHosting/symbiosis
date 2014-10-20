@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+if [ "$1" = "purge" ]; then
+
+    #
+    # Remove the admin user from sudoers
+    #
+    if [ -e /etc/sudoers ]; then
+	sed -i /etc/sudoers -e '/^admin /d'
+    fi
+
+fi
+
+exit 0
