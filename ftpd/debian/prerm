@@ -2,10 +2,17 @@
 
 set -e
 
+if [ "$1" = "upgrade" ]; then
+    #
+    #  Do nothing for upgrades.
+    #
+    echo "I: Skipping removal."
+    exit 0
+fi
+
 #
 # Stop the authd
 #
-
 if which invoke-rc.d >/dev/null 2>&1; then
     invoke-rc.d pure-authd stop
 else
