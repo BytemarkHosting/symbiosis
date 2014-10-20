@@ -1,3 +1,10 @@
+symbiosis-ftpd (2012:0929) oldstable; urgency=medium
+
+  * Fixed up FTP patterns to work, again.
+  * Don't stop authd when upgrading.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 20 Oct 2014 16:41:45 +0100
+
 symbiosis-ftpd (2012:0928) oldstable; urgency=medium
 
   * Updated firewall patterns to anchor at start of line.
