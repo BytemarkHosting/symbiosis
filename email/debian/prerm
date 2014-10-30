@@ -3,9 +3,11 @@
 set -e
 
 if [ "$1" == "upgrade" ] ; then
-  #
-  #  Do nothing for upgrades.
-  #
+  if echo $2 | grep -q ^2014: && [ -f /etc/exim4/exim4.conf ] ; then
+    # upgrading to wheezy - get rid of gnutls config that breaks the upgrade
+    sed -i /etc/exim4/exim4.conf \
+      -e 's/^tls_require_ciphers/#tls_require_ciphers/g'
+  fi
   exit 0
 fi
 
