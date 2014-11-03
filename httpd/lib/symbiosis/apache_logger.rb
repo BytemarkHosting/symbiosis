@@ -327,7 +327,10 @@ class ApacheLogger < EventMachine::Connection
 
   end
 
-  alias unbind close_filehandles
+  def unbind
+    close_filehandles
+    EventMachine.stop
+  end
 
 end
 end
