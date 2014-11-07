@@ -1,3 +1,9 @@
+symbiosis-key (2014:1107) stable; urgency=low
+
+  * Updated repositories key.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Fri, 07 Nov 2014 11:49:50 +0000
+
 symbiosis-key (2014:0226) stable; urgency=low
 
   * Added new repositories key.
