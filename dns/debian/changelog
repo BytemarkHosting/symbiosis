@@ -1,3 +1,12 @@
+symbiosis-dns (2014:1110) stable; urgency=low
+
+  * Added SRV record generator.
+  * Added SRV records for XMPP and mail services.
+  * Set TTL for Bytemark nospam records to 300 to match other records.
+  * Make sure the domain has the appropriate methods before trying to use them.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Mon, 10 Nov 2014 10:43:21 +0000
+
 symbiosis-dns (2014:0226) stable; urgency=low
 
   * Removed unneeded preinst
