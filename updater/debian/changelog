@@ -1,3 +1,9 @@
+symbiosis-updater (2014:1110) stable; urgency=low
+
+  * Re-jigged packaging (fixes #6686).
+
+ -- James Carter <jcarter@bytemark.co.uk>  Mon, 10 Nov 2014 10:46:31 +0000
+
 symbiosis-updater (2014:0218) stable; urgency=low
 
   * Updated sources list to use wheezy, not squeeze sources.
