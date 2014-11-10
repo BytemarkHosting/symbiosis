@@ -19,6 +19,12 @@ symbiosis-backup (2015:0128) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 09:55:09 +0000
 
+symbiosis-backup (2014:1110) stable; urgency=low
+
+  * Added 'make' as a dependency.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Mon, 10 Nov 2014 11:12:45 +0000
+
 symbiosis-backup (2014:0226) stable; urgency=low
 
   * make distclean now removes all generated files.
