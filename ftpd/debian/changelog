@@ -1,3 +1,10 @@
+symbiosis-ftpd (2014:1107) stable; urgency=low
+
+  * Fixed firewall pattern regex (CVE-2014-3979).
+  * Don't stop authd when upgrading.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Fri, 07 Nov 2014 14:14:06 +0000
+
 symbiosis-ftpd (2014:0218) stable; urgency=low
 
   * Updated pure-authd init script to start before pure-ftpd.
