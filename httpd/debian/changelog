@@ -1,3 +1,9 @@
+symbiosis-httpd (2014:1107) stable; urgency=low
+
+  * Allow symbiosis-httpd-logger to quit when input is exhausted.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Fri, 07 Nov 2014 14:42:10 +0000
+
 symbiosis-httpd (2014:1017) stable; urgency=medium
 
   * Fixed up httpd logger to stop it recreating deleted domains.
