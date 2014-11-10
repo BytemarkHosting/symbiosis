@@ -1,3 +1,11 @@
+symbiosis-firewall (2014:1110) stable; urgency=medium
+
+  * Make sure firewall patterns are anchored at one end.
+  * Ignore .dpkg-* files in directories.
+  * Sanitise log lines to prevent bad UTF causing problems.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Mon, 10 Nov 2014 10:57:26 +0000
+
 symbiosis-firewall (2014:0313) stable; urgency=medium
 
   * Make sure the firewall load script has sbin in its path.
