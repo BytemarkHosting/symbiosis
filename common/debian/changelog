@@ -1,3 +1,14 @@
+symbiosis-common (2014:1110) stable; urgency=low
+
+  * Postinst now generates a 4096 bit key.
+  * Updated makefile to specify library paths when testing.
+  * Updated domain config to accept the "ips" file.
+  * Quieten postinst when adding admin to adm group.
+  * Prefer newest SSL certificate.
+  * Clean up /etc/sudoers on purge.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Mon, 10 Nov 2014 10:50:53 +0000
+
 symbiosis-common (2014:0217) stable; urgency=low
 
   * Added dependency on sudo.
