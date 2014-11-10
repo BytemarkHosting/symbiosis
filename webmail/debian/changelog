@@ -1,3 +1,10 @@
+symbiosis-webmail (2014:1110) stable; urgency=low
+
+  * Updated roundcube config to use UTF8 for mailbox names in sieve.
+  * Handle roundmail config with ucf.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Mon, 10 Nov 2014 11:00:52 +0000
+
 symbiosis-webmail (2014:0226) stable; urgency=low
 
   * Moved roundcube config to correct place.
