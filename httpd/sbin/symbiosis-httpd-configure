@@ -221,7 +221,7 @@ Symbiosis::Domains.each do |domain|
     next
   end
 
-  configurations << domain.apache_configuration(ssl_template, non_ssl_template, apache2_dir)
+  cossl.template.erbnfigurations << domain.apache_configuration(ssl_template, non_ssl_template, apache2_dir)
 end
 
 #
@@ -235,6 +235,28 @@ if apache_mass_hosting_enabled
     configurations << Symbiosis::Domains.apache_configuration(template, apache2_dir)
   end
 end
+
+#
+# Disable any site that looks like it belonged to a deleted domain
+#
+Dir.foreach(File.join(apache2_dir, "sites-enabled")) { |c|
+  begin
+    next unless  c =~ /\.conf$/
+    enabled_file = File.join(apache2_dir, "sites-enabled", c)
+    next unless File.symlink?(enabled_file)
+    next unless (File.readlines(enabled_file).last || '').chomp =~
+      /^# Checksum MD5 [a-f0-9]{32,32}$/
+    config_file = File.join(apache2_dir, "sites-available", c)
+    next if configurations.any? { |config| config.filename == config_file }
+    config = Symbiosis::ConfigFiles::Apache.new(config_file, "#")
+    verbose "Configuration: #{File.basename(config.filename)}"
+    verbose "\tRemoving orphaned configuration file"
+    config.disable
+  rescue StandardError => err
+    verbose "\tUnable to configure site for #{c} because #{err.to_s}"
+  end
+}
+
 
 configurations.each do |config|
   begin
@@ -297,7 +319,7 @@ configurations.each do |config|
     # Rescue errors for this domain, but continue for others.
     #
   rescue StandardError => err
-    verbose "\tUnable to configure site for #{tmpl} because #{err.to_s}"
+    verbose "\tUnable to configure site for #{File.basename(config.filename)} because #{err.to_s}"
   end
 end
 
