@@ -1,3 +1,9 @@
+symbiosis-httpd (2014:1111) stable; urgency=low
+
+  * Disable orphaned apache config if a domain is removed. Closes #7556
+
+ -- James Carter <jcarter@bytemark.co.uk>  Tue, 11 Nov 2014 12:44:00 +0000
+
 symbiosis-httpd (2014:1107) stable; urgency=low
 
   * Allow symbiosis-httpd-logger to quit when input is exhausted.
