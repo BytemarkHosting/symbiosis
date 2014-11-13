@@ -1,3 +1,9 @@
+symbiosis-httpd (2014:1113) stable; urgency=low
+
+  * Fixed silly cut-and-paste error.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Thu, 13 Nov 2014 10:35:29 +0000
+
 symbiosis-httpd (2014:1111) stable; urgency=low
 
   * Disable orphaned apache config if a domain is removed. Closes #7556
