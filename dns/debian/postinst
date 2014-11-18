@@ -2,6 +2,7 @@
 
 set -e
 
+
 #
 # Skip, if we are not in "configure" state
 #
@@ -9,6 +10,11 @@ if [ "$1" != "configure" ]; then
         echo "I: Skipping configuration"
         exit 0
 fi
+
+#
+#  Remove the previous cron.d script
+#
+rm -f /etc/cron.d/symbiosis-tinydns 2>/dev/null >/dev/null || true
 
 #
 #  If we're not on a Bytemark host then we do nothing.
