@@ -1,3 +1,9 @@
+symbiosis-dns (2014:1118) stable; urgency=low
+
+  * Remove symbiosis-tinydns cronjob.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Tue, 18 Nov 2014 18:07:57 +0000
+
 symbiosis-dns (2014:1110) stable; urgency=low
 
   * Added SRV record generator.
