@@ -12,4 +12,7 @@ Architecture: all
 Depends: symbiosis-common (>= 2014:0113), symbiosis-email, prosody, prosody-mod-auth-dovecot, ruby | ruby-interpreter 
 Recommends: symbiosis-monit
 Description: Add XMPP (Jabber) support to Symbiosis
- Temporary description.
+ This package installs prosody and configures users based on existing 
+ symbiosis-email accounts, such that all email users can optionally use XMPP 
+ with their handle being the same as their email address. Prosody is 
+ configured to authenticate against the Dovecot authentication mechanism.
