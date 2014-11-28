@@ -1,3 +1,9 @@
+symbiosis-xmpp (2014:1128) stable; urgency=low
+
+  * Don't allow daemon restart failure to break package installation/removal.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Fri, 28 Nov 2014 15:31:02 +0000
+
 symbiosis-xmpp (2014:1110) stable; urgency=low
 
   * Added ruby dep and tweaked template (closes #6041).
