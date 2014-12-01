@@ -1,3 +1,9 @@
+symbiosis-key (2012:0814) oldstable; urgency=low
+
+  * Added new repositories key.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Mon, 01 Dec 2014 12:23:41 +0000
+
 symbiosis-key (2012:0813) oldstable; urgency=low
 
   * Updated Bytemark apt signing key.
