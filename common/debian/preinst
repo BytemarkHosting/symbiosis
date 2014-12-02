@@ -5,8 +5,8 @@ set -e
 #
 # Make sure this file gets installed with the correct permissions
 #
-if ( ! /usr/sbin/dpkg-statoverride --list /etc/sudoers.d/symbiosis > /dev/null ) ; then
-  /usr/sbin/dpkg-statoverride --add root root 0440 /etc/sudoers.d/symbiosis
+if ( ! dpkg-statoverride --list /etc/sudoers.d/symbiosis > /dev/null ) ; then
+  dpkg-statoverride --add root root 0440 /etc/sudoers.d/symbiosis
 fi
 
 case "$1" in

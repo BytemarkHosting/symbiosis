@@ -14,8 +14,8 @@ fi
 #
 # Double check this file gets installed with the correct permissions
 #
-if ( ! /usr/sbin/dpkg-statoverride --list /etc/sudoers.d/symbiosis > /dev/null ) ; then
-  /usr/sbin/dpkg-statoverride --add --update root root 0440 /etc/sudoers.d/symbiosis
+if ( ! dpkg-statoverride --list /etc/sudoers.d/symbiosis > /dev/null ) ; then
+  dpkg-statoverride --add --update root root 0440 /etc/sudoers.d/symbiosis
 fi
 
 #
@@ -47,8 +47,8 @@ fi
 #
 # Add a stat override for the /srv directory.
 #
-if ( ! /usr/sbin/dpkg-statoverride --list /srv > /dev/null ) ; then
-  /usr/sbin/dpkg-statoverride --add --update admin admin 2755 /srv
+if ( ! dpkg-statoverride --list /srv > /dev/null ) ; then
+  dpkg-statoverride --add --update admin admin 2755 /srv
 fi
 
 #
