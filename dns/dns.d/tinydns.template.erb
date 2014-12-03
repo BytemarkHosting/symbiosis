@@ -65,21 +65,21 @@
 @<%= domain %>::mx.<%= domain %>:15:300
 
 % end
-% if domain.has_spf?
+% if domain.respond_to?(:has_spf?) and domain.has_spf?
 #
 # SPF records
 #
 '<%= domain %>:<%= domain.spf_record %>:300
 
 % end
-% if domain.dkim_enabled?
+% if domain.respond_to?(:has_dkim?) and domain.has_dkim?
 #
 # DKIM records
 #
 '<%= domain.dkim_selector %>._domainkey.<%= domain %>:v=DKIM1; k=rsa; p=<%= domain.dkim_public_key_b64 %>:300
 
 % end
-% if domain.has_xmpp?
+% if domain.respond_to?(:has_xmpp?) and domain.has_xmpp?
 #
 # SRV records for XMPP.
 #
@@ -87,7 +87,7 @@
 :_xmpp-server._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,5269, domain) %>:300
 
 % end
-%if domain.mailboxes.length > 0
+%if domain.respond_to?(:mailboxes) and domain.mailboxes.length > 0
 #
 # SRV records for various mail services
 #
