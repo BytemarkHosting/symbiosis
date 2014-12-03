@@ -21,7 +21,7 @@ fi
 #  Restart all deamons
 #
 for i in prosody dovecot; do
-  invoke-rc.d $i restart
+  invoke-rc.d $i restart || true
 done
 
 #DEBHELPER#
