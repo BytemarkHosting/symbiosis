@@ -17,7 +17,7 @@ done
 #
 # Configure sites
 #
-/usr/sbin/symbiosis-xmpp-configure --verbose
+symbiosis-xmpp-configure --verbose
 
 #
 #  Rebuild dovecot
