@@ -129,16 +129,21 @@ class ApacheLogger < EventMachine::Connection
       # Set up a couple of things before we open the file.  This will make
       # sure the ownerships are correct.
       #
-      begin
-        parent_dir = File.dirname(log)
-        warn "#{$0}: Creating directory #{parent_dir}" if $VERBOSE
-        Symbiosis::Utils.mkdir_p(parent_dir, :uid => (opts[:uid] || self.uid), :gid => (opts[:gid] || self.gid) , :mode => 0755)
-      rescue Errno::EEXIST
-        # ignore
+      if File.exists?(File.dirname(File.dirname(log)))
+        begin
+          parent_dir = File.dirname(log)
+          warn "#{$0}: Creating directory #{parent_dir}" if $VERBOSE
+          Symbiosis::Utils.mkdir_p(parent_dir, :uid => (opts[:uid] || self.uid), :gid => (opts[:gid] || self.gid) , :mode => 0755)
+        rescue Errno::EEXIST
+          # ignore
+        end
+      else
+        # Don't recreate removed domains.
+        log = nil
       end
   
       warn "#{$0}: Opening log file #{log}" if $VERBOSE
-      filehandle = Symbiosis::Utils.safe_open(log, "a+", :mode => 0644, :uid => opts[:uid], :gid => opts[:gid] )
+      filehandle = log.nil? ? File.open('/dev/null', 'a+') : Symbiosis::Utils.safe_open(log, "a+", :mode => 0644, :uid => opts[:uid], :gid => opts[:gid] )
       filehandle.sync = opts[:sync]
   
     rescue StandardError => err
