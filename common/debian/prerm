@@ -4,18 +4,18 @@
 
 set -e
 
-if ( /usr/sbin/dpkg-statoverride --list /etc/sudoers.d/symbiosis > /dev/null 2>&1 ) ; then 
+if ( dpkg-statoverride --list /etc/sudoers.d/symbiosis > /dev/null 2>&1 ) ; then 
   #
   # Remove the statoverride
   #
-  /usr/sbin/dpkg-statoverride --remove /etc/sudoers.d/symbiosis
+  dpkg-statoverride --remove /etc/sudoers.d/symbiosis
 fi
 
-if ( /usr/sbin/dpkg-statoverride --list /srv > /dev/null 2>&1 ) ; then 
+if ( dpkg-statoverride --list /srv > /dev/null 2>&1 ) ; then 
   #
   # Remove the statoverride
   #
-  /usr/sbin/dpkg-statoverride --remove /srv
+  dpkg-statoverride --remove /srv
 fi
 
 if [ "purge" = "$1" ] ; then
