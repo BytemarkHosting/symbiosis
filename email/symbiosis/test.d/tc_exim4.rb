@@ -441,11 +441,12 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_router_dnslookup_with_dkim
     do_acl_setup
     domain = @acl_config['local_domains'].first
+    remote_domain = @acl_config['remote_domain']
 
     #
     # First test without DKIM
     #
-    do_exim4_bt("test@bytemark.co.uk", "test@bytemark.co.uk", "dnslookup", "remote_smtp", "test@"+domain)
+    do_exim4_bt("test@#{remote_domain}", "test@#{remote_domain}", "dnslookup", "remote_smtp", "test@"+domain)
 
     #
     # Now put dummy files in place, and test again.
@@ -453,12 +454,12 @@ class Exim4ConfigTest < Test::Unit::TestCase
     FileUtils.touch(File.join(@vhost_dir, domain, "config", "dkim"))
     FileUtils.touch(File.join(@vhost_dir, domain, "config", "dkim.key"))
 
-    do_exim4_bt("test@bytemark.co.uk", "test@bytemark.co.uk", "dnslookup_with_dkim", "remote_smtp_with_dkim", "test@"+domain)
+    do_exim4_bt("test@#{remote_domain}", "test@#{remote_domain}", "dnslookup_with_dkim", "remote_smtp_with_dkim", "test@"+domain)
   end
 
 
   def test_router_dnslookup
-    do_exim4_bt("test@bytemark.co.uk", "test@bytemark.co.uk", "dnslookup", "remote_smtp")
+    do_exim4_bt("test@#{remote_domain}", "test@#{remote_domain}", "dnslookup", "remote_smtp")
   end
 
 #  def test_router_vhost_rewrites
