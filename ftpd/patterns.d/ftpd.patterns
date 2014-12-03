@@ -17,5 +17,5 @@ ports = 21
 #
 #  The rule(s) we match
 #
-ftp login failure from IP: __IP__ username:
+ftp login failure from IP: __IP__ username: "\w+"$
 
