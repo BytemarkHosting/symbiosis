@@ -20,7 +20,7 @@ done
 #
 # Remove any old keys
 #
-for i in 9703BD62 F3562818 6734A3BF ; do
+for i in 9703BD62 F3562818 6734A3BF 23E96D7D ; do
   apt-key del $i > /dev/null 2>&1 || echo "I: Old Symbiosis key ID $i not found"
 done
 
