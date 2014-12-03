@@ -7,5 +7,5 @@ ports = 80,443
 #
 #  The patterns we use
 #
-ALERT - tried to register forbidden variable '_SESSION\[[^\]]+\]' through GET variables \(attacker '__IP__', file '/usr/share/phpmyadmin/index.php'\)
+ALERT - tried to register forbidden variable '_SESSION\[[^\]]+\]' through GET variables \(attacker '__IP__', file '/usr/share/phpmyadmin/index.php'\)$
 
