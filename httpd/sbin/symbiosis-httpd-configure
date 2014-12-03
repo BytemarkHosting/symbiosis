@@ -297,7 +297,7 @@ configurations.each do |config|
     # Rescue errors for this domain, but continue for others.
     #
   rescue StandardError => err
-    warn "\tUnable to configure site for #{tmpl} because #{err.to_s}"
+    verbose "\tUnable to configure site for #{tmpl} because #{err.to_s}"
   end
 end
 
