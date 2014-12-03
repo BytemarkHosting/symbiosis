@@ -51,12 +51,21 @@ module Symbiosis
       spf
     end
 
+    def srv_record_for(priority, weight, port, target)
+      data =  ([priority, weight, port].pack("nnn").bytes.to_a +
+              target.split(".").collect{|x| [x.length, x]} +
+              [ 0 ]).flatten
+      data.collect{|x| tinydns_encode(x)}.join
+    end
+
     private
 
     #
     # Encodes a given string into a format suitable for consupmtion by TinyDNS
     #
     def tinydns_encode(s)
+      s = [s].pack("c") if (s.is_a?(Integer) and 255 > s)
+
       s.chars.collect{|c| c =~ /[ .=+?\w]/ ? c : c.bytes.collect{|b| "\\%03o" % b}.join}.join
     end
 
