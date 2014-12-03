@@ -80,6 +80,25 @@ class TestApacheLogger < Test::Unit::TestCase
     }
   end
 
+  def test_domain_caching
+    domain = Symbiosis::Domain.new(nil, @prefix)
+    domain.create
+    name = domain.name
+    times = []
+    clock = Proc.new { times.shift }
+    cache = Symbiosis::ApacheLogger::DomainCache.new(@prefix, 10, clock)
+    times += [0, 0]
+    assert(cache[name],
+      "Symbiosis::ApacheLogger::DomainCache failed to find domain")
+    domain.destroy
+    times += [1]
+    assert(cache[name],
+      "Symbiosis::ApacheLogger::DomainCache failed to cache domain")
+    times += [100, 100]
+    assert(cache[name].nil?,
+      "Symbiosis::ApacheLogger::DomainCache failed to expire cache")
+  end
+
   def test_logging
     #
     #  Create the domain
