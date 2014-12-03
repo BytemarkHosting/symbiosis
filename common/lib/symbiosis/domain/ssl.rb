@@ -150,7 +150,7 @@ module Symbiosis
     # certificate and key, it will appear in both arrays.
     #
     def ssl_available_files
-      certificate_files = []
+      certificates = []
       key_files = []
 
       # 
@@ -203,14 +203,26 @@ module Symbiosis
         # match, otherwise reject.
         #
         if this_key and this_cert and this_cert.check_private_key(this_key)
-          certificate_files << this_fn
-          key_files         << this_fn
+          certificates << [this_fn, this_cert]
+          key_files << this_fn
         elsif this_key and !this_cert
           key_files << this_fn
         elsif this_cert and !this_key
-          certificate_files << this_fn
+          certificates << [this_fn, this_cert]
         end
       end
+
+      #
+      # Order certificates by time to expiry, penalising any that are
+      # before their start time or after their expiry time.
+      #
+      now = Time.now
+      certificate_files = certificates.sort_by { |fn, cert|
+        score = cert.not_after.to_i
+        score -= not_before.to_i if cert.not_before > now
+        score -= now.to_i if now > cert.not_after
+        -score
+      }.map { |fn, cert| fn }
 
       [certificate_files, key_files]
     end
