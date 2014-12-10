@@ -1,3 +1,10 @@
+symbiosis-httpd (2014:1210) stable; urgency=low
+
+  * Updated templates to use symbiosis-httpd-logger.
+  * When rotating logs, HUP both possible names for the logger.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Wed, 10 Dec 2014 17:54:35 +0000
+
 symbiosis-httpd (2014:1113) stable; urgency=low
 
   * Fixed silly cut-and-paste error.
