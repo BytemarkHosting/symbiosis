@@ -90,8 +90,8 @@ NameVirtualHost <%= ip %>:80
         # made against, so that the cron-job in /etc/cron.daily may generate
         # statistics for each domain.
         #
-        ErrorLog   "|| /usr/sbin/symbiosis-apache-logger -s -u <%= domain.uid %> -g <%= domain.gid %> <%= domain.log_dir %>/ssl_error.log"
-        CustomLog  "|| /usr/sbin/symbiosis-apache-logger -s -u <%= domain.uid %> -g <%= domain.gid %> <%= domain.log_dir %>/ssl_access.log" combined
+        ErrorLog   "|| /usr/sbin/symbiosis-httpd-logger -s -u <%= domain.uid %> -g <%= domain.gid %> <%= domain.log_dir %>/ssl_error.log"
+        CustomLog  "|| /usr/sbin/symbiosis-httpd-logger -s -u <%= domain.uid %> -g <%= domain.gid %> <%= domain.log_dir %>/ssl_access.log" combined
 </VirtualHost>
 
 <VirtualHost <%= ips.collect{|ip| ip+":80"}.join(" ") %>>
@@ -150,8 +150,8 @@ NameVirtualHost <%= ip %>:80
         # made against, so that the cron-job in /etc/cron.daily may generate
         # statistics for each domain.
         #
-        ErrorLog   "|| /usr/sbin/symbiosis-apache-logger -s -u <%= domain.uid %> -g <%= domain.gid %> <%= domain.log_dir %>/error.log"
-        CustomLog  "|| /usr/sbin/symbiosis-apache-logger -s -u <%= domain.uid %> -g <%= domain.gid %> <%= domain.log_dir %>/access.log" combined
+        ErrorLog   "|| /usr/sbin/symbiosis-httpd-logger -s -u <%= domain.uid %> -g <%= domain.gid %> <%= domain.log_dir %>/error.log"
+        CustomLog  "|| /usr/sbin/symbiosis-httpd-logger -s -u <%= domain.uid %> -g <%= domain.gid %> <%= domain.log_dir %>/access.log" combined
 
 % end
 </VirtualHost>
