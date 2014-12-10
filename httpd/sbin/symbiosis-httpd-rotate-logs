@@ -271,7 +271,11 @@ if ( rotated )
   # logfiles we've rotated open, rather than blindly stabbing things.
   #
   verbose( "Since we rotated we now restart the httpd logger")
-  Kernel.system( "killall -HUP symbiosis-httpd-logger" )
+  # Hit both symbiosis-httpd-logger and symbiosis-apache-logger as
+  # long and the symlink exists and it could have been launched as either.
+  verbose( "Failed to restart logger" ) unless %w{httpd apache}.map { |c|
+    Kernel.system( "killall -HUP symbiosis-#{c}-logger 2> /dev/null" )
+  }.any?
   
   #
   # Add similar arguments on to the generate-stats command as wot we received.
