@@ -1,3 +1,9 @@
+symbiosis-updater (2015:0127) stable; urgency=low
+
+  * Updated Debian standards.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 09:55:09 +0000
+
 symbiosis-updater (2014:0218) stable; urgency=low
 
   * Updated sources list to use wheezy, not squeeze sources.
@@ -13,7 +19,7 @@ symbiosis-updater (2014:0214) stable; urgency=low
 symbiosis-updater (2014:0113) stable; urgency=low
 
   * Removed gem2deb usage.
-  * Updated maintainer/uploaders. 
+  * Updated maintainer/uploaders.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 17:18:36 +0000
 
@@ -34,7 +40,7 @@ symbiosis-updater (2012:0215) stable; urgency=low
 symbiosis-updater (2012:0208) stable; urgency=low
 
   * Updated debian control files to use relationships properly, as per section
-    7.6 of the Debian Policy Manual. 
+    7.6 of the Debian Policy Manual.
   * Sources security list now points at the RC3 repo.
   * Script no longer just exits if /etc/symbiosis/updater isn't present.
 
