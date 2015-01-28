@@ -1,3 +1,10 @@
+symbiosis-common (2015:0128) stable; urgency=low
+
+  * Updated Debian standards.
+  * Added dependency on "adduser"
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 10:00:01 +0000
+
 symbiosis-common (2014:0217) stable; urgency=low
 
   * Added dependency on sudo.
@@ -158,16 +165,16 @@ symbiosis-common (2012:0208) stable; urgency=low
 
   * Symbiosis::Domains now searches for www.domain as well as just domain.
   * Added Symbiosis::Utils#safe_open to use for opening files as root.
-  * Rewrote Symbiosis::Utils#mkdir_p to be safer. 
+  * Rewrote Symbiosis::Utils#mkdir_p to be safer.
   * Removed test task from rules
   * Updated debian control files to use relationships properly, as per section
-    7.6 of the Debian Policy Manual. 
-  * Updated config file generation to make use of the opts arg for Utils#safe_open 
+    7.6 of the Debian Policy Manual.
+  * Updated config file generation to make use of the opts arg for Utils#safe_open
   * Domains which are just symlinks have their directory set correctly, i.e
     not the symlinked one, but the resolved one.
   * Domain aliases (symlinks) can be listed.
   * SSL checks relaxed.  Execeptions only raised when SSL config is actually
-    broken. 
+    broken.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 08 Feb 2012 16:28:19 +0000
 
@@ -186,7 +193,7 @@ symbiosis-common (2012:0201) stable; urgency=low
 
 symbiosis-common (2012:0124) stable; urgency=low
 
-  * Removed chown -R of doom in postinst. 
+  * Removed chown -R of doom in postinst.
   * Removed references to symbiosis-range and symbiosis-test in
     Provides/Requires lines.
   * Moved common tests to test.d
@@ -221,7 +228,7 @@ symbiosis-common (2011:1214) stable; urgency=low
   * Added dependency on liblinux-netlink-ruby
   * Added IP configuration script to automatically add IP addresses.
   * Better determination of the primary interface / IP addresses
-  * Lots of misc bugfixes 
+  * Lots of misc bugfixes
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 14 Dec 2011 21:16:23 +0000
 
