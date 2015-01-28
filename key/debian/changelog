@@ -1,3 +1,9 @@
+symbiosis-key (2015:0127) stable; urgency=low
+
+  * Updated Debian standards.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 09:55:09 +0000
+
 symbiosis-key (2014:0226) stable; urgency=low
 
   * Added new repositories key.
@@ -27,7 +33,7 @@ symbiosis-key (2012:0208) stable; urgency=low
 
   * Updated debian control files to use relationships properly, as per section
     7.6 of the Debian policy.
-  * Moved key to /usr/share/symbiosis/key 
+  * Moved key to /usr/share/symbiosis/key
   * Tidied postinst a little.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 21:48:31 +0000
@@ -53,7 +59,7 @@ symbiosis-key (2010:0923) stable; urgency=low
 symbiosis-key (2010:0914) stable; urgency=low
 
   * Add new key
-  * Remove old keys in post inst 
+  * Remove old keys in post inst
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Sep 2010 21:36:39 +0100
 

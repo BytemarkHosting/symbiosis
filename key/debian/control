@@ -4,7 +4,7 @@ Priority: extra
 Maintainer: Steve Kemp <steve@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), gem2deb
-Standards-Version: 3.9.1
+Standards-Version: 3.9.6
 XS-Ruby-Versions: all
 
 Package: symbiosis-key
@@ -13,7 +13,7 @@ Conflicts: bytemark-vhost-key
 Provides: bytemark-vhost-key
 Architecture: all
 Depends: gnupg, ${misc:Depends}
-Description: The Bytemark Debian package-signing key
+Description: Package-signing key for Bytemarks Symbiosis.
  This package contains a key which may be used to validate the signature
  of the Bytemark Symbiosis repository.
  .
