@@ -2,10 +2,10 @@ Source: symbiosis-firewall
 Section: net
 Priority: extra
 Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
-Uploaders: John Hackett <john.hackett@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), gem2deb, txt2man, ruby, ruby-dev
-Standards-Version: 3.9.1
-XS-Ruby-Versions: all 
+Standards-Version: 3.9.6
+XS-Ruby-Versions: all
 
 Package: symbiosis-firewall
 Architecture: any
@@ -14,7 +14,7 @@ Replaces: bytemark-vhost-firewall, symbiosis-test, symbiosis-monit (<< 2011:1206
 Breaks: symbiosis-monit (<< 2011:1206)
 Provides: bytemark-vhost-firewall
 Conflicts: bytemark-vhost-firewall, symbiosis-test
-Description: A simple firewall generator for the Bytemark vhost system
+Description: Symbiosis firewall generator
  This package contains a firewall generator which makes it simple to restrict
  the incoming and outgoing connections a machine is permitted to accept or
  initiate.

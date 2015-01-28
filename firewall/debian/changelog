@@ -1,3 +1,9 @@
+symbiosis-firewall (2015:0128) stable; urgency=medium
+
+  * Updated the Debian standards.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 09:55:09 +0000
+
 symbiosis-firewall (2014:0313) stable; urgency=medium
 
   * Make sure the firewall load script has sbin in its path.
@@ -44,7 +50,7 @@ symbiosis-firewall (2014:0211) stable; urgency=low
 
 symbiosis-firewall (2014:0116) stable; urgency=low
 
-  * Updated incrond to use /usr/bin/ruby 
+  * Updated incrond to use /usr/bin/ruby
   * Fixed missing variable in symbiosis-firewall-whitelist.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 16 Jan 2014 16:39:12 +0000
@@ -52,7 +58,7 @@ symbiosis-firewall (2014:0116) stable; urgency=low
 symbiosis-firewall (2014:0113) stable; urgency=low
 
   * Updated dependencies.
-  * Updateded maintainer and uploaders. 
+  * Updateded maintainer and uploaders.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 13 Jan 2014 17:05:58 +0000
 
@@ -102,7 +108,7 @@ symbiosis-firewall (2012:0302) stable; urgency=low
 symbiosis-firewall (2012:0301) stable; urgency=low
 
   * Added lockfile checking to symbiosis-firewall.
-  * Redirect modprobe stderr to /dev/null 
+  * Redirect modprobe stderr to /dev/null
   * Removed chown admin:admin in firewall script to avoid triggering incrond
     whilst running.
   * Updated postinst to remove duff firewall-blocker cronjob
