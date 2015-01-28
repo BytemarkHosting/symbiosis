@@ -16,5 +16,6 @@ if echo "ae779d6822f91492b26697d6b9931835  /etc/default/clamav-daemon" | md5sum 
   rm -f /etc/default/clamav-daemon
 fi
 
-exit 0
 
+#DEBHELPER#
+exit 0
