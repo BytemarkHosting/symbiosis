@@ -1,3 +1,9 @@
+symbiosis-phpmyadmin (2015:0128) stable; urgency=low
+
+  * Updated Debian standards.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 10:00:01 +0000
+
 symbiosis-phpmyadmin (2014:0214) stable; urgency=low
 
   * Added bug control.
@@ -43,7 +49,7 @@ symbiosis-phpmyadmin (2012:0208) stable; urgency=low
 
   * Updated debian control files to use relationships properly, as per section
     7.6 of the Debian Policy Manual.
-  * Fixed lintian errors in control file. 
+  * Fixed lintian errors in control file.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 13:54:06 +0000
 
