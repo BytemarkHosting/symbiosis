@@ -2,13 +2,13 @@ Source: bytemark-symbiosis
 Section: web
 Priority: extra
 Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
-Uploaders: John Hackett <john.hackett@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0)
-Standards-Version: 3.9.1
+Standards-Version: 3.9.6
 
 Package: bytemark-symbiosis
 Architecture: all
-Depends: symbiosis-key (>= 2012:0813), 
+Depends: symbiosis-key (>= 2012:0813),
   symbiosis-updater (>= 2014:0113),
   lsb-base (>= 3.0-6),
   ${misc:Depends}
@@ -16,18 +16,18 @@ Recommends: symbiosis-backup (>= 2014:0113),
   symbiosis-common (>= 2014:0113),
   symbiosis-cron (>= 2014:0113),
   symbiosis-email (>= 2014:0113),
-  symbiosis-firewall (>= 2014:0113), 
+  symbiosis-firewall (>= 2014:0113),
   symbiosis-ftpd (>= 2014:0113),
-  symbiosis-httpd (>= 2014:0113), 
-  symbiosis-monit (>= 2014:0113), 
+  symbiosis-httpd (>= 2014:0113),
+  symbiosis-monit (>= 2014:0113),
   symbiosis-mysql (>= 2014:0113),
-  symbiosis-pam (>= 2014:0113), 
-  symbiosis-phpmyadmin (>= 2014:0113), 
-  symbiosis-dns (>= 2014:0113), 
+  symbiosis-pam (>= 2014:0113),
+  symbiosis-phpmyadmin (>= 2014:0113),
+  symbiosis-dns (>= 2014:0113),
   symbiosis-webmail (>= 2014:0113),
   symbiosis-xmpp (>= 2014:0113),
   openssh-server
-Description: An easy, complete, and Debian-friendly server administration system
+Description: Easy, complete, and Debian-friendly server administration system
  This package is a metapackage which will pull in each package which
  is a component of the Bytemark Symbiosis system.
  .

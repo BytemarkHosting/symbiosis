@@ -1,3 +1,9 @@
+bytemark-symbiosis (2015:0128) stable; urgency=low
+
+  * Updated the Debian standards.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 09:55:09 +0000
+
 bytemark-symbiosis (2014:0218) stable; urgency=low
 
   * Updated init script to start after SSH.
@@ -43,7 +49,7 @@ bytemark-symbiosis (2012:0222) stable; urgency=low
 
   * Updated versioned dependencies to use the stable packages.
   * Updated copyright dates.
-  * Updated postinst not to repeatedly add to motd.tail 
+  * Updated postinst not to repeatedly add to motd.tail
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 20:40:28 +0000
 
