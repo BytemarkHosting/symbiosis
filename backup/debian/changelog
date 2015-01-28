@@ -1,3 +1,9 @@
+symbiosis-backup (2015:0128) stable; urgency=low
+
+  * Updated Debian standards versions.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 09:55:09 +0000
+
 symbiosis-backup (2014:0226) stable; urgency=low
 
   * make distclean now removes all generated files.
@@ -74,7 +80,7 @@ symbiosis-backup (2012:0414) stable; urgency=low
   * Updated postgres backup script to work.
   * Postgres backups now done by database, using the "custom" format to allow
     easy restoration of dumped databases using pg_restore.
-  * MySQL dumps now use the --opt flag explicitly. 
+  * MySQL dumps now use the --opt flag explicitly.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Sat, 14 Apr 2012 12:30:19 +0100
 
