@@ -1,3 +1,9 @@
+symbiosis-email (2015:0128) stable; urgency=low
+
+  * Updated Debian standards version.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 10:00:01 +0000
+
 symbiosis-email (2014:0214) stable; urgency=low
 
   * Updated dovecot tests to work.
@@ -119,7 +125,7 @@ symbiosis-email (2012:0221) stable; urgency=low
 
   * Updated firewall patterns to check mail.log, rather than mail.err.
   * Password file permissions are now updated on read to 0600, if possible.
-  * Updated depends to require latest symbiosis-common packages. 
+  * Updated depends to require latest symbiosis-common packages.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 21 Feb 2012 10:14:16 +0000
 
@@ -134,7 +140,7 @@ symbiosis-email (2012:0208) stable; urgency=low
 
   * Updated test scripts not to have executable bit set, or a shebang line.
   * Updated debian control files to use relationships properly, as per section
-    7.6 of the Debian Policy Manual. 
+    7.6 of the Debian Policy Manual.
   * Updated postinst to remove old dovecot test.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 17:22:13 +0000
@@ -142,10 +148,10 @@ symbiosis-email (2012:0208) stable; urgency=low
 symbiosis-email (2012:0201) stable; urgency=low
 
   * Removed host rdns lookups for trusted IPs (i.e. ones permitted to relay /
-    local ones) to avoid monit errors during times of DNS flakiness. 
+    local ones) to avoid monit errors during times of DNS flakiness.
   * Dovecot ManageSieve now on IPv6.
   * ManageSieve port now added to the firewall patterns list.
-  * Removed spurious crontab. 
+  * Removed spurious crontab.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 01 Feb 2012 20:44:49 +0000
 
@@ -180,7 +186,7 @@ symbiosis-email (2011:1209) stable; urgency=low
 
 symbiosis-email (2011:1201) stable; urgency=low
 
-  * Added dependency on symbiosis-common for SSL certificate generation 
+  * Added dependency on symbiosis-common for SSL certificate generation
   * Fixed TLS cipher params for exim4.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 01 Dec 2011 11:49:28 +0000
