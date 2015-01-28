@@ -2,9 +2,9 @@ Source: symbiosis-email
 Section: mail
 Priority: extra
 Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
-Uploaders: John Hackett <john.hackett@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), txt2man, gem2deb
-Standards-Version: 3.9.1
+Standards-Version: 3.9.6
 XS-Ruby-Versions: all
 
 Package: symbiosis-email
@@ -16,7 +16,7 @@ Replaces: bytemark-vhost-email, symbiosis-monit (<< 2011:1206), symbiosis-test
 Breaks:  symbiosis-monit (<< 2011:1206)
 Provides: bytemark-vhost-email
 Conflicts: bytemark-vhost-email, symbiosis-test
-Description: A complete virtual hosting solution for email
+Description: virtual hosting solution for email
  This package contains the infrastructure and configuration for a
  virtual hosting setup with full support for:
  .
@@ -26,4 +26,3 @@ Description: A complete virtual hosting solution for email
   * POP3 + POP3S
   * SMTP
   * Sieve
-
