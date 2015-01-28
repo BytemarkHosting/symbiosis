@@ -1,3 +1,9 @@
+symbiosis-webmail (2015:0128) stable; urgency=low
+
+  * Updated Debian standards.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 10:00:01 +0000
+
 symbiosis-webmail (2014:0226) stable; urgency=low
 
   * Moved roundcube config to correct place.
@@ -44,14 +50,14 @@ symbiosis-webmail (2012:0222) stable; urgency=low
 
   * Updated postinst to restart rather than reload apache for all three
     packages.
-  * Updated copyright dates and documentation links. 
+  * Updated copyright dates and documentation links.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 22 Feb 2012 14:13:43 +0000
 
 symbiosis-webmail (2012:0208) stable; urgency=low
 
   * Updated debian control files to use relationships properly, as per section
-    7.6 of the Debian Policy Manual. 
+    7.6 of the Debian Policy Manual.
   * Updated descriptions of squirrelmail/roundcube metapackages to say they
     are metapackages.
 

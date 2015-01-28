@@ -2,9 +2,9 @@ Source: symbiosis-webmail
 Section: web
 Priority: extra
 Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
-Uploaders: John Hackett <john.hackett@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0)
-Standards-Version: 3.9.1
+Standards-Version: 3.9.6
 Bugs: https://projects.bytemark.co.uk/projects/symbiosis/issues
 
 Package: symbiosis-webmail
@@ -13,7 +13,7 @@ Depends: symbiosis-webmail-squirrelmail | symbiosis-webmail-roundcube, ${misc:De
 Replaces: bytemark-vhost-webmail
 Provides: bytemark-vhost-webmail
 Conflicts: bytemark-vhost-webmail
-Description: This package gives webmail access to a Symbiosis system
+Description: Provide webmail access to a Symbiosis system
  This package will enable a global webmail system for all domains hosted
  using the Bytemark Symbiosis system.
 
@@ -21,7 +21,7 @@ Package: symbiosis-webmail-squirrelmail
 Architecture: all
 Depends: squirrelmail, ${misc:Depends}
 Recommends: symbiosis-webmail, avelsieve
-Description: This package gives webmail access to Symbiosis using Squirrelmail
+Description: Provide webmail access to Symbiosis using Squirrelmail
  This package will enable a global webmail system for all domains hosted
  using the Bytemark system.
  .
@@ -32,11 +32,8 @@ Package: symbiosis-webmail-roundcube
 Architecture: all
 Depends: roundcube (>= 0.5.4), roundcube-core (>= 0.5.4), roundcube-mysql (>= 0.5.4), roundcube-plugins (>= 0.5.4), ucf, ${misc:Depends}
 Recommends: symbiosis-webmail
-Description: This package gives webmail access to Symbiosis using Roundcube
+Description: Provide webmail access to Symbiosis using Roundcube
  This package will enable a global webmail system for all domains hosted
  using the Bytemark system.
  .
  This is a metapackage that implements webmail using the Roundcube system.
-
-
-
