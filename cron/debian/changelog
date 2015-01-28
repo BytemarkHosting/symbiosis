@@ -1,3 +1,9 @@
+symbiosis-cron (2015:0128) stable; urgency=low
+
+  * Updated Debian standards.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 10:00:01 +0000
+
 symbiosis-cron (2014:0124) stable; urgency=low
 
   * Updated bug reporting mechanism.
@@ -17,7 +23,7 @@ symbiosis-cron (2014:0113) stable; urgency=low
 
 symbiosis-cron (2012:0327) stable; urgency=low
 
-  * Fixed Symbiosis to be a module rather than a class in symbiosis/crontab. 
+  * Fixed Symbiosis to be a module rather than a class in symbiosis/crontab.
   * Fixed typedef in crontab-wrapper.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 27 Mar 2012 11:25:40 +0100
@@ -27,7 +33,7 @@ symbiosis-cron (2012:0320) stable; urgency=low
   * Fixed symbiosis-all-crontabs to fork and exec properly.
   * Fixed symbiosis-all-crontabs setuid/gid rather than use su.
   * Fixed cron library to parse @hourly (etc) shortcuts properly.
-  * Test is now installed to /etc/symbiosis/test.d. 
+  * Test is now installed to /etc/symbiosis/test.d.
   * Checked wrapper with valgrind for badness.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 20 Mar 2012 16:09:23 +0000
@@ -40,7 +46,7 @@ symbiosis-cron (2012:0222) stable; urgency=low
 
 symbiosis-cron (2012:0208) stable; urgency=low
 
-  * Updated Symbiosis::Crontab API docs. 
+  * Updated Symbiosis::Crontab API docs.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 07 Feb 2012 13:47:53 +0000
 
