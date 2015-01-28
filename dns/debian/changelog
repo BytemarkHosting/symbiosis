@@ -1,3 +1,9 @@
+symbiosis-dns (2015:0128) stable; urgency=low
+
+  * Updated Debian standards.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 10:00:01 +0000
+
 symbiosis-dns (2014:0226) stable; urgency=low
 
   * Removed unneeded preinst
@@ -7,8 +13,8 @@ symbiosis-dns (2014:0226) stable; urgency=low
 symbiosis-dns (2014:0214) stable; urgency=low
 
   * Added replaces/conflicts with symbiosis-tinydns.
-  * Added bug control. 
-  * Removed DH_VERBOSE from rules. 
+  * Added bug control.
+  * Removed DH_VERBOSE from rules.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 14 Feb 2014 13:08:57 +0000
 
@@ -68,7 +74,7 @@ symbiosis-tinydns (2012:0215) stable; urgency=low
 
 symbiosis-tinydns (2012:0208) stable; urgency=low
 
-  * Updated DNS template to use the neater ERB syntax. 
+  * Updated DNS template to use the neater ERB syntax.
   * Added uses_bytemark_antispam? methods to Symbiosis::Domain.
   * Required 'symbiosis/domain/dns' in the config file library
 
@@ -97,7 +103,7 @@ symbiosis-tinydns (2012:0124) stable; urgency=low
 symbiosis-tinydns (2012:0117) stable; urgency=low
 
   * Rewrote symbiosis-dns-generate script in ruby making use of
-    Symbiosis::ConfigFile utilities. 
+    Symbiosis::ConfigFile utilities.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 17 Jan 2012 20:52:03 +0000
 

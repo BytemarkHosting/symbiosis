@@ -2,9 +2,9 @@ Source: symbiosis-dns
 Section: net
 Priority: extra
 Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
-Uploaders: John Hackett <john.hackett@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), gem2deb, txt2man, ruby
-Standards-Version: 3.9.1
+Standards-Version: 3.9.6
 XS-Ruby-Versions: all
 
 Package: symbiosis-dns
