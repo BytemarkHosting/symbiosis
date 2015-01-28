@@ -1,3 +1,9 @@
+symbiosis-xmpp (2015:0128) stable; urgency=low
+
+  * Updated Debian standards.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 10:00:01 +0000
+
 symbiosis-xmpp (2014:0217) stable; urgency=low
 
   * Altered auth to use the same Dovecot socket as exim.

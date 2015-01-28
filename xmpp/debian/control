@@ -2,17 +2,17 @@ Source: symbiosis-xmpp
 Section: net
 Priority: extra
 Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
-Uploaders: John Hackett <john.hackett@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), gem2deb, txt2man
-Standards-Version: 3.9.1
+Standards-Version: 3.9.6
 XS-Ruby-Versions: all
 
 Package: symbiosis-xmpp
 Architecture: all
-Depends: symbiosis-common (>= 2014:0113), symbiosis-email, prosody, prosody-mod-auth-dovecot, ruby | ruby-interpreter 
+Depends: symbiosis-common (>= 2014:0113), symbiosis-email, prosody, prosody-mod-auth-dovecot, ruby | ruby-interpreter, ${misc:Depends}
 Recommends: symbiosis-monit
 Description: Add XMPP (Jabber) support to Symbiosis
- This package installs prosody and configures users based on existing 
- symbiosis-email accounts, such that all email users can optionally use XMPP 
- with their handle being the same as their email address. Prosody is 
+ This package installs prosody and configures users based on existing
+ symbiosis-email accounts, such that all email users can optionally use XMPP
+ with their handle being the same as their email address. Prosody is
  configured to authenticate against the Dovecot authentication mechanism.
