@@ -2,15 +2,15 @@ Source: symbiosis-common
 Section: web
 Priority: extra
 Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
-Uploaders: John Hackett <john.hackett@bytemark.co.uk>
+Uploaders: John Hackett <john.hackett@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), gem2deb, txt2man
-Standards-Version: 3.9.3
+Standards-Version: 3.9.6
 XS-Ruby-Versions: all
 
 Package: symbiosis-common
 Architecture: all
 XB-Ruby-Versions: ${ruby:Versions}
-Depends: ruby | ruby-interpreter, ruby-linux-netlink, ruby-cracklib, ruby-erubis, openssl, sudo, ${misc:Depends}
+Depends: ruby | ruby-interpreter, ruby-linux-netlink, ruby-cracklib, ruby-erubis, openssl, sudo, adduser, ${misc:Depends}
 Replaces: symbiosis-firewall (<< 2011:1214), symbiosis-range, symbiosis-test, bytemark-vhost-range, bytemark-vhost-test, symbiosis-crack
 Breaks: symbiosis-firewall (<< 2011:1214), symbiosis-email (<< 2012:0215)
 Conflicts: symbiosis-range, symbiosis-test, symbiosis-crack, bytemark-vhost-range, bytemark-vhost-test, symbiosis-email (<< 2012:0215)
