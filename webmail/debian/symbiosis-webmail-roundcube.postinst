@@ -28,8 +28,55 @@ mangle_config() {
   ourfile="$file.dpkg-symbiosis"
   theirfile="$file.dpkg-symbiosis-orig"
 
-  ucf --purge "$file"
-  mv -f "$file" "$theirfile"
+  if [ -L  "$file" -a -L "$theirfile" -a "$(readlink "$file")" -eq "$($readlink "$theirfile")" -a grep des_key $file ]; then
+	echo "$file and $theirfile are both symlinks to $(readlink "$file"), and the rcmail_config['des_key'] field isn't configured - something has gone wrong, so we'll rebuild the config file for roundcube."
+
+	# Try to recreate the roundcube config file in its absence. This is lifted from /var/lib/dpkg/roundcube-core.postinst
+        # Get current 3DES key from /etc/roundcube/main.inc.php
+
+	# Source the debian magic that gives us db_get and company
+	source /usr/share/debconf/confmodule
+
+        db_get roundcube/language || true
+        language="$RET"
+
+        db_get roundcube/hosts || true
+        hosts="$RET"
+
+        [ -f /etc/roundcube/main.inc.php ] && {
+            deskey=$(sed -n "s+^\$rcmail_config\['des_key'\] = '\(.*\)';\$+\1+p" \
+                /etc/roundcube/main.inc.php)
+        }
+        # If this is the default key, forget it !
+        [ "$deskey" = "rcmail-!24ByteDESkey*Str" ] && unset deskey
+        # Generate a new one
+        while [ -z "$deskey" ]; do
+            deskey=$(dd if=/dev/urandom bs=1 count=200 2> /dev/null | \
+                tr -c -d '[A-Za-z0-9]' | sed -n 's/\(.\{24\}\).*/\1/p')
+        done
+
+        # Put hosts, language and key in main.inc.php - roundcube must already be installed, but it's a dependency of symbiosis-webmail-roundcube anyway.
+        cat /usr/share/roundcube/main.inc.php.dist | while read line; do
+            case "$line" in
+                "\$rcmail_config['default_host'] = "*)
+                    printf "\$rcmail_config['default_host'] = %s;\n" "${hosts}"
+                    ;;
+                "\$rcmail_config['des_key'] = "*)
+                    printf "\$rcmail_config['des_key'] = '%s';\n" "${deskey}"
+                    ;;
+                "\$rcmail_config['language'] = "*)
+                    printf "\$rcmail_config['language'] = '%s';\n" "${language}"
+                    ;;
+                *)
+                    printf "%s\n" "$line"
+                    ;;
+            esac
+        done >> $file.ucftmp
+        ucf --debconf-ok $file.ucftmp $theirfile
+  fi
+
+  #  ucf --purge "$file"
+
   #
   # Now add the link in, unless it is already in place.
   #
