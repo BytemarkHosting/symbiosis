@@ -28,7 +28,7 @@ mangle_config() {
   ourfile="$file.dpkg-symbiosis"
   theirfile="$file.dpkg-symbiosis-orig"
 
-  if [ -L  "$file" -a -L "$theirfile" -a "$(readlink "$file")" -eq "$($readlink "$theirfile")"]; then
+  if [ -L  "$file" -a -L "$theirfile" -a "$(readlink "$file")" -eq "$(readlink "$theirfile")"]; then
 	echo "$file and $theirfile are both symlinks to $(readlink "$file"), and the rcmail_config['des_key'] field isn't configured - something has gone wrong, so we'll rebuild the config file for roundcube."
 
 	# Try to recreate the roundcube config file in its absence. This is lifted from /var/lib/dpkg/roundcube-core.postinst
