@@ -65,8 +65,9 @@ module Symbiosis
 
     #
     # This returns the dkim selector, stored in config/dkim.  If that file is
-    # empty, the first component of either /etc/mailname, /etc/hostname, or the
-    # hostname returned by the hostname(1) command is used.
+    # empty, then either /etc/mailname, /etc/hostname, or the hostname returned
+    # by the hostname(1) command is used.  If none of those produce FQDNs, then
+    # gethostbyname() is used.
     #
     def dkim_selector
       selector = get_param("dkim", self.config_dir)
@@ -90,13 +91,16 @@ module Symbiosis
         #
         # Try /proc/sys/kernel/hostname (which mirrors what uname returns)
         #
-        hostname = get_param("hostname", '/proc/sys/kernel')
+        hostname = nil
+
+        %w(/etc/mailname /etc/hostname /proc/sys/kernel/hostname).each do |path|
+          hostname = get_param( *File.split(path).reverse )
+          break if hostname.is_a?(String) and hostname.include?(".")
+        end
 
         hostname = ""  unless hostname.is_a?(String) 
-        
-        hostname.chomp!
 
-        unless hostname.empty? or !hostname.include?(".")
+        if hostname.empty? and !hostname.include?(".")
           begin
             hostname = Socket.gethostbyname(hostname).first
           rescue SocketError
@@ -108,8 +112,11 @@ module Symbiosis
         # Default to "default" if the hostname doesn't match the regex.  This
         # should never happen (I don't think!).
         #
-        hostname = "default" unless hostname =~ selector_regex
-        hostname
+        if hostname =~ selector_regex
+          $1.to_s
+        else
+          "default" 
+        end
       end
     end
 

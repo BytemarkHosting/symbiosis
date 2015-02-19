@@ -92,9 +92,11 @@ EOF
       end
     end
 
-    hostname = "default" if hostname.empty?
+    selector = hostname.split(".").first.to_s
 
-    assert_equal(hostname, @domain.dkim_selector)
+    selector = "default" if selector.empty?
+
+    assert_equal(selector, @domain.dkim_selector)
 
     @domain.__send__(:set_param, "dkim", "foo", @domain.config_dir)
     assert_equal("foo", @domain.dkim_selector)
