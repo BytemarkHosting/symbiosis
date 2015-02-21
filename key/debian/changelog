@@ -1,3 +1,9 @@
+symbiosis-key (2015:0221) stable; urgency=low
+
+  * Removed dependencies upon Ruby package(s).
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Sat, 21 Feb 2015 09:00:09 +0000
+
 symbiosis-key (2015:0127) stable; urgency=low
 
   * Updated Debian standards.
