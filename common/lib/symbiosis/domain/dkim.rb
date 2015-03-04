@@ -28,7 +28,7 @@ module Symbiosis
       @dkim_key = if key.is_a?(String)
         begin
           OpenSSL::PKey::RSA.new(key)
-        rescue OpenSSL::OpenSSLError => err
+        rescue OpenSSL::OpenSSLError
           nil
         end
       else
