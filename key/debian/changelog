@@ -1,4 +1,4 @@
-symbiosis-key (2015:0221) stable; urgency=low
+symbiosis-key (2014:1108) stable; urgency=low
 
   * Removed references to Ruby in the Debian package.
 
