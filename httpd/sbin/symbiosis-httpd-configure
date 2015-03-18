@@ -8,7 +8,7 @@
 #  symbiosis-httpd-configure [ --ssl-template | -s <file> ] 
 #                         [ --non-ssl-template | -t <file> ] 
 #                         [ --apache2-dir | -a <directory> ] 
-#                         [ --force | -f ] [ --no-reload | -r ]
+#                         [ --force | -f ] [ --no-reload | -n ]
 #                         [ --help | -h ] [ --manual | -m ] [ --verbose | -v ]
 #
 # OPTIONS
@@ -35,7 +35,7 @@
 #
 # --force, -f       Force the re-creation of all sites.
 #
-# --no-reload, -r   Do not reload apache2 even if changes have taken place.
+# --no-reload, -n   Do not reload apache2 even if changes have taken place.
 #
 # --manual, -m      Show the manual for this script.
 #
