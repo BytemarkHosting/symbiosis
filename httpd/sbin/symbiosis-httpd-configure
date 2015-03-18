@@ -5,10 +5,10 @@
 #  symbiosis-httpd-configure -- Auto-configure Apache2 sites with specified IPs
 #
 # SYNOPSIS
-#  symbiosis-httpd-configure [ --ssl-template | -s <file> ] 
-#                         [ --non-ssl-template | -t <file> ] 
-#                         [ --apache2-dir | -a <directory> ] 
-#                         [ --force | -f ] [ --no-reload | -r ]
+#  symbiosis-httpd-configure [ --ssl-template | -s <file> ]
+#                         [ --non-ssl-template | -t <file> ]
+#                         [ --apache2-dir | -a <directory> ]
+#                         [ --force | -f ] [ --no-reload | -n ]
 #                         [ --help | -h ] [ --manual | -m ] [ --verbose | -v ]
 #
 # OPTIONS
@@ -35,7 +35,7 @@
 #
 # --force, -f       Force the re-creation of all sites.
 #
-# --no-reload, -r   Do not reload apache2 even if changes have taken place.
+# --no-reload, -n   Do not reload apache2 even if changes have taken place.
 #
 # --manual, -m      Show the manual for this script.
 #
@@ -81,10 +81,10 @@ $RELOAD=false
 # The root directory -- '/' by default.
 #
 root = "/"
-non_ssl_template = nil 
-ssl_template     = nil 
-mass_non_ssl_template = nil 
-mass_ssl_template     = nil 
+non_ssl_template = nil
+ssl_template     = nil
+mass_non_ssl_template = nil
+mass_ssl_template     = nil
 apache2_dir      = nil
 no_reload       = false
 
@@ -216,7 +216,7 @@ Symbiosis::Domains.each do |domain|
     next
   end
 
-  if apache_mass_hosting_enabled and domain.ips.any?{|ip| primary_ips.include?(ip)} 
+  if apache_mass_hosting_enabled and domain.ips.any?{|ip| primary_ips.include?(ip)}
     verbose "\tThis site is using the host's primary IPs -- it is covered by the mass-hosting config.  Skipping."
     next
   end
