@@ -1,3 +1,9 @@
+symbiosis-httpd (2014:1211) stable; urgency=high
+
+  * Updated the path-mangling in mod_vhost_bytemark.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 11 Dec 2014 17:55:35 +0000
+
 symbiosis-httpd (2014:1210) stable; urgency=low
 
   * Updated templates to use symbiosis-httpd-logger.
