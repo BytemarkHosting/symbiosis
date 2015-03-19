@@ -56,6 +56,11 @@
 #include <fcntl.h>
 
 
+#ifndef _SRV_
+# define _SRV_ "/srv/"
+#endif
+
+
 /**
  * This is where the magic happens.
  *
@@ -91,7 +96,7 @@ void update_vhost_request( char *path )
   /**
    * Find /srv as a sanity check - it should be first part of the string.
    */
-  srv = strstr(path,"/srv/");
+  srv = strstr(path, _SRV_);
   if ( ( NULL == srv ) || ( srv != path ) )
     return;
 
@@ -158,7 +163,7 @@ void update_vhost_request( char *path )
    *
    * The hostnaem is the string after /srv/, but before the first slash.
    */
-  per = strstr( path + strlen("/srv/" ), "/" );
+  per = strstr( path + strlen( _SRV_ ), "/" );
   if ( per == NULL )
     return;
 
@@ -180,7 +185,7 @@ void update_vhost_request( char *path )
   char host_name[256];
   memset( host_name, '\0', sizeof(host_name)-1);
   strncpy( host_name,
-           path + strlen("/srv/" ),
+           path + strlen(_SRV_),
            per - path - 5  /* strlen("/srv/" ); */  );
 
 
@@ -223,7 +228,7 @@ void update_vhost_request( char *path )
       * Add the /srv/ + domain-piece prefix.
       */
      memset(buffer, '\0', sizeof(buffer));
-     strcpy(buffer,"/srv/" );
+     strcpy(buffer, _SRV_ );
      strncpy(buffer + 5, host_name + i, host_len - i );
 
 

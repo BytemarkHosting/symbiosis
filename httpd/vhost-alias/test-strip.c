@@ -11,7 +11,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+/**
+ * For testing we use /tmp/ as a prefix.
+ *
+ * This is the same length as /srv/ which helps.
+ */
+#define _SRV_ "/tmp/"
+#define VHOST_DEBUG 1
+
+
+
 #include "mod_vhost_bytemark.h"
+
 
 
 /**
@@ -99,24 +111,41 @@ main (int argc, char *argv[])
     struct test_case tests[] = {
 
         {
-          "/srv/www.foo.com/public/htdocs/index.php",
-          "/srv/foo.com/public/htdocs/index.php",
+          "/tmp/www.foo.com/public/htdocs/index.php",
+          "/tmp/foo.com/public/htdocs/index.php",
          },
         {
-          "/srv/foo.com/public/htdocs/index.php",
-          "/srv/foo.com/public/htdocs/index.php",
+          "/tmp/foo.com/public/htdocs/index.php",
+          "/tmp/foo.com/public/htdocs/index.php",
          },
         {
-         "/srv/bar.bar.foo.com/public/htdocs",
-         "/srv/foo.com/public/htdocs",
+          "/bogus.php",
+          "/bogus.php",
          },
         {
-         "/srv/.foo.com/public/htdocs",
-         "/srv/foo.com/public/htdocs",
+          "/tmp/bogus.php",
+          "/tmp/bogus.php",
          },
         {
-         "/srv/this.is.insane.foo.com/public/htdocs",
-         "/srv/foo.com/public/htdocs",
+          "/tmp/a/bogus.php",
+          "/tmp/a/bogus.php",
+         },
+        {
+          "/tmp//bogus.php",
+          "/tmp//bogus.php",
+         },
+
+        {
+         "/tmp/bar.bar.foo.com/public/htdocs",
+         "/tmp/foo.com/public/htdocs",
+         },
+        {
+         "/tmp/.foo.com/public/htdocs",
+         "/tmp/foo.com/public/htdocs",
+         },
+        {
+         "/tmp/this.is.insane.foo.com/public/htdocs",
+         "/tmp/foo.com/public/htdocs",
          },
 
         {
