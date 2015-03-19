@@ -1,3 +1,9 @@
+symbiosis-httpd (2014:0219) stable; urgency=low
+
+  * Updated the mangling applied to mod_vhost_bytemark.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 19 Feb 2014 18:33:56 +0000
+
 symbiosis-httpd (2014:0218) stable; urgency=low
 
   * Tidied away old lenny command.
