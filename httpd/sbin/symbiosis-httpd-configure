@@ -221,7 +221,14 @@ Symbiosis::Domains.each do |domain|
     next
   end
 
-  configurations << domain.apache_configuration(ssl_template, non_ssl_template, apache2_dir)
+  this_config = domain.apache_configuration(ssl_template, non_ssl_template, apache2_dir)
+
+  unless this_config.is_a?(Symbiosis::ConfigFiles::Apache)
+    verbose "\tA valid configuration could not be created for this site.  Skipping."
+    next
+  end
+
+  configurations << this_config
 end
 
 #
@@ -232,7 +239,16 @@ if apache_mass_hosting_enabled
   # For each template.
   #
   [mass_non_ssl_template, mass_ssl_template].each do |template|
-    configurations << Symbiosis::Domains.apache_configuration(template, apache2_dir)
+    verbose "Mass hosting template: #{template}"
+
+    this_config = Symbiosis::Domains.apache_configuration(template, apache2_dir)
+
+    unless this_config.is_a?(Symbiosis::ConfigFiles::Apache)
+      verbose "\tA valid configuration could not be created for this mass-hosting template.  Skipping."
+      next    
+    end
+
+    configurations << this_config
   end
 end
 
