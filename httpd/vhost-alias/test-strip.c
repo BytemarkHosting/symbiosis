@@ -147,6 +147,20 @@ main (int argc, char *argv[])
          "/tmp/this.is.insane.foo.com/public/htdocs",
          "/tmp/foo.com/public/htdocs",
          },
+        {
+         "/tmp/1234.5.3wwwwwwwwwwwwwww.www.www.wwwwwwwwwwwwww.www.www.wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.w.trash.default.skx.uk0.bigv.foo.com/public/htdocs/index.pup",
+         "/tmp/foo.com/public/htdocs/index.pup",
+         },
+
+        /**
+         * This transformation fails because the hostname is longer
+         * than 128 characters, which is what we want.
+         */
+        {
+         "/tmp/wwww.wwwww.wwwwww.wwwww.wwwww.wwwwwwwwwwwwwww.www.www.wwwwwwwwwwwwww.www.www.wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.w.trash.default.skx.uk0.bigv.foo.com/public/htdocs/index.pup",
+         "/tmp/wwww.wwwww.wwwwww.wwwww.wwwww.wwwwwwwwwwwwwww.www.www.wwwwwwwwwwwwww.www.www.wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww.w.trash.default.skx.uk0.bigv.foo.com/public/htdocs/index.pup",
+         },
+
 
         {
          NULL,
