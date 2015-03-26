@@ -252,27 +252,54 @@ if apache_mass_hosting_enabled
   end
 end
 
+
 #
 # Disable any site that looks like it belonged to a deleted domain
 #
-Dir.foreach(File.join(apache2_dir, "sites-enabled")) { |c|
-  begin
-    next unless  c =~ /\.conf$/
-    enabled_file = File.join(apache2_dir, "sites-enabled", c)
-    next unless File.symlink?(enabled_file)
-    next unless (File.readlines(enabled_file).last || '').chomp =~
-      /^# Checksum MD5 [a-f0-9]{32,32}$/
-    config_file = File.join(apache2_dir, "sites-available", c)
-    next if configurations.any? { |config| config.filename == config_file }
-    config = Symbiosis::ConfigFiles::Apache.new(config_file, "#")
-    verbose "Configuration: #{File.basename(config.filename)}"
-    verbose "\tRemoving orphaned configuration file"
-    config.disable
-  rescue StandardError => err
-    verbose "\tUnable to configure site for #{c} because #{err.to_s}"
-  end
-}
+filenames_available = configurations.collect{|c| c.filename }
+filenames_enabled   = filenames_available.collect{|filename| filename.sub("sites-available","sites-enabled") }
 
+Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
+  #
+  # Make sure this isn't a file we're expecting to create/enable
+  #
+  next if filenames_enabled.include?(filename)
+
+  begin
+    verbose "Configuration file: #{filename}" 
+
+    #
+    # We only deal with symlinks.
+    #
+    unless File.symlink?(filename) 
+      verbose "\tis not a symlink -- skipping"
+      next
+    end
+
+    filename_source = File.readlink(filename)
+
+    config = Symbiosis::ConfigFiles::Apache.new(filename_source, "#")
+
+    unless config.is_a?(Symbiosis::ConfigFiles::Apache)
+      verbose "\tFailed to parse #{filename_source} as a config file -- skipping"
+      next
+    end
+
+    #
+    # If the configuration has changed, then remove it.
+    #
+    if config.changed? or !$FORCE
+      verbose "\tConfiguration #{filename_source} has been edited by hand -- skipping"
+      next
+    end
+  
+    verbose "\tRemoving orphaned configuration file"
+    config.disable(filename)
+
+  rescue StandardError => err
+    verbose "\tUnable to check configuration #{filename} because #{err.to_s}"
+  end
+end
 
 configurations.each do |config|
   begin
