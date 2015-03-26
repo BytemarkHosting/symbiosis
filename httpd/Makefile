@@ -9,6 +9,9 @@ nop:
 
 docs: man/symbiosis-httpd-configure.man  man/symbiosis-httpd-logger.man man/symbiosis-httpd-generate-stats.man man/symbiosis-httpd-rotate-logs.man
 
+test:
+	$(MAKE) -C vhost-alias test
+
 man/%.man: ./sbin/%
 	[ -d man ] || mkdir man
 	RUBYLIB=./lib $<  --manual | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
