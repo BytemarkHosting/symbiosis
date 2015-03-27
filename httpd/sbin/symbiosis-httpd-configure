@@ -116,7 +116,7 @@ begin
       mass_non_ssl_template = arg
     when '--apache2-dir'
       apache2_dir = arg
-    when '--root'
+    when '--root-dir'
       root = arg
     when '--no-reload'
       no_reload = true
