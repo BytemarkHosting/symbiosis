@@ -194,7 +194,9 @@ ssl_template     = File.join(root, "/etc/symbiosis/apache.d/ssl.template.erb") i
 mass_non_ssl_template = File.join(root, "/etc/symbiosis/apache.d/zz-mass-hosting.template.erb") if mass_non_ssl_template.nil?
 mass_ssl_template     = File.join(root, "/etc/symbiosis/apache.d/zz-mass-hosting.ssl.template.erb") if mass_ssl_template.nil?
 
-apache2_dir      = File.join(root, "/etc/apache2") if apache2_dir.nil?
+apache2_dir           = File.join(root, "/etc/apache2") if apache2_dir.nil?
+
+prefix                = File.join(root, "/srv")
 
 #
 # Any arguments on the command line specify which domains to do.
@@ -208,7 +210,7 @@ configurations = []
 #
 #  For each domain.
 #
-Symbiosis::Domains.each do |domain|
+Symbiosis::Domains.each(prefix) do |domain|
   verbose "Domain: #{domain.name}"
 
   if domain.is_alias?
