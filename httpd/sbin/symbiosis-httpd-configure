@@ -238,24 +238,37 @@ end
 #
 # Now see to the mass hosting stuff.
 #
-if apache_mass_hosting_enabled
-  #
-  # For each template.
-  #
-  [mass_non_ssl_template, mass_ssl_template].each do |template|
-    verbose "Mass hosting template: #{template}"
+[mass_non_ssl_template, mass_ssl_template].each do |template|
+  verbose "Mass hosting template: #{template}"
 
-    this_config = Symbiosis::Domains.apache_configuration(template, apache2_dir)
+  this_config = Symbiosis::Domains.apache_configuration(template, apache2_dir)
 
-    unless this_config.is_a?(Symbiosis::ConfigFiles::Apache)
-      verbose "\tA valid configuration could not be created for this mass-hosting template.  Skipping."
-      next    
-    end
-    
-    verbose "\tAdding to configurations"
-
-    configurations << this_config
+  unless this_config.is_a?(Symbiosis::ConfigFiles::Apache)
+    verbose "\tA valid configuration could not be created for this mass-hosting template.  Skipping."
+    next    
   end
+
+  #
+  # Check if mass hosting is supposed to be enabled.
+  #
+  if apache_mass_hosting_enabled
+    verbose "\tAdding to configurations"
+    configurations << this_config
+
+  else
+
+    #
+    # Otherwise remove it.
+    #
+    begin
+      verbose "\tDisabling from configuration"
+      this_config.disable(nil, $FORCE)
+    rescue StandardError => err
+      verbose "\tUnable to check configuration #{filename} because #{err.to_s}"
+    end
+
+  end
+
 end
 
 
