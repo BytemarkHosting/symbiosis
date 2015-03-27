@@ -271,6 +271,8 @@ Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
   #
   next if filenames_enabled.include?(filename)
 
+  next if File.directory?(filename)
+
   begin
     verbose "Configuration file: #{filename}" 
 
