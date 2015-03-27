@@ -357,21 +357,27 @@ configurations.each do |config|
       # Definitely reload if we've rewritten the config.
       $RELOAD = true
 
-      unless config.enabled?(sites_enabled_file)
-        verbose "\tEnabling site"
-        config.enable(sites_enabled_file, $FORCE)
-      end
-
     else
       verbose "\tApache has rejected the new configuration -- no changes have been made."
+      next
+
     end
 
-    #
-    # Rescue errors for this domain, but continue for others.
-    #
+    if $FORCE or not config.enabled?(sites_enabled_file)
+      verbose "\tEnabling site"
+      config.enable(sites_enabled_file, $FORCE)
+
+      # Definitely reload if we've enabled the site
+      $RELOAD = true
+    end
+
+  #
+  # Rescue errors for this domain, but continue for others.
+  #
   rescue StandardError => err
     verbose "\tUnable to configure site for #{File.basename(config.filename)} because #{err.to_s}"
   end
+
 end
 
 #
