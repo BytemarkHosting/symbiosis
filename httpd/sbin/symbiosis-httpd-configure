@@ -230,6 +230,8 @@ Symbiosis::Domains.each(prefix) do |domain|
     next
   end
 
+  verbose "\tAdding to configurations"
+
   configurations << this_config
 end
 
@@ -249,6 +251,8 @@ if apache_mass_hosting_enabled
       verbose "\tA valid configuration could not be created for this mass-hosting template.  Skipping."
       next    
     end
+    
+    verbose "\tAdding to configurations"
 
     configurations << this_config
   end
