@@ -373,7 +373,7 @@ configurations.each do |config|
     else
       verbose "\tApache has rejected the new configuration -- no changes have been made."
       config.write
-#      next
+      next
 
     end
 
