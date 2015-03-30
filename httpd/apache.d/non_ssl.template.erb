@@ -21,12 +21,15 @@ NameVirtualHost <%= ip %>:80
         #
         ServerName  <%= domain %>
 
+        #
+        # This is the testing alias.
+        #
+        ServerAlias <%= domain %>.testing.<%= hostname() %>
 
         #
         # And server alias in place
         #
         <%= server_aliases %>
-
 
         #
         #  Allow users to override settings via .htaccess
