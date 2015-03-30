@@ -279,14 +279,14 @@ module Symbiosis
       # TODO: Should be elsewhere
       #
       def hostname
-        return @hostname if @hostname and !@hostname.nil?
+        return @hostname if defined? @hostname and @hostname.is_a?(String)
         @hostname = Symbiosis::Utils.get_param("hostname","/etc")
       end
 
     end
 
-
   end
+
 end
 
 
