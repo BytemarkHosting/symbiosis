@@ -1,0 +1,11 @@
+#
+# If you wish to receive email notices of package updates then
+# please uncomment the following line:
+#
+#EMAIL=root
+#
+
+#
+# If you uncomment the following line then updates will be disabled
+#
+#DISABLED=1
