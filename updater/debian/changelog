@@ -1,3 +1,10 @@
+symbiosis-updater (2015:0330) stable; urgency=low
+
+  * Moved the configuration file to /etc/symbiosis/updater.d/config
+  * Default to not sending emails.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 30 Mar 2015 10:33:01 +0000
+
 symbiosis-updater (2015:0127) stable; urgency=low
 
   * Updated Debian standards.

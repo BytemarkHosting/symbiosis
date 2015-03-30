@@ -27,7 +27,7 @@ SOURCES="/etc/apt/sources.list.security"
 #
 #  The email address to notify, if any.
 #
-EMAIL=root@`hostname`
+EMAIL=
 
 
 #
@@ -60,14 +60,14 @@ METHOD="dist-upgrade"
 #  Source a config file if it exists, that'll allow
 # the settings above to be overridden.
 #
-if [ -e /etc/symbiosis/updater ]; then
-  . /etc/symbiosis/updater
+if [ -e /etc/symbiosis/updater.d/config ]; then
+  . /etc/symbiosis/updater.d/config
 fi
 
 
 #
 #  Exit silently if we shouldn't run - this is configured
-# via "DISABLED=1" in /etc/symbiosis/updater
+# via "DISABLED=1" in /etc/symbiosiks/updater
 #
 if [ ! -z "$DISABLED" -a "$DISABLED" ];  then
     exit
@@ -151,8 +151,6 @@ if ( grep ^Inst "$tmp" 2>/dev/null >/dev/null ) ; then
 
         cat "$tmp" | /usr/bin/mail -s "[symbiosis-updater] `hostname`" "$EMAIL"
 
-    else
-        cat "$tmp"
     fi
 fi
 
@@ -221,7 +219,7 @@ security and system package updates, using the Debian apt-get system.
 The script will read a special sources list file which will contain
 references to repositories which may be upgraded.
 
-By default the script will archive the results of its upgrades
+By default the script will archive the results of its upgrades.
 
 =cut
 
@@ -231,7 +229,7 @@ To disable the updater please run the following command:
 
 =for example begin
 
-echo "DISABLED=1" >> /etc/symbiosis/updater
+echo "DISABLED=1" >> /etc/symbiosis/updater.d/config
 
 =for example end
 
@@ -253,7 +251,7 @@ None known.
 
 =cut
 
-=head1 SEE ALSO 
+=head1 SEE ALSO
 
 apt-get(1)
 
