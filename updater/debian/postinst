@@ -11,11 +11,25 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
+#  remove old config file
+#
+if [ -e /etc/update-packages.conf ]; then
+    rm /etc/update-packages.conf
+fi
+
+#
+#  Remove old configuration file.
+#
+if [ -e /etc/cron.daily/cron-apt ]; then
+    rm /etc/cron.daily/cron-apt
+fi
+
+#
 #  Remove the old files we might have had present by accident
 #
-for i in /etc/cron.d/bytemark-vhost-updater /etc/cron.d/symbiosis-update /etc/cron.daily/cron-apt /etc/cron.daily/update-packages /etc/update-packages.conf /etc/symbiosis/updater  ; do
+for i in /etc/cron.daily/update-packages /etc/cron.d/bytemark-vhost-updater /etc/cron.d/symbiosis-update ; do
     if [ -e $i ]; then
-        rm -f $i || true
+        rm -f $i ;
     fi
 done
 
