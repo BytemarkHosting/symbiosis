@@ -166,23 +166,6 @@ require 'symbiosis/domain/http'
 require 'symbiosis/config_files/apache'
 
 #
-# Disable creation of mass hosting sites.
-#
-unless Symbiosis::Domains.apache_configuration_enabled?
-  verbose "Symbiosis automatic apache configuration disabled. Exiting."
-  exit 0
-end
-
-#
-# Perform this check just once.
-#
-apache_mass_hosting_enabled = Symbiosis::Domains.apache_mass_hosting_enabled?
-
-unless apache_mass_hosting_enabled
-  verbose "Symbiosis automatic mass-hosting configuration disabled. Explicitly configuring all sites."
-end
-
-#
 # Set the default paths.
 #
 non_ssl_template = File.join(root, "/etc/symbiosis/apache.d/non_ssl.template.erb") if non_ssl_template.nil?
@@ -206,6 +189,24 @@ domains_to_configure = ARGV
 primary_ips = [Symbiosis::Host.primary_ipv4, Symbiosis::Host.primary_ipv6]
 
 configurations = []
+
+#
+# Disable creation of mass hosting sites.
+#
+unless Symbiosis::Domains.apache_configuration_enabled?(File.join(root,"etc","symbiosis"))
+  verbose "Symbiosis automatic apache configuration disabled. Exiting."
+  exit 0
+end
+
+#
+# Perform this check just once.
+#
+apache_mass_hosting_enabled = Symbiosis::Domains.apache_mass_hosting_enabled?(File.join(root,"etc","symbiosis"))
+
+unless apache_mass_hosting_enabled
+  verbose "Symbiosis automatic mass-hosting configuration disabled. Explicitly configuring all sites."
+end
+
 
 #
 #  For each domain.
@@ -270,7 +271,6 @@ end
   end
 
 end
-
 
 #
 # Disable any site that looks like it belonged to a deleted domain
