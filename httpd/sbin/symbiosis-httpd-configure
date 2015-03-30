@@ -292,12 +292,12 @@ Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
     #
     # We only deal with symlinks.
     #
-    unless File.symlink?(filename) 
+    unless File.lstat(filename).symlink?
       verbose "\tis not a symlink -- skipping"
       next
     end
 
-    filename_source = File.readlink(filename)
+    filename_source = File.expand_path(File.readlink(filename))
 
     config = Symbiosis::ConfigFiles::Apache.new(filename_source, "#")
 
@@ -315,7 +315,7 @@ Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
     end
   
     verbose "\tRemoving orphaned configuration file"
-    config.disable(filename)
+    config.disable(filename, $FORCE)
 
   rescue StandardError => err
     verbose "\tUnable to check configuration #{filename} because #{err.to_s}"
