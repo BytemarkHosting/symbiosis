@@ -70,7 +70,7 @@ module Symbiosis
     #
     def dkim_selector
       selector = get_param("dkim", self.config_dir)
-      selector_regex = /\b([a-z0-9-]+(\.[a-z0-9-]+)*)\b/i
+      selector_regex = /\b(([a-z0-9-]+)(\.[a-z0-9-]+)*)\b/i
 
       @dkim_selector = if selector.is_a?(String) and selector =~ selector_regex
         $1.to_s
@@ -109,7 +109,11 @@ module Symbiosis
         # should never happen (I don't think!).
         #
         hostname = "default" unless hostname =~ selector_regex
-        hostname
+
+        #
+        # Just return the first component.
+        #
+        $2.to_s
       end
     end
 
