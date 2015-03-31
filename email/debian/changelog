@@ -1,3 +1,15 @@
+symbiosis-email (2014:1018) stable; urgency=medium
+
+  [ James Carter ]
+  * Fix exim4 config for vacation messages (closes #8448).
+
+  [ Patrick J Cherry ]
+  * Accept mail from authenticated users for locally configured hosts that
+    have their mail elsewhere.
+  * Updated maintainer/uploaders.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 31 Mar 2015 13:10:01 +0100
+
 symbiosis-email (2014:1017) stable; urgency=medium
 
   * Disable SSLv3 in Exim4 and Dovecot (CVE-2014-3566).
