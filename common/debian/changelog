@@ -1,3 +1,17 @@
+symbiosis-common (2014:1111) stable; urgency=low
+
+  [ Patrick J Cherry]
+  * Added Symbiosis::ConfigFile#mananaged? test to check for files Symbiosis
+    might have managed at one point in time.
+  * The default DKIM selector is now the first part of the hostname of the
+    box, rather than the whole thing.
+  * Added in new Swordfish range to the list of Bytemark ranges.
+
+  [ James Carter ]
+  * Fixed commands with paths in the maintainer scripts
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 31 Mar 2015 13:01:11 +0100
+
 symbiosis-common (2014:1110) stable; urgency=low
 
   * Postinst now generates a 4096 bit key.
