@@ -280,6 +280,11 @@ filenames_enabled   = filenames_available.collect{|filename| filename.sub("sites
 
 Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
   #
+  # Prepend full path before the filename
+  #
+  filename = File.join(apache2_dir, "sites-enabled", filename)
+
+  #
   # Make sure this isn't a file we're expecting to create/enable
   #
   next if filenames_enabled.include?(filename)
@@ -309,8 +314,8 @@ Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
     #
     # If the configuration has changed, then remove it.
     #
-    if config.changed? or !$FORCE
-      verbose "\tConfiguration #{filename_source} has been edited by hand -- skipping"
+    unless config.managed?
+      verbose "\tConfiguration #{filename_source} not managed by Symbiosis -- skipping"
       next
     end
   
@@ -362,7 +367,7 @@ configurations.each do |config|
     #
     # This gets apache2 to check the configuration using a temporary file.
     #
-    if config.ok?
+    if $FORCE or config.ok?
 
       verbose "\tWriting configuration"
       config.write
@@ -372,7 +377,6 @@ configurations.each do |config|
 
     else
       verbose "\tApache has rejected the new configuration -- no changes have been made."
-      config.write
       next
 
     end
