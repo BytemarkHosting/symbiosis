@@ -10,7 +10,8 @@ symbiosis-httpd (2014:1211) stable; urgency=high
 
   [ Patrick J Cherry ]
   * Rewrote how orphaned apache config snippets are handled.
-  * Added tests for symbiosis-httpd-configure.
+  * Added tests for symbiosis-httpd-configure, although more coveraged is
+    needed.
   * Added testing domain for non-mass-hosted config snippets.
   * Updated uploaders and matainers in debian/control.
   * Now requires new version of symbiosis-common.
