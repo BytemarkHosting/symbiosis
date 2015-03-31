@@ -150,9 +150,6 @@ if ( grep ^Inst "$tmp" 2>/dev/null >/dev/null ) ; then
     if ( test ! -z "$EMAIL" -a -x /usr/bin/mail ); then
 
         cat "$tmp" | /usr/bin/mail -s "[symbiosis-updater] `hostname`" "$EMAIL"
-
-    else
-        cat "$tmp"
     fi
 fi
 
