@@ -32,6 +32,13 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
     FileUtils.mkdir_p(File.join(@apache2_dir,"sites-enabled"))
     FileUtils.mkdir_p(@prefix)
 
+    #
+    # We don't want to use root for this test where poss.
+    #
+    if 0 == Process.uid
+      File.chown(1000,1000,@prefix)
+    end
+
     %w(non_ssl.template.erb  ssl.template.erb zz-mass-hosting.ssl.template.erb  zz-mass-hosting.template.erb).each do |fn|
       FileUtils.cp(File.join(testd,"..","apache.d",fn), File.join(@root, "etc", "symbiosis", "apache.d"))
     end
