@@ -18,7 +18,12 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
     @ip = Symbiosis::Host.primary_ipv4
 
     @verbose = (($VERBOSE or $DEBUG) ? " --verbose " : "")
-    @script = File.expand_path(File.join(File.dirname(__FILE__),"..","sbin","symbiosis-httpd-configure")) + @verbose
+
+    testd = File.dirname(__FILE__)
+
+    @script = File.expand_path(File.join(testd,"..","sbin","symbiosis-httpd-configure"))
+    @script = '/usr/sbin/symbiosis-httpd-configure' unless File.exists?(@script)
+    @script += @verbose
 
     ENV["RUBYLIB"] = $:.join(":")
 
@@ -28,7 +33,7 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
     FileUtils.mkdir_p(@prefix)
 
     %w(non_ssl.template.erb  ssl.template.erb zz-mass-hosting.ssl.template.erb  zz-mass-hosting.template.erb).each do |fn|
-      FileUtils.cp(File.join("apache.d",fn), File.join(@root, "etc", "symbiosis", "apache.d"))
+      FileUtils.cp(File.join(testd,"..","apache.d",fn), File.join(@root, "etc", "symbiosis", "apache.d"))
     end
 
   end
