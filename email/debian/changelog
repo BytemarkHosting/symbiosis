@@ -7,6 +7,8 @@ symbiosis-email (2014:1018) stable; urgency=medium
   * Accept mail from authenticated users for locally configured hosts that
     have their mail elsewhere.
   * Updated maintainer/uploaders.
+  * Avoid advertising PLAIN and LOGIN over unencrypted connections.  Fixes
+    #8473
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 31 Mar 2015 13:10:01 +0100
 
