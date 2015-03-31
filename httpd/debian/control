@@ -1,15 +1,15 @@
 Source: symbiosis-httpd
 Section: web
 Priority: optional
-Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
-Uploaders: John Hackett <john.hackett@bytemark.co.uk>
+Maintainer: James Carter <jcarter@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), apache2-prefork-dev, libcap-dev, php5-common, txt2man, gem2deb, ruby
 Standards-Version: 3.9.1
 XS-Ruby-Versions: all
 
 Package: symbiosis-httpd
 Architecture: all
-Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static, symbiosis-common (>= 2014:0101), ruby | ruby-interpreter, ruby-eventmachine, geoip-database
+Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static, symbiosis-common (>= 2014:1111), ruby | ruby-interpreter, ruby-eventmachine, geoip-database
 Replaces: bytemark-vhost-httpd, symbiosis-test, symbiosis-monit (<< 2011:1206), symbiosis-httpd-static
 Breaks: symbiosis-monit (<< 2011:1206)
 Provides: bytemark-vhost-httpd, symbiosis-httpd-static
