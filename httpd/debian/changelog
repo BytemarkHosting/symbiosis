@@ -1,7 +1,8 @@
-symbiosis-httpd (2014:1211) stable; urgency=high
+symbiosis-httpd (2014:1212) stable; urgency=high
 
   [ Steve Kemp ]
   * Updated the path-mangling in mod_vhost_bytemark.
+  * Fixed an off-by-one error in the same module.
   * Added tests to the build process for vhost module.
   * Fixed documentation in symbiosis-httpd-configure.
 
@@ -16,7 +17,7 @@ symbiosis-httpd (2014:1211) stable; urgency=high
   * Updated uploaders and matainers in debian/control.
   * Now requires new version of symbiosis-common.
 
- -- Steve Kemp <steve@bytemark.co.uk>  Tue, 31 Mar 2015 12:57:22 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 1 Apr 2015 11:55:11 +0100
 
 symbiosis-httpd (2014:1210) stable; urgency=low
 
