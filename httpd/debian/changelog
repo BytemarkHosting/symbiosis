@@ -1,8 +1,14 @@
-symbiosis-httpd (2014:1212) stable; urgency=high
+symbiosis-httpd (2014:1211) stable; urgency=high
+
+  [ Steve Kemp ]
+  * Fixed an off-by-one error in the mod_vhost_bytemark module.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 1 Apr 2015 11:55:11 +0100
+
+symbiosis-httpd (2014:1211) stable; urgency=high
 
   [ Steve Kemp ]
   * Updated the path-mangling in mod_vhost_bytemark.
-  * Fixed an off-by-one error in the same module.
   * Added tests to the build process for vhost module.
   * Fixed documentation in symbiosis-httpd-configure.
 
@@ -17,7 +23,7 @@ symbiosis-httpd (2014:1212) stable; urgency=high
   * Updated uploaders and matainers in debian/control.
   * Now requires new version of symbiosis-common.
 
- -- Steve Kemp <steve@bytemark.co.uk>  Tue, 1 Apr 2015 11:55:11 +0100
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 31 Mar 2015 12:57:22 +0100
 
 symbiosis-httpd (2014:1210) stable; urgency=low
 
@@ -101,7 +107,7 @@ symbiosis-httpd (2013:0917) stable; urgency=low
 
 symbiosis-httpd (2013:0711) stable; urgency=low
 
-  * Updated apache build dependencies - apache2-prefork-dev in place of apache2-dev. 
+  * Updated apache build dependencies - apache2-prefork-dev in place of apache2-dev.
 
  -- John Hackett <jhackett@bytemark.co.uk>  Thu, 11 Jul 2013 12:47:21 +0100
 
@@ -184,7 +190,7 @@ symbiosis-httpd (2012:0215) stable; urgency=low
 
   * Added symbiosis-rotate-logs to mimic the behaviour of logrotate, but
     treats the symlinked domains sanely, so logs aren't rotated twice.
-  * symbiosis-rotate-logs now rotates error logs as well as access logs. 
+  * symbiosis-rotate-logs now rotates error logs as well as access logs.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 14 Feb 2012 16:47:31 +0000
 
@@ -223,7 +229,7 @@ symbiosis-httpd (2012:0202) stable; urgency=low
   * Merged ApacheMassHosting and ApacheSSL classes into one.
   * Tidied up templates to use neater ERb
   * Fixed postinst to behave better.
-  * Added Symbiosis::Domain#should_have_stats? and Symbiosis::Domain#should_have_stats= 
+  * Added Symbiosis::Domain#should_have_stats? and Symbiosis::Domain#should_have_stats=
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 01 Feb 2012 10:57:27 +0000
 
