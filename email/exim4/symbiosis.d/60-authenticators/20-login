@@ -6,5 +6,6 @@
 LOGIN:
   driver                     = dovecot
   server_set_id              = $auth1
+  server_advertise_condition = ${if eq{$tls_cipher}{}{no}{yes}}
   server_socket              = /var/run/dovecot/auth-client
 

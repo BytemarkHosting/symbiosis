@@ -1,8 +1,22 @@
 symbiosis-httpd (2014:1211) stable; urgency=high
 
+  [ Steve Kemp ]
   * Updated the path-mangling in mod_vhost_bytemark.
+  * Added tests to the build process for vhost module.
+  * Fixed documentation in symbiosis-httpd-configure.
 
- -- Steve Kemp <steve@bytemark.co.uk>  Wed, 11 Dec 2014 17:55:35 +0000
+  [ James Carter ]
+  * Fixed documentation links in Symbiosis "unconfigured site" page.
+
+  [ Patrick J Cherry ]
+  * Rewrote how orphaned apache config snippets are handled.
+  * Added tests for symbiosis-httpd-configure, although more coveraged is
+    needed.
+  * Added testing domain for non-mass-hosted config snippets.
+  * Updated uploaders and matainers in debian/control.
+  * Now requires new version of symbiosis-common.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Tue, 31 Mar 2015 12:57:22 +0100
 
 symbiosis-httpd (2014:1210) stable; urgency=low
 
