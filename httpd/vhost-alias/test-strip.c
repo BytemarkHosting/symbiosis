@@ -144,6 +144,10 @@ main (int argc, char *argv[])
          "/tmp/foo.com/public/htdocs",
          },
         {
+         "/tmp/blog.foo.com/public/htdocs",
+         "/tmp/blog.foo.com/public/htdocs",
+         },
+        {
          "/tmp/this.is.insane.foo.com/public/htdocs",
          "/tmp/foo.com/public/htdocs",
          },
