@@ -163,4 +163,34 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
   
   end
 
+  def test_bug_7593
+    domain = Symbiosis::Domain.new(nil, @prefix)
+    domain.create
+    name = domain.name
+
+    #
+    # Don't create a public/htdocs directory for this domain and
+    # disable mass hosting
+    #
+    FileUtils.touch("#{@root}/etc/symbiosis/apache.d/disabled.zz-mass-hosting")
+
+    #
+    # We don't expect any files to be created, since the domain has no document
+    # root, and mass hosting is disabled.
+    #
+    conf_files = [File.join(@apache2_dir, "sites-enabled", domain.name+".conf")]
+    conf_files += %w(zz-mass-hosting.ssl  zz-mass-hosting).collect do |fn|
+      File.join(@apache2_dir,"sites-enabled",fn)
+    end
+
+    system("#{@script} --root-dir #{@root} --no-reload")
+
+    assert_equal($?,0,"#{@script} exited with a non-zero status")
+
+    conf_files.each do |fn|
+      assert(!File.exist?(fn), "File #{fn} present, when it shouldn't be.")
+    end
+
+  end
+
 end
