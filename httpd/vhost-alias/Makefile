@@ -20,7 +20,8 @@ clean:
 
 test: test-strip.c
 	gcc -Wall -Werror -o test-strip test-strip.c
-	mkdir -p /tmp/foo.com || true
+	mkdir -p /tmp/foo.com      || true
+	mkdir -p /tmp/blog.foo.com || true
 	./test-strip 2>/dev/null
 
 install:
