@@ -3,6 +3,9 @@ symbiosis-httpd (2014:1211) stable; urgency=high
   [ Steve Kemp ]
   * Fixed an off-by-one error in the mod_vhost_bytemark module.
 
+  [ Patrick J Cherry ]
+  * Added test for bug #7593 (closes #7593)
+
  -- Steve Kemp <steve@bytemark.co.uk>  Tue, 1 Apr 2015 11:55:11 +0100
 
 symbiosis-httpd (2014:1211) stable; urgency=high
