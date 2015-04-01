@@ -1,4 +1,4 @@
-symbiosis-httpd (2014:1211) stable; urgency=high
+symbiosis-httpd (2014:1212) stable; urgency=high
 
   [ Steve Kemp ]
   * Fixed an off-by-one error in the mod_vhost_bytemark module.
