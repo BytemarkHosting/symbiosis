@@ -215,7 +215,7 @@ void update_vhost_request( char *path )
    * Try increasingly stat()ing over parts of the hostname
    * until we find a match.
    */
-  for ( i = 1; i < host_len - 1; i++ )
+  for ( i = 0; i < host_len - 1; i++ )
   {
 
      /**
