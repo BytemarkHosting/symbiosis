@@ -97,7 +97,7 @@ module Symbiosis
       # Break down the directory until we find one that exists.
       #
       stack = []
-      while !File.exists?(parent)
+      while !File.exist?(parent)
         stack.unshift parent
         parent = File.dirname(parent)
       end
@@ -184,7 +184,7 @@ module Symbiosis
       #
       # Return false unless we can read the file
       #
-      return false unless File.exists?(fn) and File.readable?(fn)
+      return false unless File.exist?(fn) and File.readable?(fn)
 
       #
       # Read the file.
@@ -221,7 +221,7 @@ module Symbiosis
       #
       # Make sure the directory exists first
       #
-      raise "Config directory does not exist." unless File.exists?(parent_dir)
+      raise "Config directory does not exist." unless File.exist?(parent_dir)
 
       #
       # Check the parent directory.
@@ -238,7 +238,7 @@ module Symbiosis
         #
         # This doesn't follow symlinks.
         #
-        File.unlink(fn) if File.exists?(fn)
+        File.unlink(fn) if File.exist?(fn)
 
       else
         #

@@ -9,14 +9,14 @@ module Symbiosis
     # for apache generated.
     #
     def self.apache_mass_hosting_enabled?(prefix="/etc/symbiosis")
-      File.exists?(File.join(prefix,"apache.d/disabled.zz-mass-hosting")) ? false : true
+      File.exist?(File.join(prefix,"apache.d/disabled.zz-mass-hosting")) ? false : true
     end
 
     #
     # Returns true if automatic apache configuration is enabled.
     #
     def self.apache_configuration_enabled?(prefix="/etc/symbiosis")
-      File.exists?(File.join(prefix,"apache.d/disabled")) ? false : true
+      File.exist?(File.join(prefix,"apache.d/disabled")) ? false : true
     end
 
     #

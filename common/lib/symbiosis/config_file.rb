@@ -80,7 +80,7 @@ module Symbiosis
     # Set the template filename.  Raises Errno::ENOENT if the file does not exist.
     #
     def template=(f)
-      raise Errno::ENOENT,f unless File.exists?(f)
+      raise Errno::ENOENT,f unless File.exist?(f)
 
       @template = f
     end
@@ -186,7 +186,7 @@ module Symbiosis
     # Test to see if the config file exists
     #
     def exists?
-      File.exists?(filename)
+      File.exist?(filename)
     end
 
     #

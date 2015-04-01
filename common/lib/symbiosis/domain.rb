@@ -25,7 +25,7 @@ module Symbiosis
     # Create a Domain given a directory.
     #
     def self.from_directory(directory)
-      raise Errno::ENOENT, directory unless File.exists?(directory)
+      raise Errno::ENOENT, directory unless File.exist?(directory)
 
       directory = File.expand_path(directory)
       prefix, name = File.split(directory)
@@ -420,7 +420,7 @@ module Symbiosis
         #
         # Skip if we've not already found it, but it exists on the system.
         #
-        next if File.exists?(File.join(self.prefix, this_domain))
+        next if File.exist?(File.join(self.prefix, this_domain))
 
         #
         # OK add it!
