@@ -10,10 +10,6 @@
 ##
 ###
 
-% ips.each do |ip|
-NameVirtualHost <%= ip %>:80
-% end
-
 <VirtualHost <%= ips.collect{|ip| ip+":80"}.join(" ") %>>
 
         #
