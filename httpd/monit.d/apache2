@@ -7,7 +7,7 @@ class ApacheCheck < Symbiosis::Monitor::Check
 
   def initialize
     super
-    @process.pidfile = "/var/run/apache2.pid"
+    @process.pidfile = "/var/run/apache2/apache2.pid"
     @process.initscript = "/etc/init.d/apache2"
     @name = "apache2"
   end
