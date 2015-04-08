@@ -7,7 +7,7 @@
 # --
 #
 
-set -ex
+set -e
 
 #
 # Skip, if we are not in "configure" state
@@ -74,7 +74,7 @@ mangle_config /etc/apache2/conf-available/security.conf
 
 #DEBHELPER#
 
-if [ -e /usr/share/apache/apache2-maintscript-helper ] ; then
+if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
   . /usr/share/apache2/apache2-maintscript-helper
   apache2_invoke $restart_type || exit $?
 fi
