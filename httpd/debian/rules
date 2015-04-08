@@ -2,7 +2,7 @@
 #
 
 %:
-	dh $@ --buildsystem=ruby --with ruby
+	dh $@ --buildsystem=ruby --with ruby,apache2
 
 override_dh_auto_build:
 	$(MAKE) docs
