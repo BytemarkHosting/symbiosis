@@ -45,52 +45,6 @@ done
 #
 symbiosis-httpd-configure --no-reload --verbose
 
-#######################################
-# Remove old cronjobs.
-#
-#  /usr/sbin/symbiosis-configure-additional no longer exists.  Remove old cronjob. 
-#
-if [ -L /etc/cron.hourly/symbiosis-configure-additional ]; then
-  rm -f /etc/cron.hourly/symbiosis-configure-additional 
-fi
-
-#  /usr/sbin/symbiosis-create-ssl no longer exists.  Remove old cronjob. 
-if [ -L /etc/cron.hourly/symbiosis-create-ssl ] ; then
-  rm -f /etc/cron.hourly/symbiosis-create-ssl
-fi
-
-# /etc/cron.hourly/configure-additional needs to go too.
-if [ -e /etc/cron.hourly/configure-additional ] ; then
-  rm -f /etc/cron.hourly/configure-additional
-fi
-
-# Remove /etc/cron.hourly/create-ssl-sites as well
-if [ -e /etc/cron.hourly/create-ssl-sites ] ; then
-  rm -f /etc/cron.hourly/create-ssl-sites
-fi
-
-# symbiosis-create-sites was renamed to symbiosis-httpd-configure in Wheezy.
-if [ -e /etc/cron.hourly/symbiosis-create-sites ] ; then
-  rm -f /etc/cron.hourly/symbiosis-create-sites
-fi
-
-# Remove the old make-logs script too.
-if [ -e /etc/cron.daily/make-logs ] ; then
-  rm -f /etc/cron.daily/make-logs
-fi
-
-# Remove old rotate-logs cronjob.
-if [ -e /etc/cron.daily/symbiosis-rotate-logs ] ; then
-  rm -f /etc/cron.daily/symbiosis-rotate-logs
-fi
-
-#
-# Remove the old tc_ssl_configuration.rb script
-#
-if [ -e /etc/symbiosis/test.d/tc_ssl_configuration.rb ] ; then
-  rm -f /etc/symbiosis/test.d/tc_ssl_configuration.rb
-fi
-
 ######################################
 #
 # Divert config files.  This is cribbed from config-package-dev.
