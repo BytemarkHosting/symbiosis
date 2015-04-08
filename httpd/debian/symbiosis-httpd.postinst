@@ -28,7 +28,6 @@ fi
 #
 #  Enable common modules + mod_vhost_bytemark
 #
-restart_type="reload"
 for mod in rewrite cgi php5 ssl dir mod_vhost_bytemark ; do
   apache2_invoke enmod $mod || exit $?
 done
@@ -64,7 +63,6 @@ mangle_config() {
 
     grep -xFq "diversion of $file to $theirfile by $package"; then
     dpkg-divert --divert "$theirfile" --rename --package "$package" --add "$file"
-    apache2_invoke reload
   fi
 
   #
@@ -73,7 +71,7 @@ mangle_config() {
   if [ ! -L "$file" ] && [ ! -e "$file" ]; then
 
     ln -s "$(basename "$ourfile")" "$file"
-    apache2_invoke reload
+    apache2_invoke reload || exit $?
 
   elif [ ! -L "$file" ] || \
        [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
@@ -85,14 +83,9 @@ mangle_config() {
 }
 
 if [ "$1" = "configure" ]; then
-  mangle_config /etc/apache2/conf-availble/security.conf
+  mangle_config /etc/apache2/conf-available/security.conf
 fi
 
 #DEBHELPER#
-
-#
-#  Restart Apache2.
-#
-apache2_invoke reload || exit $?
 
 exit 0
