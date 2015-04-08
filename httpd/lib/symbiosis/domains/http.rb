@@ -24,7 +24,7 @@ module Symbiosis
     #
     def self.apache_configuration(template, apache2_dir='/etc/apache2')
       basename             = File.basename(template, ".template.erb")
-      sites_available_file = File.join(apache2_dir, "sites-available","#{basename}")
+      sites_available_file = File.join(apache2_dir, "sites-available","#{basename}.conf")
 
       config          = Symbiosis::ConfigFiles::Apache.new(sites_available_file, "#")
       config.template = template
