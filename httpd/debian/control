@@ -9,7 +9,7 @@ XS-Ruby-Versions: all
 
 Package: symbiosis-httpd
 Architecture: all
-Depends: apache2, php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static, symbiosis-common (>= 2014:1111), ruby | ruby-interpreter, ruby-eventmachine, geoip-database
+Depends: php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark, ${misc:Depends}, symbiosis-httpd-static, symbiosis-common (>= 2014:1111), ruby | ruby-interpreter, ruby-eventmachine, geoip-database
 Replaces: bytemark-vhost-httpd, symbiosis-test, symbiosis-monit (<< 2011:1206), symbiosis-httpd-static
 Breaks: symbiosis-monit (<< 2011:1206)
 Provides: bytemark-vhost-httpd, symbiosis-httpd-static
