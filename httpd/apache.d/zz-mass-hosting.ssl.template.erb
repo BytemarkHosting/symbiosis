@@ -12,26 +12,28 @@
 
 <VirtualHost <%= ips.collect{|ip| ip+":443"}.join(" ") %>> 
 
-        #
-        #  Ensure that the SSL options are configured.
-        #
-        SSLEngine On
-        <%= ssl_config %>
+        <IfModule mod_ssl.c>
+                #
+                #  Ensure that the SSL options are configured.
+                #
+                SSLEngine On
+                <%= ssl_config %>
 
-        #
-        # Sane SSL ciphers.
-        #
-        SSLCipherSuite ALL:!LOW:!SSLv2:!EXP:!aNULL
+                #
+                # Sane SSL ciphers.
+                #
+                SSLCipherSuite ALL:!LOW:!SSLv2:!EXP:!aNULL
 
-        #
-        # Ban ancient protocols
-        #
-        SSLProtocol ALL -SSLv2 -SSLv3
+                #
+                # Ban ancient protocols
+                #
+                SSLProtocol ALL -SSLv2 -SSLv3
 
-        #
-        # And some options
-        #
-        SSLOptions +StrictRequire
+                #
+                # And some options
+                #
+                SSLOptions +StrictRequire
+        </IfModule>
 
         #
         #  This is the directory people are redirected to
@@ -51,7 +53,6 @@
                 ErrorDocument 403 /bytemark/
         </LocationMatch>
 
-
         #
         #  Allow users to override settings via .htaccess
         #
@@ -59,38 +60,42 @@
                 AllowOverride all
         </Directory>
 
-
-        #
-        #  We will allow global CGIs without any effort though.
-        #
-        AddHandler cgi-script .cgi
-
+        <IfModule mod_cgi.c>
+                #
+                #  We will allow global CGIs without any effort though.
+                #
+                AddHandler cgi-script .cgi
+        </IfModule>
 
         #
         #  Disable the "single" name for this server.
         #
         UseCanonicalName        Off
 
+        <IfModule mod_rewrite.c>
+                #
+                #  Aliases for testing sites prior to DNS migration.
+                #
+                RewriteEngine On
+                RewriteCond %{HTTP_HOST} ^(.*)\.testing\.(.*)$
+                RewriteRule ^/(.*)$  /srv/%1/public/htdocs/$1
+        </IfModule>
 
-        #
-        #  Aliases for testing sites prior to DNS migration.
-        #
-        RewriteEngine On
-        RewriteCond %{HTTP_HOST} ^(.*)\.testing\.(.*)$
-        RewriteRule ^/(.*)$  /srv/%1/public/htdocs/$1
+        <IfModule mod_bytemark_vhost.c>
+                #
+                #  The document root + CGI-directories.
+                #
+                VirtualDocumentRoot     /srv/%0/public/htdocs/
 
+                <IfModule mod_cgi.c>
+                        VirtualScriptAlias      /srv/%0/public/cgi-bin/
+                </IfModule>
 
-        #
-        #  The document root + CGI-directories.
-        #
-        VirtualDocumentRoot     /srv/%0/public/htdocs/
-        VirtualScriptAlias      /srv/%0/public/cgi-bin/
-
-
-        #
-        # Update documentroot settings for each vhost.
-        #
-        SetVirtualDocumentRoot on
+                #
+                # Update documentroot settings for each vhost.
+                #
+                SetVirtualDocumentRoot on
+        </IfModule>
 
         #
         #  We need to log the virtual hostname the incoming request was

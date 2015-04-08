@@ -21,7 +21,6 @@
                 AllowOverride All
         </Directory>
 
-
         #
         #  And this makes that redirection happen.
         #
@@ -30,7 +29,6 @@
                 ErrorDocument 403 /bytemark/
         </LocationMatch>
 
-
         #
         #  Allow users to override settings via .htaccess
         #
@@ -38,38 +36,41 @@
                 AllowOverride all
         </Directory>
 
-
-        #
-        #  We will allow global CGIs without any effort though.
-        #
-        AddHandler cgi-script .cgi
-
+        <IfModule mod_cgi.c>
+                #
+                #  We will allow global CGIs without any effort though.
+                #
+                AddHandler cgi-script .cgi
+        </IfModule>
 
         #
         #  Disable the "single" name for this server.
         #
         UseCanonicalName        Off
 
+        <IfModule mod_rewrite.c>
+                #
+                #  Aliases for testing sites prior to DNS migration.
+                #
+                RewriteEngine On
+                RewriteCond %{HTTP_HOST} ^(.*)\.testing\.(.*)$
+                RewriteRule ^/(.*)$  /srv/%1/public/htdocs/$1
+        </IfModule>
 
-        #
-        #  Aliases for testing sites prior to DNS migration.
-        #
-        RewriteEngine On
-        RewriteCond %{HTTP_HOST} ^(.*)\.testing\.(.*)$
-        RewriteRule ^/(.*)$  /srv/%1/public/htdocs/$1
+        <IfModule mod_bytemark_vhost.c>
+                #
+                #  The document root + CGI-directories.
+                #
+                VirtualDocumentRoot     /srv/%0/public/htdocs/
+                <IfModule mod_cgi.c>
+                        VirtualScriptAlias      /srv/%0/public/cgi-bin/
+                </IfModule>
 
-
-        #
-        #  The document root + CGI-directories.
-        #
-        VirtualDocumentRoot     /srv/%0/public/htdocs/
-        VirtualScriptAlias      /srv/%0/public/cgi-bin/
-
-
-        #
-        # Update documentroot settings for each vhost.
-        #
-        SetVirtualDocumentRoot on
+                #
+                # Update documentroot settings for each vhost.
+                #
+                SetVirtualDocumentRoot on
+        </IfModule>
 
         #
         #  We need to log the virtual hostname the incoming request was

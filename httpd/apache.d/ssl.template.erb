@@ -32,29 +32,30 @@
         <%= server_aliases %>
 
 
-        SSLEngine On
+        <IfModule mod_ssl.c>
+                SSLEngine On
 
-        #
-        # The certificate, key, and intermediate bundle (if needed)
-        #
-        <%= ssl_config %>
+                #
+                # The certificate, key, and intermediate bundle (if needed)
+                #
+                <%= ssl_config %>
 
 
-        #
-        # Sane SSL ciphers.
-        #
-        SSLCipherSuite ALL:!LOW:!SSLv2:!EXP:!aNULL
+                #
+                # Sane SSL ciphers.
+                #
+                SSLCipherSuite ALL:!LOW:!SSLv2:!EXP:!aNULL
 
-        #
-        # Ban ancient protocols
-        #
-        SSLProtocol ALL -SSLv2 -SSLv3
+                #
+                # Ban ancient protocols
+                #
+                SSLProtocol ALL -SSLv2 -SSLv3
 
-        #
-        # And some options
-        #
-        SSLOptions +StrictRequire
-
+                #
+                # And some options
+                #
+                SSLOptions +StrictRequire
+        </IfModule>
 
         #
         #  Allow users to override settings via .htaccess
@@ -68,14 +69,16 @@
         #
         DocumentRoot <%= htdocs_directory %>/
 
-        #
-        # General CGI Handling
-        #
-        ScriptAlias /cgi-bin/ <%= cgibin_directory %>/
+        <IfModule mod_cgi.c>
+                #
+                # General CGI Handling
+                #
+                ScriptAlias /cgi-bin/ <%= cgibin_directory %>/
 
-        <Location /cgi-bin>
-                Options +ExecCGI
-        </Location>
+                <Location /cgi-bin>
+                        Options +ExecCGI
+                </Location>
+        </IfModule>
 
         #
         # Disable indexes by default on the top-level.
@@ -110,14 +113,14 @@
         #
         <%= server_aliases %>
 
-
 % if mandatory_ssl?
-        #
-        #  All accesses redirect to the HTTPS version of
-        # the site.
-        #
-        Redirect / https://<%= domain %>/
-
+        <IfModule mod_alias.c>
+                #
+                #  All accesses redirect to the HTTPS version of
+                # the site.
+                #
+                Redirect / https://<%= domain %>/
+        </IfModule>
 % else
 
         #
@@ -132,14 +135,16 @@
         #
         DocumentRoot     <%= htdocs_directory %>/
 
-        #
-        # General CGI Handling
-        #
-        ScriptAlias /cgi-bin/ <%= cgibin_directory %>/
+        <IfModule mod_cgi.c>
+                #
+                # General CGI Handling
+                #
+                ScriptAlias /cgi-bin/ <%= cgibin_directory %>/
 
-        <Location /cgi-bin>
-                Options +ExecCGI
-        </Location>
+                <Location /cgi-bin>
+                        Options +ExecCGI
+                </Location>
+        </IfModule>
         
         #
         # Disable indexes by default 

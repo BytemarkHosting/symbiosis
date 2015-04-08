@@ -39,14 +39,16 @@
         #
         DocumentRoot     <%= htdocs_directory %>/
 
-        #
-        # General CGI Handling
-        #
-        ScriptAlias /cgi-bin/ <%= cgibin_directory %>/
+        <IfModule mod_cgi.c>
+                #
+                # General CGI Handling
+                #
+                ScriptAlias /cgi-bin/ <%= cgibin_directory %>/
 
-        <Location /cgi-bin>
-                Options +ExecCGI
-        </Location>
+                <Location /cgi-bin>
+                        Options +ExecCGI
+                </Location>
+        </IfModule>
 
         #
         # Disable indexes by default on the top-level.
