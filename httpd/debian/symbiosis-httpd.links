@@ -1,12 +1,2 @@
 usr/sbin/symbiosis-httpd-configure                  etc/cron.hourly/symbiosis-httpd-configure
-usr/sbin/symbiosis-httpd-configure                  usr/sbin/symbiosis-create-sites
-usr/sbin/symbiosis-httpd-configure                  usr/sbin/symbiosis-create-mass-hosting-sites
-usr/share/man/man1/symbiosis-httpd-configre.1.gz    usr/share/man/man1/symbiosis-symbiosis-create-sites.1.gz
-usr/share/man/man1/symbiosis-httpd-configre.1.gz    usr/share/man/man1/symbiosis-symbiosis-create-mass-hosting-sites.1.gz
 usr/sbin/symbiosis-httpd-rotate-logs                etc/cron.daily/symbiosis-httpd-rotate-logs
-usr/sbin/symbiosis-httpd-rotate-logs                usr/sbin/symbiosis-rotate-logs
-usr/share/man/man1/symbiosis-httpd-rotate-logs.1.gz usr/share/man/man1/symbiosis-rotate-logs.1.gz
-usr/sbin/symbiosis-httpd-logger                     usr/sbin/symbiosis-apache-logger
-usr/share/man/man1/symbiosis-httpd-logger.1.gz      usr/share/man/man1/symbiosis-apache-logger.1.gz
-usr/sbin/symbiosis-httpd-generate-stats                usr/sbin/symbiosis-generate-stats
-usr/share/man/man1/symbiosis-httpd-generate-stats.1.gz usr/share/man/man1/symbiosis-generate-stats.1.gz
