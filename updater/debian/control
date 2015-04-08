@@ -1,8 +1,8 @@
 Source: symbiosis-updater
-Section: web
+Section: admin
 Priority: extra
 Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
-Uploaders: John Hackett <john.hackett@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
+Uploaders: Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0)
 Standards-Version: 3.9.6
 
@@ -11,9 +11,7 @@ Replaces: bytemark-vhost-updater
 Conflicts: bytemark-vhost-updater, cron-apt
 Provides: bytemark-vhost-updater
 Architecture: all
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, unattended-upgrades
 Description: Automatic package upgrades
- This package contains a helper which will automatically apply security
- and vhost package updates once a day.
- .
- It replaces the prior use of cron-apt, which could fail at times.
+ This package configures the unattended-upgrades package such that security
+ updates  will be applied automatically.
