@@ -17,29 +17,9 @@ if [ "$1" != "configure" ]; then
         exit 0
 fi
 
-#
-#  Remove any existing sites (the zz-mass-hosting ones will be recreated later).
-#
-for i in mass-hosting mass-hosting.ssl default 000-default 00-default ; do
-  a2dissite -q $i 2>/dev/null || true
-done
-
-#
-# Remove these if they're not symlinks pointing to our config files, but save
-# them in an array to make sure we put them back later.
-#
-declare -a relink
-
-for i in zz-mass-hosting zz-mass-hosting.ssl ; do
-  #
-  # Remove and relink if the sites-enabled symlink doesn't point at the
-  # sites-available file.
-  #
-  if [ ! /etc/apache2/sites-available/$i -ef /etc/apache2/sites-enabled/$i ] ; then 
-    a2dissite -q $i 2>/dev/null || true
-    relink[${#relink[@]}]=$i
-  fi
-done
+if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
+  . /usr/share/apache2/apache2-maintscript-helper
+fi
 
 ##
 # SSL cert generation now in symbiosis-common.
@@ -50,35 +30,20 @@ done
 #
 restart_type="reload"
 for mod in rewrite cgi php5 ssl dir mod_vhost_bytemark ; do
-  if ! [ -e /etc/apache2/mods-enabled/$mod.load ] ; then
-    echo "I: enabling apache module $mod"
-    restart_type="restart"
-    a2enmod -q $mod
-  fi
+  apache2_invoke enmod $mod || exit $?
 done
 
 #
 # Disable other old/unwanted modules.
 #
 for mod in vhost_alias ; do
-  if [ -e /etc/apache2/mods-enabled/$mod.load ] ; then
-    echo "I: disabling apache module $mod"
-    restart_type="restart"
-    a2dismod -q $mod
-  fi
+  apache2_invoke dismod $mod || exit $?
 done
 
 #
 # Reconfigure apache.
 #
 symbiosis-httpd-configure --no-reload --verbose
-
-#
-# Now relink any sites that were removed earlier
-#
-for i in relink[*] ; do
-  a2ensite -q $i 2>/dev/null || true
-done
 
 #######################################
 # Remove old cronjobs.
@@ -145,7 +110,7 @@ mangle_config() {
 
     grep -xFq "diversion of $file to $theirfile by $package"; then
     dpkg-divert --divert "$theirfile" --rename --package "$package" --add "$file"
-
+    apache2_invoke reload
   fi
 
   #
@@ -154,6 +119,7 @@ mangle_config() {
   if [ ! -L "$file" ] && [ ! -e "$file" ]; then
 
     ln -s "$(basename "$ourfile")" "$file"
+    apache2_invoke reload
 
   elif [ ! -L "$file" ] || \
        [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
@@ -173,6 +139,6 @@ fi
 #
 #  Restart Apache2.
 #
-invoke-rc.d apache2 $restart_type
+apache2_invoke reload || exit $?
 
 exit 0
