@@ -1,2 +1,0 @@
-vhost-alias/.libs/*.so usr/lib/apache2/modules
-debian/mod_vhost_bytemark.load  etc/apache2/mods-available
