@@ -164,10 +164,8 @@ mangle_config() {
   fi
 }
 
-if [ "$1" = configure ] ; then
-  mangle_config /etc/apache2/conf.d/security
-  mangle_config /etc/php5/apache2/php.ini
-  mangle_config /etc/apache2/ports.conf
+if [ "$1" = "configure" ]; then
+  mangle_config /etc/apache2/conf-availble/security.conf
 fi
 
 #DEBHELPER#

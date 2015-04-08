@@ -49,9 +49,7 @@ unmangle_config() {
 }
 
 if [ "$1" = "remove" ]; then
-  unmangle_config /etc/php5/apache2/php.ini 
-  unmangle_config /etc/apache2/ports.conf 
-  unmangle_config /etc/apache2/conf.d/security 
+  unmangle_config /etc/apache2/conf-availble/security.conf
 fi
 
 #DEBHELPER#
