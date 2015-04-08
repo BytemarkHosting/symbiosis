@@ -42,7 +42,7 @@ symbiosis-httpd-configure --no-reload --verbose
 
 mangle_config() {
   package=symbiosis-httpd
-  file="$2"
+  file="$1"
   ourfile="$file.dpkg-symbiosis"
   theirfile="$file.dpkg-symbiosis-orig"
 
