@@ -6,9 +6,9 @@
 # Debian packages.
 #
 #<Directory />
-#	AllowOverride None
-#	Order Deny,Allow
-#	Deny from all
+#   AllowOverride None
+#   Order Deny,Allow
+#   Deny from all
 #</Directory>
 
 
@@ -22,9 +22,8 @@
 # and compiled in modules.
 # Set to one of:  Full | OS | Minimal | Minor | Major | Prod
 # where Full conveys the most information, and Prod the least.
-#
 #ServerTokens Minimal
-ServerTokens Prod
+ServerTokens Prod 
 #ServerTokens Full
 
 #
@@ -34,7 +33,6 @@ ServerTokens Prod
 # documents or custom error documents).
 # Set to "EMail" to also include a mailto: link to the ServerAdmin.
 # Set to one of:  On | Off | EMail
-#
 ServerSignature Off
 #ServerSignature On
 
@@ -45,7 +43,6 @@ ServerSignature Off
 # diagnostic purposes).
 #
 # Set to one of:  On | Off | extended
-#
 TraceEnable Off
 #TraceEnable On
 
@@ -56,8 +53,7 @@ TraceEnable Off
 # probably deny access to their directories. For example, for subversion:
 #
 #<DirectoryMatch "/\.svn">
-#	Deny from all
-#	Satisfy all
+#   Require all denied
 #</DirectoryMatch>
 
 #
@@ -68,18 +64,11 @@ TraceEnable Off
 #Header set X-Content-Type-Options: "nosniff"
 
 #
-# Some browsers have a built-in XSS filter that will detect some cross site
-# scripting attacks. By default, these browsers modify the suspicious part of
-# the page and display the result. This behavior can create various problems
-# including new security issues. This header will tell the XSS filter to
-# completely block access to the page instead.
-# Requires mod_headers to be enabled.
-#
-#Header set X-XSS-Protection: "1; mode=block"
-
-#
 # Setting this header will prevent other sites from embedding pages from this
 # site as frames. This defends against clickjacking attacks.
 # Requires mod_headers to be enabled.
 #
 #Header set X-Frame-Options: "sameorigin"
+
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
