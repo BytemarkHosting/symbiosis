@@ -10,24 +10,6 @@ if [ "$1" = "upgrade" ] ; then
   exit 0
 fi
 
-if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
-  . /usr/share/apache2/apache2-maintscript-helper
-fi
-
-#
-#  Disable the zz-mass-hosting sites
-#
-for i in zz-mass-hosting zz-mass-hosting.ssl ; do
-  apache2_invoke dissite $i || true 
-done
-
-#
-#  Disable the module(s)
-#
-for i in mod_vhost_bytemark vhost_alias ; do
-  apache2_invoke dismod $i
-done 
-
 #
 # Remove mangled configurations.
 #
@@ -48,7 +30,6 @@ unmangle_config() {
 
   if [ ! -L "$file" ] && [ ! -e "$file" ]; then
     dpkg-divert --remove --rename --package "$package" "$file"
-    apache2_invoke reload
   else
     echo "Not removing diversion of $file by $package" >&2
   fi
@@ -58,4 +39,10 @@ if [ "$1" = "remove" ]; then
   unmangle_config /etc/apache2/conf-availble/security.conf
 fi
 
+if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
+  apache2_invoke reload
+fi
+
 #DEBHELPER#
+
+exit 0

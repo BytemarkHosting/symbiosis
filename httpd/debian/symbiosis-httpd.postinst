@@ -7,7 +7,7 @@
 # --
 #
 
-set -e
+set -ex
 
 #
 # Skip, if we are not in "configure" state
@@ -17,26 +17,16 @@ if [ "$1" != "configure" ]; then
         exit 0
 fi
 
-if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
-  . /usr/share/apache2/apache2-maintscript-helper
-fi
-
-##
-# SSL cert generation now in symbiosis-common.
-##
-
 #
-#  Enable common modules + mod_vhost_bytemark
+#  Enable common modules
 #
-for mod in rewrite cgi php5 ssl dir mod_vhost_bytemark ; do
-  apache2_invoke enmod $mod || exit $?
-done
-
-#
-# Disable other old/unwanted modules.
-#
-for mod in vhost_alias ; do
-  apache2_invoke dismod $mod || exit $?
+restart_type="reload"
+for mod in rewrite cgi php5 ssl dir vhost_bytemark ; do
+  if ! [ -e /etc/apache2/mods-enabled/$mod.load ] ; then
+    echo "I: enabling apache module $mod"
+    restart_type="restart"
+    a2enmod -q -m $mod
+  fi
 done
 
 #
@@ -52,7 +42,7 @@ symbiosis-httpd-configure --no-reload --verbose
 
 mangle_config() {
   package=symbiosis-httpd
-  file="$1"
+  file="$2"
   ourfile="$file.dpkg-symbiosis"
   theirfile="$file.dpkg-symbiosis-orig"
 
@@ -69,9 +59,7 @@ mangle_config() {
   # Now add the link in, unless it is already in place.
   #
   if [ ! -L "$file" ] && [ ! -e "$file" ]; then
-
     ln -s "$(basename "$ourfile")" "$file"
-    apache2_invoke reload || exit $?
 
   elif [ ! -L "$file" ] || \
        [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
@@ -82,10 +70,13 @@ mangle_config() {
   fi
 }
 
-if [ "$1" = "configure" ]; then
-  mangle_config /etc/apache2/conf-available/security.conf
-fi
+mangle_config /etc/apache2/conf-available/security.conf
 
 #DEBHELPER#
+
+if [ -e /usr/share/apache/apache2-maintscript-helper ] ; then
+  . /usr/share/apache2/apache2-maintscript-helper
+  apache2_invoke $restart_type || exit $?
+fi
 
 exit 0
