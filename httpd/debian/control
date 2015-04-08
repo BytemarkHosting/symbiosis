@@ -26,7 +26,7 @@ Description: Tools to manage Apache virtual hosting in Symbiosis
 
 Package: libapache2-mod-vhost-bytemark
 Architecture: any
-Depends: apache2, ${shlibs:Depends}, ${misc:Depends}
+Depends: apache2-api-20120211, ${shlibs:Depends}, ${misc:Depends}
 Description: A mass-hosting module for Apache 2.x
  This module allows you to easily host multiple virtual hosts with
  a single simple configuration file.
