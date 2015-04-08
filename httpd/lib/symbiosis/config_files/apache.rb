@@ -25,6 +25,7 @@ module Symbiosis
         # Set the log directory.
         #
         ENV['APACHE_LOG_DIR'] = '/tmp'
+        ENV['APACHE_RUN_DIR'] = '/tmp'
 
         IO.popen( "/usr/sbin/apache2 -C 'UseCanonicalName off' -C 'Include /etc/apache2/mods-enabled/*.load' -C 'Include /etc/apache2/mods-enabled/*.conf' -f #{tempfile.path} -t 2>&1 ") {|io| output = io.readlines }
 
