@@ -50,7 +50,7 @@ Description: PAM configuration metapackage for Sybmbiosis
 
 
 Package: symbiosis-key
-Depends: bytemark-key, ${misc:Depends}
+Depends: bytemark-keys, ${misc:Depends}
 Architecture: all
 Description: Package-signing key for Bytemarks Symbiosis.(metapackage)
  This metapackage depends on the central bytemark-key package which is used to
