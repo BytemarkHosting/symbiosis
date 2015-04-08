@@ -1,0 +1,39 @@
+
+//
+// Please don't edit this
+// It's managed by Ansible
+// Haikus are quite hard.
+//
+
+
+//
+// Core settings
+//
+Unattended-Upgrade::Origins-Pattern {
+   "origin=Bytemark Hosting";
+   "n=${distro_id} stable";
+   "n=${distro_id} ${distro_codename}-security";
+   "n=${distro_id} ${distro_codename}-updates";
+   "n=${distro_id} ${distro_codename}-lts";
+};
+
+
+
+//
+// Ensure things work
+//
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+
+
+//
+// Only send an email on error.
+//
+Unattended-Upgrade::Mail "root";
+Unattended-Upgrade::MailOnlyOnError "true";
+
+//
+// Don't remove things.
+//
+Unattended-Upgrade::Remove-Unused-Dependencies "false";
