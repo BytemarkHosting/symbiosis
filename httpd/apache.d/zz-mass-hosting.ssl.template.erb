@@ -103,7 +103,7 @@
         # statistics for each domain.
         #
         LogFormat "%V %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" zz_mass_hosting_combined
-        CustomLog "|| /usr/sbin/symbiosis-apache-logger -s -l ssl_access.log /var/log/apache2/zz-mass-hosting.ssl_access.log" zz_mass_hosting_combined
-        ErrorLog  /var/log/apache2/zz-mass-hosting.error.log
+        CustomLog "|| /usr/sbin/symbiosis-apache-logger -s -l ssl_access.log ${APACHE_LOG_DIR}/zz-mass-hosting.ssl_access.log" zz_mass_hosting_combined
+        ErrorLog  ${APACHE_LOG_DIR}/zz-mass-hosting.error.log
 </VirtualHost>
 
