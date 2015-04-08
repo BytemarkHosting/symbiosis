@@ -75,6 +75,14 @@ fi
 
 
 #
+#  Exit silently if we're obsolete
+#
+if [ -x /usr/bin/unattended-upgrades ]; then
+    exit 0
+fi
+
+
+#
 #  Sanity check that we're on a Debian/Ubuntu host.
 #
 if [ ! -x /usr/bin/apt-get ] ; then
@@ -250,7 +258,7 @@ None known.
 
 =cut
 
-=head1 SEE ALSO 
+=head1 SEE ALSO
 
 apt-get(1)
 
