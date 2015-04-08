@@ -47,3 +47,14 @@ Description: PAM configuration metapackage for Sybmbiosis
  .
  Currently it enforces checks for weak passwords, against libcrack, and
  per-user temporary directories, using pam-tmpdir.
+
+
+Package: symbiosis-key
+Depends: bytemark-key, ${misc:Depends}
+Architecture: all
+Description: Package-signing key for Bytemarks Symbiosis.(metapackage)
+ This metapackage depends on the central bytemark-key package which is used to
+ sign all packages provided by Bytemark.
+ .
+ Once installed this package will prevent any signature warnings about the
+ Bytemark Symbiosis packages.
