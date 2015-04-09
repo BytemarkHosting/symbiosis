@@ -30,12 +30,14 @@ manual = help = false
 opts = GetoptLong.new(
          [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
          [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
+         [ '--foreground', '-f', GetoptLong::NO_ARGUMENT ],
          [ '--prefix',     '-p', GetoptLong::OPTIONAL_ARGUMENT ],
          [ '--socket',     '-s', GetoptLong::OPTIONAL_ARGUMENT ]
        )
 
 prefix = "/srv"
 socket_path = "/run/dovecot/symbiosis-email-dict-proxy"
+foreground = false
 
 opts.each do |opt,arg|
   case opt
@@ -47,6 +49,8 @@ opts.each do |opt,arg|
     prefix = arg
   when '--socket'
     socket_path = arg
+  when '--foreground'
+    foreground = true
   end
 end
 
@@ -54,6 +58,7 @@ end
 # Require these bits here, so we can generate the manpage without needing extra
 # build-deps.
 #
+require 'daemons'
 require 'eventmachine'
 require 'syslog'
 require 'symbiosis/utils'
@@ -69,6 +74,11 @@ syslog = Syslog.open( File.basename($0), Syslog::LOG_NDELAY && Syslog::LOG_PERRO
 Symbiosis::Email::DictHandler.prefix = prefix
 Symbiosis::Email::DictHandler.syslog = syslog
 
+#
+# Make sure the parent directory is in place.
+#
+Symbiosis::Utils.mkdir_p(File.dirname(socket_path))
+
 dovecot_user = Etc.getpwnam("dovecot")
 
 systemd_socket = nil
@@ -82,6 +92,13 @@ systemd_socket = nil
 #   systemd_socket = Socket.for_fd(SD_LISTEN_FDS_START + 0)
 #   syslog.info "Got socket #{SD_LISTEN_FDS_START + 0} from systemd"
 # end
+
+Daemons.daemonize({
+  :app_name   => "symbiosis-email-dict-proxy",
+  :ontop      => foreground,
+  :dir_mode   => :system,
+  :log_output => false
+})
 
 EventMachine.run do
   begin
