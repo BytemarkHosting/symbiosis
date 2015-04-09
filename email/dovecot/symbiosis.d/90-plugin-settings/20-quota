@@ -3,4 +3,5 @@
   #
   quota      = maildir:Symbiosis mailbox quota
   quota_rule = ?:storage=0
+  quota_grace = 0%%
 
