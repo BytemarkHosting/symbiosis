@@ -1,2 +1,2 @@
-conf.d/*  /etc/apache2/conf.d/
+conf-available/*  /etc/apache2/conf-available/
 php5/conf.d etc/php5/
