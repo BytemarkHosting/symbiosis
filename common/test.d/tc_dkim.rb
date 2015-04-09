@@ -94,7 +94,8 @@ EOF
 
     hostname = "default" if hostname.empty?
 
-    assert_equal(hostname, @domain.dkim_selector)
+    # We should get the first part of the hostname back
+    assert_equal(hostname.split(".").first, @domain.dkim_selector)
 
     @domain.__send__(:set_param, "dkim", "foo", @domain.config_dir)
     assert_equal("foo", @domain.dkim_selector)
