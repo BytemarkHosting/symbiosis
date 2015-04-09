@@ -8,154 +8,23 @@ set -e
 
 function do_upgrade() {
 
-  ##### Exim4 config adjustments ################
+  ##### Config adjustments ################
   #
   # Array of config files to remove
   #
   declare -a files_to_remove
 
-  files_to_remove+=("50-rewrite/10-localhost-rewrite")
+  files_to_remove+=("/etc/dovecot/symbiosis.d/30-authentication/50-passdb-checkpassword"
+    "/etc/dovecot/symbiosis.d/30-authentication/85-userdb-checkpassword"
+  )
 
   for file in ${files_to_remove[*]} ; do
    dpkg-maintscript-helper rm_conffile \
-     /etc/exim4/symbiosis.d/$file \
-     "2013:1231" symbiosis-email -- "$@"
+     $file \
+     "2014:1231" symbiosis-email -- "$@"
   done
 
-  #
-  # Forget the variables so we can reclare them.
-  #
-  # unset files_to_move
   unset files_to_remove
-
-  ##### Dovecot config adjustments ################
-  #
-  # Array of config files to remove
-  #
-  declare -a files_to_remove
-
-  #
-  # Array of files to move (move "key" to "value")
-  #
-  declare -A files_to_move
-
-  files_to_move["000-header"]="00-header"
-  files_to_move["005-main/00-header"]="10-main/00-header"
-  files_to_move["005-main/10-protocols"]="10-main/10-protocols"
-  files_to_move["005-main/20-listen"]="10-main/20-listen"
-  files_to_move["005-main/30-disable-plaintext-login"]="10-main/30-disable-plaintext-login"
-  files_to_remove+=("010-logging/00-header")
-  files_to_move["010-logging/10-log-timestamp"]="10-main/40-log-timestamp"
-  files_to_remove+=("020-ssl/00-header")
-  files_to_move["020-ssl/10-ssl-cert-key-files"]="10-main/50-ssl-cert-key-files"
-  files_to_move["020-ssl/20-ssl-cipher-list"]="10-main/51-ssl-cipher-list"
-  files_to_remove+=("030-login-processes/.placeholder")
-  files_to_move["040-mailbox-locations/10-default"]="20-mailboxes/10-default-mailbox-location"
-  files_to_remove+=("040-mailbox-locations/.placeholder")
-  files_to_remove+=("050-mail-processes/.placeholder")
-  files_to_remove+=("060-mailbox-handling/.placeholder")
-  files_to_remove+=("070-maildir-settings/.placeholder")
-  files_to_remove+=("080-mbox-settings/.placeholder")
-  files_to_remove+=("090-dbox-settings/.placeholder")
-  files_to_move["100-imap-settings/00-header"]="40-imap-settings/00-header"
-  files_to_move["100-imap-settings/10-plugins"]="40-imap-settings/10-plugins"
-  files_to_move["100-imap-settings/99-footer"]="40-imap-settings/99-footer"
-  files_to_move["110-pop3-settings/00-header"]="50-pop3-settings/00-header"
-  files_to_move["110-pop3-settings/10-pop3-uidl-format"]="50-pop3-settings/10-pop3-uidl-format"
-  files_to_move["110-pop3-settings/20-plugins"]="50-pop3-settings/20-plugins"
-  files_to_move["110-pop3-settings/99-footer"]="50-pop3-settings/99-footer"
-  files_to_move["115-managesieve-settings/00-header"]="60-sieve-settings/00-header"
-  files_to_move["115-managesieve-settings/10-basics"]="60-sieve-settings/10-basics"
-  files_to_move["115-managesieve-settings/99-footer"]="60-sieve-settings/99-footer"
-  files_to_move["120-lda-settings/00-header"]="70-lda-settings/00-header"
-  files_to_move["120-lda-settings/10-postmaster"]="70-lda-settings/10-postmaster"
-  files_to_move["120-lda-settings/20-plugins"]="70-lda-settings/20-plugins"
-  files_to_move["120-lda-settings/30-quota-settings"]="70-lda-settings/30-quota-settings"
-  files_to_move["120-lda-settings/40-auto-create"]="70-lda-settings/40-auto-create"
-  files_to_move["120-lda-settings/40-auto-subscribe"]="70-lda-settings/40-auto-subscribe"
-  files_to_move["120-lda-settings/99-footer"]="70-lda-settings/99-footer"
-  files_to_remove+=("120-lda-settings/.placeholder")
-  files_to_move["130-authentication-processes/00-header"]="30-authentication/00-header"
-  files_to_remove+=("130-authentication-processes/50-auth-default/00-header")
-  files_to_move["130-authentication-processes/50-auth-default/10-mechanisms"]="30-authentication/10-mechanisms"
-  files_to_move["130-authentication-processes/50-auth-default/50-passdb-checkpassword"]="30-authentication/50-passdb-checkpassword"
-  files_to_move["130-authentication-processes/50-auth-default/80-userdb-prefetch"]="30-authentication/80-userdb-prefetch"
-  files_to_move["130-authentication-processes/50-auth-default/85-userdb-checkpasswd"]="30-authentication/85-userdb-checkpasswd"
-  files_to_remove+=("130-authentication-processes/50-auth-default/90-user")
-  files_to_move["130-authentication-processes/50-auth-default/95-socket-listen"]="30-authentication/90-service-auth"
-  files_to_remove+=("130-authentication-processes/50-auth-default/99-footer")
-  files_to_move["140-dictionary-server-settings/00-header"]="80-dict-settings/00-header "
-  files_to_move["140-dictionary-server-settings/99-footer"]="80-dict-settings/99-footer"
-  files_to_move["150-plugin-settings/00-header"]="90-plugin-settings/00-header"
-  files_to_move["150-plugin-settings/10-managesieve"]="90-plugin-settings/10-sieve"
-  files_to_move["150-plugin-settings/20-quota"]="90-plugin-settings/20-quota"
-  files_to_move["150-plugin-settings/99-footer"]="90-plugin-settings/99-footer"
-  files_to_move["999-footer"]="99-footer"
-
-  for file in ${files_to_remove[*]} ; do
-   dpkg-maintscript-helper rm_conffile \
-     /etc/dovecot/symbiosis.d/$file \
-     "2013:1231" symbiosis-email -- "$@"
-  done
-
-  for file in ${!files_to_move[*]} ; do
-   dpkg-maintscript-helper mv_conffile \
-     /etc/dovecot/symbiosis.d/$file \
-     /etc/dovecot/symbiosis.d/${files_to_move[$file]} \
-     "2013:1231" symbiosis-email -- "$@"
-  done
-
-  #
-  # Finally move any languishing user-added files
-  #
-  declare -A directories_to_move
-  directories_to_move["010-logging"]="10-main"
-  directories_to_move["020-ssl"]="10-main"
-  directories_to_move["030-login-processes"]="10-main"
-  directories_to_move["040-mailbox-locations"]="20-mailboxes"
-  directories_to_move["050-mail-processes"]="20-mailboxes"
-  directories_to_move["060-mailbox-handling"]="20-mailboxes"
-  directories_to_move["070-maildir-settings"]="20-mailboxes"
-  directories_to_move["080-mbox-settings"]="20-mailboxes"
-  directories_to_move["090-dbox-settings"]="20-mailboxes"
-  directories_to_move["130-authentication-processes/50-auth-default"]="30-authentication"
-  directories_to_move["130-authentication-processes"]="30-authentication"
-  directories_to_move["100-imap-settings"]="40-imap-settings"
-  directories_to_move["110-pop3-settings"]="50-pop3-settings"
-  directories_to_move["115-managesieve-settings"]="60-sieve-settings"
-  directories_to_move["120-lda-settings"]="70-lda-settings"
-  directories_to_move["140-dictionary-server-settings"]="80-dict-settings"
-  directories_to_move["150-plugin-settings"]="90-plugin-settings"
-
-  #
-  # For each directory, remove it, making sure we do
-  # 130-authentication-processes last, since it has a subdirectory.
-  #
-  for dir in ${!directories_to_move[*]} "130-authentication-processes" ; do
-    src="/etc/dovecot/symbiosis.d/$dir"
-    target="/etc/dovecot/symbiosis.d/${directories_to_move[$dir]}"
-
-    # Make sure the target directory exists.
-    mkdir -p $target
-
-    # Make sure the source directory exists before removal.
-    if [ -d "$src" ] ; then
-      # Remove the directory if it is empty.
-      rmdir --ignore-fail-on-non-empty $src
-    fi
-
-    # If it isn't empty, move the files
-    if [ -d "$src" ] ; then
-      echo "I: Moving left over Dovecot configuration files from $src to $target"
-      find $src -type f -exec mv -v \{\} $target \;
-
-      #
-      # and try again.
-      #
-      rmdir --ignore-fail-on-non-empty $src
-    fi
-
-  done
 }
 
 #
@@ -168,26 +37,12 @@ fi
 
 do_upgrade $@
 
-#
-#  Previous mistakes
-#
-if [ -e /etc/cron.d/exim_rewrite_scan ]; then
-    rm -f /etc/cron.d/exim_rewrite_scan
+if ! ( groups clamav | grep -q Debian-exim ) ; then
+  #
+  #  Add the user
+  #
+  adduser clamav Debian-exim
 fi
-
-if [ -e /etc/cron.d/bytemark-vhost-email ]; then
-    rm -f /etc/cron.d/bytemark-vhost-email
-fi
-
-if [ -e /etc/cron.d/symbiosis-email ]; then
-    rm -f /etc/cron.d/symbiosis-email
-fi
-
-
-#
-#  Add the user
-#
-adduser clamav Debian-exim
 
 #
 # Set the TMPDIR variable for clamav.
@@ -215,28 +70,11 @@ touch /etc/exim4/rewrites
 chown Debian-exim /etc/exim4/rewrites
 
 #
-# Copy any existing files in /etc/exim4/bytemark-vhost.d, backing up anything
-# in the way.
-#
-if [ -d /etc/exim4/bytemark-vhost.d ] ; then
-  cp -a -b -S .dpkg-new /etc/exim4/bytemark-vhost.d/* /etc/exim4/symbiosis.d
-  rm -rf /etc/exim4/bytemark-vhost.d
-fi
-
-#
-# Remove the old dovecot test.
-#
-if [ -e /etc/symbiosis/test.d/tc_dovecot_.rb ] ; then
-  rm -f /etc/symbiosis/test.d/tc_dovecot_.rb
-fi
-
-#
 #  Rebuild exim4
 #
 if [ -e /etc/exim4/Makefile ]; then
     cd /etc/exim4 && make
 fi
-
 
 #
 #  Rebuild dovecot
@@ -249,15 +87,8 @@ fi
 #  Restart all deamons
 #
 for i in spamassassin clamav-daemon exim4 dovecot; do
-
     # spamassassin + clamav-daemon might not be installed.  Wrap the invokation.
-    if [ -x /etc/init.d/$i ]; then
-        if which invoke-rc.d >/dev/null 2>&1; then
-            invoke-rc.d $i restart
-        else
-            /etc/init.d/$i restart
-        fi
-    fi
+    service $i restart || true
 done
 
 #DEBHELPER#

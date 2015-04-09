@@ -1,0 +1,11 @@
+[Unit]
+Description=Symbiosis: dovecot dict proxy
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/symbiosis-email-dict-proxy
+Restart=always
+
+[Install]
+Alias=symbiosis-email-dict-proxy
+WantedBy=multi-user.target

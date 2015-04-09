@@ -1,0 +1,96 @@
+#!/usr/bin/ruby
+# NAME
+#  symbiosis-email-password-daemon -- Dovecot dict interface for Symbiosis
+#
+# SYNOPSIS
+#  symbiosis-email-password-daemon [ -h | --help ] [-m | --manual] [ -p | --prefix ]
+#
+# OPTIONS
+#  -h, --help            Show a help message, and exit.
+#
+#  -m, --manual          Show this manual, and exit.
+#
+#  -p, --prefix          Specify the prefix directory (default /srv)
+#
+#  -s, --socket          Specify the path to the unix socket
+#
+#
+# SEE ALSO
+#
+# dovecot(1), http://wiki2.dovecot.org/AuthDatabase/Dict
+#
+# AUTHOR
+#
+# Patrick J. Cherry <patrick@bytemark.co.uk>
+#
+
+require 'getoptlong'
+
+manual = help = false
+opts = GetoptLong.new(
+         [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
+         [ '--prefix',     '-p', GetoptLong::OPTIONAL_ARGUMENT ],
+         [ '--socket',     '-s', GetoptLong::OPTIONAL_ARGUMENT ]
+       )
+
+prefix = "/srv"
+socket_path = "/run/dovecot/symbiosis-email-dict-proxy"
+
+opts.each do |opt,arg|
+  case opt
+  when '--help'
+    help = true
+  when '--manual'
+    manual = true
+  when '--prefix'
+    prefix = arg
+  when '--socket'
+    socket_path = arg
+  end
+end
+
+#
+# Require these bits here, so we can generate the manpage without needing extra
+# build-deps.
+#
+require 'eventmachine'
+require 'symbiosis/email/dict_handler'
+require 'syslog'
+
+syslog = Syslog.open( File.basename($0), Syslog::LOG_NDELAY && Syslog::LOG_PERROR, Syslog::LOG_MAIL ) 
+
+Symbiosis::Email::DictHandler.prefix = prefix
+Symbiosis::Email::DictHandler.syslog = syslog
+
+dovecot_user = Etc.getpwnam("dovecot")
+
+systemd_socket = nil
+
+# If we use systemd socket activation in future, here's how.
+#
+# SD_LISTEN_FDS_START = 3
+#
+# if ENV['LISTEN_PID'].to_i == $$
+#   # use existing socket passed from systemd
+#   systemd_socket = Socket.for_fd(SD_LISTEN_FDS_START + 0)
+#   syslog.info "Got socket #{SD_LISTEN_FDS_START + 0} from systemd"
+# end
+
+EventMachine.run do
+  begin
+  if systemd_socket
+    # This method not in EventMachine prior to 1.0.7 (I think)
+    EventMachine.attach_server systemd_socket, Symbiosis::Email::DictHandler
+  else
+    EventMachine.start_server socket_path, nil, Symbiosis::Email::DictHandler
+    File.chmod(0600, socket_path)
+    File.lchown(dovecot_user[:uid], dovecot_user[:gid], socket_path)
+  end
+  rescue StandardError => err
+    syslog.info "Caught #{err.to_s} "
+    EM.stop
+  end
+end
+
+
