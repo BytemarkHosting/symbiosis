@@ -302,7 +302,7 @@ Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
       next
     end
 
-    filename_source = File.expand_path(File.readlink(filename))
+    filename_source = File.expand_path(File.readlink(filename), File.join(apache2_dir, "sites-enabled"))
 
     config = Symbiosis::ConfigFiles::Apache.new(filename_source, "#")
 
