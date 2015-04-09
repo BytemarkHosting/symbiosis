@@ -27,8 +27,8 @@ module Symbiosis
     # Check to see if we're a mauve-alert client installed
     #
     def self.has_mauve_alert?()
-      ( File.exists?( "/etc/mauvealert/mauvesend.destination" ) &&
-        File.exists?( "/usr/bin/mauvesend" ) )
+      ( File.exist?( "/etc/mauvealert/mauvesend.destination" ) &&
+        File.exist?( "/usr/bin/mauvesend" ) )
     end
 
     #

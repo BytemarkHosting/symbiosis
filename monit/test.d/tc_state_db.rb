@@ -13,7 +13,7 @@ class TestStateDb < Test::Unit::TestCase
   end
 
   def teardown
-    File.unlink(@statedb_fn) if File.exists?(@statedb_fn)
+    File.unlink(@statedb_fn) if File.exist?(@statedb_fn)
   end
 
   def test_create_table

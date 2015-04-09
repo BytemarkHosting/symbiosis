@@ -38,7 +38,7 @@ class TestDovecot < Test::Unit::TestCase
   end
 
   def fetch_hostname
-    if File.exists?('/proc/sys/kernel/hostname')
+    if File.exist?('/proc/sys/kernel/hostname')
       File.read('/proc/sys/kernel/hostname').chomp
     else
       "localhost"
@@ -360,7 +360,7 @@ EOF
 
     do_test_deliver_with_sieve(mailbox)
   ensure
-    File.unlink(sieve_file) if sieve_file and File.exists?(sieve_file)
+    File.unlink(sieve_file) if sieve_file and File.exist?(sieve_file)
   end
 
   def do_test_deliver_with_sieve_and_quota(mailbox)

@@ -36,19 +36,19 @@ class SSLTest < Test::Unit::TestCase
     # Our root CA.
     #
     root_ca_path = File.expand_path(File.join(File.dirname(__FILE__), "RootCA"))
-    unless File.exists?(root_ca_path)
+    unless File.exist?(root_ca_path)
       warn "\n#{root_ca_path} missing"
       return nil
     end
 
     root_ca_cert_file = File.join(root_ca_path, "RootCA.crt")
-    unless File.exists?(root_ca_cert_file)
+    unless File.exist?(root_ca_cert_file)
       warn "\n#{root_ca_cert_file} missing"
       return nil
     end
 
     root_ca_key_file  = File.join(root_ca_path, "RootCA.key")
-    unless File.exists?(root_ca_key_file)
+    unless File.exist?(root_ca_key_file)
       warn "\n#{root_ca_key_file} missing"
       return nil
     end
@@ -60,7 +60,7 @@ class SSLTest < Test::Unit::TestCase
     #
     root_ca_cert_symlink = File.join(root_ca_path, root_ca_cert.subject.hash.to_s(16)+ ".0")
 
-    unless File.exists?(root_ca_cert_symlink)
+    unless File.exist?(root_ca_cert_symlink)
       if File.writable?(root_ca_path)
         warn "\nCreating symlink to from #{root_ca_cert_file} to #{root_ca_cert_symlink}"
         File.symlink(File.basename(root_ca_cert_file),root_ca_cert_symlink)

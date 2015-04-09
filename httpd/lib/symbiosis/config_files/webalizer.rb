@@ -38,7 +38,7 @@ module Symbiosis
         # This is the old place.
         #
         old_location = File.join(domain.stats_dir, "webalizer.hist")
-        return old_location if File.exists?(old_location)
+        return old_location if File.exist?(old_location)
 
         #
         # OK, just use the new one.
@@ -61,7 +61,7 @@ module Symbiosis
         # This is the old place.
         #
         old_location = File.join(domain.stats_dir, "webalizer.current")
-        return old_location if File.exists?(old_location)
+        return old_location if File.exist?(old_location)
 
         #
         # OK, just use the new one.

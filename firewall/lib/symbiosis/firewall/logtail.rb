@@ -14,7 +14,7 @@ module Symbiosis
         #
         # hmm.. maybe we should deal with this a bit better?
         #
-        raise Errno::ENOENT, file unless File.exists?(file)
+        raise Errno::ENOENT, file unless File.exist?(file)
         @filename = file
         @pos = nil 
         @identifier = nil

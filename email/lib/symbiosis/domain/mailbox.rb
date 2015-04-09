@@ -270,7 +270,7 @@ module Symbiosis
         #
         # Make sure there's a temporary directory available
         #
-        self.domain.create_dir(File.dirname(tmpfile), 0700) unless File.exists?(File.dirname(tmpfile))
+        self.domain.create_dir(File.dirname(tmpfile), 0700) unless File.exist?(File.dirname(tmpfile))
 
         begin
           #

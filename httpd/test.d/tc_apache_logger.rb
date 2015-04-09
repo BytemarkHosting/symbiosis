@@ -198,7 +198,7 @@ class TestApacheLogger < Test::Unit::TestCase
         access_log = @default_filename
       end
 
-      assert(File.exists?(access_log), "Access log #{access_log} for #{d.name} not found")
+      assert(File.exist?(access_log), "Access log #{access_log} for #{d.name} not found")
     
       # And that we can read it.
       logged_lines = File.readlines(access_log).collect{|l| l.to_s.chomp}

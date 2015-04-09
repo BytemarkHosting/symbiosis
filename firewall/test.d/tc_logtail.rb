@@ -12,7 +12,7 @@ class TestLogtail < Test::Unit::TestCase
   end
 
   def teardown
-   File.unlink(@db) if File.exists?(@db)
+   File.unlink(@db) if File.exist?(@db)
   end
 
   def test_me
@@ -32,7 +32,7 @@ class TestLogtail < Test::Unit::TestCase
     end
 
   ensure
-    File.unlink(fn) if File.exists?(fn)
+    File.unlink(fn) if File.exist?(fn)
   end
   
 end

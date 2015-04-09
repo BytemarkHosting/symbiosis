@@ -27,7 +27,7 @@ class TestPhpMyAdmin < Test::Unit::TestCase
   #  Fetch the admin password
   #
   def root_passwd()
-    if ( File.exists?( "/etc/symbiosis/.passwd" ) )
+    if ( File.exist?( "/etc/symbiosis/.passwd" ) )
       File.read("/etc/symbiosis/.passwd").chomp
     else
       nil
@@ -41,7 +41,7 @@ class TestPhpMyAdmin < Test::Unit::TestCase
     #
     # If there is no debian.cnf, give up now.
     #
-    return nil unless File.exists?( "/etc/mysql/debian.cnf" )
+    return nil unless File.exist?( "/etc/mysql/debian.cnf" )
 
     File.open("/etc/mysql/debian.cnf").each do |line|
       next unless line =~ /^\s*password\s*=\s*(\S+)/

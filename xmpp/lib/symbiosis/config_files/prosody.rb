@@ -95,14 +95,14 @@ module Symbiosis
         #
         # Clobber any files in the way, if the force flag is set.
         #
-        if force and File.exists?(fn)
+        if force and File.exist?(fn)
           File.unlink(fn)
         end
 
         #
         # If the file is still there after disabling, raise an error
         #
-        raise Errno::EEXIST, fn if File.exists?(fn)
+        raise Errno::EEXIST, fn if File.exist?(fn)
 
         #
         # Symlink away!
@@ -129,14 +129,14 @@ module Symbiosis
         # Remove the file, only if it is a symlink to our filename, or if the
         # force flag is set.
         #
-        if self.enabled?(fn) or (File.exists?(fn) and force)
+        if self.enabled?(fn) or (File.exist?(fn) and force)
           File.unlink(fn)
         end
 
         #
         # If the file is still there after disabling, raise an error
         #
-        raise Errno::EEXIST, fn if File.exists?(fn)
+        raise Errno::EEXIST, fn if File.exist?(fn)
 
         nil
       end
@@ -166,7 +166,7 @@ module Symbiosis
           #
           ans << "cafile = \"#{@domain.ssl_bundle_file}\"" if @domain.ssl_bundle_file
 
-        elsif File.exists?("/etc/ssl/ssl.crt") and File.exists?("/etc/ssl/ssl.key")
+        elsif File.exist?("/etc/ssl/ssl.crt") and File.exist?("/etc/ssl/ssl.key")
           #
           # TODO: this makes absolutely no checks for the certificate validity
           # etc., unlike the @domain functions above.
@@ -177,7 +177,7 @@ module Symbiosis
           # Add the key and bundle, assuming they exist.
           #
           ans << "key = \"/etc/ssl/ssl.key\""
-          ans << "cafile = \"/etc/ssl/ssl.bundle\"" if File.exists?("/etc/ssl/ssl.bundle")
+          ans << "cafile = \"/etc/ssl/ssl.bundle\"" if File.exist?("/etc/ssl/ssl.bundle")
         end
 
         ans.join(";\n")

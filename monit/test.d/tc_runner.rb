@@ -35,14 +35,14 @@ class TestRunner < Test::Unit::TestCase
   end
 
   def teardown
-    File.unlink(@statedb_fn) if File.exists?(@statedb_fn)
+    File.unlink(@statedb_fn) if File.exist?(@statedb_fn)
     @symlinks.each{|s,r| un_symlink(s)}
   end
 
   def do_symlink(script, result)
     s = File.join(@monit_d, script)
     File.unlink(s) if File.symlink?(s)
-    raise "Awooga! File in the way!" if File.exists?(s)
+    raise "Awooga! File in the way!" if File.exist?(s)
     File.symlink(result,s)
   end
 

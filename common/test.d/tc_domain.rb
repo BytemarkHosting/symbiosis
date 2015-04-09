@@ -138,7 +138,7 @@ class TestDomain < Test::Unit::TestCase
       #
       # This shouldn't happen (tm).
       #
-      assert(File.exists?(prefix), "Temporary directory missing")
+      assert(File.exist?(prefix), "Temporary directory missing")
 
       domain = Domain.new(nil, prefix)
       FileUtils.mkdir_p(domain.directory)

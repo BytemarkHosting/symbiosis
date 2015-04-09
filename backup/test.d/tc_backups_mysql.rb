@@ -43,7 +43,7 @@ class TcBackupsMysql < Test::Unit::TestCase
       database = @database + " #{charset}"
       drop_db(database) if has_mysql?
       dump_name = calculate_dump_name(database)
-      File.unlink(dump_name) if File.exists?(dump_name)
+      File.unlink(dump_name) if File.exist?(dump_name)
     end
   end
 
@@ -181,7 +181,7 @@ class TcBackupsMysql < Test::Unit::TestCase
       drop_db(database, charset)
 
       dump_name = calculate_dump_name(database, charset)
-      assert(File.exists?(dump_name),"Mysql dump file '#{dump_name}' does not exist.")
+      assert(File.exist?(dump_name),"Mysql dump file '#{dump_name}' does not exist.")
 
       create_db(database, charset)
       system("zcat #{dump_name} | /usr/bin/mysql --defaults-file=#{@defaults_file} --default-character-set=#{charset} '#{database}'")

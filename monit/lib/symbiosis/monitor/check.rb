@@ -41,7 +41,7 @@ module Symbiosis
       #     #
       #     # See if the port can be gleaned from the SSH config. 
       #     #
-      #     if ( File.exists?( "/etc/sshd/sshd_config" ) )
+      #     if ( File.exist?( "/etc/sshd/sshd_config" ) )
       # 
       #       File("file").readlines.each |l|
       #         @port = $1.to_i if l =~ /^Port\s+(\d+)/

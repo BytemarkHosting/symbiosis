@@ -140,7 +140,7 @@ class TestFTP < Test::Unit::TestCase
       #
       # Make sure no quota has been set.
       #
-      File.unlink(quota_file) if File.exists?(quota_file)
+      File.unlink(quota_file) if File.exist?(quota_file)
 
       Symbiosis::Utils.safe_open(quota_file,"a+") do |f|
         f.truncate(0)

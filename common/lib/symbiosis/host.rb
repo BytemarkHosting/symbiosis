@@ -207,7 +207,7 @@ module Symbiosis
     # called /etc/symbiosis/dns.d/backup.name
     #
     def self.primary_backup_space(backup_space_filename=BACKUP_SPACE_FILENAME)
-      if File.exists?(backup_space_filename)
+      if File.exist?(backup_space_filename)
         File.open(backup_space_filename){|fh| fh.readlines}.first.to_s.chomp
       else
         self.backup_spaces.first

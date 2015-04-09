@@ -89,7 +89,7 @@ module Symbiosis
 
       @records     = []
       @environment = {}
-      if File.exists?(string_or_filename)
+      if File.exist?(string_or_filename)
         @filename = string_or_filename
         @crontab = File.open(string_or_filename){|fh| fh.read} 
       else

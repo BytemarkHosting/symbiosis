@@ -22,7 +22,7 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
     testd = File.dirname(__FILE__)
 
     @script = File.expand_path(File.join(testd,"..","sbin","symbiosis-httpd-configure"))
-    @script = '/usr/sbin/symbiosis-httpd-configure' unless File.exists?(@script)
+    @script = '/usr/sbin/symbiosis-httpd-configure' unless File.exist?(@script)
     @script += @verbose
 
     ENV["RUBYLIB"] = $:.join(":")

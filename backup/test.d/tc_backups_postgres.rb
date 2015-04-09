@@ -39,7 +39,7 @@ class TcBackupsPostgres < Test::Unit::TestCase
       database = do_conv(charset, @default_charset, @database) + " #{charset}"
       drop_db(database, charset) if has_postgres?
       dump_name = calculate_dump_name(database)
-      File.unlink(dump_name) if File.exists?(dump_name)
+      File.unlink(dump_name) if File.exist?(dump_name)
     end
   end
 

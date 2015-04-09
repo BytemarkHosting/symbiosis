@@ -95,7 +95,7 @@ class TestUtils < Test::Unit::TestCase
     param = "test-get-param"
     fn = File.join(@prefix, param)
 
-    assert(!File.exists?(fn))
+    assert(!File.exist?(fn))
     assert_equal(false,get_param(param, @prefix))
 
     FileUtils.touch(fn)
@@ -128,13 +128,13 @@ class TestUtils < Test::Unit::TestCase
     assert_nothing_raised do
       assert_equal(value, set_param(param, value, @prefix)) 
     end
-    assert(!File.exists?(fn))
+    assert(!File.exist?(fn))
 
     value = nil
     assert_nothing_raised do
       assert_equal(value, set_param(param, value, @prefix))
     end
-    assert(!File.exists?(fn))
+    assert(!File.exist?(fn))
 
     value = true
     assert_nothing_raised do
@@ -158,7 +158,7 @@ class TestUtils < Test::Unit::TestCase
     assert_nothing_raised do
       assert_equal(value, set_param(param, value, @prefix))
     end
-    assert(!File.exists?(fn))
+    assert(!File.exist?(fn))
 
   ensure
     #
@@ -291,7 +291,7 @@ class TestUtils < Test::Unit::TestCase
     #
     # Make sure the file exists.
     #
-    assert(File.exists?(fn),"Lock file #{fn} doesn't exist.")
+    assert(File.exist?(fn),"Lock file #{fn} doesn't exist.")
 
     #
     # Check to see if we can check the lock again..

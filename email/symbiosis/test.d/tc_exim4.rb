@@ -27,8 +27,8 @@ class Exim4ConfigTest < Test::Unit::TestCase
     @tempdir = nil
     loop do
       @tempdir = File.join("/tmp", File.basename($0)+"."+$$.to_s+"."+Time.now.usec.to_s)
-      FileUtils.mkdir(@tempdir) unless File.exists?(@tempdir)
-      if File.exists?(@tempdir)
+      FileUtils.mkdir(@tempdir) unless File.exist?(@tempdir)
+      if File.exist?(@tempdir)
         puts "Created directory #{@tempdir}" if $DEBUG
         break
       end
@@ -335,11 +335,11 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
   def is_running?(pidfile)
     # make sure the pidfile exists
-    return false unless File.exists?(pidfile)
+    return false unless File.exist?(pidfile)
 
     pid = File.open(pidfile){|fh| fh.gets}.chomp
     # Check the pid
-    return false unless File.exists?("/proc/#{pid}")
+    return false unless File.exist?("/proc/#{pid}")
 
     # OK everything is working
     return true
@@ -618,7 +618,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   end
 
   def fetch_hostname
-    if File.exists?('/proc/sys/kernel/hostname')
+    if File.exist?('/proc/sys/kernel/hostname')
       File.read('/proc/sys/kernel/hostname').chomp
     else
       "localhost"
@@ -675,7 +675,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
   ensure
     # Make sure we remove the forward file (if any)
-    File.unlink(forward_file) if forward_file and File.exists?(forward_file)
+    File.unlink(forward_file) if forward_file and File.exist?(forward_file)
   end
 
   def test_router_local_users_forward_sieve
@@ -701,7 +701,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
   ensure
     # Make sure we remove the sieve file (if any)
-    File.unlink(sieve_file) if sieve_file and File.exists?(sieve_file)
+    File.unlink(sieve_file) if sieve_file and File.exist?(sieve_file)
   end
 
   def test_router_local_users_vacation
@@ -723,7 +723,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
   ensure
     # Make sure we remove the vacation file (if any)
-    File.unlink(vacation_file) if vacation_file and File.exists?(vacation_file)
+    File.unlink(vacation_file) if vacation_file and File.exist?(vacation_file)
   end
 
   def test_router_local_user_mailbox
@@ -741,7 +741,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_router_mail_for_local_root
     do_acl_setup
 
-    if File.exists?('/proc/sys/kernel/hostname')
+    if File.exist?('/proc/sys/kernel/hostname')
       this_hostname = File.read('/proc/sys/kernel/hostname').chomp
     else
       this_hostname = "localhost"
@@ -758,7 +758,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_postmaster_for_any_domains
     do_acl_setup
 
-    if File.exists?('/proc/sys/kernel/hostname')
+    if File.exist?('/proc/sys/kernel/hostname')
       this_hostname = File.read('/proc/sys/kernel/hostname').chomp
     else
       this_hostname = "localhost"
@@ -798,7 +798,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_localhost_rewrite
     do_acl_setup
 
-    if File.exists?('/proc/sys/kernel/hostname')
+    if File.exist?('/proc/sys/kernel/hostname')
       this_hostname = File.read('/proc/sys/kernel/hostname').chomp
     end
 

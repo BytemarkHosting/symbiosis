@@ -83,7 +83,7 @@ module Symbiosis
           #
           directories.each do |dir|
             path = "#{dir}/#{file}"
-            break if File.exists?(path)
+            break if File.exist?(path)
 
             path = nil
           end
@@ -92,7 +92,7 @@ module Symbiosis
         end
 
         # uh-oh!  not found it.
-        raise ArgumentError, "Could not find any templates called #{files.join(" or ")}." unless path and File.exists?(path)
+        raise ArgumentError, "Could not find any templates called #{files.join(" or ")}." unless path and File.exist?(path)
 
         return path
       end
@@ -191,7 +191,7 @@ module Symbiosis
       # cannot be found.
       #
       def template_file=(tf)
-        raise Errno::ENOENT, tf unless File.exists?(tf)
+        raise Errno::ENOENT, tf unless File.exist?(tf)
         @template_file = tf
       end
      

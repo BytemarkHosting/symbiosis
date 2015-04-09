@@ -43,7 +43,7 @@ module Symbiosis
           #
           # Raise a no-such-process error if the status file doesn't exist.
           #
-          raise Errno::ESRCH, self.pid unless File.exists?(statusfile)
+          raise Errno::ESRCH, self.pid unless File.exist?(statusfile)
 
           #
           # Read the status file and find the name.
@@ -92,7 +92,7 @@ module Symbiosis
         end
 
         def check_initscript
-          raise Errno::ENOENT, initscript unless File.exists?(initscript)
+          raise Errno::ENOENT, initscript unless File.exist?(initscript)
           raise Errno::EPERM,  initscript unless File.executable?(initscript)
         end
 

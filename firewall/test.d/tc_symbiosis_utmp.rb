@@ -8,7 +8,7 @@ class TestUtmp < Test::Unit::TestCase
 
   def setup
     @wtmp = "wtmp-test"
-    if File.executable?('/usr/bin/gcc') and File.exists?('/usr/include/pwd.h')
+    if File.executable?('/usr/bin/gcc') and File.exist?('/usr/include/pwd.h')
       system("/usr/bin/gcc create-wtmp-test.c -o create-wtmp-test")
     end
   end
@@ -29,7 +29,7 @@ class TestUtmp < Test::Unit::TestCase
     FileUtils.touch(@wtmp)
     system("./create-wtmp-test")
 
-    assert(File.exists?(@wtmp))
+    assert(File.exist?(@wtmp))
     assert_nothing_raised {
       wtmp = Symbiosis::Utmp.read(@wtmp);
     }
