@@ -1,3 +1,9 @@
+symbiosis-email (2015:0409) stable; urgency=medium
+
+  * Major rejig (holding commit note)
+
+ --  Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 09 Apr 2015 19:15:56 +0100
+
 symbiosis-email (2015:0128) stable; urgency=low
 
   * Updated Debian standards version.

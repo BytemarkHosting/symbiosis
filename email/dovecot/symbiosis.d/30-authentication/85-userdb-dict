@@ -1,0 +1,9 @@
+# This userdb entry is for use by the LDA which doesn't work with "prefetch"
+# 
+# http://wiki2.dovecot.org/AuthDatabase/Dict
+userdb {
+  driver = dict
+  args = /etc/dovecot/symbiosis-dict-auth.conf
+}
+
+

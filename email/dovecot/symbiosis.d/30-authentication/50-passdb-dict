@@ -1,0 +1,10 @@
+#
+# Auth using the Symbiosis dict proxy.
+#
+# See http://wiki2.dovecot.org/AuthDatabase/Dict
+#
+passdb {
+  driver = dict
+  args = /etc/dovecot/symbiosis-dict-auth.conf
+}
+
