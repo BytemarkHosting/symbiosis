@@ -1,0 +1,70 @@
+#!/usr/bin/ruby
+# NAME
+#  symbiosis-email-password-daemon -- Dovecot dict interface for Symbiosis
+#
+# SYNOPSIS
+#  symbiosis-email-password-daemon [ -h | --help ] [-m | --manual] [ -p | --prefix ]
+#
+# OPTIONS
+#  -h, --help            Show a help message, and exit.
+#
+#  -m, --manual          Show this manual, and exit.
+#
+#  -p, --prefix          Specify the prefix directory (default /srv)
+#
+#  -s, --socket          Specify the path to the unix socket
+#
+#
+# SEE ALSO
+#
+# dovecot(1), http://wiki2.dovecot.org/AuthDatabase/Dict
+#
+# AUTHOR
+#
+# Patrick J. Cherry <patrick@bytemark.co.uk>
+#
+
+require 'getoptlong'
+
+manual = help = false
+opts = GetoptLong.new(
+         [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
+         [ '--prefix',     '-p', GetoptLong::OPTIONAL_ARGUMENT ],
+         [ '--socket',     '-s', GetoptLong::OPTIONAL_ARGUMENT ]
+       )
+
+prefix = "/srv"
+socket_path = "/run/dovecot/symbiosis-auth-proxy"
+
+opts.each do |opt,arg|
+  case opt
+  when '--help'
+    help = true
+  when '--manual'
+    manual = true
+  when '--prefix'
+    prefix = arg
+  when '--socket'
+    socket_path = arg
+  end
+end
+
+#
+# Require these bits here, so we can generate the manpage without needing extra
+# build-deps.
+#
+require 'eventmachine'
+require 'symbiosis/email/dict_handler'
+
+Symbiosis::Email::DictHandler.prefix = prefix
+
+dovecot_user = Etc.getpwnam("dovecot")
+
+EventMachine.run do
+    EventMachine.start_server socket_path, nil, Symbiosis::Email::DictHandler
+    File.lchown(dovecot_user[:uid], nil, socket_path)
+    File.chmod(0700, socket_path)
+end
+
+
