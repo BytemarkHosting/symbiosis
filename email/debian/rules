@@ -14,10 +14,12 @@
 #export DH_RUBY_GEMSPEC=gem.gemspec
 
 %:
-	dh $@ --buildsystem=ruby --with ruby
+	dh $@ --buildsystem=ruby --with ruby,systemd
 
 override_dh_auto_build-indep:
 	$(MAKE) docs
 
 override_dh_auto_clean:
 	$(MAKE) clean
+
+
