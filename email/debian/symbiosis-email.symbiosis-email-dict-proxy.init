@@ -14,9 +14,9 @@ fi
 ### END INIT INFO
 
 # Author: Patrick J Cherry <patrick@bytemark.co.uk>
-#
-# Please remove the "Author" lines above and replace them
-# with your own name if you copy and modify this script.
 
 DESC="Symbiosis: email dict proxy"
 DAEMON=/usr/sbin/symbiosis-email-dict-proxy
+NAME="ruby"
+
+

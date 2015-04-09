@@ -94,7 +94,7 @@ systemd_socket = nil
 # end
 
 Daemons.daemonize({
-  :app_name   => "symbiosis-email-dict-proxy",
+  :app_name   => "ruby",
   :ontop      => foreground,
   :dir_mode   => :system,
   :log_output => false
