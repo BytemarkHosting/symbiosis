@@ -60,9 +60,9 @@ class TestPhpMyAdmin < Test::Unit::TestCase
     http.use_ssl = false
 
     # Get the contents
-    http.start do |http|
+    http.start do |connection|
       request  = Net::HTTP::Get.new("/phpmyadmin/")
-      response = http.request(request)
+      response = connection.request(request)
 
       assert_equal(302, response.code.to_i, "No redirect when fetching /phpmyadmin/" )
       assert_match(/^https:/, response['location'], "Redirect to non-https site when when fetching /phpmyadmin/")
@@ -80,9 +80,9 @@ class TestPhpMyAdmin < Test::Unit::TestCase
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
     # Get the contents
-    http.start do |http|
+    http.start do |connection|
       request  = Net::HTTP::Get.new("/phpmyadmin/")
-      response = http.request(request)
+      response = connection.request(request)
 
       assert_equal(401, response.code.to_i, "Did not get '401 Unauthenticated' response when fetching /phpmyadmin/" )
     end
@@ -100,10 +100,10 @@ class TestPhpMyAdmin < Test::Unit::TestCase
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
     # Get the contents
-    http.start do |http|
+    http.start do |connection|
       request  = Net::HTTP::Get.new("/phpmyadmin/")
       request.basic_auth "root", ""
-      response = http.request(request)
+      response = connection.request(request)
       assert_equal(401, response.code.to_i, "Phpmyadmin login for root succeeded when no password was given." )
     end
   end
@@ -136,10 +136,10 @@ class TestPhpMyAdmin < Test::Unit::TestCase
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
     # Get the contents
-    http.start do |http|
+    http.start do |connection|
       request  = Net::HTTP::Get.new("/phpmyadmin/")
       request.basic_auth "root", password
-      response = http.request(request)
+      response = connection.request(request)
       assert_equal(200, response.code.to_i, "Phpmyadmin login failed for the root user." )
     end
   end
@@ -172,11 +172,11 @@ class TestPhpMyAdmin < Test::Unit::TestCase
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
     # Get the contents
-    http.start do |http|
+    http.start do |connection|
       request  = Net::HTTP::Get.new("/phpmyadmin/")
       request.basic_auth "debian-sys-maint", password
 
-      response = http.request(request)
+      response = connection.request(request)
       assert_equal(401, response.code.to_i, "Phpmyadmin login succeeded for the debian-sys-maint user." )
     end
   end
