@@ -247,7 +247,7 @@ end
 #
 # Exit if we've been disabled, but not if we're flushing the firewall.
 #
-if File.exists?(File.join(base_dir, "disabled")) and action != "flush"
+if File.exist?(File.join(base_dir, "disabled")) and action != "flush"
   verbose "Firewall disabled.  Exiting." 
   exit 0 
 end
@@ -406,13 +406,13 @@ begin
   #
   Template.directories.collect{|d| d.sub("rule.d","action.d") }.each do |script_dir|
     script_path = File.join(script_dir, "#{action}.sh.erb")
-    break if File.exists?(script_path)
+    break if File.exist?(script_path)
   end
 
   #
   # Make sure we can find the script
   #
-  unless ( File.exists?(script_path) )
+  unless ( File.exist?(script_path) )
     warn "symbiosis-firewall: Could not find action script for #{action.inspect}"
     exit 1
   end

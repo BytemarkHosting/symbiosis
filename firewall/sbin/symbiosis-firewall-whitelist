@@ -158,7 +158,7 @@ require 'symbiosis/ipaddr'
 #
 # Exit if we've been disabled
 #
-if %w(disabled.whitelist whitelist.d/disabled).any?{|fn| File.exists?(File.join(base_dir, fn))}
+if %w(disabled.whitelist whitelist.d/disabled).any?{|fn| File.exist?(File.join(base_dir, fn))}
   puts "Firewall whitelist disabled.  Exiting." if $VERBOSE
   exit 0
 end
@@ -208,7 +208,7 @@ expire_before = time_now - ( expire_after * ( 24 * 60 * 60 ) )
 #
 stamp_file = '/var/lib/symbiosis/symbiosis-firewall-whitelist.stamp'
 
-if File.exists?(stamp_file)
+if File.exist?(stamp_file)
   last_run = File.stat(stamp_file).mtime
 else
   last_run = nil

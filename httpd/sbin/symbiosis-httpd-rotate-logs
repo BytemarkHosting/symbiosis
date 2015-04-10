@@ -141,7 +141,7 @@ Symbiosis::Domains.each(prefix) do |domain|
   #
   # Check the log directory exists.
   #
-  unless ( File.exists?(domain.log_dir) )
+  unless ( File.exist?(domain.log_dir) )
     verbose "\tSkipping as #{domain.log_dir} doesn't exist."
     next
   end

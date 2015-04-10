@@ -43,7 +43,7 @@ class ClamdCheck < Symbiosis::Monitor::Check
   #
   def should_ignore?
     self.class.dpkg_running? or 
-      (not File.exists?(@process.initscript) and not should_be_running)
+      (not File.exist?(@process.initscript) and not should_be_running)
   end
 end
 

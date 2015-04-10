@@ -69,7 +69,7 @@ def all_packages
 
   @all_packages = Dir["*"].collect do |pkgdir|
 
-    next unless File.exists?(pkgdir+"/debian/changelog")
+    next unless File.exist?(pkgdir+"/debian/changelog")
 
     bin_pkgs = []
     source = pkg = arch = version = distro = nil

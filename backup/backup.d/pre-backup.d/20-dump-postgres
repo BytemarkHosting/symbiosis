@@ -15,7 +15,7 @@ backup_dir = "/var/backups/postgresql"
 # If we don't have a backup directory then create it.  Backup2l will complain
 # if this isn't present.
 #
-Symbiosis::Utils.mkdir_p backup_dir unless File.exists?(backup_dir)
+Symbiosis::Utils.mkdir_p backup_dir unless File.exist?(backup_dir)
 
 begin 
   user = Etc.getpwnam("postgres")

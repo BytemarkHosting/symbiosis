@@ -247,7 +247,7 @@ require 'log4r/outputter/syslogoutputter'
 #
 # Exit if we've been disabled
 #
-if File.exists?(File.join(dir, "disabled"))
+if File.exist?(File.join(dir, "disabled"))
   msg = "symbiosis-monit: disabled. "
   if force
     warn msg + "Ignoring as --force given." if $VERBOSE
@@ -260,7 +260,7 @@ end
 #
 # Don't run if the machine is still booting
 #
-if File.exists?("/var/lib/initscripts/nologin")
+if File.exist?("/var/lib/initscripts/nologin")
   msg = "symbiosis-monit: This machine is still booting. "
   if force
     warn msg + "Ignoring as --force given." if $VERBOSE

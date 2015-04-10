@@ -227,7 +227,7 @@ Symbiosis::Domains.each(prefix) do |domain|
   #
   # Now stat() it -- webalizer updates this file with each run.
   #
-  if File.exists?(history_file)
+  if File.exist?(history_file)
     last_run = File.stat(history_file).mtime
   end
 
@@ -251,7 +251,7 @@ Symbiosis::Domains.each(prefix) do |domain|
   #
   cdir = output_dir
   while cdir != "/"
-    break if File.exists?(cdir)
+    break if File.exist?(cdir)
     cdir, odir = File.split(cdir)
   end
 

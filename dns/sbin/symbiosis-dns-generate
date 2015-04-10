@@ -216,7 +216,7 @@ Symbiosis::Domains.each do |domain|
         #
         # Create directory with the same ownership as the parent
         #
-        domain.create_dir(output_dir) unless File.exists?(output_dir)
+        domain.create_dir(output_dir) unless File.exist?(output_dir)
 
         #
         # Write the snippet
@@ -295,7 +295,7 @@ begin
   #
   hash_file = File.expand_path(File.join(bytemarkdns_dir,".hash"))
 
-  if File.exists?(hash_file)
+  if File.exist?(hash_file)
     old_hash = File.readlines(hash_file).first.to_s.chomp
   else
     old_hash = nil

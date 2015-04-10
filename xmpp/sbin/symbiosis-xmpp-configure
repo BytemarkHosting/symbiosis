@@ -131,7 +131,7 @@ end
 #
 # Disable creation of mass hosting sites.
 #
-if File.exists?("/etc/symbiosis/xmpp.d/disabled")
+if File.exist?("/etc/symbiosis/xmpp.d/disabled")
   verbose "Symbiosis automatic prosody configuration disabled. Exiting."
   exit 0
 end

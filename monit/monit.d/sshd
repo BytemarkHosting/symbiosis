@@ -14,7 +14,7 @@ class SshdCheck < Symbiosis::Monitor::Check
     sshd_config = "/etc/ssh/sshd_config"
     @port = @host = nil
 
-    if ( File.exists?( sshd_config ) )
+    if ( File.exist?( sshd_config ) )
       # Need to parse for:
       #
       # ListenAddress host|IPv4_addr|IPv6_addr

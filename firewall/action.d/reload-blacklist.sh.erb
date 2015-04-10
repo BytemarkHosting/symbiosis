@@ -24,7 +24,7 @@ set -v
 # 
 % chain = "blacklist"
 % dir  = File.join(base_dir, "#{chain}.d")
-% disabled = (!File.directory?(dir) or  File.exists?(File.join(dir,"disabled.#{chain}")) or File.exists?(File.join(dir,"disabled")))
+% disabled = (!File.directory?(dir) or  File.exist?(File.join(dir,"disabled.#{chain}")) or File.exist?(File.join(dir,"disabled")))
 #######################################################################
 for cmd in <%= iptables_cmds.join(" ") %> ; do
   #
