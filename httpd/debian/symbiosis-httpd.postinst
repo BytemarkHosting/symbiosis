@@ -30,6 +30,13 @@ for mod in rewrite cgi php5 ssl dir vhost_bytemark ; do
 done
 
 #
+# Remove 000-default site
+#
+if ! [ -e /etc/apache2/sites-enabled/000-default.conf ] ; then
+  a2dissite -q -m 000-default
+fi
+
+#
 # Reconfigure apache.
 #
 symbiosis-httpd-configure --no-reload --verbose
