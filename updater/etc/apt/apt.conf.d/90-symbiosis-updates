@@ -17,6 +17,12 @@ Unattended-Upgrade::Origins-Pattern {
    "n=${distro_id} ${distro_codename}-lts";
 };
 
+Unattended-Upgrade::Origins-Pattern {
+   "origin=Bytemark Hosting";
+   "origin=Debian,archive=stable";
+   "origin=Debian,archive=oldstable";
+};
+
 
 
 //
