@@ -37,6 +37,13 @@ if [ -e /etc/apache2/sites-enabled/000-default.conf ] ; then
 fi
 
 #
+# Remove the serve-cgi snippet (ugh!)
+#
+if [ -e /etc/apache2/conf-enabled/serve-cgi-bin.conf ] ; then
+  a2disconf -q -m serve-cgi-bin
+fi
+
+#
 # Reconfigure apache.
 #
 symbiosis-httpd-configure --no-reload --verbose
