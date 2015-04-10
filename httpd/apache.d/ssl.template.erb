@@ -32,7 +32,7 @@
         <%= server_aliases %>
 
 
-        <IfModule mod_ssl.c>
+        <IfModule ssl_module>
                 SSLEngine On
 
                 #
@@ -70,7 +70,7 @@
         #
         DocumentRoot <%= htdocs_directory %>/
 
-        <IfModule mod_cgi.c>
+        <IfModule cgi_module>
                 #
                 # General CGI Handling
                 #
@@ -115,7 +115,7 @@
         <%= server_aliases %>
 
 % if mandatory_ssl?
-        <IfModule mod_alias.c>
+        <IfModule alias_module>
                 #
                 #  All accesses redirect to the HTTPS version of
                 # the site.
@@ -136,7 +136,7 @@
         #
         DocumentRoot     <%= htdocs_directory %>/
 
-        <IfModule mod_cgi.c>
+        <IfModule cgi_module>
                 #
                 # General CGI Handling
                 #

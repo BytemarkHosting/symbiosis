@@ -12,7 +12,7 @@
 
 <VirtualHost <%= ips.collect{|ip| ip+":443"}.join(" ") %>> 
 
-        <IfModule mod_ssl.c>
+        <IfModule ssl_module>
                 #
                 #  Ensure that the SSL options are configured.
                 #
@@ -61,7 +61,7 @@
                 Require all granted
         </Directory>
 
-        <IfModule mod_cgi.c>
+        <IfModule cgi_module>
                 #
                 #  We will allow global CGIs without any effort though.
                 #
@@ -73,7 +73,7 @@
         #
         UseCanonicalName        Off
 
-        <IfModule mod_rewrite.c>
+        <IfModule rewrite_module>
                 #
                 #  Aliases for testing sites prior to DNS migration.
                 #
@@ -82,13 +82,13 @@
                 RewriteRule ^/(.*)$  /srv/%1/public/htdocs/$1
         </IfModule>
 
-        <IfModule mod_bytemark_vhost.c>
+        <IfModule vhost_bytemark_module>
                 #
                 #  The document root + CGI-directories.
                 #
                 VirtualDocumentRoot     /srv/%0/public/htdocs/
 
-                <IfModule mod_cgi.c>
+                <IfModule cgi_module>
                         VirtualScriptAlias      /srv/%0/public/cgi-bin/
                 </IfModule>
 
