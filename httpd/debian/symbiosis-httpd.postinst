@@ -32,7 +32,7 @@ done
 #
 # Remove 000-default site
 #
-if ! [ -e /etc/apache2/sites-enabled/000-default.conf ] ; then
+if [ -e /etc/apache2/sites-enabled/000-default.conf ] ; then
   a2dissite -q -m 000-default
 fi
 
