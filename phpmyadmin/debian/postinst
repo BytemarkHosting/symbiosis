@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -10,22 +10,11 @@ if [ "$1" != "configure" ]; then
         exit 0
 fi
 
-
-#
-#  Remove old files
-#
-for i in phpmyadmin.vhost.conf phpadmin.conf phpmyadmin.conf ; do
-  if [ -e /etc/apache2/conf.d/$i ]; then
-    rm -f /etc/apache2/conf.d/$i
-  fi
-done
-
-
 #
 #  Ensure that the PHPMyAdmin configuration file is included.
 #
 if [ -e /etc/phpmyadmin/apache.conf ]; then
-    ln -sf /etc/phpmyadmin/apache.conf /etc/apache2/conf.d/phpmyadmin.conf
+    ln -sf /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
 fi
 
 #
@@ -47,9 +36,12 @@ EOF
 fi
 
 #
-#  Reload Apache2 to ensure this change is picked up.
+# Restart apache2 
 #
-invoke-rc.d apache2 reload || true
+if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
+    . /usr/share/apache2/apache2-maintscript-helper
+    apache2_invoke enconf phpmyadmin.conf || exit $?
+fi
 
 #DEBHELPER#
 exit 0
