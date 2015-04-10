@@ -16,24 +16,18 @@ fi
 update-alternatives --install /var/www/webmail symbiosis-webmail /usr/share/squirrelmail 50
 
 #
-# Restart apache2 if apache2ctl exists and is executable.
+# Link in the default file.
 #
-if [ -x /usr/sbin/apache2ctl ] ; then
-  #
-  # Remove existing link, and add new one.
-  #
-  rm -f /etc/apache2/conf.d/squirrelmail.conf
-  rm -f /etc/apache2/conf.d/squirrelmail.local.conf
+if [ -d /etc/apache2/conf-available ]
+    ln -s /etc/squirrelmail/apache.conf  /etc/apache2/conf-available/squirrelmail.conf
+fi
 
-  #
-  # Link in the default file.
-  #
-  ln -s /etc/squirrelmail/apache.conf  /etc/apache2/conf.d/squirrelmail.conf
-
-  #
-  #  Restart Apache2.
-  #
-  invoke-rc.d apache2 force-reload || true
+#
+# Restart apache2 
+#
+if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
+    . /usr/share/apache2/apache2-maintscript-helper
+    apache2_invoke enconf squirrelmail.conf || exit $?
 fi
 
 #DEBHELPER#
