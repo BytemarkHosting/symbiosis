@@ -67,7 +67,7 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
     #
     domain_conf_fn = File.join(@apache2_dir, "sites-enabled", domain.name+".conf")
     mass_hosting_files = %w(zz-mass-hosting.ssl  zz-mass-hosting).collect do |fn|
-      File.join(@apache2_dir,"sites-enabled",fn)
+      File.join(@apache2_dir,"sites-enabled",fn+".conf")
     end
 
     system("#{@script} --root-dir #{@root} --no-reload")
@@ -102,7 +102,7 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
     FileUtils.mkdir_p(domain.htdocs_dir)
     Symbiosis::Utils.set_param( "ip", "10.0.0.1", domain.config_dir)
 
-    snippet_files = ["zz-mass-hosting.ssl",  "zz-mass-hosting", domain.name + ".conf"].collect do |fn|
+    snippet_files = ["zz-mass-hosting.ssl.conf",  "zz-mass-hosting.conf", domain.name + ".conf"].collect do |fn|
       File.join(@apache2_dir,"sites-enabled",fn)
     end
 
@@ -180,7 +180,7 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
     #
     conf_files = [File.join(@apache2_dir, "sites-enabled", domain.name+".conf")]
     conf_files += %w(zz-mass-hosting.ssl  zz-mass-hosting).collect do |fn|
-      File.join(@apache2_dir,"sites-enabled",fn)
+      File.join(@apache2_dir,"sites-enabled",fn+".conf")
     end
 
     system("#{@script} --root-dir #{@root} --no-reload")
