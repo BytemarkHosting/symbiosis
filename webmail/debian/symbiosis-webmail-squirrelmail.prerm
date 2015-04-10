@@ -26,7 +26,7 @@ update-alternatives --remove symbiosis-webmail /usr/share/squirrelmail/
 #
 # Remove link in the default file.
 #
-if [ -h /etc/apache2/conf-available/squirrelmail.conf ]
+if [ -h /etc/apache2/conf-available/squirrelmail.conf ] ; then
     rm /etc/apache2/conf-available/squirrelmail.conf
 fi
 

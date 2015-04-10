@@ -18,7 +18,7 @@ update-alternatives --install /var/www/webmail symbiosis-webmail /usr/share/squi
 #
 # Link in the default file.
 #
-if [ -d /etc/apache2/conf-available ]
+if [ -d /etc/apache2/conf-available ] ; then
     ln -s /etc/squirrelmail/apache.conf  /etc/apache2/conf-available/squirrelmail.conf
 fi
 
