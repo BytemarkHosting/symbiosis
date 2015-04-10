@@ -153,7 +153,7 @@ EventMachine.run do
   %w(HUP USR1).each do |sig|
     trap(sig) do
       warn "#{$0}: Caught #{sig}" if $VERBOSE 
-      EventMachine.next_tick do
+      EventMachine.add_timer(0) do
         logger.close_filehandles
         logger.resume
       end
@@ -166,7 +166,7 @@ EventMachine.run do
   %w(QUIT TERM INT).each do |sig|
     trap(sig) do
       warn "#{$0}: Caught #{sig}" if $VERBOSE 
-      EventMachine.next_tick do
+      EventMachine.add_timer(0) do
         logger.close_filehandles
         EventMachine.stop
       end
