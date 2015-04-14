@@ -27,7 +27,7 @@ unmangle_config() {
 }
 
 if [ "$1" = "upgrade" ]; then
-  if dpkg --compare-versions $2 lt 2015:0101
+  if dpkg --compare-versions "$2" lt "2015:0101" ; then
     unmangle_config /etc/apache2/conf.d/security.conf
   fi
 fi
