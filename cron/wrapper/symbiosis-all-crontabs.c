@@ -220,7 +220,7 @@ void process_domains( const char *dirname )
                 "%s/%s/config/crontab",
                 dirname, entry );
 
-       if ( lstat( crontab_path, &crontab ) != 0 )
+       if ( stat( crontab_path, &crontab ) != 0 )
        {
            if ( g_verbose )
                printf("\tIgnoring as %s doesnt exist\n", crontab_path );
