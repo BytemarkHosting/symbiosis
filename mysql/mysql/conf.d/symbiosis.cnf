@@ -1,0 +1,14 @@
+#
+# This config snippet contains optimisations for Bytemark Symbiosis installs.
+#
+
+[mysqld]
+#
+# Bind to all interfaces (symbiosis-firewall will block this by default)
+#
+bind-address = ::
+
+#
+# Keep separate DBs in separate files.
+#
+innodb_file_per_table = on
