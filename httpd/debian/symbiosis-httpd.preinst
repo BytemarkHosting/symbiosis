@@ -14,7 +14,7 @@ unmangle_config() {
   if [ ! -L "$file" ] || \
      [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
        "$(readlink "$file")" != "$(basename "$theirfile")" ]; then
-    echo "E: $file is not linked to either $(basename "$ourfile") or $(basename "$theirfile")" >&2
+    echo "W: $file is not linked to either $(basename "$ourfile") or $(basename "$theirfile")" >&2
   else
     rm -f "$file"
   fi
@@ -28,7 +28,9 @@ unmangle_config() {
 
 if [ "$1" = "upgrade" ]; then
   if dpkg --compare-versions "$2" lt "2015:0101" ; then
-    unmangle_config /etc/apache2/conf.d/security.conf
+    unmangle_config /etc/apache2/conf.d/security
+    unmangle_config /etc/php5/apache2/php.ini
+    unmangle_config /etc/apache2/ports.conf
   fi
 fi
 
