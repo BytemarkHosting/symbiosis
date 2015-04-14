@@ -1,9 +1,8 @@
 
 #
-#  Allow incoming connections on port 20 + 21
+#  Allow incoming connections on port 21 and high numbered ports
 #
 % iptables_cmds.each do |cmd|
-<%= cmd %> -A <%= chain%> -p tcp --dport 20 <%= src_or_dst %> -j ACCEPT
-<%= cmd %> -A <%= chain%> -p tcp --dport 21 <%= src_or_dst %> -j ACCEPT
+<%= cmd %> -A <%= chain%> -p tcp -m multiport --dports 21,49152:65535 <%= src_or_dst %> -j ACCEPT
 % end
 
