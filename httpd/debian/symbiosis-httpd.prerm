@@ -10,37 +10,46 @@ if [ "$1" = "upgrade" ] ; then
   exit 0
 fi
 
+restart_type="reload"
+
 #
-# Remove mangled configurations.
+# Replace 000-default site
 #
-
-unmangle_config() {
-  file="$1"
-  ourfile="$file.dpkg-symbiosis"
-  theirfile="$file.dpkg-symbiosis-orig"
-  package=symbiosis-httpd
-
-  if [ ! -L "$file" ] || \
-     [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
-       "$(readlink "$file")" != "$(basename "$theirfile")" ]; then
-    echo "E: $file is not linked to either $(basename "$ourfile") or $(basename "$theirfile")" >&2
-  else
-    rm -f "$file"
-  fi
-
-  if [ ! -L "$file" ] && [ ! -e "$file" ]; then
-    dpkg-divert --remove --rename --package "$package" "$file"
-  else
-    echo "Not removing diversion of $file by $package" >&2
-  fi
-}
-
-if [ "$1" = "remove" ]; then
-  unmangle_config /etc/apache2/conf-availble/security.conf
+if ! [ -e /etc/apache2/sites-enabled/000-default.conf ] ; then
+  a2ensite -q -m 000-default
 fi
 
+#
+# Replace the serve-cgi snippet
+#
+if ! [ -e /etc/apache2/conf-enabled/serve-cgi-bin.conf ] ; then
+  a2enconf -q -m serve-cgi-bin
+fi
+
+#
+# Remove our security config
+#
+if [ -e /etc/apache2/conf-enabled/serve-cgi-bin.conf ] ; then
+  a2disconf -q -m symbiosis-security
+fi
+
+#
+# Disable the modules we enabled
+#
+for mod in rewrite cgi php5 ssl dir vhost_bytemark ; do
+  if [ -e /etc/apache2/mods-enabled/$mod.load ] ; then
+    echo "I: enabling apache module $mod"
+    restart_type="restart"
+    a2dismod -q -m $mod
+  fi
+done
+
+
+#
+# Restart apache, as required
+#
 if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
-  apache2_invoke reload
+  apache2_invoke $restart
 fi
 
 #DEBHELPER#
