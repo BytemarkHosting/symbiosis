@@ -86,6 +86,53 @@ module Symbiosis
       ttl
     end
 
+    def dmarc_enabled?
+      dmarc_record.is_a?(String)
+    end
+
+    alias has_dmarc? dmarc_enabled?
+
+    #
+    # Returns a DMARC record, based on various arguments in config/dmarc
+    #
+    def dmarc_record
+      raw_dmarc = get_param("dmarc", self.config_dir)
+
+      unless raw_dmarc
+        return nil
+      end
+
+      if raw_dmarc.is_a?(String) and raw_dmarc =~ /^v=DMARC\d;(\w+=[^;]+;)+/
+        # Take this as a raw record
+        return raw_dmarc.split($/).first
+      end
+
+      has_antispam = get_param("antispam", self.config_dir)
+
+      dmarc_hash = {
+        "v" => "DMARC1",
+        "p" => "quarantine",
+        "adkim" => (self.has_dkim? ? "s" : nil),
+        "aspf" => (self.has_spf? ? "s" : nil),
+        "sp" => "none",
+        "pct" => "100" 
+      }.reject{|k,v| v.nil?}
+
+      # 
+      # raw_dmarc = raw_dmarc.to_s.split($/)
+      #
+      # raw_dmarc.each do |line|
+      #   if /\b([A-Za-z0-9]+)\s*=\s*(\w+);?/
+      #       dmarc_hash[$1.downcase] = $2
+      #   end
+      # end
+
+      dmarc = ["v="+dmarc_hash.delete("v")]
+      dmarc += dmarc_hash.sort.collect{|k,v| "#{k}=#{v}"}
+
+      return tinydns_encode(dmarc.join(";"))
+    end
+
     private
 
     #

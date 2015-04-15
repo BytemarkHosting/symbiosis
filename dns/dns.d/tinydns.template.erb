@@ -79,6 +79,13 @@
 '<%= domain.dkim_selector %>._domainkey.<%= domain %>:v=DKIM1; k=rsa; p=<%= domain.dkim_public_key_b64 %>:<%= ttl %>
 
 % end
+% if domain.respond_to?(:has_dmarc?) and domain.has_dmarc?
+#
+# DMARC records
+#
+'_dmarc.<%= domain %>:<%= domain.dmarc_record %>:<%= ttl %>
+
+% end
 % if domain.respond_to?(:has_xmpp?) and domain.has_xmpp?
 #
 # SRV records for XMPP.
