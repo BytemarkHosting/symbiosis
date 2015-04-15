@@ -15,8 +15,8 @@ clean:
 	$(RM) -r man
 
 test:
-	make -C exim4/   check
-	make -C dovecot/ check
+	make -C exim4/   test
+	make -C dovecot/ test
 
 .PHONY: clean docs all test
 
