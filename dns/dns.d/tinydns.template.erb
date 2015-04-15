@@ -1,46 +1,46 @@
 #
 #  Nameserver records.
 #
-.<%= domain %>::a.ns.bytemark.co.uk:300
-.<%= domain %>::b.ns.bytemark.co.uk:300
-.<%= domain %>::c.ns.bytemark.co.uk:300
+.<%= domain %>::a.ns.bytemark.co.uk:<%= ttl %>
+.<%= domain %>::b.ns.bytemark.co.uk:<%= ttl %>
+.<%= domain %>::c.ns.bytemark.co.uk:<%= ttl %>
 
 % if ipv4?
 #
 #  The domain name itself
 #
-=<%= domain %>:<%= ip %>:300
+=<%= domain %>:<%= ip %>:<%= ttl %>
 
 #
 #  Useful aliases.
 #
-+ftp.<%= domain %>:<%= ip %>:300
-+www.<%= domain %>:<%= ip %>:300
-+mail.<%= domain %>:<%= ip %>:300
++ftp.<%= domain %>:<%= ip %>:<%= ttl %>
++www.<%= domain %>:<%= ip %>:<%= ttl %>
++mail.<%= domain %>:<%= ip %>:<%= ttl %>
 
 #
 # A record for MX
 #
-+mx.<%= domain %>:<%= ip %>:300
++mx.<%= domain %>:<%= ip %>:<%= ttl %>
 
 % end
 % if ipv6?
 #
 #  The domain name itself -- AAAA record and reverse.
 #
-6<%= domain %>:<%= ipv6 %>:300
+6<%= domain %>:<%= ipv6 %>:<%= ttl %>
 
 #
 #  Useful aliases -- AAAA records only
 #
-3ftp.<%= domain %>:<%= ipv6 %>:300
-3www.<%= domain %>:<%= ipv6 %>:300
-3mail.<%= domain %>:<%= ipv6 %>:300
+3ftp.<%= domain %>:<%= ipv6 %>:<%= ttl %>
+3www.<%= domain %>:<%= ipv6 %>:<%= ttl %>
+3mail.<%= domain %>:<%= ipv6 %>:<%= ttl %>
 
 #
 # AAAA record for MX
 #
-3mx.<%= domain %>:<%= ipv6 %>:300
+3mx.<%= domain %>:<%= ipv6 %>:<%= ttl %>
 
 % end
 % if bytemark_antispam?
@@ -50,51 +50,51 @@
 # Tag my real records so only Bytemark can see them.  The IP is defined above,
 # so not needed here.
 #
-@<%= domain %>::mx.<%= domain %>:5:300::nospam
+@<%= domain %>::mx.<%= domain %>:5:<%= ttl %>::nospam
 
 #
 # Tell the rest of the world to go via Bytemark
 #
-@<%= domain %>::a.nospam.bytemark.co.uk:5:300::world
-@<%= domain %>::b.nospam.bytemark.co.uk:10:300::world
+@<%= domain %>::a.nospam.bytemark.co.uk:5:<%= ttl %>::world
+@<%= domain %>::b.nospam.bytemark.co.uk:10:<%= ttl %>::world
 
 % else
 #
 #  MX record -- no IP defined, as this is done separately above.
 #
-@<%= domain %>::mx.<%= domain %>:15:300
+@<%= domain %>::mx.<%= domain %>:15:<%= ttl %>
 
 % end
 % if domain.respond_to?(:has_spf?) and domain.has_spf?
 #
 # SPF records
 #
-'<%= domain %>:<%= domain.spf_record %>:300
+'<%= domain %>:<%= domain.spf_record %>:<%= ttl %>
 
 % end
 % if domain.respond_to?(:has_dkim?) and domain.has_dkim?
 #
 # DKIM records
 #
-'<%= domain.dkim_selector %>._domainkey.<%= domain %>:v=DKIM1; k=rsa; p=<%= domain.dkim_public_key_b64 %>:300
+'<%= domain.dkim_selector %>._domainkey.<%= domain %>:v=DKIM1; k=rsa; p=<%= domain.dkim_public_key_b64 %>:<%= ttl %>
 
 % end
 % if domain.respond_to?(:has_xmpp?) and domain.has_xmpp?
 #
 # SRV records for XMPP.
 #
-:_xmpp-client._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,5222, domain) %>:300
-:_xmpp-server._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,5269, domain) %>:300
+:_xmpp-client._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,5222, domain) %>:<%= ttl %>
+:_xmpp-server._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,5269, domain) %>:<%= ttl %>
 
 % end
 %if domain.respond_to?(:mailboxes) and domain.mailboxes.length > 0
 #
 # SRV records for various mail services
 #
-:_submission._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,587, "mail."+domain) %>:300
-:_imap._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,143, "mail."+domain) %>:300
-:_imaps._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,993, "mail."+domain) %>:300
-:_pop3._tcp.<%= domain %>:33:<%= domain.srv_record_for(10,5,110, "mail."+domain) %>:300
-:_pop3s._tcp.<%= domain %>:33:<%= domain.srv_record_for(10,5,995, "mail."+domain) %>:300
+:_submission._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,587, "mail."+domain) %>:<%= ttl %>
+:_imap._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,143, "mail."+domain) %>:<%= ttl %>
+:_imaps._tcp.<%= domain %>:33:<%= domain.srv_record_for(0,5,993, "mail."+domain) %>:<%= ttl %>
+:_pop3._tcp.<%= domain %>:33:<%= domain.srv_record_for(10,5,110, "mail."+domain) %>:<%= ttl %>
+:_pop3s._tcp.<%= domain %>:33:<%= domain.srv_record_for(10,5,995, "mail."+domain) %>:<%= ttl %>
 
 % end

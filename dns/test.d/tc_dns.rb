@@ -1,3 +1,4 @@
+# Encoding: UTF-8
 $:.unshift  "../lib/" if File.directory?("../lib")
 $:.unshift  "../../common/lib" if File.directory?("../../common/lib")
 
@@ -192,6 +193,46 @@ EOF
     result_decoded = @domain.__send__(:tinydns_decode, result)
 
     assert_equal(target_decoded,result_decoded)
+  end
+  
+  def test_set_ttl
+    config = Symbiosis::ConfigFiles::Tinydns.new(nil, "#")
+    config.domain = @domain
+    config.template = @dns_template
+
+    #
+    # The default TTL for Symbiosis is 5 minutes
+    #
+    assert_equal(300, @domain.ttl, "Wrong default TTL returned")
+
+    #
+    # Minimum TTL is 60s, max is 86400s.
+    #
+    @domain.__send__(:set_param, "ttl", "5", @domain.config_dir)
+    assert_equal(60, @domain.ttl, "Domain has wrong minimum TTL") 
+    
+    @domain.__send__(:set_param, "ttl", "5123123123123123123123123", @domain.config_dir)
+    assert_equal(86400, @domain.ttl, "Domain has wrong maximum TTL") 
+
+
+    #
+    # Make sure there are no SPF records by default.
+    #
+    @domain.__send__(:set_param, "ttl", nil, @domain.config_dir)
+    txt = config.generate_config.split($/)
+    ns_records = txt.select{|t| t =~ /^\./}
+
+    assert_match(/:300$/m, ns_records.first, "NS records have incorect TTL when no custom TTL is set")
+
+    #
+    # Now set the TTL to something else
+    #
+    @domain.__send__(:set_param, "ttl", "12345", @domain.config_dir)
+    txt = config.generate_config.split($/)
+    ns_records = txt.select{|t| t =~ /^\./}
+
+    assert_match(/:12345$/m, ns_records.first, "NS records have incorrect TTL when custom TTL is set")
+
   end
 
 end

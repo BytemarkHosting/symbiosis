@@ -33,7 +33,14 @@ module Symbiosis
         
         ip.to_s
       end
-      
+
+      #
+      # Returns the domain's TTL
+      #
+      def ttl
+        @domain.ttl.to_s
+      end       
+
       #
       # Returns true if the domain has an IPv4 address configured.
       #

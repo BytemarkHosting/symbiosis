@@ -58,6 +58,30 @@ module Symbiosis
       data.collect{|x| tinydns_encode(x)}.join
     end
 
+    #
+    # Returns the DNS TTL as defined in config/ttl, or 300 if no TTL has been set.
+    #
+    def ttl
+      ttl = get_param("ttl", self.config_dir)
+      if ttl.is_a?(String) and ttl =~ /([0-9]+)/
+        begin
+          ttl = Integer($1)
+        rescue ArgumentError
+          ttl = 300
+        end
+      else
+        ttl = 300
+      end
+
+      if ttl < 60
+        ttl = 60
+      elsif ttl > 86400
+        ttl = 86400
+      end
+
+      ttl
+    end
+
     private
 
     #
