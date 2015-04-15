@@ -50,7 +50,7 @@ remote_smtp_with_dkim:
   # 
   # Use the domain's IP (if it has one) to send outgoing mail.
   #
-  interfaces = <, ${filter{<,${readfile{VHOST_DIR/$sender_address_domain/config/${extract{1}{:}{${filter{ip:ips}{exists{VHOST_DIR/$sender_address_domain/config/$item}}}}}}{,}}}{isip{$item}}}
+  interface = <, ${filter{<,${readfile{VHOST_DIR/$sender_address_domain/config/${extract{1}{:}{${filter{ip:ips}{exists{VHOST_DIR/$sender_address_domain/config/$item}}}}}}{,}}}{isip{$item}}}
 
 
 
