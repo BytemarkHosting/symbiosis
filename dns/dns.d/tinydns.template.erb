@@ -43,28 +43,11 @@
 3mx.<%= domain %>:<%= ipv6 %>:<%= ttl %>
 
 % end
-% if bytemark_antispam?
 #
-# MX records for the Bytemark anti-spam service
-#
-# Tag my real records so only Bytemark can see them.  The IP is defined above,
-# so not needed here.
-#
-@<%= domain %>::mx.<%= domain %>:5:<%= ttl %>::nospam
-
-#
-# Tell the rest of the world to go via Bytemark
-#
-@<%= domain %>::a.nospam.bytemark.co.uk:5:<%= ttl %>::world
-@<%= domain %>::b.nospam.bytemark.co.uk:10:<%= ttl %>::world
-
-% else
-#
-#  MX record -- no IP defined, as this is done separately above.
+# MX record -- no IP defined, as this is done separately above.
 #
 @<%= domain %>::mx.<%= domain %>:15:<%= ttl %>
 
-% end
 % if domain.respond_to?(:has_spf?) and domain.has_spf?
 #
 # SPF records

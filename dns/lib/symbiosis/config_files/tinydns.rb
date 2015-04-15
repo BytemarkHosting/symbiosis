@@ -66,11 +66,11 @@ module Symbiosis
       end
 
       #
-      # Checks to see if this domain uses the Bytemark anti-spam service,
-      # described at http://www.bytemark.co.uk/nospam .
+      # This always returns false as the Bytemark antispam service has been
+      # deprecated. 
       #
       def bytemark_antispam?
-        @domain.uses_bytemark_antispam?
+        false
       end
 
       class Eruby < ::Erubis::Eruby

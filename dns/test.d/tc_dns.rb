@@ -173,16 +173,19 @@ EOF
   end
 
   def test_bytemark_antispam
+    #
+    # This now ignores this flag, as the service has been withdrawn
+    #
     @domain.__send__(:set_param,"bytemark-antispam", true, @domain.config_dir)
     config = Symbiosis::ConfigFiles::Tinydns.new(nil, "#")
     config.domain = @domain
     config.template = @dns_template
-    assert(@domain.uses_bytemark_antispam?)
+    assert(!@domain.uses_bytemark_antispam?)
 
     txt = config.generate_config
 
-    assert_match(/^@#{Regexp.escape(@domain.name)}::a\.nospam\.bytemark\.co\.uk/,txt, "No line mentions a.nospam.bytemark.co.uk")
-    assert_match(/^@#{Regexp.escape(@domain.name)}::b\.nospam\.bytemark\.co\.uk/,txt, "No line mentions b.nospam.bytemark.co.uk")
+    assert_no_match(/^@#{Regexp.escape(@domain.name)}::a\.nospam\.bytemark\.co\.uk/,txt, "No line mentions a.nospam.bytemark.co.uk")
+    assert_no_match(/^@#{Regexp.escape(@domain.name)}::b\.nospam\.bytemark\.co\.uk/,txt, "No line mentions b.nospam.bytemark.co.uk")
   end
 
   def test_srv_generation
