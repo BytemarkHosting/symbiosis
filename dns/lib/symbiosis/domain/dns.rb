@@ -47,8 +47,12 @@ module Symbiosis
     def spf_record
       spf = get_param("spf", self.config_dir)
       spf = "v=spf1 +a +mx ?all" if spf === true
-      spf = nil unless spf.is_a?(String)
-      spf
+
+      if spf.is_a?(String)
+       tinydns_encode(spf)
+      else
+        nil
+      end
     end
 
     def srv_record_for(priority, weight, port, target)
@@ -90,7 +94,7 @@ module Symbiosis
     def tinydns_encode(s)
       s = [s].pack("c") if (s.is_a?(Integer) and 255 > s)
 
-      s.chars.collect{|c| c =~ /[ .=+?\w]/ ? c : c.bytes.collect{|b| "\\%03o" % b}.join}.join
+      s.chars.collect{|c| c =~ /[\w .=+;?-]/ ? c : c.bytes.collect{|b| "\\%03o" % b}.join}.join
     end
 
     #
