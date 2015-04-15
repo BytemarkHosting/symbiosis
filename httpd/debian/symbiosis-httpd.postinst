@@ -21,7 +21,7 @@ fi
 #  Enable common modules
 #
 restart_type="reload"
-for mod in rewrite cgi php5 ssl dir vhost_bytemark ; do
+for mod in headers rewrite cgi php5 ssl dir vhost_bytemark ; do
   if ! [ -e /etc/apache2/mods-enabled/$mod.load ] ; then
     echo "I: enabling apache module $mod"
     restart_type="restart"
