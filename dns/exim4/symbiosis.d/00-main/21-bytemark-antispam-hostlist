@@ -1,5 +1,0 @@
-# This is the list of machines and ranges Bytemark uses for its
-# anti-spam service.
-
-hostlist    bytemark_antispam_hosts = <; 89.16.184.144/28 ; 2001:41c8:20:359::/64 
-

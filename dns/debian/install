@@ -1,6 +1,5 @@
 sbin                  usr/
 dns.d                 etc/symbiosis/
-exim4                 etc/
 test.d                etc/symbiosis
 
 

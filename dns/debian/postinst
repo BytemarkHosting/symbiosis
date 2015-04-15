@@ -1,7 +1,32 @@
 #!/bin/bash
+#
+# This script uses bash for arrays.
+#
 
 set -e
 
+#
+# Copied from preinst.
+#
+function do_upgrade() {
+
+  ##### Config adjustments ################ 
+  #
+  # Array of config files to remove
+  #
+  declare -a files_to_remove
+
+  files_to_remove+=(
+    "/etc/exim4/symbiosis.d/00-main/21-bytemark-antispam-hostlist"
+    "/etc/exim4/symbiosis.d/10-acl/50-acl-check-rcpt/70-bytemark-antispam-defer"
+  )
+
+  for file in ${files_to_remove[*]} ; do
+   dpkg-maintscript-helper rm_conffile \
+     $file \
+     "2014:1231" symbiosis-dns -- "$@"
+  done
+}
 
 #
 # Skip, if we are not in "configure" state
@@ -10,6 +35,8 @@ if [ "$1" != "configure" ]; then
         echo "I: Skipping configuration"
         exit 0
 fi
+
+do_upgrade $@
 
 #
 #  Remove the previous cron.d script
