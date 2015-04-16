@@ -15,7 +15,7 @@ function do_upgrade() {
   declare -a files_to_remove
 
   files_to_remove+=(
-    "/etc/exim4/symbiosis.d/00-main/21-bytemark-antispam-hostlist""
+    "/etc/exim4/symbiosis.d/00-main/21-bytemark-antispam-hostlist"
     "/etc/exim4/symbiosis.d/10-acl/50-acl-check-rcpt/70-bytemark-antispam-defer"
   )
 

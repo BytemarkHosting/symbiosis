@@ -1,5 +1,3 @@
 sbin                  usr/
 dns.d                 etc/symbiosis/
 test.d                etc/symbiosis
-
-
