@@ -4,11 +4,14 @@
 
 require 'date' # stdlib
 
+if File.exist?("/usr/lib/update-notifier/update-motd-fsck-at-reboot")
+  exit 0
+end
+
 TIME_FMT = "%a %b %d %H:%M:%S %Y"
 
 if Process.uid > 0
-  puts "This MUST be run as root."
-  exit 1
+  exit 0
 end
 
 class Filesystem

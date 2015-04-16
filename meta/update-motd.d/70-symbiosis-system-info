@@ -1,0 +1,13 @@
+#!/bin/sh
+
+
+#
+# If Ubuntu landscape is installed, just exit
+#
+test -x /usr/bin/landscape-sysinfo && exit 0
+
+echo -n "  * Load averge: "
+awk '{print $1}' /proc/loadavg
+
+echo "  * Filesystem usage "
+df -l -h --output='target,size,pcent,ipcent' -x tmpfs -x devtmpfs | sed -e 's/^/      /'

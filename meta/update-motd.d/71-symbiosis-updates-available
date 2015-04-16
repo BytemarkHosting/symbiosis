@@ -21,8 +21,38 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import sys
-import subprocess
+import os.path
+
+#
+# On Ubuntu, check that we don't run this test twice.  Let's use theirs.
+#
+if os.path.isfile("/usr/lib/update-notifier/update-motd-updates-available"):
+    sys.exit(0)
+
+import re
+import string
+
+#
+# Check the load average before we start
+#
+loadavg_fh = open('/proc/loadavg','r')
+loadavg = string.split(loadavg_fh.read(), " ", 1)
+loadavg_fh.close()
+
+cpus = 0
+for line in open("/proc/cpuinfo"):
+ if re.match(r"^processor\s+",line):
+   cpus += 1
+
+loadavg_1 = float(loadavg[0])
+if loadavg_1 > cpus or (cpus == 0 and loadavg_1 > 1):
+    sys.exit(0)
+
+#
+# Now move on with getting the distro
+#
 import apt_pkg
+import subprocess
 
 DISTRO = subprocess.Popen(["lsb_release", "-c", "-s"],
                           stdout=subprocess.PIPE).communicate()[0].strip()
@@ -117,9 +147,9 @@ for pkg in cache.packages:
             security_upgrades += 1
             break
 if upgrades > 0 or security_upgrades > 0 :
-    print "  Security status:\n"
-    print "    %d updates to install." % upgrades
-    print "    %d are security updates." % security_upgrades
+    print "  * Security status:"
+    print "    - %d updates to install." % upgrades
+    print "    - %d are security updates." % security_upgrades
 else:
     print "    There are no outstanding packages to update"
 
