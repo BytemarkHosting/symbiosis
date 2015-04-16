@@ -2,7 +2,7 @@ Source: bytemark-symbiosis
 Section: web
 Priority: extra
 Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
-Uploaders: John Hackett <john.hackett@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
+Uploaders: James Carter <jcarter@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0)
 Standards-Version: 3.9.6
 
@@ -11,6 +11,8 @@ Architecture: all
 Depends: symbiosis-key (>= 2012:0813),
   symbiosis-updater (>= 2014:0113),
   lsb-base (>= 3.0-6),
+  libpam-modules,
+  python-apt,
   ${misc:Depends}
 Recommends: symbiosis-backup (>= 2014:0113),
   symbiosis-common (>= 2014:0113),
