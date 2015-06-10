@@ -329,7 +329,7 @@ module Symbiosis
           unless param.is_a?(String)
             @password = nil
           else
-            @password = param.split.first.strip
+            @password = param.strip
           end
 
         end
