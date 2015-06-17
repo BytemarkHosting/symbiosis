@@ -1,3 +1,11 @@
+symbiosis-webmail (2015:0618) stable; urgency=medium
+
+  * Moved apache config to conf-available.
+  * Tidied packaging for jessie
+  * Updated maintainers + uploaders 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 11:07:11 +0100
+
 symbiosis-webmail (2015:0128) stable; urgency=low
 
   * Updated Debian standards.
