@@ -1,8 +1,15 @@
-symbiosis-email (2015:0409) stable; urgency=medium
+symbiosis-email (2015:0618) stable; urgency=medium
 
-  * Major rejig (holding commit note)
+  * Updated maintainers/uploaders
+  * Avoid advertising PLAIN and LOGIN over unencrypted connections.
+  * Replace ye olde checkpassword auth with dict proxy lookup.
+  * Set default quota grace to 0%.
+  * Renamed File#exists? to File#exist? everywhere.
+  * Exim4 now uses the IP in config/ip as the outgoing interface IP.
+  * Emails tagged with spam get delivered to Maildir/.Spam/
+  * Fixed acceptance of multi-word email passwords.
 
- --  Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 09 Apr 2015 19:15:56 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 10:47:19 +0100
 
 symbiosis-email (2015:0128) stable; urgency=low
 
