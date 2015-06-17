@@ -1,3 +1,13 @@
+symbiosis-dns (2015:0618) stable; urgency=medium
+
+  * Updated File#exists? to File#exist?
+  * Custom TTLs can now be set using a value in config/ttl
+  * Added DMARC support via config/dmarc
+  * Deprecated bytemark_antispam flag
+  * Fix the SPF record so it doesn't include CR/LF. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 10:38:10 +0100
+
 symbiosis-dns (2015:0128) stable; urgency=low
 
   * Updated Debian standards.
