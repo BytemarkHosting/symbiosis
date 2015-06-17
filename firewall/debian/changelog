@@ -1,3 +1,11 @@
+symbiosis-firewall (2015:0617) stable; urgency=medium
+
+  * Changed File#exists? to File#exist? everywhere.
+  * Added high numbered port range for passive FTP + TLS.
+  * Now all tables (filter, nat, raw) are flushed.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 10:22:48 +0100
+
 symbiosis-firewall (2015:0128) stable; urgency=medium
 
   * Updated the Debian standards.
