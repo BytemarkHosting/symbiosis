@@ -1,3 +1,10 @@
+symbiosis-ftpd (2015:0618) stable; urgency=medium
+
+  * Updated maintainers/uploaders + debian standards.
+  * Renamed File#exists? to File#exist?
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 10:45:40 +0100
+
 symbiosis-ftpd (2014:0218) stable; urgency=low
 
   * Updated pure-authd init script to start before pure-ftpd.
