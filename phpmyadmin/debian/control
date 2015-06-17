@@ -1,8 +1,8 @@
 Source: symbiosis-phpmyadmin
 Section: web
 Priority: extra
-Maintainer: Patrick J Cherry <patrick@bytemark.co.uk>
-Uploaders: John Hackett <john.hackett@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
+Maintainer: James Carter <jcarter@bytemark.co.uk>
+Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0)
 Standards-Version: 3.9.6
 Bugs: https://projects.bytemark.co.uk/projects/symbiosis/issues
