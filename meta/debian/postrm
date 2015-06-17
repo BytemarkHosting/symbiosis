@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "upgrade" ]; then
+    echo "I: Skipping configuration"
+    exit 0
+fi
+
+if [ -f /etc/motd.dpkg-symbiosis-orig ] ; then
+  echo "I: Disabling dynamic MOTD"
+  rm /etc/motd
+  mv /etc/motd.dpkg-symbiosis-orig /etc/motd
+fi
+
+#DEBHELPER#
+exit 0
