@@ -59,7 +59,7 @@ class TestCheckpassword < Test::Unit::TestCase
     assert_equal(1, status, "Authentication succeeded for a bad password")
    
     # Test for a malicious name.
-    assert_nothing_raised{ msg, status = do_checkpassword_test("../"+mailbox.username, pw) }
+    assert_nothing_raised{ msg, status = do_checkpassword_test("../mailboxes/"+mailbox.username, pw) }
     assert_equal(1, status, "Authentication succeeded for a malicious username")
     
     # Test for crypted passwords
@@ -76,6 +76,7 @@ class TestCheckpassword < Test::Unit::TestCase
     msg = nil
     status = nil
     mailbox = @domain.create_mailbox("test")
+    mailbox.encrypt_password = false 
     mailbox.password = ""
 
     assert_nothing_raised{ msg, status = do_checkpassword_test(mailbox.username, "") }
@@ -101,17 +102,18 @@ class TestCheckpassword < Test::Unit::TestCase
     status = nil
     xkcd_password = "correct horse battery staple"
     mailbox = @domain.create_mailbox("test")
+    mailbox.encrypt_password = false 
     mailbox.password = xkcd_password
     
 
     assert_nothing_raised{ msg, status = do_checkpassword_test(mailbox.username, xkcd_password) }
-    assert_equal(0, status, msg)
+    assert_equal(0, status, "Check password failed for the uncrypted xkcd password")
 
     mailbox.encrypt_password = true
     mailbox.password = xkcd_password
 
     assert_nothing_raised{ msg, status = do_checkpassword_test(mailbox.username, xkcd_password) }
-    assert_equal(0, status, msg)
+    assert_equal(0, status, "Check password failed for the crypted xkcd password")
   end
 
 end
