@@ -1,13 +1,66 @@
-#!/bin/sh
+#!/usr/bin/ruby
 
+require 'pp'
 
 #
 # If Ubuntu landscape is installed, just exit
 #
-test -x /usr/bin/landscape-sysinfo && exit 0
+if File.exist?("/usr/bin/landscape-sysinfo")
+    exit 0
+end
 
-echo -n "  * Load averge: "
-awk '{print $1}' /proc/loadavg
+loadavg = 
+if File.exist?("/proc/loadavg")
+  loadavg = File.read("/proc/loadavg").split(/\s+/)
+end
 
-echo "  * Filesystem usage "
-df -l -h --output='target,size,pcent,ipcent' -x tmpfs -x devtmpfs | sed -e 's/^/      /'
+meminfo = Hash.new
+meminfo.default = 0
+
+if File.exist?("/proc/meminfo")
+  File.readlines("/proc/meminfo").each do |l|
+    key,value,kb = l.split(/\s+/)
+    case key
+      when "MemTotal:"
+        meminfo["total"] += value.to_i
+        meminfo["used"] += value.to_i
+      when "MemFree:"
+        meminfo["used"] -= value.to_i
+      when "Buffers:"
+        meminfo["used"] -= value.to_i
+      when "Cached:"
+        meminfo["used"] -= value.to_i
+      when "SwapTotal:"
+        meminfo["swap_total"] += value.to_i
+        meminfo["swap_used"] += value.to_i
+      when "SwapFree:"
+        meminfo["swap_used"] -= value.to_i
+      when "SwapCached:"
+        meminfo["swap_used"] -= value.to_i
+    end
+  end
+end
+
+df=`df -l --output='target,size,pcent,ipcent' -x tmpfs -x devtmpfs`.split($/)
+
+#
+# Now print out our info
+#
+
+puts "    * System information as of #{Time.now.to_s}\n\n"
+puts "        System load:  %.2f\n" % loadavg.first.to_f
+puts "        Memory used: %.1f%% of %.1fGiB" % [meminfo["used"]*100.0/meminfo["total"], meminfo["total"].to_f/1024**2 ]
+puts "        Swap used:   %.1f%% of %.1fGiB" % [meminfo["swap_used"]*100.0/meminfo["swap_total"], meminfo["swap_total"].to_f/1024**2 ]
+df.each do |l|
+  next if l =~ /Mounted on/
+  mountpoint, size, pcent, ipcent = l.split(/\s+/)
+  size = size.to_i
+  puts "        Usage of %s:   %s of %.1fGB (%s of inodes used)" % [mountpoint, pcent, size/1.0e6, ipcent]
+end
+  
+#      Memory used: #{meminfo["swap_used"]*100.0/meminfo["swap_total"]}% of #{meminfo["swap_total"].to_f/1024**2}GiB
+#      Usage of /
+#      Usage of /boot
+#      
+#EOF
+
