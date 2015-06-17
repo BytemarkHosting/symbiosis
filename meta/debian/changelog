@@ -1,3 +1,12 @@
+bytemark-symbiosis (2015:0618) stable; urgency=medium
+
+  * Now depends on bytemark-key instead of symbiosis-key.
+  * New boot splash.
+  * Dynamic MOTD added to alert user to resource usage issues.
+  * Updated maintainers + uploaders 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 10:54:13 +0100
+
 bytemark-symbiosis (2015:0128) stable; urgency=low
 
   * Updated the Debian standards.
