@@ -367,7 +367,7 @@ namespace :rdoc do
   # Build all the documentation, removing any existing.
   #
   task :all => ["dependencies", "clobber"] do
-    sh "rdoc1.8 --diagram --op doc/html */lib/ */ext/"
+    sh "rdoc --diagram --op doc/html */lib/ */ext/"
   end
 
   #
@@ -376,7 +376,7 @@ namespace :rdoc do
   task :dependencies do 
     missing_build_deps = []
     [
-      %w(/usr/bin/rdoc1.8 rdoc1.8),
+      %w(/usr/bin/rdoc rdoc),
       %w(/usr/bin/dot graphviz)
     ].each do |executable, package|
       missing_build_deps << package unless File.executable?(executable)
