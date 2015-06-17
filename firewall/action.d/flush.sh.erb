@@ -31,21 +31,40 @@ fi
 #
 # Clean up existing tables
 #
+# TODO: try and iterate through an array, rather than hard-coding it all :)
+# declare -a table_filters
+# table_filters=("filter INPUT FORWARD OUTPUT" \
+#               "nat PREROUTING INPUT OUTPUT POSTROUTING" \
+#               "raw PREROUTING OUTPUT")
+
 for cmd in <%= iptables_cmds.join(" ") %> ; do
+  #
+  # Fix policies
+  #
   for chain in INPUT FORWARD OUTPUT ; do
-    #
-    # Fix policy, flush chain, and allow everything on loopback.
-    #
-    $cmd  -P $chain ACCEPT
+    $cmd -P $chain ACCEPT
   done
+
+  for chain in PREROUTING OUTPUT ; do
+    $cmd -t raw -P $chain ACCEPT
+  done
+
+  for chain in PREROUTING INPUT OUTPUT POSTROUTING ; do
+    $cmd -t nat -P $chain ACCEPT
+  done
+
   #
   # Flush everything
   #
-  $cmd  -F 
+  $cmd -F
+  $cmd -t raw -F
+  $cmd -t nat -F
 
   #
-  # Delete any old chains
+  # Delete old chains
   #
   $cmd -X
-done
+  $cmd -t raw -X
+  $cmd -t nat -X
 
+done
