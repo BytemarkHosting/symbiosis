@@ -1,3 +1,10 @@
+symbiosis-updater (2015:0618) stable; urgency=medium
+
+  * Added config for u-a
+  * Updated maintainer+ uploaders. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 11:08:16 +0100
+
 symbiosis-updater (2015:0408) stable; urgency=low
 
   * Use unattended-upgrades.
