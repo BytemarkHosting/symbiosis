@@ -1,3 +1,10 @@
+symbiosis-monit (2015:0618) stable; urgency=medium
+
+  * Rename File#exists? to File#exist?
+  * Updated maintainers + Uploaders.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 11:02:42 +0100
+
 symbiosis-monit (2015:0128) stable; urgency=low
 
   * Updated to use more recent Debian standards.
