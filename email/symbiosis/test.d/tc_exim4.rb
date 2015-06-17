@@ -83,7 +83,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
       fh.puts("spool_directory = "+File.join(@tempdir, "spool"))
     end
 
-    print `cd #{File.join(@tempdir,"exim4")} && make`
+    print `cd #{File.join(@tempdir,"exim4")} && make exim4.conf`
   end
 
   def teardown
