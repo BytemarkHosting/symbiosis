@@ -25,7 +25,8 @@ module Symbiosis
       spf = "v=spf1 +a +mx ?all" if spf === true
 
       if spf.is_a?(String)
-       tinydns_encode(spf)
+       # Encode just the first line 
+       tinydns_encode(spf.split($/).first)
       else
         nil
       end
