@@ -1,3 +1,9 @@
+symbiosis-email (2014:1019) stable; urgency=medium
+
+  * Passwords with spaces in now work.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 22 Jun 2015 09:06:19 +0100
+
 symbiosis-email (2014:1018) stable; urgency=medium
 
   [ James Carter ]
