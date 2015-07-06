@@ -15,7 +15,7 @@ function do_upgrade() {
   declare -a files_to_remove
 
   files_to_remove+=("/etc/dovecot/symbiosis.d/30-authentication/50-passdb-checkpassword"
-    "/etc/dovecot/symbiosis.d/30-authentication/85-userdb-checkpassword"
+    "/etc/dovecot/symbiosis.d/30-authentication/85-userdb-checkpasswd"
   )
 
   for file in ${files_to_remove[*]} ; do
