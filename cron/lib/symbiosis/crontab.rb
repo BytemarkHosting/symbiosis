@@ -210,6 +210,12 @@ module Symbiosis
         # Skip if line begins with a hash or is all spaces or empty.
         next if line =~ /\A([\s#].*|\s*)\Z/ 
 
+        # Skip unsupported lines
+        if line =~ /^\s*@reboot/
+          warn "cronjobs to be invoked at @reboot-time are not supported."
+          next
+        end
+
         if line =~ /\A([A-Z]+)\s*=\s*(.*)\Z/
           @environment[$1] = $2
         else
