@@ -1,3 +1,9 @@
+symbiosis-common (2015:0713) stable; urgency=medium
+
+  * Depend upon `cracklib-runtime` package so password testing works.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Mon, 13 Jul 2015 09:33:09 +0000
+
 symbiosis-common (2015:0618) stable; urgency=medium
 
   * Added 5.28.56.0/21 to the Bytemark ranges.
