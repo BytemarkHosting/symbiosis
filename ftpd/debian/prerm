@@ -11,6 +11,16 @@ if [ "$1" = "upgrade" ]; then
 fi
 
 #
+# Revert the TLS cipher suites
+# 
+cs="/etc/pure-ftpd/conf/TLSCipherSuite"
+if [ -f "$cs" ] && echo "69564370d505ab7968397591929b0bfc  $cs" | md5sum -c > /dev/null 2>&1 ; then
+  # OK this is the Debian ciphers
+  echo "I: Reverting pure-ftpd cipher suite to Debian default"
+  echo 'ALL:!aNULL:!SSLv3' > $cs
+fi
+
+#
 # Stop the authd
 #
 if which invoke-rc.d >/dev/null 2>&1; then
