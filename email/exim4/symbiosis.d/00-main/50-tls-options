@@ -31,8 +31,23 @@ tls_privatekey = /etc/ssl/ssl.key
 tls_on_connect_ports = 465
 
 #
-# Don't allow duff SSL ciphers
+# Sensible set of TLS ciphers, fulfilling the "Intermediate Compatibility"
+# configuration on https://wiki.mozilla.org/Security/Server_Side_TLS
 #
-# TODO: Check the below works with Outlook.
-tls_require_ciphers      = NORMAL:-VERS-SSL3.0:%COMPAT
+tls_require_ciphers      = '%SERVER_PRECEDENCE:%LATEST_RECORD_VERSION:%COMPAT:PFS:NORMAL:-VERS-SSL3.0:-ARCFOUR-128:-MD5:-CURVE-SECP192R1:-CURVE-SECP224R1'
+
+#
+# This is the "Modern compatibilty" suite (more or less)
+#
+# tls_require_ciphers      = '%SERVER_PRECEDENCE:%LATEST_RECORD_VERSION:%COMPAT:PFS:NORMAL:-VERS-SSL3.0:-VERS-TLS1.0:-ARCFOUR-128:-MD5:-3DES-CBC:-CAMELLIA-128-CBC:-CAMELLIA-256-CBC:-CAMELLIA-128-GCM:-CAMELLIA-256-GCM:-CURVE-SECP192R1:-CURVE-SECP224R1'
+
+#
+# Finally, this is the "Old backward compatilibility" suite (approximately)
+#
+# tls_require_ciphers      = '%SERVER_PRECEDENCE:%LATEST_RECORD_VERSION:%COMPAT:PFS:NORMAL:-ARCFOUR-128:-MD5:-CURVE-SECP192R1:-CURVE-SECP224R1'
+
+#
+# This stores the DH parameters in /var/spool/exim4/gnutls-dhparam-NNNN.
+#
+tls_dhparam = historic
 

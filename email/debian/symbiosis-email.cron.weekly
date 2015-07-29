@@ -1,0 +1,38 @@
+#!/bin/bash -eu
+
+tmpfile=""
+
+#
+# Clean up after ourselves.
+#
+do_cleanup() {
+  trap - EXIT
+
+  if [ -n "$tmpfile" -a -f "$tmpfile" ] ; then
+    rm $tmpfile
+  fi
+}
+
+trap do_cleanup EXIT
+
+#
+# This script regenerates Exim Diffie-Helman parameters.
+#
+
+for i in /var/spool/exim4/gnutls-params-[0-9]* ; do
+
+  length=${i##/var/spool/exim4/gnutls-params-}
+  tmpfile=$(tempfile -m 0600 -d /var/spool/exim4/ -p .dh)
+
+
+  if [ ! -f "$tmpfile" ] ; then
+    continue
+  fi
+
+  chown Debian-exim.Debian-exim $tmpfile
+
+  certtool --generate-dh-params --bits $length > $tmpfile 2> /dev/null
+
+  mv $tmpfile $i
+done
+
