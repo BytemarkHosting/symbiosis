@@ -37,7 +37,7 @@ tls_on_connect_ports = 465
 # don't break too badly.
 #
 tls_require_ciphers  = %SERVER_PRECEDENCE:%LATEST_RECORD_VERSION:%COMPAT:PFS:NORMAL:-VERS-SSL3.0:-MD5:-CURVE-SECP192R1:-CURVE-SECP224R1\
-                       ${if ne{$received_port}{25}{:-ARCFOUR-128}}
+                       ${if !eq{$received_port}{25}{:-ARCFOUR-128}}
 
 #
 # This stores the DH parameters in /var/spool/exim4/gnutls-dhparam-NNNN.
