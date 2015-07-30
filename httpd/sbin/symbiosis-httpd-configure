@@ -2,7 +2,7 @@
 #
 # NAME
 #
-#  symbiosis-httpd-configure -- Auto-configure Apache2 sites with specified IPs
+#  symbiosis-httpd-configure - Auto-configure Apache2 sites with specified IPs
 #
 # SYNOPSIS
 #  symbiosis-httpd-configure [ --ssl-template | -s <file> ] 

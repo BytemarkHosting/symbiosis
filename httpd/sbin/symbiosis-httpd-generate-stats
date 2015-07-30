@@ -1,15 +1,17 @@
 #!/usr/bin/ruby
 #
 # NAME
-#   symbiosis-generate-stats - Generate statistics for domains.
 #
+#  symbiosis-generate-stats - Generate statistics for domains.
 #
 # SYNOPSIS
+#
 #  symbiosis-generate-stats [ --template | -t <filename> ] [ --force | -f ]
 #                           [ --prefix | -p <directory> ] [ -h | --help ]
 #                           [-m | --manual] [ -v | --verbose ]
 #
 # OPTIONS
+#
 #  -t, --template <file>   Set the webalizer config template file. Defaults to
 #                          /etc/symbiosis/apache.d/webalizer.conf.erb.
 #

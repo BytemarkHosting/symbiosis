@@ -1,9 +1,11 @@
 #!/usr/bin/ruby
 #
 # NAME
+#
 #   symbiosis-httpd-rotate-logs - Rotate and prune Apache logs.
 #
 # SYNOPSIS
+#
 #  symbiosis-httpd-rotate-logs [ -n | --max-rotations <n> ] [ -c | --compress-at <n> ] 
 #                        [ --prefix | -p <directory> ] [ -h | --help ]
 #                        [-m | --manual] [ -v | --verbose ]

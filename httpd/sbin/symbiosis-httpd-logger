@@ -1,9 +1,11 @@
 #!/usr/bin/ruby -w
 #
 # NAME
+#
 #   symbiosis-apache-logger - Log access requests on a per-domain basis.
 #
 # SYNOPSIS
+#
 #  symbiosis-apache-logger [ --max-files | -f <n> ] [ -s | --sync ]
 #                          [ --uid | -u <n> ] | [ --gid | -g <n> ]
 #                          [ --log-name | -l <filename> ] [ -h | --help ]
