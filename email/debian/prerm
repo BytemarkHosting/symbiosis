@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "$1" == "upgrade" ] ; then
+if [ "$1" = "upgrade" ] ; then
   #
   #  Do nothing for upgrades.
   #
