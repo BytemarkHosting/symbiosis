@@ -31,20 +31,13 @@ tls_privatekey = /etc/ssl/ssl.key
 tls_on_connect_ports = 465
 
 #
-# Sensible set of TLS ciphers, fulfilling the "Intermediate Compatibility"
-# configuration on https://wiki.mozilla.org/Security/Server_Side_TLS
+# Sensible set of TLS ciphers.  This is loosely based on the "intermediate"
+# suite described at https://wiki.mozilla.org/Security/Server_Side_TLS.  RC4 is
+# removed unless the connecting port is 25, so ancient remote mail servers
+# don't break too badly.
 #
-tls_require_ciphers      = '%SERVER_PRECEDENCE:%LATEST_RECORD_VERSION:%COMPAT:PFS:NORMAL:-VERS-SSL3.0:-ARCFOUR-128:-MD5:-CURVE-SECP192R1:-CURVE-SECP224R1'
-
-#
-# This is the "Modern compatibilty" suite (more or less)
-#
-# tls_require_ciphers      = '%SERVER_PRECEDENCE:%LATEST_RECORD_VERSION:%COMPAT:PFS:NORMAL:-VERS-SSL3.0:-VERS-TLS1.0:-ARCFOUR-128:-MD5:-3DES-CBC:-CAMELLIA-128-CBC:-CAMELLIA-256-CBC:-CAMELLIA-128-GCM:-CAMELLIA-256-GCM:-CURVE-SECP192R1:-CURVE-SECP224R1'
-
-#
-# Finally, this is the "Old backward compatilibility" suite (approximately)
-#
-# tls_require_ciphers      = '%SERVER_PRECEDENCE:%LATEST_RECORD_VERSION:%COMPAT:PFS:NORMAL:-ARCFOUR-128:-MD5:-CURVE-SECP192R1:-CURVE-SECP224R1'
+tls_require_ciphers  = %SERVER_PRECEDENCE:%LATEST_RECORD_VERSION:%COMPAT:PFS:NORMAL:-VERS-SSL3.0:-MD5:-CURVE-SECP192R1:-CURVE-SECP224R1\
+                       ${if ne{$received_port}{25}{:-ARCFOUR-128}}
 
 #
 # This stores the DH parameters in /var/spool/exim4/gnutls-dhparam-NNNN.
