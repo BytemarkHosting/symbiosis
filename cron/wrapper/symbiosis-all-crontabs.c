@@ -84,7 +84,10 @@ void process_crontab( char *crontab_path, char *domain_path, struct passwd *usr 
     /**
      * Live in /srv/domain.com by default 
      */
-    chdir(domain_path);
+    if ( chdir(domain_path) == -1 ) {
+        printf("*** ERROR: Unable to change to directory %s\n", domain_path);
+        exit(-1);
+    }
 
     /**
      * Fix up environment (this was cleared some time ago)
