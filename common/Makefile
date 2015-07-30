@@ -1,20 +1,15 @@
 
 all: docs
 
-man/symbiosis-configure-ips.man: sbin/symbiosis-configure-ips
+man/%.man:: ./bin/%
 	[ -d man ] || mkdir man
-	RUBYLIB=./lib $<  --manual | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
+	RUBYLIB=./lib $<  --help | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
 
-man/symbiosis-password-test.man: sbin/symbiosis-password-test
-	[ -d man ] || mkdir man
-	RUBYLIB=./lib $<  --manual | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
-
-man/%.man: ./bin/%
+man/%.man:: ./sbin/%
 	[ -d man ] || mkdir man
 	RUBYLIB=./lib $<  --help | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
 
 docs: man/symbiosis-encrypt-password.man  man/is-bytemark-ip.man  man/symbiosis-ip.man  man/symbiosis-test.man  man/which-backup-space.man man/symbiosis-configure-ips.man man/symbiosis-password-test.man
-
 
 clean:
 	$(RM) -r man
