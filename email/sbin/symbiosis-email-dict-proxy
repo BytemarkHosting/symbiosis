@@ -1,11 +1,14 @@
 #!/usr/bin/ruby
 # NAME
-#  symbiosis-email-password-daemon -- Dovecot dict interface for Symbiosis
+#
+#  symbiosis-email-password-daemon - Dovecot dict interface for Symbiosis
 #
 # SYNOPSIS
+#
 #  symbiosis-email-password-daemon [ -h | --help ] [-m | --manual] [ -p | --prefix ]
 #
 # OPTIONS
+#
 #  -h, --help            Show a help message, and exit.
 #
 #  -m, --manual          Show this manual, and exit.
@@ -52,6 +55,16 @@ opts.each do |opt,arg|
   when '--foreground'
     foreground = true
   end
+end
+
+#
+# Output help as required.
+#
+if help or manual
+  require 'symbiosis/utils'
+  Symbiosis::Utils.show_help(__FILE__) if help
+  Symbiosis::Utils.show_manual(__FILE__) if manual
+  exit 0
 end
 
 #
