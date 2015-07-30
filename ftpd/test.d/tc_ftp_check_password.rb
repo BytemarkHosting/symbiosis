@@ -2,10 +2,19 @@ require 'test/unit'
 require 'tmpdir'
 require 'symbiosis/domain'
 require 'symbiosis/domain/ftp'
+require 'fileutils'
 
 class TestFtpdCheckPassword < Test::Unit::TestCase
 
   def setup
+    #
+    # Drop effective privs
+    #
+    if 0 == Process.uid
+      Process.egid = 1000
+      Process.euid = 1000
+    end
+
     @prefix = Dir.mktmpdir("srv","/tmp")
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
@@ -18,6 +27,14 @@ class TestFtpdCheckPassword < Test::Unit::TestCase
     # Remove the @prefix directory
     #
     FileUtils.remove_entry_secure @prefix
+
+    #
+    # Return back to root
+    #
+    if 0 == Process.uid
+      Process.egid = 0
+      Process.euid = 0
+    end
   end
 
   def do_checkpassword_test(username, password)
