@@ -10,46 +10,26 @@ if [ "$1" = "upgrade" ] ; then
   exit 0
 fi
 
-restart_type="reload"
-
-#
-# Replace 000-default site
-#
-if ! [ -e /etc/apache2/sites-enabled/000-default.conf ] ; then
-  a2ensite -q -m 000-default
-fi
-
-#
-# Replace the serve-cgi snippet
-#
-if ! [ -e /etc/apache2/conf-enabled/serve-cgi-bin.conf ] ; then
-  a2enconf -q -m serve-cgi-bin
-fi
-
-#
-# Remove our security config
-#
-if [ -e /etc/apache2/conf-enabled/serve-cgi-bin.conf ] ; then
-  a2disconf -q -m symbiosis-security
-fi
-
-#
-# Disable the modules we enabled
-#
-for mod in rewrite cgi php5 ssl dir vhost_bytemark ; do
-  if [ -e /etc/apache2/mods-enabled/$mod.load ] ; then
-    echo "I: enabling apache module $mod"
-    restart_type="restart"
-    a2dismod -q -m $mod
-  fi
-done
-
-
-#
-# Restart apache, as required
-#
 if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
-  apache2_invoke $restart
+
+  . /usr/share/apache2/apache2-maintscript-helper
+
+  #
+  # Replace 000-default site
+  #
+  apache2_invoke ensite 000-default
+
+  #
+  # Replace the serve-cgi snippet
+  #
+  apache2_invoke enconf serve-cgi-bin
+
+  #
+  # Disable the modules we enabled
+  #
+  for mod in headers rewrite cgi ssl ; do
+    apache2_invoke dismod $mod
+  done
 fi
 
 #DEBHELPER#
