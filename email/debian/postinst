@@ -80,6 +80,22 @@ if [ -e /etc/exim4/Makefile ]; then
     cd /etc/exim4 && make
 fi
 
+# 
+# Dovecot ships with its own config.
+#
+package="symbiosis-email"
+conf="/etc/dovecot/dovecot.conf"
+theirfile="$conf.dpkg-symbiosis-orig"
+
+#
+# Add the diversion, if it doesn't exist.
+#
+if ! dpkg-divert --list "$package" | \
+  grep -xFq "diversion of $conf to $theirfile by $package"; then
+
+  dpkg-divert --divert "$theirfile" --rename --package "$package" --add "$conf"
+fi
+
 #
 #  Rebuild dovecot
 #

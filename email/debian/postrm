@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "purge" ] ; then
+  if [ -e /etc/exim4/exim4.conf ] ; then
+    echo "I: Removing exim4.conf"
+    rm /etc/exim4/exim4.conf
+  fi
+
+  if [ -e /etc/dovecot/dovecot.conf.dpkg-symbiosis ] ; then
+    echo "I: Removing dovecot.conf.dpkg-symbiosis"
+    rm /etc/dovecot/dovecot.conf.dpkg-symbiosis
+  fi 
+fi
+
+#DEBHELPER#
+
+exit 0

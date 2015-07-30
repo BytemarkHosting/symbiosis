@@ -16,6 +16,16 @@ if echo "ae779d6822f91492b26697d6b9931835  /etc/default/clamav-daemon" | md5sum 
   rm -f /etc/default/clamav-daemon
 fi
 
+# 
+# Remove the old diversion 
+#
+package="symbiosis-email"
+conf="/etc/dovecot/dovecot.conf"
+
+if [ -e "${conf}.dpkg-symbiosis-orig" ] ; then
+  mv -f $conf ${conf}.dpkg-symbiosis
+  dpkg-divert --remove --rename --package "$package" "$conf"
+fi
 
 #DEBHELPER#
 exit 0
