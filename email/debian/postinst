@@ -41,12 +41,26 @@ fi
 
 do_upgrade $@
 
+#
+# Configure supplementary groups for clamav and freshclam
+#
 if ! ( groups clamav | grep -q Debian-exim ) ; then
   #
   #  Add the user
   #
+  echo "I: Adding Debian-exim group to clamav"
   adduser clamav Debian-exim
 fi
+
+. /usr/share/debconf/confmodule
+if ! ( db_get clamav-daemon/AddGroups | grep -q Debian-exim ) ; then
+  db_set clamav-daemon/AddGroups 'Debian-exim'
+fi
+
+if ( grep -q '^AllowSupplementaryGroups \+false' /etc/clamav/clamd.conf ) ; then
+  echo "I: Allowing clamav to operate using its supplementary groups"
+  sed -i -e 's/^AllowSupplementaryGroups .*$/AllowSupplementaryGroups true/' /etc/clamav/clamd.conf
+fi 
 
 #
 # Set the TMPDIR variable for clamav.
@@ -106,7 +120,7 @@ fi
 #
 #  Restart all deamons
 #
-for i in spamassassin clamav-daemon exim4 dovecot symbiosis-email-dict-proxy; do
+for i in spamassassin clamav-daemon symbiosis-email-dict-proxy; do
     # spamassassin + clamav-daemon might not be installed.  Wrap the invokation.
     service $i restart || true
 done
