@@ -36,12 +36,5 @@ fi
 
 #DEBHELPER#
 
-#
-#  Restart Apache2.
-#
-invoke-rc.d apache2 force-reload
-
-#DEBHELPER#
-
 exit 0
 

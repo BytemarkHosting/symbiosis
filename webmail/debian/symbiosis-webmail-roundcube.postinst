@@ -51,13 +51,4 @@ if [ "$1" = configure ] ; then
 fi
 
 #DEBHELPER#
-
-#
-#  Restart Apache2.
-#
-invoke-rc.d apache2 force-reload
-
-exit 0
-
-#DEBHELPER#
 exit 0
