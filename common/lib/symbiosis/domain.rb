@@ -280,7 +280,7 @@ module Symbiosis
     #
     def crypt_password(password)
       raise ArgumentError, "password must be a string" unless password.is_a?(String)
-      salt = "$1$"+random_string(8)+"$"
+      salt = "$6$"+random_string(8)+"$"
       return "{CRYPT}"+password.crypt(salt)
     end
 
