@@ -11,7 +11,7 @@ ssl_protocols = !SSLv2 !SSLv3
 #
 # Prefer our ciphers
 #
-ssl_prefer_server_ciphers = true
+ssl_prefer_server_ciphers = yes
 
 # 
 # Regenerates every week
