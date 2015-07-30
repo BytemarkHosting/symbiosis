@@ -6,7 +6,20 @@
 #
 # SYNOPSIS
 #
-#  symbiosis-test [ --help ] [ --verbose ] [directory]
+#  symbiosis-test [ --help ] [ --manual ] [ --verbose ] [directory]
+#
+# OPTIONS
+#
+#   --help        Show a brief help message.
+#
+#  --manual       Show the full manual.
+#
+#  --verbose      Show debugging information.
+#
+# USAGE
+# 
+# This program runs all the tests in a given directory, defaulting to
+# /etc/symbiosis/test.d.
 #
 # AUTHOR
 #
@@ -21,33 +34,32 @@
 
 require 'getoptlong'
 
+help = manual = false
+
 opts = GetoptLong.new(
          [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
          [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ]
        )
 
 opts.each do |opt, arg|
   case opt
   when '--help'
-    $HELP = true
+    help = true
+  when '--manual'
+    manual = true
   when '--verbose'
     $VERBOSE = true
   end
 end
 
 #
-# CAUTION! Here be quality kode.
+# Output help as required.
 #
-if $HELP
-  # Open the file, stripping the shebang line
-  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
-
-  lines.each do |line|
-    line.chomp!
-    break if line.empty?
-    puts line[2..-1].to_s
-  end
-
+if help or manual
+  require 'symbiosis/utils'
+  Symbiosis::Utils.show_help(__FILE__) if help
+  Symbiosis::Utils.show_manual(__FILE__) if manual
   exit 0
 end
 

@@ -219,7 +219,11 @@ module Symbiosis
         if line =~ /\A([A-Z]+)\s*=\s*(.*)\Z/
           @environment[$1] = $2
         else
-          @records << CrontabRecord.parse(line)
+          begin
+            @records << CrontabRecord.parse(line)
+          rescue CrontabFormatError => err
+            warn "Failed to parse crontab: #{err.to_s}"
+          end
         end
       }
     end

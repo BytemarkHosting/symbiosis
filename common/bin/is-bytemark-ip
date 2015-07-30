@@ -2,7 +2,7 @@
 #
 # NAME
 #
-#   is-bytemark-ip -- Check if a system's IP addresses are on the Bytemark network.
+#   is-bytemark-ip - Check if a system's IP addresses are on the Bytemark network.
 #
 # SYNOPSIS
 #
@@ -15,7 +15,9 @@
 #
 #  --ipv6          Check IPv6 addresses
 #
-#   --help         Show the help information for this script.
+#   --help         Show the help.
+#
+#   --manual       Show the full manual.
 #
 #   --verbose      Show debugging information.
 #
@@ -46,12 +48,13 @@ require 'getoptlong'
 
 opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+    [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
     [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
     [ '--ipv4',  '-4', GetoptLong::NO_ARGUMENT ],
     [ '--ipv6',  '-6', GetoptLong::NO_ARGUMENT ]
 )
 
-help = false
+manual = help = false
 $VERBOSE = false
 ipv4 = nil
 ipv6 = nil
@@ -60,6 +63,8 @@ opts.each do |opt,arg|
   case opt
     when '--help'
       help = true
+    when '--manual'
+      manual = true
     when '--verbose'
       $VERBOSE = true
     when '--ipv6'
@@ -70,18 +75,12 @@ opts.each do |opt,arg|
 end
 
 #
-# CAUTION! Here be quality kode.
+# Output help as required.
 #
-if help
-  # Open the file, stripping the shebang line
-  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
-
-  lines.each do |line|
-    line.chomp!
-    break if line.empty?
-    puts line[2..-1].to_s
-  end
-
+if help or manual
+  require 'symbiosis/utils'
+  Symbiosis::Utils.show_help(__FILE__) if help
+  Symbiosis::Utils.show_manual(__FILE__) if manual
   exit 0
 end
 

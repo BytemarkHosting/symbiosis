@@ -2,7 +2,7 @@
 # 
 # NAME
 #
-#   symbiosis-ip -- Determine the primary IP address of this system
+#   symbiosis-ip - Determine the primary IP address of this system
 #
 # SYNOPSIS
 #
@@ -39,13 +39,14 @@ require 'getoptlong'
 
 opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+    [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
     [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
     [ '--all', '-a', GetoptLong::NO_ARGUMENT ],
     [ '--ipv4', '-4', GetoptLong::NO_ARGUMENT ],
     [ '--ipv6', '-6', GetoptLong::NO_ARGUMENT ]
 )
 
-help = false
+manual = help = false
 $VERBOSE = false
 show_all = false
 ipv6 = false
@@ -55,6 +56,8 @@ opts.each do |opt,arg|
   case opt
     when '--help'
       help = true
+    when '--manual'
+      manual = true
     when '--verbose'
       $VERBOSE = true
     when '--all'
@@ -67,18 +70,12 @@ opts.each do |opt,arg|
 end
 
 #
-# CAUTION! Here be quality kode.
+# Output help as required.
 #
-if help
-  # Open the file, stripping the shebang line
-  lines = File.open(__FILE__){|fh| fh.readlines}[2..-1]
-
-  lines.each do |line|
-    line.chomp!
-    break if line.empty?
-    puts line[2..-1].to_s
-  end
-
+if help or manual
+  require 'symbiosis/utils'
+  Symbiosis::Utils.show_help(__FILE__) if help
+  Symbiosis::Utils.show_manual(__FILE__) if manual
   exit 0
 end
 

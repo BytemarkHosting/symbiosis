@@ -104,6 +104,14 @@ if ! [ -e /etc/ssl/ssl.crt -a -e /etc/ssl/ssl.key ]; then
   fi
 fi
 
+#
+# Generate dhparams
+#
+if ! [ -e /etc/ssl/dhparams.pem ] ; then
+  echo "I: Generating a new, unique Diffie-Hellman group"
+  openssl dhparam -out /etc/ssl/dhparams.pem 2048
+fi
+
 #DEBHELPER#
 
 exit 0
