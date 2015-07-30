@@ -1,3 +1,1 @@
-man/symbiosis-httpd-configure.man
-man/symbiosis-httpd-logger.man
-man/symbiosis-httpd-generate-stats.man
+man/*.man
