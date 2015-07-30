@@ -1,4 +1,3 @@
-#!/usr/bin/ruby
 #
 #  Simple HTTP tests
 #
