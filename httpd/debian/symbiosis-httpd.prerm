@@ -10,25 +10,35 @@ if [ "$1" = "upgrade" ] ; then
   exit 0
 fi
 
+#
+# Replace 000-default site
+#
+if [ -e /etc/apache2/sites-available/000-default.conf -a ! -e /etc/apache2/sites-enabled/000-default.conf ] ; then
+  echo "I: enabling site 000-default"
+  ln -s /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-enabled/000-default.conf
+fi
+
+#
+# Remove the serve-cgi snippet (ugh!)
+#
+if [ -e /etc/apache2/conf-available/serve-cgi-bin.conf -a ! -e /etc/apache2/conf-enabled/serve-cgi-bin.conf ] ; then
+  echo "I: enabling conf serve-cgi-bin"
+  ln -s /etc/apache2/conf-available/serve-cgi-bin.conf /etc/apache2/conf-enabled/serve-cgi-bin.conf
+fi
+
 if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
 
   . /usr/share/apache2/apache2-maintscript-helper
-
-  #
-  # Replace 000-default site
-  #
-  apache2_invoke ensite 000-default
-
-  #
-  # Replace the serve-cgi snippet
-  #
-  apache2_invoke enconf serve-cgi-bin
 
   #
   # Disable the modules we enabled
   #
   for mod in headers rewrite cgi ssl ; do
     apache2_invoke dismod $mod
+  done
+
+  for site in zz-mass-hosting zz-mass-hosting.ssl ; do
+    apache2_invoke dissite $site
   done
 fi
 

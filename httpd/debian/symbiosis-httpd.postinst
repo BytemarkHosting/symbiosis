@@ -13,8 +13,24 @@ set -e
 # Skip, if we are not in "configure" state
 #
 if [ "$1" != "configure" ]; then
-        echo "I: Skipping configuration"
-        exit 0
+  echo "I: Skipping configuration"
+  exit 0
+fi
+
+#
+# Remove 000-default site
+#
+if [ -L /etc/apache2/sites-enabled/000-default.conf ] ; then
+  echo "I: Disabling site 000-default"
+  rm /etc/apache2/sites-enabled/000-default.conf
+fi
+
+#
+# Remove the serve-cgi snippet (ugh!)
+#
+if [ -L /etc/apache2/conf-enabled/serve-cgi-bin.conf ] ; then
+  echo "I: Disabling config serve-cgi-bin"
+  rm -f /etc/apache2/conf-enabled/serve-cgi-bin.conf
 fi
 
 if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
@@ -24,27 +40,14 @@ if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
   #  Enable common modules
   #
   for mod in headers rewrite cgi ssl vhost_bytemark ; do
-    if ! [ -e /etc/apache2/mods-enabled/$mod.load ] ; then
-      apache2_invoke enmod $mod
-    fi
+    apache2_invoke enmod $mod
   done
-
-  #
-  # Remove 000-default site
-  #
-  apache2_invoke dissite 000-default
-
-  #
-  # Remove the serve-cgi snippet (ugh!)
-  #
-  apache2_invoke disconf serve-cgi-bin
 fi
 
 #
 # Reconfigure apache.
 #
 symbiosis-httpd-configure --no-reload --verbose
-
 
 #DEBHELPER#
 

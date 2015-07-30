@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "purge" ] ; then
+  for site in zz-mass-hosting zz-mass-hosting.ssl ; do
+    rm -f /etc/apache2/sites-available/$site.conf
+  done
+fi
+
+#DEBHELPER#
+
+exit 0
