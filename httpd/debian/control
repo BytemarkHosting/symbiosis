@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: James Carter <jcarter@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
 Build-Depends: debhelper (>= 7.0.0), apache2-dev, libcap-dev, php5-common, txt2man, gem2deb, ruby
-Standards-Version: 3.9.1
+Standards-Version: 3.9.6
 XS-Ruby-Versions: all
 
 Package: symbiosis-httpd
@@ -27,7 +27,7 @@ Description: Tools to manage Apache virtual hosting in Symbiosis
 Package: libapache2-mod-vhost-bytemark
 Architecture: any
 Depends: apache2-api-20120211, ${shlibs:Depends}, ${misc:Depends}
-Description: A mass-hosting module for Apache 2.x
+Description: Mass-hosting module for Apache 2.x and Bytemark Symbiosis
  This module allows you to easily host multiple virtual hosts with
  a single simple configuration file.
  .
