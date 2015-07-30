@@ -46,9 +46,17 @@ fi
 #
 # Add our security config
 #
-if [ ! -e /etc/apache2/conf-enabled/serve-cgi-bin.conf ] ; then
+if [ ! -e /etc/apache2/conf-enabled/symbiosis-security.conf ] ; then
   a2enconf -q -m symbiosis-security
 fi
+
+#
+# And our SSL config.
+#
+if [ ! -e /etc/apache2/conf-enabled/symbiosis-ssl.conf ] ; then
+  a2enconf -q -m symbiosis-ssl
+fi
+
 
 #
 # Reconfigure apache.
