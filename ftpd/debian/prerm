@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -23,11 +23,7 @@ fi
 #
 # Stop the authd
 #
-if which invoke-rc.d >/dev/null 2>&1; then
-    invoke-rc.d pure-authd stop
-else
-    /etc/init.d/pure-authd stop
-fi
+invoke-rc.d pure-authd stop
 
 #DEBHELPER#
 exit 0
