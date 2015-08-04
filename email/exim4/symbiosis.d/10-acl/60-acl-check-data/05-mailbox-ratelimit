@@ -1,0 +1,26 @@
+#
+# This clause rate limits authenticated clients based on the value stored in
+# /srv/domain.com/mailboxes/bob/ratelimit OR
+# /srv/domain.com/config/mailbox-ratelimit, with the default value being 100
+# messages / hour
+#
+
+deny authenticated = *
+     message     = Sender rate for $authenticated_id exceeds $sender_rate_limit messages per $sender_rate_period
+     log_message = Sender rate for $authenticated_id is $sender_rate / $sender_rate_period
+     condition = ${if and{\
+                    {!eq{$authenticated_id}{}}\
+                    { or {
+                      {exists{VHOST_DIR/${domain:$authenticated_id}/VHOST_CONFIG_DIR/mailbox-ratelimit}}\
+                      {exists{VHOST_DIR/${domain:$authenticated_id}/VHOST_MAILBOX_DIR/${local_part:$authenticated_id}/ratelimit}}\
+                    }}
+                  }}
+
+     ratelimit = ${if match{
+                    ${if exists{VHOST_DIR/${domain:$authenticated_id}/VHOST_MAILBOX_DIR/${local_part:$authenticated_id}/ratelimit}\
+                      {${readfile{VHOST_DIR/${domain:$authenticated_id}/VHOST_MAILBOX_DIR/${local_part:$authenticated_id}/ratelimit}}}\
+                      {${readfile{VHOST_DIR/${domain:$authenticated_id}/VHOST_CONFIG_DIR/mailbox-ratelimit}}}\
+                     }\
+                  {([0-9]+)}}{$1}{100}} / 1h / strict / $authenticated_id
+
+
