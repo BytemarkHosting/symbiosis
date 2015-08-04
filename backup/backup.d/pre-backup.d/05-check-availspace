@@ -3,48 +3,56 @@
 #Relies upon libfilesys-df-perl
 
 use strict;
-use Filesys::Df;
+my $has_filesysdf  = eval "use Filesys::Df; 1;";
 use Switch;
 
 my $rv = 1;
 
-open my $fh, '<', '/etc/symbiosis/backup.d/backup2l.conf' or die "Unable to open file:$!\n";
-my %hash = map { split /=|\s+/; } <$fh>;
-close $fh;
-while (my ($key, $val) = each %hash) 
+unless ($has_filesysdf)
 {
-        if($key eq "BACKUP_DIR")
+        print "Perl module Filesys::Df is not installed, exiting and so not completing backup\n\n";
+        $rv = 1;
+}
+else
+{
+        open my $fh, '<', '/etc/symbiosis/backup.d/backup2l.conf' or die "Unable to open file:$!\n";
+        my %hash = map { split /=|\s+/; } <$fh>;
+        close $fh;
+        while (my ($key, $val) = each %hash)
         {
-                $val =~ s/"//g;
-                
-                my $ref = df($val); 
-                my $divis = 0;
-                my $mb_available =  $ref->{bavail} / 1024 ;
-                my $est_output = `backup2l --estimate --conf /etc/symbiosis/backup.d/backup2l.conf`;
-                $est_output =~ /^\s*[0-9].*\/ ([0-9A-Z.]+) \(uncompressed\)$/m;
-                my $estimate = $1;
-                $estimate =~ /(?<int>[-+]?[0-9]*\.?[0-9]+)(?<suff>[A-Z]+)/;
+                if($key eq "BACKUP_DIR")
+                {
+                        $val =~ s/"//g;
 
-                switch($+{suff})
-                {
-                        case "B"        {  $divis = 1; }
-                        case "KB"       {  $divis = 1024; }
-                        case "MB"       {  $divis = 1024 * 1024; }
-                        case "GB"       {  $divis  = 1024 * 1024 * 1024; }
-                        case "TB"       {  $divis = 1024 * 1024 * 1024* 1024; }
-                        else            {  $divis = 1;}
-                }
-                my $value_in_bytes = $+{int} * $divis;
-                my $value_in_mb = $value_in_bytes / (1024 * 1024);
-                if($mb_available < $value_in_mb)
-                {
-                        print "There is not enough space : Available space $mb_available MB , space needed $value_in_mb MB\n\n";
-                        $rv = 1;
-                }
-                else
-                {
-                        print "There is enough space : Available space $mb_available MB , space needed $value_in_mb MB\n\n";
-                        $rv = 0;
+                        my $ref = df($val);
+                        my $divis = 0;
+                        my $mb_available =  $ref->{bavail} / 1024 ;
+                        my $est_output = `backup2l --estimate --conf /etc/symbiosis/backup.d/backup2l.conf`;
+                        $est_output =~ /^\s*[0-9].*\/ ([0-9A-Z.]+) \(uncompressed\)$/m;
+                        my $estimate = $1;
+                        $estimate =~ /(?<int>[-+]?[0-9]*\.?[0-9]+)(?<suff>[A-Z]+)/;
+
+                        switch($+{suff})
+                        {
+                                case "B"        {  $divis = 1; }
+                                case "KB"       {  $divis = 1024; }
+                                case "MB"       {  $divis = 1024 * 1024; }
+                                case "GB"       {  $divis  = 1024 * 1024 * 1024; }
+                                case "TB"       {  $divis = 1024 * 1024 * 1024* 1024; }
+                                else            {  $divis = 1;}
+                        }
+                        my $value_in_bytes = $+{int} * $divis;
+                        my $value_in_mb = $value_in_bytes / (1024 * 1024);
+                        if($mb_available < $value_in_mb)
+                        {
+                                print "There is not enough space : Available space $mb_available MB , space needed $value_in_mb MB\n\n";
+                                $rv = 1;
+                        }
+                        else
+                        {
+                                print "There is enough space : Available space $mb_available MB , space needed $value_in_mb MB\n\n";
+                                $rv = 0;
+                        }
                 }
         }
 }
