@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -64,17 +64,6 @@ if [ -e /etc/ssl/private/pure-ftpd.pem ] ; then
 fi
 
 #
-# Update default runlevels.
-#
-if [ -x "/etc/init.d/pure-authd" ]; then
-  if [ -n "$(which insserv)" ] ; then
-    insserv pure-authd
-  else
-    update-rc.d pure-authd defaults >/dev/null
-  fi
-fi
-
-#
 #  Restart (or start)
 #
 if [ "$2" = "" ] ; then
@@ -84,11 +73,6 @@ else
 fi
 
 invoke-rc.d pure-authd $action
-
-#
-# Restart pure-ftpd, since we've already made config changes.
-#
-
 invoke-rc.d pure-ftpd restart 
 
 #DEBHELPER#
