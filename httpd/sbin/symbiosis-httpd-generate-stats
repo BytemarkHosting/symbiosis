@@ -276,6 +276,10 @@ Symbiosis::Domains.each(prefix) do |domain|
   #
   domain.create_dir( output_dir )
 
+  # Remove old output
+  verbose "\tRemoving output from #{output_dir} older than 365 days"
+  system( "sudo -u '\##{domain.uid}' find #{output_dir} -ctime +365 -delete" )
+
   #
   #  Now process each logfile.
   #
