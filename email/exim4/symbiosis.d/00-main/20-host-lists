@@ -7,16 +7,30 @@ domainlist local_domains     = @ : +vhost_domains
 domainlist vhost_domains     = ${if exists{VHOST_DIR}{dsearch;VHOST_DIR}}
 hostlist   relay_from_hosts  = 127.0.0.1 : ::::1 : @[] : ${if exists{ETC_DIR/exim4/relay_from_hosts}{net-iplsearch;ETC_DIR/exim4/relay_from_hosts}}
 
+# 
+# Private address ranges as per RFC6890
+#
+hostlist private_addresses = <; 0.0.0.0/8  ; 10.0.0.0/8     ; 100.64.0.0/10   ; \
+                            127.0.0.0/8    ; 169.254.0.0/16 ; 172.16.0.0/12   ; \
+                            192.0.0.0/24   ; 192.0.2.0/24   ; 192.88.99.0/24  ; \
+                            192.168.0.0/16 ; 198.18.0.0/15  ; 198.51.100.0/24 ; \
+                            203.0.113.0/24 ; 240.0.0.0/4    ; 255.255.255.255 ; \
+                            ::1/128        ; ::/128         ; 64:ff9b::/96    ; \
+                            100::/64       ; 2001:db8::/32  ; fc00::/7        ; \
+                            fe80::/10 
+
 # The next 4 lists are white- and blacklists defined locally.  There are
 # defined in files in the Exim configuration directory, and used in the
 # smtp_rcpt access control list to accept/reject mail respectively.
 
 addresslist blacklisted_senders = ${if exists{ETC_DIR/exim4/blacklist/by_sender}    {lsearch*@;ETC_DIR/exim4/blacklist/by_sender}}
-hostlist    blacklisted_hosts   = ${if exists{ETC_DIR/exim4/blacklist/by_ip}      {net-iplsearch;ETC_DIR/exim4/blacklist/by_ip}} : \
-                                  ${if exists{ETC_DIR/exim4/blacklist/by_hostname}{wildlsearch;ETC_DIR/exim4/blacklist/by_hostname}}
+hostlist    blacklisted_hosts_by_ip       = ${if exists{ETC_DIR/exim4/blacklist/by_ip}      {net-iplsearch;ETC_DIR/exim4/blacklist/by_ip}}
+hostlist    blacklisted_hosts_by_hostname = ${if exists{ETC_DIR/exim4/blacklist/by_hostname}{wildlsearch;ETC_DIR/exim4/blacklist/by_hostname}}
+hostlist    blacklisted_hosts   = +blacklisted_hosts_by_ip : +blacklisted_hosts_by_hostname
 
 addresslist whitelisted_senders = ${if exists{ETC_DIR/exim4/whitelist/by_sender}    {lsearch*@;ETC_DIR/exim4/whitelist/by_sender}}
-hostlist    whitelisted_hosts   = ${if exists{ETC_DIR/exim4/whitelist/by_ip}      {net-iplsearch;ETC_DIR/exim4/whitelist/by_ip}} : \
-                                  ${if exists{ETC_DIR/exim4/whitelist/by_hostname}{wildlsearch;ETC_DIR/exim4/whitelist/by_hostname}}
+hostlist    whitelisted_hosts_by_ip       = ${if exists{ETC_DIR/exim4/whitelist/by_ip}      {net-iplsearch;ETC_DIR/exim4/whitelist/by_ip}}
+hostlist    whitelisted_hosts_by_hostname = ${if exists{ETC_DIR/exim4/whitelist/by_hostname}{wildlsearch;ETC_DIR/exim4/whitelist/by_hostname}}
+hostlist    whitelisted_hosts   = +whitelisted_hosts_by_ip : +whitelisted_hosts_by_hostname
 
 

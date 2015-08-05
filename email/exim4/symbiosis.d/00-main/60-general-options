@@ -12,7 +12,7 @@ never_users = root
 #
 # This setting looks up IPs from machines not allowed to relay mail by default. 
 
-host_lookup = !+relay_from_hosts
+host_lookup = !+relay_from_hosts : !+private_addresses
 
 # The settings below, which are actually the same as the defaults in the
 # code, cause Exim to make RFC 1413 (ident) callbacks for all incoming SMTP

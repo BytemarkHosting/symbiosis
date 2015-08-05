@@ -1,11 +1,32 @@
 # Like the last router, this tries DNS lookups for vhost domains with no
 # mailbox directory, and no default forwarding rule set up.
+#
+# This router will get run if any of
+#
+#  the message has a message ID already (i.e. it is already in the queue), or
+#  the sender_host_address is empty (i.e. the message was accepted locally), or
+#  the sender_host_address is allowed to relay, or
+#  the message was sent by an authenticated user,
+#
+# are true, AND none of the following files exist
+#
+#  /srv/$domain/mailboxes
+#  /srv/$domain/config/default_forward
+#  /srv/$domain/config/aliases
+#
+#
 
 vhost_no_local_mail:
   debug_print = "R: vhost_no_local_mail for $local_part@$domain"
   driver = dnslookup
   domains = +vhost_domains
   condition  = ${if and{ \
+                 {or { \
+                   {!eq{$message_exim_id}{}} \
+                   {eq{$sender_host_address}{}} \
+                   {match_ip{$sender_host_address}{+relay_from_hosts}} \
+                   {!eq{$authenticated_id}{}} \
+                 }} \
                  {!exists{VHOST_DIR/$domain/VHOST_MAILBOX_DIR/}} \
                  {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/default_forward}} \
                  {!exists{VHOST_DIR/$domain/VHOST_CONFIG_DIR/aliases}} \
@@ -16,9 +37,6 @@ vhost_no_local_mail:
   mx_domains = +vhost_domains
   transport = remote_smtp
   same_domain_copy_routing = yes
-  # ignore private rfc1918 and APIPA addresses
-  ignore_target_hosts = 0.0.0.0 : 127.0.0.0/8 : 192.168.0.0/16 :\
-                        172.16.0.0/12 : 10.0.0.0/8 : 169.254.0.0/16 :\
-                        255.255.255.255
+  ignore_target_hosts = +private_addresses
   no_more
 

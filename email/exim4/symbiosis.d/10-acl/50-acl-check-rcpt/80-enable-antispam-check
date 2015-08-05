@@ -1,10 +1,8 @@
   # Test to see if a domain needs spam scanning.  This rule only gets matched
-  # if the file VHOST_DIR/domain/VHOST_CONFIG_DIR/antispam,
-  # VHOST_DIR/domain/VHOST_CONFIG_DIR/bytemark-antispam does not exist and
+  # if the file VHOST_DIR/domain/VHOST_CONFIG_DIR/antispam exists
   # acl_m0 hasn't previously been set to "tag"
   warn    domains    = +vhost_domains
           condition  = ${if and{ \
-                          {!exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/bytemark-antispam}} \
                           {exists{VHOST_DIR/${domain}/VHOST_CONFIG_DIR/antispam}} \
                           {!eq{$acl_m0}{tag}} \
                         }}
