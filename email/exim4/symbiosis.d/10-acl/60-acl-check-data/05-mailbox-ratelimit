@@ -15,12 +15,10 @@ deny authenticated = *
                       {exists{VHOST_DIR/${domain:$authenticated_id}/VHOST_MAILBOX_DIR/${local_part:$authenticated_id}/ratelimit}}\
                     }}\
                   }}
-
      ratelimit = ${if match{\
                     ${if exists{VHOST_DIR/${domain:$authenticated_id}/VHOST_MAILBOX_DIR/${local_part:$authenticated_id}/ratelimit}\
                       {${readfile{VHOST_DIR/${domain:$authenticated_id}/VHOST_MAILBOX_DIR/${local_part:$authenticated_id}/ratelimit}}}\
                       {${readfile{VHOST_DIR/${domain:$authenticated_id}/VHOST_CONFIG_DIR/mailbox-ratelimit}}}\
                      }\
-                  }{([0-9]+)}}{$1}{100}} / 1h / strict / $authenticated_id
-
+                  }{([0-9]+)}{$1}{100}} / 1h / strict / $authenticated_id
 
