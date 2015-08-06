@@ -60,3 +60,12 @@ if ( array_search("managesieve", $config['plugins']) === false ) {
   $config['managesieve_vacation'] = 1;
 
 }
+
+if ( !array_key_exists('force_https', $config) ) {
+  /*
+   * Make sure all connections are secure. 
+   */
+  $config['force_https'] = true;
+}
+
+
