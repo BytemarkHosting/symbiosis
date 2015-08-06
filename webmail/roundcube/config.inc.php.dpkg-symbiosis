@@ -7,7 +7,7 @@
  *
  ****************************************************************************/
 
-$rcmail_config = array();
+$config = array();
 
 /**
  * Read in original, main config.
@@ -19,36 +19,44 @@ if (is_readable('/etc/roundcube/main.inc.php.dpkg-symbiosis-orig')) {
 /**
  * Set the default server host, if not already set.
  */
-if ( !array_key_exists('default_host', $rcmail_config) or
-     strlen($rcmail_config['default_host']) == 0 ) {
+if ( !array_key_exists('default_host', $config) or
+     strlen($config['default_host']) == 0 ) {
 
-  $rcmail_config['default_host'] = 'localhost';
+  $config['default_host'] = 'localhost';
 
 }
 
 /**
  * Make sure the plugins array exists.
  */
-if ( !array_key_exists('plugins', $rcmail_config) ) {
+if ( !array_key_exists('plugins', $config) ) {
 
-  $rcmail_config['plugins'] = array();
+  $config['plugins'] = array();
 
 }
 
 /**
  * Now check to ensure the managesieve plugin is enabled.
  */
-if ( array_search("managesieve", $rcmail_config['plugins']) === false ) {
-  $rcmail_config['plugins'][] = "managesieve";
+if ( array_search("managesieve", $config['plugins']) === false ) {
+  $config['plugins'][] = "managesieve";
 
   /**
    * Set the default port to 4190.
    */
-  $rcmail_config['managesieve_port'] = 4190;
+  $config['managesieve_port'] = 4190;
 
   /**
    * Make sure mailbox names are encoded in UTF-8 for dovecot (see
    * http://wiki2.dovecot.org/Pigeonhole/Sieve/Troubleshooting)
    */
-  $rcmail_config['managesieve_mbox_encoding'] = 'UTF-8';
+  $config['managesieve_mbox_encoding'] = 'UTF-8';
+
+  /* Enables separate management interface for vacation responses (out-of-office)
+   * 0 - no separate section (default),
+   * 1 - add Vacation section,
+   * 2 - add Vacation section, but hide Filters section
+   */
+  $config['managesieve_vacation'] = 1;
+
 }
