@@ -10,17 +10,17 @@ deny authenticated = *
      log_message = Sender rate for $authenticated_id is $sender_rate / $sender_rate_period
      condition = ${if and{\
                     {!eq{$authenticated_id}{}}\
-                    { or {
+                    { or {\
                       {exists{VHOST_DIR/${domain:$authenticated_id}/VHOST_CONFIG_DIR/mailbox-ratelimit}}\
                       {exists{VHOST_DIR/${domain:$authenticated_id}/VHOST_MAILBOX_DIR/${local_part:$authenticated_id}/ratelimit}}\
-                    }}
+                    }}\
                   }}
 
-     ratelimit = ${if match{
+     ratelimit = ${if match{\
                     ${if exists{VHOST_DIR/${domain:$authenticated_id}/VHOST_MAILBOX_DIR/${local_part:$authenticated_id}/ratelimit}\
                       {${readfile{VHOST_DIR/${domain:$authenticated_id}/VHOST_MAILBOX_DIR/${local_part:$authenticated_id}/ratelimit}}}\
                       {${readfile{VHOST_DIR/${domain:$authenticated_id}/VHOST_CONFIG_DIR/mailbox-ratelimit}}}\
                      }\
-                  {([0-9]+)}}{$1}{100}} / 1h / strict / $authenticated_id
+                  }{([0-9]+)}}{$1}{100}} / 1h / strict / $authenticated_id
 
 
