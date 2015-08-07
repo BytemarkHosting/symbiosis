@@ -6,44 +6,6 @@
 set -e
 
 #
-# Copied from preinst.
-#
-function do_upgrade() {
-
-  ##### Config adjustments ################ 
-  #
-  # Array of config files to remove
-  #
-  declare -a files_to_remove
-
-  files_to_remove+=(
-    "/etc/exim4/symbiosis.d/00-main/21-bytemark-antispam-hostlist"
-    "/etc/exim4/symbiosis.d/10-acl/50-acl-check-rcpt/70-bytemark-antispam-defer"
-  )
-
-  for file in ${files_to_remove[*]} ; do
-   dpkg-maintscript-helper rm_conffile \
-     $file \
-     "2014:1231" symbiosis-dns -- "$@"
-  done
-}
-
-#
-# Skip, if we are not in "configure" state
-#
-if [ "$1" != "configure" ]; then
-        echo "I: Skipping configuration"
-        exit 0
-fi
-
-do_upgrade $@
-
-#
-#  Remove the previous cron.d script
-#
-rm -f /etc/cron.d/symbiosis-tinydns 2>/dev/null >/dev/null || true
-
-#
 #  If we're not on a Bytemark host then we do nothing.
 #
 if [ "$(/usr/bin/is-bytemark-ip)" == "0" ] ; then
@@ -76,16 +38,7 @@ if [ -e /etc/exim4/Makefile -a -e /etc/exim4/symbiosis.d/00-header ]; then
     #
     # Don't fail the whole install if make fails.
     #
-    if make ; then
-
-        #
-        #  Restart exim4
-        #
-        invoke-rc.d exim4 reload
-    else
-        echo "W: Rebuild of exim4 configuration failed."
-    fi
-
+    make || echo "W: Rebuild of exim4 configuration failed."
 fi
 
 #
