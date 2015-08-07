@@ -348,7 +348,7 @@ module Symbiosis
 
           p_dir, p_file = File.split(self.password_file)
 
-          if self.encrypt_password 
+          if @encrypt_password 
             set_param(self.dot + "password", self.domain.crypt_password(pw), self.directory, :mode => 0600)
           else
             set_param(self.dot + "password", pw, self.directory, :mode => 0600)
