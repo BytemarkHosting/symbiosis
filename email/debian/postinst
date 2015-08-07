@@ -7,40 +7,12 @@
 set -e
 
 #
-# Ugh.. this is copied from the preinst.
-#
-
-function do_upgrade() {
-
-  ##### Config adjustments ################
-  #
-  # Array of config files to remove
-  #
-  declare -a files_to_remove
-
-  files_to_remove+=("/etc/dovecot/symbiosis.d/30-authentication/50-passdb-checkpassword"
-    "/etc/dovecot/symbiosis.d/30-authentication/85-userdb-checkpasswd"
-    "/etc/symbiosis/test/tc_checkpassword.rb"
-  )
-
-  for file in ${files_to_remove[*]} ; do
-   dpkg-maintscript-helper rm_conffile \
-     $file \
-     "2014:1231" symbiosis-email -- "$@"
-  done
-
-  unset files_to_remove
-}
-
-#
 # Skip, if we are not in "configure" state
 #
 if [ "$1" != "configure" ]; then
         echo "I: Skipping configuration"
         exit 0
 fi
-
-do_upgrade $@
 
 #
 # Configure supplementary groups for clamav and freshclam
