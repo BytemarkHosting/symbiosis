@@ -1,3 +1,9 @@
+symbiosis-xmpp (2014:1129) stable; urgency=medium
+
+  * Updated postinst not to specify paths to commands.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 07 Aug 2015 21:34:18 +0100
+
 symbiosis-xmpp (2014:1128) stable; urgency=low
 
   * Don't allow daemon restart failure to break package installation/removal.
