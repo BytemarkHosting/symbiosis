@@ -130,6 +130,20 @@ class TestDomain < Test::Unit::TestCase
 
   end
 
+  def test_crypt_password
+    domain = Domain.new()
+    password = "correct horse battery staple"
+
+    assert_match(/^{CRYPT}\$6\$.{8,8}\$/,domain.crypt_password(password), "Text password not crypted correctly (with SHA512)")
+
+    password = "{CRYPT}asdasdads"
+    assert_equal(domain.crypt_password(password),password, "Password with {CRYPT} at the beginning gets re-hashed.")
+
+    password = "$1$asda$asdawdasda"
+    assert_match(/^{CRYPT}/, domain.crypt_password(password), "Password with salt at the beginning doesn't get CRYPT pre-pended")
+    assert_equal(domain.crypt_password(password),"{CRYPT}"+password, "Password with salt at the beginning gets re-hashed.")
+  end
+
   def test_aliases
     #
     # This tmpdir gets destroyed at the end of the block.
