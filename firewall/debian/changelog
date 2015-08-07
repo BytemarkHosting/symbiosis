@@ -1,3 +1,9 @@
+symbiosis-firewall (2014:1111) stable; urgency=medium
+
+  * Updated postinst not to use scripts with paths.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 07 Aug 2015 21:36:28 +0100
+
 symbiosis-firewall (2014:1110) stable; urgency=medium
 
   * Make sure firewall patterns are anchored at one end.
