@@ -47,7 +47,7 @@ mangle_config() {
 }
 
 if [ "$1" = configure ] ; then
-  mangle_config /etc/roundcube/main.inc.php symbiosis-webmail-roundcube
+  mangle_config /etc/roundcube/config.inc.php symbiosis-webmail-roundcube
 fi
 
 #DEBHELPER#

@@ -2,3 +2,4 @@ exim4/                     etc/
 dovecot/                   etc/
 sbin/                      usr/
 symbiosis/                 etc/
+apache2/                   etc/

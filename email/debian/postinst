@@ -124,6 +124,14 @@ elif [ -e ${conf}~ ] && ( ! grep -q '/etc/dovecot/symbiosis.d/' ${conf}~ ) ; the
 fi
 
 #
+# Restart apache2 for our dpush snippet
+#
+if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
+    . /usr/share/apache2/apache2-maintscript-helper
+    apache2_invoke enconf symbiosis-email.conf || true
+fi
+
+#
 #  Rebuild dovecot
 #
 if [ -e /etc/dovecot/Makefile ] ; then
