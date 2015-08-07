@@ -37,7 +37,7 @@ module Symbiosis
         @local_part    = local_part
         @domain        = domain
         @mailboxes_dir = mailboxes_dir
-        @encrypt_password = true
+        @encrypt_password = @domain.should_encrypt_mailbox_passwords?
         @password      = nil
         @local_user    = nil
       end
@@ -342,18 +342,20 @@ module Symbiosis
       # Symbiosis::Domain#crypt_password
       #
       def password=(pw)
-        @password = pw
         self.create
 
-        p_dir, p_file = File.split(self.password_file)
+        if pw != self.password
 
-        if @encrypt_password
-          set_param(self.dot + "password", self.domain.crypt_password(@password), self.directory, :mode => 0600)
-        else
-          set_param(self.dot + "password", @password, self.directory, :mode => 0600)
+          p_dir, p_file = File.split(self.password_file)
+
+          if self.encrypt_password 
+            set_param(self.dot + "password", self.domain.crypt_password(pw), self.directory, :mode => 0600)
+          else
+            set_param(self.dot + "password", pw, self.directory, :mode => 0600)
+          end
         end
 
-        return @password
+        return (@password = pw)
       end
 
       #

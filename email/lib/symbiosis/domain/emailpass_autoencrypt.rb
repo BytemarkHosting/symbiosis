@@ -6,10 +6,14 @@ module Symbiosis
   class Domain
 
     #
-    # Returns true if this domain has email encryption enabled.
+    # Returns true if this domain has email password encryption enabled.
     #
-    def has_emailautoenc?
-      get_param("emailautoenc",self.config_dir)
+    def should_encrypt_mailbox_passwords?
+      if get_param("mailbox-dont-encrypt-passwords",self.config_dir)
+        false
+      else
+        true
+      end
     end
 
   end
