@@ -21,4 +21,5 @@ rm -f /etc/apache2/conf.d/squirrelmail.local.conf
 invoke-rc.d apache2 reload || true
 
 #DEBHELPER#
+
 exit 0
