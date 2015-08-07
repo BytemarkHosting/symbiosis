@@ -6,7 +6,7 @@ module Symbiosis
   class Domain
 
     #
-    # Returns true if this domain has email encryption enabled.
+    # Returns true if this domain has a chat server enabled.
     #
     def has_emailautoenc?
       get_param("emailautoenc",self.config_dir)
@@ -15,3 +15,4 @@ module Symbiosis
   end
 
 end
+
