@@ -63,17 +63,7 @@ if [ -e /etc/ssl/private/pure-ftpd.pem ] ; then
   fi
 fi
 
-#
-#  Restart (or start)
-#
-if [ "$2" = "" ] ; then
-  action=start
-else
-  action=restart
-fi
-
-invoke-rc.d pure-authd $action
-invoke-rc.d pure-ftpd restart 
+service pure-ftpd restart 
 
 #DEBHELPER#
 exit 0
