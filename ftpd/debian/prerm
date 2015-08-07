@@ -20,10 +20,8 @@ if [ -f "$cs" ] && echo "69564370d505ab7968397591929b0bfc  $cs" | md5sum -c > /d
   echo 'ALL:!aNULL:!SSLv3' > $cs
 fi
 
-#
-# Stop the authd
-#
-invoke-rc.d pure-authd stop
-
 #DEBHELPER#
+
+service pure-ftpd restart
+
 exit 0

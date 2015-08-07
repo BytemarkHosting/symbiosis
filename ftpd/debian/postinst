@@ -63,7 +63,9 @@ if [ -e /etc/ssl/private/pure-ftpd.pem ] ; then
   fi
 fi
 
-service pure-ftpd restart 
 
 #DEBHELPER#
+
+service pure-ftpd restart 
+
 exit 0
