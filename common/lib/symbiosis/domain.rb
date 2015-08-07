@@ -274,23 +274,34 @@ module Symbiosis
     end
 
     #
-    # Encrypt a password, using the cyrpt() function, with MD5 hashing and an 8
-    # character salt.  The function returns the crypt() output, prepended with
-    # <code>{CRYPT}</code>.
+    # Encrypt a password, using the crypt() function, with SHA512 hashing and
+    # an 8 character salt.  The function returns the crypt() output, prepended
+    # with <code>{CRYPT}</code>.
     #
     def crypt_password(password)
       raise ArgumentError, "password must be a string" unless password.is_a?(String)
+
       password =~ /^(\{(?:crypt|CRYPT)\})?((\$(?:1|2a|5|6)\$[a-zA-Z0-9.\/]{1,16}\$)?[a-zA-Z0-9\.\/]+)$/
-      crypt = $1.to_s
-      crypted_password = $2
-      saltmatch =  $3.to_s
-      force_crypt   = (!crypt.empty? or !saltmatch.empty?)
-      if(crypt.empty? or saltmatch.empty?)
-        salt = "$1$"+random_string(8)+"$"
-        return "{CRYPT}"+password.crypt(salt)
-      else
-        return password
-      end
+
+      crypt            = $1.to_s
+      crypted_password = $2.to_s
+      salt             = $3.to_s
+
+      #
+      # if the {CRYPT} string is at the beginning, assume the password is already crypted
+      #
+      return password if !crypt.empty?
+
+      #
+      # If we have a salt match, return the password prepended with {CRYPT}
+      #
+      return "{CRYPT}"+password if !salt.empty?
+
+      #
+      # If we get this far, we're assuming the password is not crypted.  CRYPT AWAY!
+      #
+      salt = "$6$"+random_string(8)+"$"
+      return "{CRYPT}"+password.crypt(salt)
     end
 
     #
