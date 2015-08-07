@@ -2,18 +2,15 @@
 /*****************************************************************************
  *
  * This configuration is deployed with Bytemark Symbiosis.  Feel free to make
- * changes here, or to the original configuration in
- * /etc/roundcube/main.inc.php.dpkg-symbiosis-orig.
+ * changes here.
  *
  ****************************************************************************/
 
-$config = array();
-
-/**
- * Read in original, main config.
+/*
+ * Make sure the configuration array is defined.
  */
-if (is_readable('/etc/roundcube/main.inc.php.dpkg-symbiosis-orig')) {
-  include_once('/etc/roundcube/main.inc.php.dpkg-symbiosis-orig');
+if ! is_array( $config ) {
+  $confg = array();
 }
 
 /**
@@ -30,9 +27,7 @@ if ( !array_key_exists('default_host', $config) or
  * Make sure the plugins array exists.
  */
 if ( !array_key_exists('plugins', $config) ) {
-
   $config['plugins'] = array();
-
 }
 
 /**
@@ -67,5 +62,4 @@ if ( !array_key_exists('force_https', $config) ) {
    */
   $config['force_https'] = true;
 }
-
 

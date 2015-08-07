@@ -15,39 +15,19 @@ fi
 #
 update-alternatives --install /var/www/webmail symbiosis-webmail /var/lib/roundcube/ 100
 
-######################################
 #
-# Divert config files.  This is cribbed from config-package-dev.
+# Make sure Symbiosis config is included.
 #
-######################################
+if ( ! grep -q "require('/etc/roundcube/config.symbiosis.inc.php')" /etc/roundcube/config.inc.php ); then
+  cat >>/etc/roundcube/config.inc.php <<EOF
 
-mangle_config() {
-  file="$1"
-  package="$2"
-
-  ourfile="$file.dpkg-symbiosis"
-  theirfile="$file.dpkg-symbiosis-orig"
-
-  ucf --purge "$file"
-  mv -f "$file" "$theirfile"
-  #
-  # Now add the link in, unless it is already in place.
-  #
-  if [ ! -L "$file" ] && [ ! -e "$file" ]; then
-
-    ln -s "$(basename "$ourfile")" "$file"
-
-  elif [ ! -L "$file" ] || \
-       [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
-         "$(readlink "$file")" != "$(basename "$theirfile")" ]; then
-
-    echo "E: $file is not linked to either $(basename "$ourfile") or $(basename "$theirfile")" >&2
-
-  fi
+/**
+ * Read symbiosis config.
+ */
+if (is_readable('/etc/roundcube/config.symbiosis.inc.php')) {
+    require('/etc/roundcube/config.symbiosis.inc.php');
 }
-
-if [ "$1" = configure ] ; then
-  mangle_config /etc/roundcube/config.inc.php symbiosis-webmail-roundcube
+EOF
 fi
 
 #DEBHELPER#
