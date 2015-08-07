@@ -1,0 +1,10 @@
+[Unit]
+Description=Pure FTPd: Authentication daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/pure-authd --run /usr/sbin/symbiosis-ftpd-check-password --socket /var/run/pure-ftpd/pure-authd.sock
+Restart=always
+
+[Install]
+WantedBy=pure-ftpd.service

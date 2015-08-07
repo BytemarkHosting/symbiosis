@@ -12,11 +12,6 @@ if [ "$1" = "purge" ] ; then
   fi
 
   #
-  # Remove from the rc levels.
-  #
-  update-rc.d pure-authd remove > /dev/null 
-
-  #
   # And restart pure-ftpd.
   #
   invoke-rc.d pure-ftpd restart 

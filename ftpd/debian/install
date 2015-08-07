@@ -1,5 +1,4 @@
 sbin/*             usr/sbin/
-init.d/*           etc/init.d/
 default/*          etc/default/
 monit.d/*          etc/symbiosis/monit.d/
 test.d/*           etc/symbiosis/test.d/
