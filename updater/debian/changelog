@@ -1,3 +1,10 @@
+symbiosis-updater (2014:1112) stable; urgency=medium
+
+  * Disable the the symbiosis-updater script if unattended-upgrades is
+    installed.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 07 Aug 2015 21:30:08 +0100
+
 symbiosis-updater (2014:1111) stable; urgency=medium
 
   * Email is only sent if the EMAIL parameter is set.
