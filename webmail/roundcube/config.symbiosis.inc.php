@@ -10,7 +10,7 @@
  * Make sure the configuration array is defined.
  */
 if ! is_array( $config ) {
-  $confg = array();
+  $config = array();
 }
 
 /**
