@@ -281,7 +281,7 @@ if ( rotated )
   stats_args  = " --prefix #{prefix}"
   stats_args += " --verbose" if $VERBOSE
   verbose( "Since we rotated we now generate statistics" )
-  Kernel.system( "/usr/sbin/symbiosis-generate-stats #{stats_args}" ) 
+  Kernel.system( "/usr/sbin/symbiosis-httpd-generate-stats #{stats_args}" ) 
 end
 
 
