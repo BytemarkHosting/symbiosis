@@ -1,3 +1,4 @@
+#!/usr/bin/ruby1.8
 #
 #  Simple HTTP tests
 #
@@ -197,9 +198,9 @@ class TestHTTP < Test::Unit::TestCase
       #
       #  Now does it have the output we expect?
       #
-      assert_equal(@domain.htdocs_dir, getFullResponse( "/cgi-bin/test.cgi", @domain.name ).split($/).last,
+      assert_equal(@domain.cgibin_dir, getFullResponse( "/cgi-bin/test.cgi", @domain.name ).split($/).last,
         "Document root set incorrectly.for scripts in public/cgi-bin for #{@domain.name}" )
-      assert_equal(@domain.htdocs_dir, getFullResponse( "/cgi-bin/test.cgi", "www."+@domain.name ).split($/).last, 
+      assert_equal(@domain.cgibin_dir, getFullResponse( "/cgi-bin/test.cgi", "www."+@domain.name ).split($/).last, 
         "Document root set incorrectly for scripts in public/cgi-bin for www.#{@domain.name}" )
     end
   end
@@ -232,10 +233,10 @@ class TestHTTP < Test::Unit::TestCase
       # Do this a couple of times to make sure we didn't get lucky
       #
       2.times do
-        assert_equal(@domain.htdocs_dir+"/", getFullResponse( "/#{subdir}/test.cgi", @domain.name ).split($/).last,
+        assert_equal(@domain.htdocs_dir, getFullResponse( "/#{subdir}/test.cgi", @domain.name ).split($/).last,
           "Document root set incorrectly for scripts in public/htdocs/#{subdir} for #{@domain.name}" )
 
-        assert_equal(@domain.htdocs_dir+"/", getFullResponse( "/#{subdir}/test.cgi", "www."+@domain.name ).split($/).last,
+        assert_equal(@domain.htdocs_dir, getFullResponse( "/#{subdir}/test.cgi", "www."+@domain.name ).split($/).last,
           "Document root set incorrectly for scripts in public/htdocs/#{subdir} for www.#{@domain.name}" )
       end
     end
