@@ -51,6 +51,7 @@
 #include "httpd.h"
 #include "http_config.h"
 #include "http_core.h"
+#include "http_log.h" /* for ap_log_error */
 #include "http_request.h"  /* for ap_hook_translate_name */
 
 #include "mod_vhost_bytemark.h"
@@ -221,6 +222,23 @@ static const char *vhost_alias_set(cmd_parms *cmd, void *dummy, const char *map)
     return NULL;
 }
 
+static const char *vhost_set_docroot(cmd_parms *cmd, void *dummy,
+            const char *str)
+{
+    /*
+     * Log that this setting is deprecated.
+     *
+     * FIXME: this doesn't actually work, so it isn't much use at this time.
+     * 
+     */
+    ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, cmd->server, 
+         "The SetVirtualDocumentRoot directive (%s:%d) is deprecated "
+         "and can safely be removed from your configuration and any Symbiosis templates.",
+          cmd->directive->filename, cmd->directive->line_num);
+
+    return NULL;
+}
+
 
 static const command_rec mva_commands[] =
 {
@@ -236,8 +254,8 @@ static const command_rec mva_commands[] =
     AP_INIT_TAKE1("VirtualDocumentRootIP", vhost_alias_set,
                   &vhost_alias_set_doc_root_ip, RSRC_CONF,
                   "how to create the DocumentRoot based on the host"),
-    AP_INIT_TAKE1("SetVirtualDocumentRoot", ap_set_deprecated, 
-                  NULL, RSRC_CONF, 
+    AP_INIT_TAKE1("SetVirtualDocumentRoot", vhost_set_docroot, 
+                  NULL, RSRC_CONF,
                   "SetVirtualDocumentRoot directive is no longer required"),
     { NULL }
 };
@@ -506,7 +524,7 @@ static void register_hooks(apr_pool_t *p)
     ap_hook_translate_name(mva_translate, aszPre, NULL, APR_HOOK_MIDDLE);
 }
 
-module AP_MODULE_DECLARE_DATA vhost_bytemark_module =
+AP_DECLARE_MODULE(vhost_bytemark) =
 {
     STANDARD20_MODULE_STUFF,
     NULL,                       /* dir config creater */
