@@ -42,7 +42,7 @@
 
 #include "apr.h"
 #include "apr_strings.h"
-#include "apr_hooks.h"
+#include "ap_hooks.h"
 #include "apr_lib.h"
 
 #define APR_WANT_STRFUNC
@@ -75,7 +75,6 @@ typedef struct mva_sconf_t {
     const char *cgi_root;
     mva_mode_e doc_root_mode;
     mva_mode_e cgi_root_mode;
-    int set_doc_root;
 } mva_sconf_t;
 
 static void *mva_create_server_config(apr_pool_t *p, server_rec *s)
@@ -87,7 +86,6 @@ static void *mva_create_server_config(apr_pool_t *p, server_rec *s)
     conf->cgi_root = NULL;
     conf->doc_root_mode = VHOST_ALIAS_UNSET;
     conf->cgi_root_mode = VHOST_ALIAS_UNSET;
-    conf->set_doc_root = 0;
     return conf;
 }
 
@@ -115,7 +113,6 @@ static void *mva_merge_server_config(apr_pool_t *p, void *parentv, void *childv)
         conf->cgi_root = child->cgi_root;
     }
 
-    conf->set_doc_root = child->set_doc_root;
     return conf;
 }
 
@@ -225,17 +222,6 @@ static const char *vhost_alias_set(cmd_parms *cmd, void *dummy, const char *map)
 }
 
 
-static const char *vhost_set_docroot(cmd_parms *cmd, void *dummy,
-				     const char *str)
-{
-    mva_sconf_t *conf;
-    conf = (mva_sconf_t *) ap_get_module_config(cmd->server->module_config,
-						&vhost_bytemark_module);
-    conf->set_doc_root = (strcasecmp(str, "yes") == 0 ||
-			  strcasecmp(str, "on") == 0) ? 1 : 0;
-    return NULL;
-}
-
 static const command_rec mva_commands[] =
 {
     AP_INIT_TAKE1("VirtualScriptAlias", vhost_alias_set,
@@ -250,9 +236,9 @@ static const command_rec mva_commands[] =
     AP_INIT_TAKE1("VirtualDocumentRootIP", vhost_alias_set,
                   &vhost_alias_set_doc_root_ip, RSRC_CONF,
                   "how to create the DocumentRoot based on the host"),
-    AP_INIT_TAKE1("SetVirtualDocumentRoot", vhost_set_docroot,
-		  NULL, RSRC_CONF,
-	 	  "set DOCUMENT_ROOT to parsed document root"),
+    AP_INIT_TAKE1("SetVirtualDocumentRoot", ap_set_deprecated, 
+                  NULL, RSRC_CONF, 
+                  "SetVirtualDocumentRoot directive is no longer required"),
     { NULL }
 };
 
@@ -287,7 +273,8 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
     int ndots;
 
     char buf[HUGE_STRING_LEN];
-    char *dest, last;
+    char *dest;
+    const char *docroot;
 
     int N, M, Np, Mp, Nd, Md;
     const char *start, *end;
@@ -306,18 +293,15 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
     r->filename = NULL;
 
     dest = buf;
-    last = '\0';
     while (*map) {
         if (*map != '%') {
             /* normal characters */
             vhost_alias_checkspace(r, buf, &dest, 1);
-            last = *dest++ = *map++;
+            *dest++ = *map++;
             continue;
         }
         /* we are in a format specifier */
         ++map;
-        /* can't be a slash */
-        last = '\0';
         /* %% -> % */
         if (*map == '%') {
             ++map;
@@ -334,7 +318,7 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
             continue;
         }
         /* deal with %-N+.-M+ -- syntax is already checked */
-        N = M = 0;   /* value */
+        M = 0;   /* value */
         Np = Mp = 0; /* is there a plus? */
         Nd = Md = 0; /* is there a dash? */
         if (*map == '-') ++map, Nd = 1;
@@ -394,19 +378,17 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
             *dest++ = apr_tolower(*p);
         }
     }
-    *dest = '\0';
     /* no double slashes */
-    if (last == '/') {
-        ++uri;
+    if (dest - buf > 0 && dest[-1] == '/') {
+        --dest;
     }
-
-    if (r->filename) {
-        r->filename = apr_pstrcat(r->pool, r->filename, buf, uri, NULL);
-    }
-    else {
-        r->filename = apr_pstrcat(r->pool, buf, uri, NULL);
-    }
-
+    *dest = '\0';
+    
+    if (r->filename)
+        docroot = apr_pstrcat(r->pool, r->filename, buf, NULL);
+    else
+        docroot = apr_pstrdup(r->pool, buf);
+    r->filename = apr_pstrcat(r->pool, docroot, uri, NULL);
 
     /*
      * A this point we either have a request which points to a file
@@ -455,33 +437,8 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
         }
     }
 
-    /**
-     * Set the document root for non-CGI requests.
-     */
-    if (conf->set_doc_root)
-    {
-        /* ignore cgi requests. */
-        const char *cgi;
-
-        if ( ( NULL != r ) &&
-             ( NULL != r->uri ) )
-          cgi = strstr(r->uri, "cgi-bin/");
-
-        if ( NULL == cgi )
-        {
-            request_rec *top = (r->main)?r->main:r;
-            char *tmp        = apr_pstrdup(top->pool, r->filename);
-            char *p          = NULL;
-
-            p = strstr(tmp, "/htdocs/" );
-            if ( p != NULL )
-              p[strlen( "/htdocs/" ) ] = '\0';
-
-            core_server_config *core = (core_server_config *) ap_get_module_config(r->server->module_config, &core_module);
-
-            core->ap_document_root = tmp;
-        }
-    }
+    ap_set_context_info(r, NULL, docroot);
+    ap_set_document_root(r, docroot);
 }
 
 static int mva_translate(request_rec *r)
@@ -536,6 +493,7 @@ static int mva_translate(request_rec *r)
         /* see is_scriptaliased() in mod_cgi */
         r->handler = "cgi-script";
         apr_table_setn(r->notes, "alias-forced-type", r->handler);
+        ap_set_context_info(r, "/cgi-bin", NULL);
     }
 
     return OK;
