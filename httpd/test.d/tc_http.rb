@@ -6,6 +6,7 @@
 
 
 require 'symbiosis/domain'
+require 'symbiosis/domain/http'
 require 'symbiosis/test/http'
 require 'socket'
 require 'test/unit'
@@ -177,4 +178,67 @@ class TestHTTP < Test::Unit::TestCase
     end
   end
 
+  #
+  #  Test that CGI scripts get the correct document root 
+  #
+  def test_document_root_in_cgibin_dir
+    Symbiosis::Utils.mkdir_p(@domain.htdocs_dir)
+    Symbiosis::Utils.mkdir_p(@domain.cgibin_dir)
+
+    Symbiosis::Utils.safe_open( "#{@domain.cgibin_dir}/test.cgi", "a", {:uid => @domain.uid, :gid => @domain.gid, :mode => 0755} ) do |fh|
+      fh.puts( "#!/bin/sh" )
+      fh.puts( "echo -e \"Content-type: text/plain\\n\\n\"" )
+      fh.puts( "echo $DOCUMENT_ROOT" )
+    end
+
+    #
+    # Do this a couple of times to make sure we didn't get lucky
+    #
+    2.times do
+      #
+      #  Now does it have the output we expect?
+      #
+      assert_equal(@domain.htdocs_dir, getFullResponse( "/cgi-bin/test.cgi", @domain.name ).split($/).last,
+        "Document root set incorrectly.for scripts in public/cgi-bin for #{@domain.name}" )
+      assert_equal(@domain.htdocs_dir, getFullResponse( "/cgi-bin/test.cgi", "www."+@domain.name ).split($/).last, 
+        "Document root set incorrectly for scripts in public/cgi-bin for www.#{@domain.name}" )
+    end
+  end
+
+  #
+  #  Test that CGI scripts get the correct document root when placed outside the normal cgi dir. 
+  #
+  def test_cgi_document_root_in_other_dir
+
+    %w(test-cgi test-cgi-bin).each do |subdir|
+      #
+      # Now check withe a CGI script in a different directory.
+      #
+      Symbiosis::Utils.mkdir_p(File.join(@domain.htdocs_dir, subdir))
+
+      Symbiosis::Utils.safe_open( "#{@domain.htdocs_dir}/#{subdir}/test.cgi", "a", 
+        {:uid => @domain.uid, :gid => @domain.gid, :mode => 0755} ) do |fh|
+        fh.puts( "#!/bin/sh" )
+        fh.puts( "echo -e \"Content-type: text/plain\\n\\n\"" )
+        fh.puts( "echo $DOCUMENT_ROOT" )
+      end
+      
+
+      Symbiosis::Utils.safe_open( "#{@domain.htdocs_dir}/#{subdir}/.htaccess", "a", 
+        {:uid => @domain.uid, :gid => @domain.gid, :mode => 0644} ) do | fh|
+        fh.puts('Options +ExecCGI')
+      end
+
+      #
+      # Do this a couple of times to make sure we didn't get lucky
+      #
+      2.times do
+        assert_equal(@domain.htdocs_dir+"/", getFullResponse( "/#{subdir}/test.cgi", @domain.name ).split($/).last,
+          "Document root set incorrectly for scripts in public/htdocs/#{subdir} for #{@domain.name}" )
+
+        assert_equal(@domain.htdocs_dir+"/", getFullResponse( "/#{subdir}/test.cgi", "www."+@domain.name ).split($/).last,
+          "Document root set incorrectly for scripts in public/htdocs/#{subdir} for www.#{@domain.name}" )
+      end
+    end
+  end
 end
