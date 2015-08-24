@@ -401,10 +401,10 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
     }
 
     /*
-     * A this point we either have a document root which points to something on
-     * disk - or not.
+     * A this point we either have a document root which points to something
+     * on disk - or not.
      *
-     * If the docroot doesn't exist on disk we can *attempt* to remap
+     * If the root doesn't exist on disk we can *attempt* to remap
      * that to the real file.
      *
      * If this remapping fails we don't care as the result will be a 404,
@@ -417,7 +417,7 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
       /**
        * If we have:
        *
-       *  A document root
+       *  A document root.
        *  Which doesn't exist.
        *
        * Then:
@@ -455,11 +455,14 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
     /**
      * Set the document root 
      */
-    if (conf->set_doc_root && NULL != r && NULL != buf)
+    if ( conf->set_doc_root && 
+        ( NULL != buff ) && 
+        ( NULL != r ) )
     {
+
         core_server_config *core = (core_server_config *) ap_get_module_config(r->server->module_config, &core_module);
-        char *tmp                = apr_pstrdup(r->pool, buf);
-        core->ap_document_root   = tmp;
+        char *tmp        = apr_pstrdup(r->pool, buf);
+        core->ap_document_root = tmp;
     }
 }
 
