@@ -8,8 +8,9 @@
 require 'symbiosis/domain'
 require 'symbiosis/domain/http'
 require 'symbiosis/test/http'
-require 'socket'
 require 'test/unit'
+require 'net/http'
+require 'uri'
 
 class TestHTTP < Test::Unit::TestCase
 
@@ -39,16 +40,21 @@ class TestHTTP < Test::Unit::TestCase
   #
   # Helper methods
   #
-  def getCode( path, dname )
-    result=nil
-    sock = TCPSocket.new("#{@ip}", "80")
-    sock.print "GET #{path} HTTP/1.1\nHost: #{dname}\nConnection: close\n\n"
-    response = sock.readline
-    if /^HTTP.* (\d\d\d) /.match(response)
-      result=$1.dup
+  def getResponse(path, dname)
+    response = nil
+
+    Net::HTTP.start("#{@ip}", "80") do |http|
+      request = Net::HTTP::Get.new path
+      request['Host'] = dname 
+      response = http.request request
     end
-    sock.close()
-    result
+
+    return response
+  end
+
+  def getCode( path, dname )
+    response = getResponse(path, dname)
+    response.code 
   end
 
 
@@ -56,17 +62,8 @@ class TestHTTP < Test::Unit::TestCase
   #  Return the Header & Body of a request
   #
   def getFullResponse( path, dname )
-    result=nil
-    sock = TCPSocket.new("#{@ip}", "80")
-    sock.print "GET #{path} HTTP/1.0\nHost: #{@domain.name}\nConnection: close\n\n"
-
-    body = ""
-    while ( ! sock.eof? )
-      sock.readline
-      body += $_
-    end
-    sock.close()
-    body
+    response = getResponse(path, dname)
+    response.body
   end
 
   #
@@ -187,8 +184,8 @@ class TestHTTP < Test::Unit::TestCase
 
     Symbiosis::Utils.safe_open( "#{@domain.cgibin_dir}/test.cgi", "a", {:uid => @domain.uid, :gid => @domain.gid, :mode => 0755} ) do |fh|
       fh.puts( "#!/bin/sh" )
-      fh.puts( "echo -e \"Content-type: text/plain\\n\\n\"" )
-      fh.puts( "echo $DOCUMENT_ROOT" )
+      fh.puts( "echo \"Content-type: text/plain\\n\"" )
+      fh.puts( "echo -n $DOCUMENT_ROOT" )
     end
 
     #
@@ -198,9 +195,10 @@ class TestHTTP < Test::Unit::TestCase
       #
       #  Now does it have the output we expect?
       #
-      assert_equal(@domain.htdocs_dir, getFullResponse( "/cgi-bin/test.cgi", @domain.name ).split($/).last,
+      assert_equal(@domain.cgibin_dir+"/", getFullResponse( "/cgi-bin/test.cgi", @domain.name ),
         "Document root set incorrectly.for scripts in public/cgi-bin for #{@domain.name}" )
-      assert_equal(@domain.htdocs_dir, getFullResponse( "/cgi-bin/test.cgi", "www."+@domain.name ).split($/).last, 
+
+      assert_equal(@domain.cgibin_dir+"/", getFullResponse( "/cgi-bin/test.cgi", "www."+@domain.name ), 
         "Document root set incorrectly for scripts in public/cgi-bin for www.#{@domain.name}" )
     end
   end
@@ -219,8 +217,8 @@ class TestHTTP < Test::Unit::TestCase
       Symbiosis::Utils.safe_open( "#{@domain.htdocs_dir}/#{subdir}/test.cgi", "a", 
         {:uid => @domain.uid, :gid => @domain.gid, :mode => 0755} ) do |fh|
         fh.puts( "#!/bin/sh" )
-        fh.puts( "echo -e \"Content-type: text/plain\\n\\n\"" )
-        fh.puts( "echo $DOCUMENT_ROOT" )
+        fh.puts( "echo \"Content-type: text/plain\\n\"" )
+        fh.puts( "echo -n $DOCUMENT_ROOT" )
       end
       
 
@@ -233,10 +231,10 @@ class TestHTTP < Test::Unit::TestCase
       # Do this a couple of times to make sure we didn't get lucky
       #
       2.times do
-        assert_equal(@domain.htdocs_dir+"/", getFullResponse( "/#{subdir}/test.cgi", @domain.name ).split($/).last,
+        assert_equal(@domain.htdocs_dir+"/", getFullResponse( "/#{subdir}/test.cgi", @domain.name ),
           "Document root set incorrectly for scripts in public/htdocs/#{subdir} for #{@domain.name}" )
 
-        assert_equal(@domain.htdocs_dir+"/", getFullResponse( "/#{subdir}/test.cgi", "www."+@domain.name ).split($/).last,
+        assert_equal(@domain.htdocs_dir+"/", getFullResponse( "/#{subdir}/test.cgi", "www."+@domain.name ),
           "Document root set incorrectly for scripts in public/htdocs/#{subdir} for www.#{@domain.name}" )
       end
     end
