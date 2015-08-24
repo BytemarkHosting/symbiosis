@@ -186,7 +186,7 @@ void update_vhost_request( char *path )
      */
     if ( stat( buffer, &statbuf) == 0 )
     {
-      memcpy( path+5, srv+4+i, strlen(srv+4+i)+1 );
+      memmove( path+5, srv+4+i, strlen(srv+4+i)+1 );
 #if 0
       fprintf(stderr,"mod_vhost_bytemark.c: succeeded on %s -> %s\n",buffer, path);
 #endif
