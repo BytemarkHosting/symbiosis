@@ -459,10 +459,9 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
         ( NULL != buff ) && 
         ( NULL != r ) )
     {
-        request_rec *top = (r->main)?r->main:r;
-        char *tmp        = apr_pstrdup(top->pool, buf);
 
         core_server_config *core = (core_server_config *) ap_get_module_config(r->server->module_config, &core_module);
+        char *tmp        = apr_pstrdup(r->pool, buf);
         core->ap_document_root = tmp;
     }
 }
