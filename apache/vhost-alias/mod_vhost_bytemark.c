@@ -456,7 +456,7 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
      * Set the document root 
      */
     if ( conf->set_doc_root && 
-        ( NULL != buff ) && 
+        ( NULL != buf ) && 
         ( NULL != r ) )
     {
 
