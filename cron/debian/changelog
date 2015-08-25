@@ -1,3 +1,11 @@
+symbiosis-cron (2015:0825) stable; urgency=medium
+
+  * @reboot crontabs are now explicitly not supported.
+  * symbiosis-all-crontabs wrapper is now built with hardened flags.
+  * symbiosis-all-crontabs wrapper no longer ignores chdir return value.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 25 Aug 2015 11:52:07 +0100
+
 symbiosis-cron (2015:0618) stable; urgency=medium
 
   * Updated File#exists? to File#exist?
