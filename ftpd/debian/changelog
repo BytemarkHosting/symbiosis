@@ -1,3 +1,14 @@
+symbiosis-ftpd (2015:0825) stable; urgency=medium
+
+  * Updated TLS ciphers to be those recommended by Mozilla.
+  * Added tests and manpage for symbiosis-ftpd-check-password. Fixes #9233
+  * Removed un-needed build-deps.
+  * Removed old links to symbiosis-check-ftp-password.
+  * Changed postinst scripts to use sh rather than bash.
+  * pure-authd now runs as a systemd unit.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 25 Aug 2015 12:08:56 +0100
+
 symbiosis-ftpd (2015:0618) stable; urgency=medium
 
   * Updated maintainers/uploaders + debian standards.
