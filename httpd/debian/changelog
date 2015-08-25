@@ -1,3 +1,18 @@
+symbiosis-httpd (2015:0825) stable; urgency=medium
+
+  * Updated SSL ciphers to use those recommened by Mozilla.
+  * Added OSCP stapling to the SSL configs
+  * Cleaned up errors from Lintian.
+  * Tidied up maintscripts to use apache2-maintscipt-helper.
+  * Removed reference to non-extant symbiosis-generate-stats in
+    symbiosis-httpd-rotate-logs, replaced with symbiosis-httpd-generate-stats
+  * Brought the mod_vhost_bytemark module up to Apache 2.4 standards.
+  * Removed SetVirtualDocumentRoot option from mod_vhost_bytemark as it is no
+    longer needed.  Removed it from the templates too.
+  * Updated HTTP tests to check for the DOCUMENT_ROOT variable.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 25 Aug 2015 11:29:30 +0100
+
 symbiosis-httpd (2015:0618) stable; urgency=medium
 
   * Update the build process to run more tests.
