@@ -1,3 +1,10 @@
+symbiosis-email (2013:0611) oldstable; urgency=medium
+
+  * Updated prerm to remove TLS ciphers in exim4.conf so upgrades do not
+    break.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 25 Aug 2015 10:32:54 +0100
+
 symbiosis-email (2013:0610) oldstable; urgency=medium
 
   * Removed SSLv3 from Exim4 following CVE-2014-3566.
