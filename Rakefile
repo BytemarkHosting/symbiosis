@@ -312,12 +312,13 @@ end
 desc "Check which packages need their changelogs updating"
 task "check_changelogs" do
   need_updating = []
+  br = `hg branch`.chomp
   source_dirs.each do |d|
-    ch_r = `hg log -l 1 --template '{rev}' #{d}/debian/changelog`.to_i
-    d_r  = `hg log -l 1 --template '{rev}' #{d}/**`.to_i
+    ch_r = `hg log -b #{br} -l 1 --template '{rev}' #{d}/debian/changelog`.to_i
+    d_r  = `hg log -b #{br} -l 1 --template '{rev}' #{d}/**`.to_i
     if ch_r < d_r
-      ch_ch = `hg log -r #{ch_r} --template 'changelog: {rev}: {author|user}: {date|shortdate}'`
-      d_ch =  `hg log -r #{d_r} --template 'directory: {rev}: {author|user}: {date|shortdate}'`
+      ch_ch = `hg log -b #{br} -r #{ch_r} --template 'changelog: {rev}: {author|user}: {date|shortdate}'`
+      d_ch =  `hg log -b #{br} -r #{d_r} --template 'directory: {rev}: {author|user}: {date|shortdate}'`
       need_updating << d + "\n    " + ch_ch + "\n    " + d_ch
     end
   end
