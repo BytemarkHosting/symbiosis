@@ -1,3 +1,10 @@
+symbiosis-mysql (2015:0825) stable; urgency=medium
+
+  * Tidied maint scripts to use sh not bash.
+  * Removed un-needed build-deps.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 25 Aug 2015 12:05:47 +0100
+
 symbiosis-mysql (2015:0618) stable; urgency=medium
 
   * Moved symbiois specific config to conf.d
