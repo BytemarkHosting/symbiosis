@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require 'pp'
+require 'symbiosis/host'
 
 #
 # If Ubuntu landscape is installed, just exit
@@ -9,58 +9,118 @@ if File.exist?("/usr/bin/landscape-sysinfo")
     exit 0
 end
 
-loadavg = 
-if File.exist?("/proc/loadavg")
-  loadavg = File.read("/proc/loadavg").split(/\s+/)
-end
+class MotdSysInfo
 
-meminfo = Hash.new
-meminfo.default = 0
+  def initialize
+  end
 
-if File.exist?("/proc/meminfo")
-  File.readlines("/proc/meminfo").each do |l|
-    key,value,kb = l.split(/\s+/)
-    case key
-      when "MemTotal:"
-        meminfo["total"] += value.to_i
-        meminfo["used"] += value.to_i
-      when "MemFree:"
-        meminfo["used"] -= value.to_i
-      when "Buffers:"
-        meminfo["used"] -= value.to_i
-      when "Cached:"
-        meminfo["used"] -= value.to_i
-      when "SwapTotal:"
-        meminfo["swap_total"] += value.to_i
-        meminfo["swap_used"] += value.to_i
-      when "SwapFree:"
-        meminfo["swap_used"] -= value.to_i
-      when "SwapCached:"
-        meminfo["swap_used"] -= value.to_i
+  def loadavg
+    loadavg ||= [0]
+    if File.exist?("/proc/loadavg")
+      loadavg = File.read("/proc/loadavg").split(/\s+/)
     end
+    loadavg
+  end
+
+  def meminfo
+    meminfo = Hash.new
+    meminfo.default = 0
+
+    if File.exist?("/proc/meminfo")
+      File.readlines("/proc/meminfo").each do |l|
+        key,value,kb = l.split(/\s+/)
+        case key
+          when "MemTotal:"
+            meminfo["total"] += value.to_i
+            meminfo["used"] += value.to_i
+          when "MemFree:"
+            meminfo["used"] -= value.to_i
+          when "Buffers:"
+            meminfo["used"] -= value.to_i
+          when "Cached:"
+            meminfo["used"] -= value.to_i
+          when "SwapTotal:"
+            meminfo["swap_total"] += value.to_i
+            meminfo["swap_used"] += value.to_i
+          when "SwapFree:"
+            meminfo["swap_used"] -= value.to_i
+          when "SwapCached:"
+            meminfo["swap_used"] -= value.to_i
+        end
+      end
+    end
+    meminfo
+  end
+
+  def df
+    dfusage = []
+
+    df=`df -l --output='target,size,used,itotal,iused' -x tmpfs -x devtmpfs`.split($/)
+    df.each do |l|
+      next if l =~ /Mounted on/
+      mountpoint, *data = l.split(/\s+/)
+      data = data.map{|d| d.to_i}
+
+      usage = ((data[0] > 0 ? data[1].to_f/data[0] : 0)*100.0).round
+      iusage = ((data[2] > 0 ? data[3].to_f/data[2] : 0)*100.0).round
+      dfusage << [mountpoint, usage, data[0]/1.0e6, iusage]
+    end
+    dfusage
+  end
+
+  def ips
+    @ips ||= []
+    if @ips.empty?
+      @ips << Symbiosis::Host.primary_ipv4
+      @ips << Symbiosis::Host.primary_ipv6
+    end
+    @ips
+  end
+
+  def nl(nl = nil)
+    @nl ||= ""
+    @nl = nl if nl
+    print @nl
+    @nl = (@nl == "" ? "\n" : "")
+  end
+
+  def oprint(label, datum)
+    print ((label+":").ljust(18)+" "+datum).ljust(36)+" "
+    nl  
+  end
+
+  def run
+    print ("System information as of #{Time.now.to_s}\n\n")
+
+    unless ips.empty?
+      oprint("Primary addresses", ips.join(", "))
+      nl("\n")
+    end
+
+    oprint("System load", ("%.2f" % loadavg.first.to_f))
+    oprint("Processes", Dir.glob('/proc/[0-9]*').count.to_s)
+    oprint("Memory used", ("%.1f%% of %.1fGiB" % [meminfo["used"]*100.0/meminfo["total"], meminfo["total"].to_f/1024**2 ]))
+
+    if meminfo["swap_total"] > 0
+      oprint("Swap used", ("%.1f%% of %.1fGiB" % [meminfo["swap_used"]*100.0/meminfo["swap_total"], meminfo["swap_total"].to_f/1024**2 ]))
+    else
+      nl("\n")
+    end
+
+    df.each do |mountpoint, usage, size, iusage|
+      if mountpoint == "/" or usage > 90 or iusage > 90
+        oprint("Usage of #{mountpoint}", ("%.0f%% of %.1fGB" % [usage, size]))
+        oprint("Inode usage on #{mountpoint}", ("%.0f%%" % iusage))
+      end
+    end
+
   end
 end
-
-df=`df -l --output='target,size,pcent,ipcent' -x tmpfs -x devtmpfs`.split($/)
 
 #
 # Now print out our info
 #
+MotdSysInfo.new.run
 
-puts "    * System information as of #{Time.now.to_s}\n\n"
-puts "        System load:  %.2f\n" % loadavg.first.to_f
-puts "        Memory used: %.1f%% of %.1fGiB" % [meminfo["used"]*100.0/meminfo["total"], meminfo["total"].to_f/1024**2 ]
-puts "        Swap used:   %.1f%% of %.1fGiB" % [meminfo["swap_used"]*100.0/meminfo["swap_total"], meminfo["swap_total"].to_f/1024**2 ]
-df.each do |l|
-  next if l =~ /Mounted on/
-  mountpoint, size, pcent, ipcent = l.split(/\s+/)
-  size = size.to_i
-  puts "        Usage of %s:   %s of %.1fGB (%s of inodes used)" % [mountpoint, pcent, size/1.0e6, ipcent]
-end
-  
-#      Memory used: #{meminfo["swap_used"]*100.0/meminfo["swap_total"]}% of #{meminfo["swap_total"].to_f/1024**2}GiB
-#      Usage of /
-#      Usage of /boot
-#      
 #EOF
 

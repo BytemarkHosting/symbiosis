@@ -18,40 +18,40 @@ class Filesystem
   attr_reader :dev,:mp
 
   def initialize(dev,mp)
-  	@facts = nil
-  	@dev = dev
-  	@mp = mp
+    @facts = nil
+    @dev = dev
+    @mp = mp
   end
 
   def uuid
-  	facts[:filesystem_uuid]
+    facts[:filesystem_uuid]
   end
 
   def facts
-  	# cache it
-  	return @facts.nil? ? real_facts : @facts
+    # cache it
+    return @facts.nil? ? real_facts : @facts
   end
 
   def [](param)
-  	facts[param]
+    facts[param]
   end
 
   def check_needed?
-  	check_reasons.length > 0
+    check_reasons.length > 0
   end
 
   def check_reasons
-  	reasons = []
-  	reasons << is_max_mount_count_reached?
-  	reasons << is_date_check_needed?
-  	reasons << is_manual_check_requested?
-  	reasons.map do |ra|
-  	  ra[0] == true ? ra[1] : nil
-	end.reject{|a|a.nil?}
+    reasons = []
+    reasons << is_max_mount_count_reached?
+    reasons << is_date_check_needed?
+    reasons << is_manual_check_requested?
+    reasons.map do |ra|
+      ra[0] == true ? ra[1] : nil
+  end.reject{|a|a.nil?}
   end
 
   def eql?(other)
-  	other.uuid == self.uuid
+    other.uuid == self.uuid
   end
 
   private
@@ -67,77 +67,77 @@ class Filesystem
   # on Debian, the presence of "/fastboot" will negate the fsck requirement.
 
   def is_max_mount_count_reached?
-  	max_count = facts[:maximum_mount_count].to_i
-  	count = facts[:mount_count].to_i
-  	if max_count > 0
-	  if count > max_count
-	  	return [true, "Maximum mount count exceeded! (#{max_count} > #{count})"]
-	  end
-	end
-	return [false,nil]
+    max_count = facts[:maximum_mount_count].to_i
+    count = facts[:mount_count].to_i
+    if max_count > 0
+    if count > max_count
+      return [true, "Maximum mount count exceeded! (#{max_count} > #{count})"]
+    end
+  end
+  return [false,nil]
   end
 
   def is_date_check_needed?
-	if facts[:next_check_after]
-	  next_check = DateTime.strptime(facts[:next_check_after],TIME_FMT) 
-	  last_check = DateTime.strptime(facts[:last_checked],TIME_FMT) 
-	  if next_check < DateTime.now
-	  	return [true,"Not checked since #{last_check.to_s}"]
-	  end
-	end
-	[false,nil]
+  if facts[:next_check_after]
+    next_check = DateTime.strptime(facts[:next_check_after],TIME_FMT) 
+    last_check = DateTime.strptime(facts[:last_checked],TIME_FMT) 
+    if next_check < DateTime.now
+      return [true,"Not checked since #{last_check.to_s}"]
+    end
+  end
+  [false,nil]
   end
 
   def is_manual_check_requested?
     forcefsck_path = File.join(@mp,"forcefsck") 
     fastboot_path = File.join(@mp,"fastboot") 
-	if File.exists? forcefsck_path 
-	  if File.exists? fastboot_path
-	  	return [false,nil]
-	  else
-	  	return [true,"#{forcefsck_path} exists!"]
-	  end
-	end
-	return [false,nil]
+  if File.exists? forcefsck_path 
+    if File.exists? fastboot_path
+      return [false,nil]
+    else
+      return [true,"#{forcefsck_path} exists!"]
+    end
+  end
+  return [false,nil]
   end
 
   def real_facts
-  	fs_info = %x[/sbin/dumpe2fs -h #{@dev} 2>/dev/null].each_line.map do |l|
-	  (k,v) = l.split(":",2).map{|a|a.strip}
-	  unless k.length == 0
-		k = k.gsub(/\s/,"_").downcase.to_sym
-	  end
-	  [k,v]
-	end
-	@facts = Hash[fs_info]
+    fs_info = %x[/sbin/dumpe2fs -h #{@dev} 2>/dev/null].each_line.map do |l|
+    (k,v) = l.split(":",2).map{|a|a.strip}
+    unless k.length == 0
+    k = k.gsub(/\s/,"_").downcase.to_sym
+    end
+    [k,v]
+  end
+  @facts = Hash[fs_info]
   end
 end
 
 begin
   # check dumpe2fs is there otherwise we might as well give up
   if !File.exists? "/sbin/dumpe2fs"
-  	exit 0
+    exit 0
   end
 
   # first get the filesystems that we might check on boot
   ext_fs = open("/etc/fstab","r").readlines.map do |fst|
-	(dev,mp,fs,opt,d,check) = fst.split 
+  (dev,mp,fs,opt,d,check) = fst.split 
 
-	if dev =~ /^UUID=(.*)/
-	  base_uuid_path = "/dev/disk/by-uuid"
-	  rel_dev_path = File.readlink(File.join(base_uuid_path,$1))
-	  dev = File.expand_path(rel_dev_path,base_uuid_path)
-	end
+  if dev =~ /^UUID=(.*)/
+    base_uuid_path = "/dev/disk/by-uuid"
+    rel_dev_path = File.readlink(File.join(base_uuid_path,$1))
+    dev = File.expand_path(rel_dev_path,base_uuid_path)
+  end
 
-	[dev,mp] if (fs =~ /^ext/ and check != nil and check.to_i > 0)
+  [dev,mp] if (fs =~ /^ext/ and check != nil and check.to_i > 0)
   end.reject{|a|a.nil?}.map{|a|Filesystem.new(*a)}.uniq
 
   ext_fs.find_all{|a|a.check_needed?}.each do |fs|
-	puts "WARNING: #{fs.dev} will be checked at next reboot for the following reason(s)!"
-	fs.check_reasons.each do |r|
-	  puts "  * #{r}"
-	end
-	puts "This may cause an extended reboot."
+  puts " => #{fs.dev} will be checked at next reboot for the following reason(s)!"
+  fs.check_reasons.each do |r|
+    puts "     * #{r}"
+  end
+  puts "This may cause an extended reboot."
   end
 ensure # we have to exit 0 or we'll make Molly[-guard] sad
   exit 0

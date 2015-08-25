@@ -146,11 +146,8 @@ for pkg in cache.packages:
         if is_security_upgrade(version):
             security_upgrades += 1
             break
+
 if upgrades > 0 or security_upgrades > 0 :
-    print "  * Security status:"
-    print "    - %d updates to install." % upgrades
-    print "    - %d are security updates." % security_upgrades
-else:
-    print "  * There are no outstanding packages to update."
+    print " => There are %d packages to upgrade, of which %d are security-related." % (upgrades, security_upgrades)
 
 print "" # leave a trailing blank line
