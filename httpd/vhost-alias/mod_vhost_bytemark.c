@@ -402,17 +402,11 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
     }
     *dest = '\0';
     
-    if (r->filename)
-        docroot = apr_pstrcat(r->pool, r->filename, buf, NULL);
-    else
-        docroot = apr_pstrdup(r->pool, buf);
-    r->filename = apr_pstrcat(r->pool, docroot, uri, NULL);
-
     /*
-     * A this point we either have a request which points to a file
+     * A this point we either have a document root which points to something
      * on disk - or not.
      *
-     * If the request doesn't exist on disk we can *attempt* to remap
+     * If the document root doesn't exist on disk we can *attempt* to remap
      * that to the real file.
      *
      * If this remapping fails we don't care as the result will be a 404,
@@ -425,8 +419,7 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
       /**
        * If we have:
        *
-       *  A request.
-       *  That mapped to a filename.
+       *  A document root
        *  Which doesn't exist.
        *
        * Then:
@@ -434,9 +427,8 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
        *  Attempt to fix.
        *
        */
-      if ( ( NULL != r ) &&
-           ( NULL != r->filename ) &&
-           ( stat( r->filename, &buffer ) < 0 ) )
+      if ( ( NULL != buf ) &&
+           ( stat( buf, &buffer ) < 0 ) )
         {
 
           /**
@@ -444,16 +436,23 @@ static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
            * after the /srv prefix which will result in
            * a request being rewritten from (for example)
            *
-           *   /srv/test.example.com/public/htdocs/test/index.php
+           *   /srv/test.example.com/public/htdocs
            *
            * to:
            *
-           *   /srv/example.com/public/htdocs/test/index.php
+           *   /srv/example.com/public/htdocs
            *
            */
-          update_vhost_request( r->filename );
+          update_vhost_request( buf );
         }
     }
+    
+    if (r->filename)
+        docroot = apr_pstrcat(r->pool, r->filename, buf, NULL);
+    else
+        docroot = apr_pstrdup(r->pool, buf);
+    r->filename = apr_pstrcat(r->pool, docroot, uri, NULL);
+
 
     ap_set_context_info(r, NULL, docroot);
     ap_set_document_root(r, docroot);
