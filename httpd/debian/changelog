@@ -1,3 +1,12 @@
+symbiosis-httpd (2014:1213) stable; urgency=medium
+
+  * Updated mod_vhost_bytemark to handle paths inside the VirtualDocumentRoot
+    that contain "cgi-bin" correctly  (closes #12153).
+  * Updated mod_vhost_bytemark always set the DOCUMENT_ROOT variable,
+    regardless of whether it was a cgi request (closes #12158).
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 25 Aug 2015 11:05:21 +0100
+
 symbiosis-httpd (2014:1212) stable; urgency=high
 
   [ Steve Kemp ]
