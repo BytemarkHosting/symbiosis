@@ -1,3 +1,12 @@
+symbiosis-httpd (2013:0611) oldstable; urgency=medium
+
+  * Updated mod_vhost_bytemark to handle paths inside the VirtualDocumentRoot
+    that contain "cgi-bin" correctly  (closes #12153).
+  * Updated mod_vhost_bytemark always set the DOCUMENT_ROOT variable,
+    regardless of whether it was a cgi request (closes #12158).
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 25 Aug 2015 10:38:29 +0100
+
 symbiosis-httpd (2013:0610) oldstable; urgency=high
 
   * Ban ancient SSLv3 protocol (CVE-2014-3566).
