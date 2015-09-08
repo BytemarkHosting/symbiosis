@@ -22,6 +22,13 @@ module Symbiosis
     NAME_REGEXP = /^[a-z0-9-]+\.([a-z0-9-]+\.?)+$/i
 
     #
+    # This regular expression matchs crypted passwords, putting the word
+    # "{CRYPT}" in $1, the whole crypted password in $2, and just the salt in
+    # $3.
+    #
+    CRYPTED_PASSWORD_REGEXP = /^(\{(?:crypt|CRYPT)\})?((\$(?:1|2a|5|6)\$[a-zA-Z0-9.\/]{1,16}\$)?[a-zA-Z0-9\.\/]+)$/
+
+    #
     # Create a Domain given a directory.
     #
     def self.from_directory(directory)
@@ -281,11 +288,12 @@ module Symbiosis
     def crypt_password(password)
       raise ArgumentError, "password must be a string" unless password.is_a?(String)
 
-      password =~ /^(\{(?:crypt|CRYPT)\})?((\$(?:1|2a|5|6)\$[a-zA-Z0-9.\/]{1,16}\$)?[a-zA-Z0-9\.\/]+)$/
+      crypt = salt = ""
 
-      crypt            = $1.to_s
-      crypted_password = $2.to_s
-      salt             = $3.to_s
+      if password =~ CRYPTED_PASSWORD_REGEXP
+        crypt = $1.to_s
+        salt  = $3.to_s
+      end
 
       #
       # if the {CRYPT} string is at the beginning, assume the password is already crypted
@@ -340,7 +348,7 @@ module Symbiosis
       # 
       # Check the password, crypt first, plaintext second.
       #
-      if real_password =~ /^(\{(?:crypt|CRYPT)\})?((\$(?:1|2a|5|6)\$[a-zA-Z0-9.\/]{1,16}\$)?[a-zA-Z0-9\.\/]+)$/
+      if real_password =~ CRYPTED_PASSWORD_REGEXP
         crypt = $1.to_s
         crypted_password = $2
         salt =  $3.to_s
