@@ -22,7 +22,7 @@ module Symbiosis
     NAME_REGEXP = /^[a-z0-9-]+\.([a-z0-9-]+\.?)+$/i
 
     #
-    # This regular expression matchs crypted passwords, putting the word
+    # This regular expression matches crypted passwords, putting the word
     # "{CRYPT}" in $1, the whole crypted password in $2, and just the salt in
     # $3.
     #
