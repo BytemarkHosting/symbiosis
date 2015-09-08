@@ -11,9 +11,9 @@ theirfile="$file.dpkg-symbiosis-orig"
 package="symbiosis-backup"
 
 if [ ! -L "$file" ] || \
-   [ "$(readlink "$file")" != "$(basename "$ourfile")" -a \
+   [ "$(readlink "$file")" != "$ourfile" -a \
      "$(readlink "$file")" != "$(basename "$theirfile")" ]; then
-  echo "E: $file is not linked to either $(basename "$ourfile") or $(basename "$theirfile")" >&2
+  echo "E: $file is not linked to either $ourfile or $(basename "$theirfile")" >&2
 else
   rm -f "$file"
 fi
@@ -21,7 +21,7 @@ fi
 if [ ! -L "$file" ] && [ ! -e "$file" ]; then
   dpkg-divert --remove --rename --package "$package" "$file"
 else
-  echo "Not removing diversion of $file by $package" >&2
+  echo "I: Not removing diversion of $file by $package" >&2
 fi
 
 #
