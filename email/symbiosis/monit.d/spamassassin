@@ -8,7 +8,7 @@ class SpamdCheck < Symbiosis::Monitor::Check
     super
     @process.pidfile = "/var/run/spamassassin.pid"
     @process.initscript = "/etc/init.d/spamassassin"
-    @name = "spamd"
+    @name = "/usr/sbin/spamd"
   end
 
   def should_be_running
