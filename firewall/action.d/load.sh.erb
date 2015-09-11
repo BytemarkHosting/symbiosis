@@ -58,23 +58,37 @@ for cmd in <%= iptables_cmds.join(" ") %> ; do
     $cmd -t raw -P $chain ACCEPT
   done
 
-  for chain in PREROUTING INPUT OUTPUT POSTROUTING ; do
-    $cmd -t nat -P $chain ACCEPT
-  done
+  has_nat=""
+  if $cmd -t nat -L 2>/dev/null ;  then
+    has_nat="1"
+  fi
+
+  #
+  # nat table only exists for iptables (not ip6tables)
+  #
+  if [ -n "$has_nat" ] ; then
+    for chain in PREROUTING INPUT OUTPUT POSTROUTING ; do
+      $cmd -t nat -P $chain ACCEPT
+    done
+  fi
 
   #
   # Flush everything
   #
   $cmd -F
   $cmd -t raw -F
-  $cmd -t nat -F
+  if [ -n "$has_nat" ] ; then
+    $cmd -t nat -F
+  fi
 
   #
   # Delete old chains
   #
   $cmd -X
   $cmd -t raw -X
-  $cmd -t nat -X
+  if [ -n "$has_nat" ] ; then
+    $cmd -t nat -X
+  fi
 
   #
   # Allow everythink on loopback
