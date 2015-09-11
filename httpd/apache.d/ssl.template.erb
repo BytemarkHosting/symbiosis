@@ -49,11 +49,6 @@
                 SSLHonorCipherOrder     on
                 SSLCompression          off
 
-                # OCSP Stapling, only in httpd 2.3.3 and later
-                SSLUseStapling          on
-                SSLStaplingResponderTimeout 5
-                SSLStaplingReturnResponderErrors off
-
 % if mandatory_ssl?
                 <IfModule headers_mod>
                         # HSTS (mod_headers is required) (15768000 seconds = 6 months)
