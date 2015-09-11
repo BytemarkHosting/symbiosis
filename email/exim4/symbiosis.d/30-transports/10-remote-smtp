@@ -5,6 +5,14 @@ remote_smtp:
   driver = smtp
 
   # 
-  # Use the domain's IP (if it has one) to send outgoing mail.
+  # Use the domain's IP (if it has one) to send outgoing mail.  We use
+  # $sender_address_domain preferentially over $parent_domain, the latter being
+  # used when forwarding happens.
   #
-  interface = <, ${filter{<,${readfile{VHOST_DIR/$sender_address_domain/config/${extract{1}{:}{${filter{ip:ips}{exists{VHOST_DIR/$sender_address_domain/config/$item}}}}}}{,}}}{isip{$item}}}
+  interface = <, ${filter{<,${readfile{${extract{1}{:}{\
+      ${filter \
+       {VHOST_DIR/$sender_address_domain/config/ip:VHOST_DIR/$sender_address_domain/config/ips:VHOST_DIR/$parent_domain/config/ip:VHOST_DIR/$parent_domain/config/ips} \
+       {exists{$item}} \
+      }\
+      }}}{,}}}{isip{$item}}}
+
