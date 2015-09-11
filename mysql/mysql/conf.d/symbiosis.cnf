@@ -11,4 +11,4 @@ bind-address = ::
 #
 # Keep separate DBs in separate files.
 #
-innodb_file_per_table = on
+innodb_file_per_table = 1
