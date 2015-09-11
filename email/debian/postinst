@@ -34,6 +34,22 @@ if ( grep -q '^AllowSupplementaryGroups \+false' /etc/clamav/clamd.conf ) ; then
 fi 
 
 #
+# These are here to aid wheezy-upgrades.
+#
+if ( grep -q '^PidFile ' /etc/clamav/clamd.conf ) ; then
+  echo "I: Removing PidFile setting from clamav config"
+
+  sed -i -e 's/\(^PidFile .*$\)/# \1/' /etc/clamav/clamd.conf
+fi 
+
+if ( grep -q '^PidFile ' /etc/clamav/freshclam.conf ) ; then
+  echo "I: Removing PidFile setting from freshclam config"
+
+  sed -i -e 's/\(^PidFile .*$\)/# \1/' /etc/clamav/freshclam.conf
+fi 
+
+
+#
 # Set the TMPDIR variable for clamav.
 #
 echo "TMPDIR='/var/tmp/'" >> /etc/default/clamav-daemon
