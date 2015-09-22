@@ -10,8 +10,8 @@ XS-Ruby-Versions: all
 Package: symbiosis-email
 Architecture: all
 Pre-Depends: dpkg (>= 1.15.7.2)
-Depends: symbiosis-common (>= 2014:0113), exim4-daemon-heavy, dovecot-sieve, dovecot-managesieved, dovecot-imapd, dovecot-pop3d, adduser, make, clamav-daemon, clamav-freshclam, spamassassin, ruby, ruby-eventmachine, ruby-daemons, gnutls-bin, d-push, ${misc:Depends}
-Recommends: symbiosis-webmail
+Depends: symbiosis-common (>= 2014:0113), exim4-daemon-heavy, dovecot-sieve, dovecot-managesieved, dovecot-imapd, dovecot-pop3d, adduser, make, clamav-daemon, clamav-freshclam, spamassassin, ruby, ruby-eventmachine, ruby-daemons, gnutls-bin,  ${misc:Depends}
+Recommends: symbiosis-webmail, symbiosis-email-activesync
 Replaces: bytemark-vhost-email, symbiosis-monit (<< 2011:1206), symbiosis-test
 Breaks:  symbiosis-monit (<< 2011:1206)
 Provides: bytemark-vhost-email
@@ -26,3 +26,13 @@ Description: virtual hosting solution for email
   * POP3 + POP3S
   * SMTP
   * Sieve
+
+Package: symbiosis-email-activesync
+Architecture: all
+Depends: symbiosis-email,d-push, ${misc:Depends}
+Recommends: symbiosis-webmail
+Description: Provides email access using the Microsoft Exchange ActiveSync protocol 
+ This package will enable a global webmail system for all domains hosted
+ using the Bytemark system.
+ .
+ This is a metapackage that implements the Microsoft Exchange ActiveSync protocol using the d-push system.
