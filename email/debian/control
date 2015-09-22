@@ -29,7 +29,7 @@ Description: virtual hosting solution for email
 
 Package: symbiosis-email-activesync
 Architecture: all
-Depends: symbiosis-email,d-push, ${misc:Depends}
+Depends: d-push, ${misc:Depends}
 Recommends: symbiosis-webmail
 Description: Provides email access using the Microsoft Exchange ActiveSync protocol 
  This package will enable a global webmail system for all domains hosted
