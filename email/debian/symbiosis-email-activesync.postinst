@@ -1,9 +1,5 @@
 #!/bin/bash
 
-#
-# This script has to use bash as it uses arrays.
-#
-
 set -e
 
 #
