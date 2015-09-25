@@ -9,7 +9,7 @@
 /*
  * Make sure the configuration array is defined.
  */
-if ! is_array( $config ) {
+if (!is_array( $config)) {
   $config = array();
 }
 
