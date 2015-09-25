@@ -11,6 +11,7 @@
  */
 if (!is_array( $config)) {
   $config = array();
+
 }
 
 /**
@@ -27,13 +28,16 @@ if ( !array_key_exists('default_host', $config) or
  * Make sure the plugins array exists.
  */
 if ( !array_key_exists('plugins', $config) ) {
+
   $config['plugins'] = array();
+
 }
 
 /**
  * Now check to ensure the managesieve plugin is enabled.
  */
 if ( array_search("managesieve", $config['plugins']) === false ) {
+
   $config['plugins'][] = "managesieve";
 
   /**
@@ -57,9 +61,38 @@ if ( array_search("managesieve", $config['plugins']) === false ) {
 }
 
 if ( !array_key_exists('force_https', $config) ) {
+
   /*
    * Make sure all connections are secure. 
    */
   $config['force_https'] = true;
+
 }
+
+if ( !array_key_exists(['login_lc'], $config) ) {
+  /*
+   * Forces conversion of logins to lower case.
+   */ 
+  $config['login_lc'] = 2;
+}
+
+
+if ( !array_key_exists('log_driver', $config) ) {
+  /*
+   * Log to syslog
+   */
+  $config['log_driver'] = 'syslog';
+
+  /*
+   * Log failed logins
+   */
+  $config['log_logins'] = true;
+
+  /*
+   * Log session authentication errors
+   */
+  $config['log_session'] = true;
+
+}
+
 

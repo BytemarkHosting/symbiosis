@@ -50,7 +50,7 @@ class DovecotCheck < Symbiosis::Monitor::Check
       when "managesieve"
         do_sieve_check
       else
-        warn "Uknown protocol #{proto}"
+        warn "Unknown protocol #{proto}"
         0
     end
   end
