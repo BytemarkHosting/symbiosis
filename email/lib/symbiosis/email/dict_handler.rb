@@ -70,7 +70,6 @@ module Symbiosis
 
         if mailbox.nil?
           syslog.info "Non-existent mailbox #{username.inspect}"
-          syslog.err  "#{service} login failure for username: #{username.inspect}"
           return "N\n"
         end
 
