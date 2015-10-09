@@ -145,39 +145,50 @@ module Symbiosis
       #
       def do_resolve_name(name)
         ips = []
+        ip = nil
 
-        begin
-          case name
-            when IPAddr
-              ips << name
-            when String
-              ips << IPAddr.new(name)
-            when NilClass
-              ips << name
-            else
-              warn "#{name.inspect} could not be resolved because it is a #{name.class}." if $VERBOSE
-          end
-        rescue ArgumentError
-          %w(A AAAA).each do |type|
+        return [] if name.nil?
+
+        case name
+          when IPAddr
+            ip = name
+          when String
             begin
-              Resolv::DNS.open do |dns|
-                #
-                # This works with CNAME records too, depending on what the
-                # resolver gives us.
-                #
-                dns.getresources(name, Resolv::DNS::Resource::IN.const_get(type)).each do |a|
-                  #
-                  # Convert to IPAddr straight away, ignoring errors.
-                  #
-                  begin
-                    ips << IPAddr.new(a.address.to_s)
-                  rescue ArgumentError
-                    warn "#{type} record for #{name} returned duff IP #{a.address.to_s.inspect}." if $VERBOSE
-                  end
-                end
-              end
-            rescue Resolv::ResolvError, Resolv::ResolvTimeout => e
+              ip = IPAddr.new(name)
+            rescue ArgumentError
+              ip = nil
+            end
+          else
+            warn "#{name.inspect} could not be resolved because it is a #{name.class}." if $VERBOSE
+        end
+
+        return [ip] unless ip.nil? 
+
+        #
+        # If we've not managed to turn the argument into an IP, try some DNS.
+        #
+        Resolv::DNS.open do |dns|
+          %w(A AAAA).each do |type|
+            #
+            # This works with CNAME records too, depending on what the
+            # resolver gives us.
+            #
+            stuff = []
+            begin
+              stuff = dns.getresources(name, Resolv::DNS::Resource::IN.const_get(type))
+            rescue StandardError => e
               warn "#{name} could not be resolved because #{e.message}." if $VERBOSE
+            end
+            
+            #
+            # Convert to IPAddr straight away, ignoring errors.
+            #
+            stuff.each do |a|
+              begin
+                ips << IPAddr.new(a.address.to_s)
+              rescue ArgumentError
+                warn "#{type} record for #{name} returned duff IP #{a.address.to_s.inspect}." if $VERBOSE
+              end
             end
           end
         end
