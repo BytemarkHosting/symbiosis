@@ -1,3 +1,11 @@
+symbiosis-firewall (2015:1009) stable; urgency=medium
+
+  * Changed REJECT target to send back a tcp-reset packet for TCP connections.
+  * Only flush nat table if it exists.
+  * Rejigged DNS resolution code not to barf if DNS is unavailable.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Oct 2015 17:00:10 +0100
+
 symbiosis-firewall (2015:0617) stable; urgency=medium
 
   * Changed File#exists? to File#exist? everywhere.
@@ -11,6 +19,20 @@ symbiosis-firewall (2015:0128) stable; urgency=medium
   * Updated the Debian standards.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 09:55:09 +0000
+
+symbiosis-firewall (2014:1111) stable; urgency=medium
+
+  * Updated postinst not to use scripts with paths.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 07 Aug 2015 21:36:28 +0100
+
+symbiosis-firewall (2014:1110) stable; urgency=medium
+
+  * Make sure firewall patterns are anchored at one end.
+  * Ignore .dpkg-* files in directories.
+  * Sanitise log lines to prevent bad UTF causing problems.
+
+ -- James Carter <jcarter@bytemark.co.uk>  Mon, 10 Nov 2014 10:57:26 +0000
 
 symbiosis-firewall (2014:0313) stable; urgency=medium
 
