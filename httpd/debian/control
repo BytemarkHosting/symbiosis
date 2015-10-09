@@ -37,7 +37,3 @@ Description: Mass-hosting module for Apache 2.4 and Bytemark Symbiosis
  * Allows per vhost document root to be setup.
  * Allows domains to be handled with or without a www. prefix.
 
-Package: symbiosis-httpd-passenger
-Architecture: all
-Depends: ruby,libapache2-mod-passenger,ruby-rails
-Description: Adds in Passenger support to Symbiosis sites
