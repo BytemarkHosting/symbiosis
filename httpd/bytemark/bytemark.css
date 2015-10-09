@@ -1,0 +1,18 @@
+html {  background: #e3e3e3 url(/bytemark/background.png) repeat-y; color: black; margin: 0px; text-align: justify; padding: 0px; background-position: center; }
+body { background-color: none; font-family: sans-serif; font-size: 11pt; width: 990px; margin: 0px auto; padding: 0px; }
+address { background-color: #336699; color: white; padding: 5px; text-align: right; }
+a { color: #336699 }
+a img { border: none }
+a:visited, a:link { text-decoration: none; color: #336699 }
+a:hover { text-decoration: underline; }
+span.tt { font-family: monospace; }
+span.bold { font-weight: bold; }
+li{ margin-left: 3ex;}
+
+.body { padding: 10px; margin:  0px 30px; }
+
+/* logo + header */
+.logo { background-color: #FFFFFF; float: left; margin: 0px; }
+.logo img { padding: 27px 23px; margin: 0px; }
+h1.header { color: #336699; padding: 27px 23px; margin: 0px; font-size: 16pt; margin-bottom: 20px; background-color: #fff; min-height: 20px; text-align: right; font-weight: normal; }
+
