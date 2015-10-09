@@ -1,3 +1,9 @@
+symbiosis-mysql (2015:1009) stable; urgency=medium
+
+  * Fixed up innodb file per table config setting.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Oct 2015 17:21:28 +0100
+
 symbiosis-mysql (2015:0825) stable; urgency=medium
 
   * Tidied maint scripts to use sh not bash.
