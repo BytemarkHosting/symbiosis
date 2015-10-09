@@ -36,8 +36,6 @@ for i in /var/spool/exim4/gnutls-params-[0-9]* ; do
     continue
   fi
 
-  if [ 
-
   chown Debian-exim.Debian-exim $tmpfile
 
   certtool --generate-dh-params --bits $length > $tmpfile 2> /dev/null
