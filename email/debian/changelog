@@ -1,3 +1,17 @@
+symbiosis-email (2015:1009) stable; urgency=medium
+
+  * Comment out PidFile settings in clamav/freshclam config to aid upgrades. 
+  * Removed clamav monitoring as this is now run under systemd.
+  * Corrected spamassassin pid and process name for monitoring.
+  * Move d-push support into own meta-package, so as not to pull in unwanted
+    gubbins.
+  * Removed reference to non-existent variable in the dict_handler
+  * Removed unused password_daemon code.
+  * Added specific versions for various dependencies.
+  * Remove tc_checkpassword.rb as this is no longer used.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Oct 2015 17:24:41 +0100
+
 symbiosis-email (2015:0825) stable; urgency=medium
 
   * Updated GnuTLS ciphers in Exim.
@@ -39,6 +53,54 @@ symbiosis-email (2015:0128) stable; urgency=low
   * Updated Debian standards version.
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 10:00:01 +0000
+
+symbiosis-email (2014:1021) stable; urgency=medium
+
+  * Fixed forwarding mail from one domain to another with non-local mail does
+    not work when the message originated remotely (#12128).
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 07 Aug 2015 21:32:04 +0100
+
+symbiosis-email (2014:1020) stable; urgency=medium
+
+  * Fixed exim configuraion to allow mail being forwarded to
+    locally-hosted domains with mail hosted elsewhere to work if the mail
+    originates remotely.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 05 Aug 2015 08:33:39 +0100
+
+symbiosis-email (2014:1019) stable; urgency=medium
+
+  * Passwords with spaces in now work.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 22 Jun 2015 09:06:19 +0100
+
+symbiosis-email (2014:1018) stable; urgency=medium
+
+  [ James Carter ]
+  * Fix exim4 config for vacation messages (closes #8448).
+
+  [ Patrick J Cherry ]
+  * Accept mail from authenticated users for locally configured hosts that
+    have their mail elsewhere.
+  * Updated maintainer/uploaders.
+  * Avoid advertising PLAIN and LOGIN over unencrypted connections.  Fixes
+    #8473
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 31 Mar 2015 13:10:01 +0100
+
+symbiosis-email (2014:1017) stable; urgency=medium
+
+  * Disable SSLv3 in Exim4 and Dovecot (CVE-2014-3566).
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 17 Oct 2014 10:31:03 +0100
+
+symbiosis-email (2014:0627) stable; urgency=medium
+
+  * Added further tests to exim4 delivery
+  * Fixed firewall patterns (CVE-2014-3979)
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 27 Jun 2014 19:17:21 +0100
 
 symbiosis-email (2014:0214) stable; urgency=low
 
