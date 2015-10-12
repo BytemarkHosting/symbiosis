@@ -24,6 +24,26 @@ symbiosis-updater (2015:0127) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 09:55:09 +0000
 
+symbiosis-updater (2014:1112) stable; urgency=medium
+
+  * Disable the the symbiosis-updater script if unattended-upgrades is
+    installed.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 07 Aug 2015 21:30:08 +0100
+
+symbiosis-updater (2014:1111) stable; urgency=medium
+
+  * Email is only sent if the EMAIL parameter is set.
+  * Updated maintainers/uploaders.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 31 Mar 2015 13:16:24 +0100
+
+symbiosis-updater (2014:1110) stable; urgency=low
+
+  * Re-jigged packaging (fixes #6686).
+
+ -- James Carter <jcarter@bytemark.co.uk>  Mon, 10 Nov 2014 10:46:31 +0000
+
 symbiosis-updater (2014:0218) stable; urgency=low
 
   * Updated sources list to use wheezy, not squeeze sources.
