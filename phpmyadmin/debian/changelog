@@ -14,6 +14,12 @@ symbiosis-phpmyadmin (2015:0128) stable; urgency=low
 
  -- Steve Kemp <steve@bytemark.co.uk>  Wed, 28 Jan 2015 10:00:01 +0000
 
+symbiosis-phpmyadmin (2014:1107) stable; urgency=low
+
+  * Fixed firewall pattern regex (CVE-2014-3979).
+
+ -- James Carter <jcarter@bytemark.co.uk>  Fri, 07 Nov 2014 14:09:32 +0000
+
 symbiosis-phpmyadmin (2014:0214) stable; urgency=low
 
   * Added bug control.
