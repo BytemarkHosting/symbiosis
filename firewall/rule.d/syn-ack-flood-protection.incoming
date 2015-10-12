@@ -1,0 +1,17 @@
+#
+#
+#  Drop all INVALID <%= direction %> connections<%= port.nil? ? "" : " to port #{port}" %><%= address.nil? ? "" : " from address #{address}" %>.
+#
+# This is a basic attempt to mitigate SYN-ACK and ACK floods 
+#
+# http://rhelblog.redhat.com/2014/04/11/mitigate-tcp-syn-flood-attacks-with-red-hat-enterprise-linux-7-beta/
+#
+
+% iptables_cmds.each do |cmd|
+% unless port.nil?
+<%= cmd %> -A <%= chain%> -p tcp --dport <%= port %> <%= src_or_dst %> -m state --state INVALID -j DROP 
+<%= cmd %> -A <%= chain%> -p udp --dport <%= port %> <%= src_or_dst %> -m state --state INVALID -j DROP
+% else
+<%= cmd %> -A <%= chain%> <%= src_or_dst %> -m state --state INVALID -j DROP
+% end
+% end

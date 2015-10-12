@@ -1,0 +1,7 @@
+#
+# Make the connection tracking system more strict in this categorization.
+# Specifically this will (among other things) help catch SYN-ACK and ACK-floods.
+#
+# http://rhelblog.redhat.com/2014/04/11/mitigate-tcp-syn-flood-attacks-with-red-hat-enterprise-linux-7-beta/
+#
+net.netfilter.nf_conntrack_tcp_loose=0
