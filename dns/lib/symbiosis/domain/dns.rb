@@ -92,7 +92,7 @@ module Symbiosis
         "adkim" => (self.has_dkim? ? "s" : nil),
         "aspf" => (self.has_spf? ? "s" : nil),
         "sp" => "none",
-        "pct" => "100" 
+        "pct" => (has_antispam ? "100"  : nil)
       }.reject{|k,v| v.nil?}
 
       # 
