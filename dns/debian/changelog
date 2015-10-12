@@ -3,7 +3,7 @@ symbiosis-dns (2015:1009) stable; urgency=medium
   * symbiosis-dns-generate, avoid corrupting DNS data when out of disc space. 
   * Fixed "filtering" percent on DMARC record to reflect antispam flag.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Oct 2015 17:20:49 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 12 Oct 2015 16:25:13 +0100
 
 symbiosis-dns (2015:0825) stable; urgency=medium
 
