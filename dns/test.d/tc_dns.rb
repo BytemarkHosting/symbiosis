@@ -246,8 +246,15 @@ EOF
     #
     @domain.__send__(:set_param,'dmarc',true, @domain.config_dir)
     assert(@domain.has_dmarc?)
+    assert_equal("v=DMARC1;p=quarantine;sp=none", @domain.dmarc_record)
+   
+    #
+    # Test with antispam
+    #
+    @domain.__send__(:set_param,'antispam',true, @domain.config_dir)
     assert_equal("v=DMARC1;p=quarantine;pct=100;sp=none", @domain.dmarc_record)
    
+
     #
     # Test it with SPF
     #
