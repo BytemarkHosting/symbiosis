@@ -1,6 +1,7 @@
 symbiosis-common (2015:1012) stable; urgency=medium
 
   * Tidied up password hashing code to remove unused variable.
+  * Removed unused variable in the DKIM code.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 12 Oct 2015 14:18:24 +0100
 
