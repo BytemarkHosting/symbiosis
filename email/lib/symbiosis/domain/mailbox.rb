@@ -346,8 +346,6 @@ module Symbiosis
 
         if pw != self.password
 
-          p_dir, p_file = File.split(self.password_file)
-
           if @encrypt_password 
             set_param(self.dot + "password", self.domain.crypt_password(pw), self.directory, :mode => 0600)
           else
@@ -397,7 +395,7 @@ module Symbiosis
         #
         next unless File.directory?(entry)
 
-        this_mailboxes_dir, local_part = File.split(entry)
+        local_part = File.split(entry).last
 
         #
         # Don't want directories that are not valid local parts.
