@@ -3,6 +3,7 @@ symbiosis-firewall (2015:1009) stable; urgency=medium
   * Changed REJECT target to send back a tcp-reset packet for TCP connections.
   * Only flush nat table if it exists.
   * Rejigged DNS resolution code not to barf if DNS is unavailable.
+  * Added basic SYN-ACK/ACK flood protection.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Oct 2015 17:00:10 +0100
 
