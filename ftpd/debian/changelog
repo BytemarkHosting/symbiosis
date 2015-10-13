@@ -1,5 +1,6 @@
 symbiosis-ftpd (2015:1009) stable; urgency=medium
 
+  * Updated the SSL ciphers.
   * Remove monit script for pure-authd as this is under systemd now.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Oct 2015 17:30:31 +0100
