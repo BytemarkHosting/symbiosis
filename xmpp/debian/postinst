@@ -14,6 +14,14 @@ for i in {client,server} ; do
   fi
 done
 
+
+if [ ! -f /var/spool/prosody/dhparams ] ; then
+  #
+  # Generate dhperams if they don't exist already
+  #
+  /etc/cron.weekly/symbiosis-xmpp --verbose
+fi
+
 #
 # Configure sites
 #
