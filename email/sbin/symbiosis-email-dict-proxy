@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
 # NAME
 #
-#  symbiosis-email-password-daemon - Dovecot dict interface for Symbiosis
+#  symbiosis-email-dict-proxy - Dovecot dict interface for Symbiosis
 #
 # SYNOPSIS
 #
-#  symbiosis-email-password-daemon [ -h | --help ] [-m | --manual] [ -p | --prefix ]
+#  symbiosis-email-dict-proxy [ -h | --help ] [-m | --manual] [ -p | --prefix ]
 #
 # OPTIONS
 #
