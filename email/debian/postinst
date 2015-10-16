@@ -122,7 +122,7 @@ fi
 #
 #  Restart all deamons
 #
-for i in exim4 dovecot spamassassin clamav-daemon symbiosis-email-dict-proxy; do
+for i in exim4 dovecot spamassassin clamav-daemon symbiosis-email-dict-proxy poppass; do
     # spamassassin + clamav-daemon might not be installed.  Wrap the invokation.
     service $i restart || true
 done
