@@ -1,0 +1,10 @@
+[Unit]
+Description=Symbiosis: email poppass daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/symbiosis-email-poppassd --foreground
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

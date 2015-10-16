@@ -1,0 +1,118 @@
+#!/usr/bin/ruby
+# NAME
+#
+#  symbiosis-email-poppassd - Poppassd interface for Symbiosis
+#
+# SYNOPSIS
+#
+#  symbiosis-email-poppassd [ -h | --help ] [-m | --manual] [ -p | --prefix ] [ -P | --port ]
+#
+# OPTIONS
+#
+#  -h, --help            Show a help message, and exit.
+#
+#  -m, --manual          Show this manual, and exit.
+#
+#  -p, --prefix          Specify the prefix directory (default /srv)
+#
+#  -P, --port            Specify which port to run on (default 106)
+#
+#
+# SEE ALSO
+#
+# poppassd (8)
+#
+# AUTHOR
+#
+# Patrick J. Cherry <patrick@bytemark.co.uk>
+#
+
+require 'getoptlong'
+
+manual = help = false
+opts = GetoptLong.new(
+         [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
+         [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
+         [ '--foreground', '-f', GetoptLong::NO_ARGUMENT ],
+         [ '--prefix',     '-p', GetoptLong::OPTIONAL_ARGUMENT ],
+         [ '--port',       '-P', GetoptLong::OPTIONAL_ARGUMENT ]
+       )
+
+prefix = "/srv"
+port = 106
+foreground = false
+
+opts.each do |opt,arg|
+  case opt
+  when '--help'
+    help = true
+  when '--manual'
+    manual = true
+  when '--prefix'
+    prefix = arg
+  when '--port'
+    port = arg
+  when '--foreground'
+    foreground = true
+  end
+end
+
+begin
+  port = Intger(port)
+rescue ArgumentError
+  warn "*** Port #{port.inspect} does not look like an integer"
+  exit 1
+end
+
+#
+# Output help as required.
+#
+if help or manual
+  require 'symbiosis/utils'
+  Symbiosis::Utils.show_help(__FILE__) if help
+  Symbiosis::Utils.show_manual(__FILE__) if manual
+  exit 0
+end
+
+#
+# Require these bits here, so we can generate the manpage without needing extra
+# build-deps.
+#
+require 'daemons'
+require 'eventmachine'
+require 'syslog'
+require 'symbiosis/utils'
+require 'symbiosis/email/poppass_handler'
+ 
+syslog = Syslog.open( File.basename($0), Syslog::LOG_NDELAY && Syslog::LOG_PERROR, Syslog::LOG_MAIL ) 
+
+Symbiosis::Email::PoppassHandler.prefix = prefix
+Symbiosis::Email::PoppassHandler.syslog = syslog
+
+# If we use systemd socket activation in future, here's how.
+#
+# SD_LISTEN_FDS_START = 3
+#
+# if ENV['LISTEN_PID'].to_i == $$
+#   # use existing socket passed from systemd
+#   systemd_socket = Socket.for_fd(SD_LISTEN_FDS_START + 0)
+#   syslog.info "Got socket #{SD_LISTEN_FDS_START + 0} from systemd"
+# end
+
+Daemons.daemonize({
+  :app_name   => "ruby",
+  :ontop      => foreground,
+  :dir_mode   => :system,
+  :log_output => false
+})
+
+EventMachine.run do
+  begin
+    EventMachine.start_server "127.0.0.1", port
+  rescue StandardError => err
+    syslog.info "Caught #{err.to_s} "
+    EM.stop
+  end
+end
+
+
