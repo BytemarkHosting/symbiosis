@@ -43,6 +43,7 @@ test: ext/symbiosis_utmp.so
 	@touch  i/whitelist.d/2001:1af:123:00::1
 	@touch  i/blacklist.d/192.168.1.101
 	@touch  i/blacklist.d/2001:1af:123:00::2
+	@touch  i/blacklist.d/.empty
 	@touch  i/incoming.d/00-established
 	@touch  i/incoming.d/00-related
 	@touch  i/incoming.d/05-ping
@@ -63,7 +64,7 @@ test: ext/symbiosis_utmp.so
 	@touch  i/incoming.d/99-reject
 	@touch  i/outgoing.d/00-established
 	@touch  i/outgoing.d/00-related
-	@touch  i/outgoing.d/10-match-uid-not-www-data
+	@touch  i/outgoing.d/10-reject-www-data
 	@echo "212.110.161.177" > i/outgoing.d/20-accept
 	@echo "2001:41c8:20:862:ac1:1::|48" >> i/outgoing.d/20-accept
 	@touch  i/outgoing.d/99-reject
