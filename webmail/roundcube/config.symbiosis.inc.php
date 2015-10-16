@@ -9,7 +9,7 @@
 /*
  * Make sure the configuration array is defined.
  */
-if (!is_array( $config)) {
+if ( !is_array($config) ) {
   $config = array();
 
 }
@@ -93,6 +93,34 @@ if ( !array_key_exists('log_driver', $config) ) {
    */
   $config['log_session'] = true;
 
+}
+
+
+/*
+ * Enable the password changing plugin, if it has not already been enabled.
+ */
+if ( array_search("password", $config['plugins']) === false ) {
+  $config['plugins'][] = "password";
+
+  /*
+   * We use poppassd in Symbiosis
+   */
+  $config['password_driver'] = 'poppassd';
+
+  /*
+   * The user has to confirm their current password
+   */
+  $config['password_confirm_current'] = true;
+
+  /*
+   * The host which changes the password
+   */
+  $config['password_pop_host'] = 'localhost';
+
+  /*
+   *  TCP port used for poppassd connections
+   */
+  $config['password_pop_port'] = 106;
 }
 
 
