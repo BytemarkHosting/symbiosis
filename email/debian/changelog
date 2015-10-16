@@ -9,6 +9,7 @@ symbiosis-email (2015:1009) stable; urgency=medium
   * Removed unused password_daemon code.
   * Added specific versions for various dependencies.
   * Remove tc_checkpassword.rb as this is no longer used.
+  * Updated SSL ciphers for Dovecot.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Oct 2015 17:24:41 +0100
 
