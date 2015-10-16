@@ -38,7 +38,6 @@ module Symbiosis
         @domain        = domain
         @mailboxes_dir = mailboxes_dir
         @encrypt_password = @domain.should_encrypt_mailbox_passwords?
-        @password      = nil
         @local_user    = nil
       end
 
@@ -320,20 +319,20 @@ module Symbiosis
       # mailbox doesn't exist.
       #
       def password
-        if self.exists? and @password.nil?
+        if self.exists?
           #
           # Read the password
           #
           param = get_param(self.dot + "password", self.directory, :mode => 0600)
 
           unless param.is_a?(String)
-            @password = nil
+            password = nil
           else
-            @password = param.strip
+            password = param.strip
           end
 
         end
-        @password
+        password
       end
 
       #
@@ -353,7 +352,7 @@ module Symbiosis
           end
         end
 
-        return (@password = pw)
+        return pw
       end
 
       #
