@@ -1,3 +1,10 @@
+symbiosis-xmpp (2015:1013) stable; urgency=medium
+
+  * Updated SSL paramters.
+  * Added separate dhparam file, and a cron job to regenerate it.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 13 Oct 2015 14:52:10 +0100
+
 symbiosis-xmpp (2015:0825) stable; urgency=medium
 
   * Tidied manpage. 
