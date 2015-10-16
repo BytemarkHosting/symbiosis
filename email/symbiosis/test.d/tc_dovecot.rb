@@ -13,10 +13,12 @@ class TestDovecot < Test::Unit::TestCase
 
     @mailbox = @domain.create_mailbox("test")
     @mailbox.encrypt_password = false
-    @mailbox.password = Symbiosis::Utils.random_string
+    @mailbox_password = Symbiosis::Utils.random_string
+    @mailbox.password = @mailbox_password
 
     @mailbox_crypt = @domain.create_mailbox("te-s.t_crypt")
-    @mailbox_crypt.password = Symbiosis::Utils.random_string
+    @mailbox_crypt_password = Symbiosis::Utils.random_string
+    @mailbox_crypt.password = @mailbox_crypt_password
 
     Net::IMAP.debug = true if $DEBUG
   end
@@ -68,7 +70,7 @@ class TestDovecot < Test::Unit::TestCase
   def test_imap_auth_plain
     assert_nothing_raised do
       imap = Net::IMAP.new('localhost', 143, false)
-      imap.login(@mailbox.username, @mailbox.password)
+      imap.login(@mailbox.username, @mailbox_password)
       imap.logout
       imap.disconnect unless imap.disconnected?
     end
@@ -95,7 +97,7 @@ class TestDovecot < Test::Unit::TestCase
   def test_imap_auth_login
     assert_nothing_raised do
       imap = Net::IMAP.new('localhost', 143, false)
-      imap.authenticate('LOGIN', @mailbox.username, @mailbox.password)
+      imap.authenticate('LOGIN', @mailbox.username, @mailbox_password)
       imap.logout
       imap.disconnect unless imap.disconnected?
     end
@@ -104,7 +106,7 @@ class TestDovecot < Test::Unit::TestCase
   def test_imap_auth_login_crypt
     assert_nothing_raised do
       imap = Net::IMAP.new('localhost', 143, false)
-      imap.authenticate('LOGIN', @mailbox_crypt.username, @mailbox_crypt.password)
+      imap.authenticate('LOGIN', @mailbox_crypt.username, @mailbox_crypt_password)
       imap.logout
       imap.disconnect unless imap.disconnected?
     end
@@ -116,7 +118,7 @@ class TestDovecot < Test::Unit::TestCase
     assert_nothing_raised do
       imap = Net::IMAP.new('localhost', 143, false)
       imap.starttls({:verify_mode => OpenSSL::SSL::VERIFY_NONE})
-      imap.authenticate('LOGIN', @mailbox_crypt.username, @mailbox_crypt.password)
+      imap.authenticate('LOGIN', @mailbox_crypt.username, @mailbox_crypt_password)
       imap.logout
       imap.disconnect unless imap.disconnected?
     end
@@ -125,7 +127,7 @@ class TestDovecot < Test::Unit::TestCase
   def test_imap_auth_ssl
     assert_nothing_raised do
       imap = Net::IMAP.new('localhost', 993, true, nil, false) 
-      imap.authenticate('LOGIN', @mailbox.username, @mailbox.password)
+      imap.authenticate('LOGIN', @mailbox.username, @mailbox_password)
       imap.logout
       imap.disconnect unless imap.disconnected?
     end
@@ -135,7 +137,7 @@ class TestDovecot < Test::Unit::TestCase
     assert_nothing_raised do
       pop = Net::POP.new('localhost', 110)
       pop.set_debug_output STDOUT if $DEBUG
-      pop.start(@mailbox.username, @mailbox.password)
+      pop.start(@mailbox.username, @mailbox_password)
       pop.finish
     end
   end
@@ -144,7 +146,7 @@ class TestDovecot < Test::Unit::TestCase
     assert_nothing_raised do
       pop = Net::POP.new('localhost', 110)
       pop.set_debug_output STDOUT if $DEBUG
-      pop.start(@mailbox_crypt.username, @mailbox_crypt.password)
+      pop.start(@mailbox_crypt.username, @mailbox_crypt_password)
       pop.finish
     end
   end
@@ -158,7 +160,7 @@ class TestDovecot < Test::Unit::TestCase
       Net::POP.enable_ssl({:verify_mode => OpenSSL::SSL::VERIFY_NONE})
       pop = Net::POP.new('localhost', 995)
       pop.set_debug_output STDOUT if $DEBUG
-      pop.start(@mailbox_crypt.username, @mailbox_crypt.password)
+      pop.start(@mailbox_crypt.username, @mailbox_crypt_password)
       pop.finish
     end
   end
@@ -220,7 +222,7 @@ EOF
 
     assert_nothing_raised do
       imap = Net::IMAP.new('localhost', 143, false)
-      imap.authenticate('LOGIN', @mailbox.username, @mailbox.password)
+      imap.authenticate('LOGIN', @mailbox.username, @mailbox_password)
 
       #
       # Now check the quotaroot.
