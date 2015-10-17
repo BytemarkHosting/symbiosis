@@ -12,10 +12,12 @@ class TestEximLive < Test::Unit::TestCase
 
     @mailbox = @domain.create_mailbox("test")
     @mailbox.encrypt_password = false
-    @mailbox.password = Symbiosis::Utils.random_string
+    @mailbox_password = Symbiosis::Utils.random_string
+    @mailbox.password = @mailbox_password
 
     @mailbox_crypt = @domain.create_mailbox("te-s.t_crypt")
-    @mailbox_crypt.password = Symbiosis::Utils.random_string
+    @mailbox_crypt_password = Symbiosis::Utils.random_string
+    @mailbox_crypt.password = @mailbox_crypt_password
 
     @ssl_ctx = OpenSSL::SSL::SSLContext.new("TLSv1_client")
     @ssl_ctx.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -68,13 +70,13 @@ class TestEximLive < Test::Unit::TestCase
 
     smtp.start do
       assert_nothing_raised("AUTH PLAIN failed for a user with plaintext password") do
-        smtp.auth_login(@mailbox.username, @mailbox.password)
+        smtp.auth_login(@mailbox.username, @mailbox_password)
       end
     end
 
     smtp.start do
       assert_nothing_raised("AUTH LOGIN failed for a user with plaintext password") do
-        smtp.auth_login(@mailbox.username, @mailbox.password)
+        smtp.auth_login(@mailbox.username, @mailbox_password)
       end
     end
   end
@@ -113,13 +115,13 @@ class TestEximLive < Test::Unit::TestCase
 
     smtp.start do
       assert_nothing_raised("AUTH PLAIN failed for a user with crypt'd password") do
-        smtp.auth_login(@mailbox_crypt.username, @mailbox_crypt.password)
+        smtp.auth_login(@mailbox_crypt.username, @mailbox_crypt_password)
       end
     end
 
     smtp.start do
       assert_nothing_raised("AUTH PLAIN failed for a user with crypt'd password") do
-        smtp.auth_login(@mailbox_crypt.username, @mailbox_crypt.password)
+        smtp.auth_login(@mailbox_crypt.username, @mailbox_crypt_password)
       end
     end
   end
@@ -143,7 +145,7 @@ EOF
 
     smtp.start do
       assert_nothing_raised("AUTH PLAIN failed for a user with crypt'd password") do
-        smtp.auth_login(@mailbox_crypt.username, @mailbox_crypt.password)
+        smtp.auth_login(@mailbox_crypt.username, @mailbox_crypt_password)
       end
 
       assert_nothing_raised do
@@ -226,7 +228,7 @@ EOF
 #
 #    assert_nothing_raised do
 #      smtp = Net::SMTP.new('localhost', 25, false)
-#      smtp.authenticate('LOGIN', @mailbox.username, @mailbox.password)
+#      smtp.authenticate('LOGIN', @mailbox.username, @mailbox_password)
 #
 #      #
 #      # Now check the quotaroot.
