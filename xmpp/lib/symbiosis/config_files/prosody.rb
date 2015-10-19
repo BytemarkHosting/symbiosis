@@ -180,7 +180,7 @@ module Symbiosis
           ans << "cafile = \"/etc/ssl/ssl.bundle\"" if File.exist?("/etc/ssl/ssl.bundle")
         end
 
-        ans.join(";\n")
+        ans.join(";\n")+";\n"
       end
 
     end
