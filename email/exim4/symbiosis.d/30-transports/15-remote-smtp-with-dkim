@@ -48,14 +48,19 @@ remote_smtp_with_dkim:
   #
 
   # 
-  # Use the domain's IP (if it has one) to send outgoing mail.
+  # Use the domain's IP (if it has one) to send outgoing mail.  We use
+  # $sender_address_domain, or a default value kept in
+  # /etc/symbiosis/config/ip(s).
   #
-  interface = <, ${filter{<,${readfile{${extract{1}{:}{\
-      ${filter \
-       {VHOST_DIR/$sender_address_domain/config/ip:VHOST_DIR/$sender_address_domain/config/ips:VHOST_DIR/$parent_domain/config/ip:VHOST_DIR/$parent_domain/config/ips} \
-       {exists{$item}} \
-      }\
-      }}}{,}}}{isip{$item}}}
-
-
-
+  interface = <, ${if !eq\
+      {${extract {1}{:}{${filter\
+          {VHOST_DIR/$sender_address_domain/config/ip:VHOST_DIR/$sender_address_domain/config/ips:/etc/symbiosis/config/ip:/etc/symbiosis/config/ips}\
+          {exists{$item}}\
+        }}\
+      }}\
+      {}\
+      {${filter\
+        {<,${readfile{$value}}}{isip{$item}}\
+      }}\
+    }
+ 
