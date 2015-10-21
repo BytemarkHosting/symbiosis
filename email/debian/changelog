@@ -1,3 +1,11 @@
+symbiosis-email (2015:1021) stable; urgency=medium
+
+  * Added poppassd to provide an interface to change mailbox passwords.
+  * Fixed SMTP outgoing interface selection (closes #12298).
+  * Added manpage for symbiosis-email-encrypt-passwords.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 21 Oct 2015 22:16:37 +0100
+
 symbiosis-email (2015:1009) stable; urgency=medium
 
   * Comment out PidFile settings in clamav/freshclam config to aid upgrades. 
