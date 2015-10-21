@@ -108,7 +108,7 @@ Daemons.daemonize({
 
 EventMachine.run do
   begin
-    EventMachine.start_server "127.0.0.1", port
+    EventMachine.start_server "127.0.0.1", port, Symbiosis::Email::PoppassHandler
   rescue StandardError => err
     syslog.info "Caught #{err.to_s} "
     EM.stop
