@@ -4,7 +4,7 @@ symbiosis-email (2015:1021) stable; urgency=medium
   * Fixed SMTP outgoing interface selection (closes #12298).
   * Added manpage for symbiosis-email-encrypt-passwords.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 21 Oct 2015 22:16:37 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 21 Oct 2015 22:32:46 +0100
 
 symbiosis-email (2015:1009) stable; urgency=medium
 
