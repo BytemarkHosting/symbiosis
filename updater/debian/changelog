@@ -1,3 +1,9 @@
+symbiosis-updater (2015:1021) stable; urgency=medium
+
+  * Updated Origins-Patterns to work with Debian and Bytemark repos.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 21 Oct 2015 22:13:20 +0100
+
 symbiosis-updater (2015:0618) stable; urgency=medium
 
   * Added config for u-a
