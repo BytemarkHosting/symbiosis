@@ -5,7 +5,8 @@ man/%.man: ./sbin/%
 	[ -d man ] || mkdir man
 	RUBYLIB=./lib:../common/lib $<  --manual | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
 
-docs: man/symbiosis-email-dict-proxy.man
+docs: man/symbiosis-email-dict-proxy.man  man/symbiosis-email-encrypt-passwords.man  man/symbiosis-email-poppassd.man
+
 
 clean:
 	$(RM) exim4/exim4.conf
