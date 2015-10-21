@@ -1,3 +1,9 @@
+symbiosis-xmpp (2015:1021) stable; urgency=medium
+
+  * Fixed bugs in configuration (missing semicolons).
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 21 Oct 2015 22:10:47 +0100
+
 symbiosis-xmpp (2015:1013) stable; urgency=medium
 
   * Updated SSL paramters.
