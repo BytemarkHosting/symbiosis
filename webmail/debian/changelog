@@ -1,3 +1,11 @@
+symbiosis-webmail (2015:1021) stable; urgency=medium
+
+  * Enabled password change plugin in roundcube.
+  * Added recommendation to install password change plugin for squirrelmail.
+  * Tidied control file.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 21 Oct 2015 22:14:33 +0100
+
 symbiosis-webmail (2015:0925) stable; urgency=medium
 
   * Fixed typo in roundcube config
