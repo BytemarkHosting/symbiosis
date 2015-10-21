@@ -24,7 +24,9 @@ override_dh_auto_clean:
 
 override_dh_systemd_enable:
 	dh_systemd_enable -psymbiosis-email --name symbiosis-email-dict-proxy symbiosis-email-dict-proxy.service
+	dh_systemd_enable -psymbiosis-email --name symbiosis-email-poppassd symbiosis-email-poppassd.service
 
 override_dh_installinit:
 	dh_installinit -R --name symbiosis-email-dict-proxy
+	dh_installinit -R --name symbiosis-email-poppassd
 
