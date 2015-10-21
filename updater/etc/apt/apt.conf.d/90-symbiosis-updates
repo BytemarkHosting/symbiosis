@@ -5,13 +5,14 @@ APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Unattended-Upgrade "1";
 
 //
-// Install updates from Bytemark and Debian.
+// Install updates from Bytemark and the vendor
 //
 Unattended-Upgrade::Origins-Pattern {
    "o=Bytemark Hosting";
-   "o=Debian,n=jessie";
-   "o=Debian,n=jessie-updates";
-   "o=Debian,n=jessie,l=Debian-Security";
+   "o=${distro_id},n=${distro_codename}";
+   "o=${distro_id},n=${distro_codename}-updates";
+   "o=${distro_id},n=${distro_codename}-lts";
+   "o=${distro_id},n=${distro_codename},l=${distro_id}-Security";
 };
 
 
