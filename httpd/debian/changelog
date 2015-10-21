@@ -1,3 +1,10 @@
+symbiosis-httpd (2015:1021) stable; urgency=medium
+
+  * Ensure OCSP stapling is explictly diabled in the SSL templates.
+  * Ensure HSTS headers are sent with SSL sites when mod_headers is enabled.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 21 Oct 2015 22:09:12 +0100
+
 symbiosis-httpd (2015:1009) stable; urgency=medium
 
   * Updated mod_vhost_bytemark to look at the buffer, rather than r->filename.
