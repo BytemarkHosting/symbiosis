@@ -58,7 +58,7 @@ opts.each do |opt,arg|
 end
 
 begin
-  port = Intger(port)
+  port = Integer(port)
 rescue ArgumentError
   warn "*** Port #{port.inspect} does not look like an integer"
   exit 1
