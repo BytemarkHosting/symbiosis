@@ -8,7 +8,8 @@ require 'pp'
 DEBEMAIL = ENV["DEBEMAIL"] || "symbiosis@bytemark.co.uk"
 DEB_BUILD_ARCH = ENV["BUILD_ARCH"] || `dpkg-architecture -qDEB_BUILD_ARCH`.chomp
 DISTRO   = (ENV["DISTRO"]   || "debian").downcase
-RELEASE  = (ENV["RELEASE"]  || "testing").downcase
+RELEASE  = (ENV["RELEASE"]  || "stable").downcase
+CODENAME  = (ENV["CODENAME"]  || "jessie").downcase
 REPONAME = (ENV["REPONAME"] || "symbiosis").downcase
 PARALLEL_BUILD = ENV.has_key?("PARALLEL_BUILD")
 
@@ -226,9 +227,10 @@ file "Release" => ["Sources.gz", "Sources", "Packages.gz", "Packages"] do |t|
   #
   release =<<EOF
 Description: Bytemark Symbiosis, built for #{DISTRO.capitalize} #{RELEASE}
-Origin: #{Socket.gethostname}
+Origin: Bytemark Hosting
 Label: #{REPONAME}
 Suite: #{RELEASE}
+Codename: #{CODENAME}
 Architectures: #{available_build_archs.join(" ")} source
 EOF
   #
