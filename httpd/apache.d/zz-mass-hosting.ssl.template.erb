@@ -34,9 +34,9 @@
                 # OCSP Stapling -- make sure you remove the reject-www-data
                 # rule from the outgoing firewall if you use this.
                 #
-                # SSLUseStapling          on
-                # SSLStaplingResponderTimeout 5
-                # SSLStaplingReturnResponderErrors off
+                SSLUseStapling          off
+                SSLStaplingResponderTimeout 5
+                SSLStaplingReturnResponderErrors off
 
                 #
                 # No HSTS here, as we can't check if this domain is supposed to
