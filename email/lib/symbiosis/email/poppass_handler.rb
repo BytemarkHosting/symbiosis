@@ -75,7 +75,7 @@ module Symbiosis
         end
       rescue StandardError => err
         send_data "500 Something bad has happened.  Sorry!\r\n"
-        syslog.warning "Caught #{err.to_s}"
+        syslog.err "Caught #{err.to_s}"
         close_connection(true)
       end
 
@@ -96,7 +96,7 @@ module Symbiosis
         @mailbox = Symbiosis::Domains.find_mailbox(@username, self.prefix)
 
         if @mailbox.nil?
-          syslog.info "Non-existent mailbox #{@username.inspect}"
+          syslog.notice "Non-existent mailbox #{@username.inspect}"
           sleep @fail_timeout
           return "500 Incorrect login\r\n"
         end
@@ -104,13 +104,13 @@ module Symbiosis
         begin
           @authorised = @mailbox.login(passwd)
         rescue ArgumentError => err
-          syslog.info "Unable to login to mailbox #{@username.inspect} because #{err.to_s}"
+          syslog.notice "Unable to login to mailbox #{@username.inspect} because #{err.to_s}"
           sleep @fail_timeout
           return "500 Incorrect login\r\n"
         end
 
         unless @authorised
-          syslog.info "Incorrect password given for mailbox #{@username.inspect}"
+          syslog.notice "Incorrect password given for mailbox #{@username.inspect}"
           sleep @fail_timeout
           return "500 Incorrect login\r\n"
         end
@@ -126,12 +126,21 @@ module Symbiosis
         c = CrackLib::Fascist(passwd)
 
         unless c.ok?
+          syslog.notice "Password change failed for user #{@username.inspect} -- #{c.reason}"
           return "400 Sorry, that password is too weak -- #{c.reason}\r\n"
         end
 
-        @mailbox.password = passwd
+        begin
+          @mailbox.password = passwd
+        rescue StandardError => err
+          syslog.err "Password change failed for user #{@username.inspect} because #{err.to_s}"
+          return "400 Sorry, it was not possible to change your password due to a system error.\r\n"
+        end
+
+        syslog.info "Password changed for user #{@username.inspect}"
         return "200 Password changed\r\n"
       end
     end
   end
 end
+
