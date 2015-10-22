@@ -114,6 +114,11 @@ module Symbiosis
         end
 
         #
+        # If no addresses have been returned, stick a nil in.
+        #
+        addresses << nil if addresses.empty?
+
+        #
         # Now, for each address create a template and add it to our rules.
         #
         addresses.uniq.each do |address|
