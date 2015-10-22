@@ -1,9 +1,10 @@
 symbiosis-firewall (2015:1022) stable; urgency=medium
 
+  * Make sure firewall rules for all addresses are applied properly.
   * Fixed two cases of overly verbose output, one from testing to see if the
     nat table exists, and the other parsing IP addresses.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 22 Oct 2015 14:03:42 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 22 Oct 2015 16:57:36 +0100
 
 symbiosis-firewall (2015:1009) stable; urgency=medium
 
