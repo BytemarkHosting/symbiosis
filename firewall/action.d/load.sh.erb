@@ -59,7 +59,7 @@ for cmd in <%= iptables_cmds.join(" ") %> ; do
   done
 
   has_nat=""
-  if $cmd -t nat -L 2>/dev/null ;  then
+  if $cmd -t nat -L > /dev/null 2> /dev/null ;  then
     has_nat="1"
   fi
 
