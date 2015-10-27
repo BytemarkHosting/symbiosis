@@ -88,15 +88,14 @@ module Symbiosis
         #  getipnodebyname() where available) in an attempt to acquire a fully
         #  qualified host name."
         #
-        # Try /proc/sys/kernel/hostname (which mirrors what uname returns)
+        hostname = Symbiosis::Host.fqdn
+
         #
-        hostname = get_param("hostname", '/proc/sys/kernel')
-
-        hostname = ""  unless hostname.is_a?(String) 
+        # We don't want localhost to be our selector.
+        #
+        hostname = ""  if hostname == "localhost"
         
-        hostname.chomp!
-
-        unless hostname.empty? or !hostname.include?(".")
+        unless hostname.empty? or hostname.include?(".")
           begin
             hostname = Socket.gethostbyname(hostname).first
           rescue SocketError
@@ -108,7 +107,7 @@ module Symbiosis
         # Default to "default" if the hostname doesn't match the regex.  This
         # should never happen (I don't think!).
         #
-        hostname = "default" unless hostname =~ selector_regex
+        hostname = "default" unless hostname =~ selector_regex 
 
         #
         # Just return the first component.
