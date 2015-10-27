@@ -1,8 +1,8 @@
-
 require 'eventmachine'
 require 'em/protocols/line_protocol'
 require 'symbiosis/domains'
 require 'symbiosis/domain/mailbox'
+require 'symbiosis/host'
 require 'syslog'
 require 'json'
 
@@ -70,7 +70,7 @@ module Symbiosis
         # Append our local hostname if none has been given.
         #
         unless username =~ /@/
-          username += "@"+Symbiosis::Host.fqdn
+          username = username +  "@" + Symbiosis::Host.fqdn.to_s
         end
 
         mailbox = Symbiosis::Domains.find_mailbox(username, prefix)

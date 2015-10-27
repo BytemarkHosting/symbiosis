@@ -264,7 +264,7 @@ module Symbiosis
         # Start with a temporary file, using DJB's unique name generator. http://cr.yp.to/proto/maildir.html 
         # 
         tv = Time.now
-        tmpfile = File.join(self.maildir, "tmp", [tv.tv_sec, "M#{tv.tv_usec}P#{Process.pid}", Socket.gethostname].join("."))
+        tmpfile = File.join(self.maildir, "tmp", [tv.tv_sec, "M#{tv.tv_usec}P#{Process.pid}", Symbiosis::Host.fqdn].join("."))
 
         #
         # Make sure there's a temporary directory available
@@ -404,7 +404,7 @@ module Symbiosis
         results << Mailbox.new(local_part, self, mailboxes_dir)
       end
 
-      primary_hostname = Socket.gethostname
+      primary_hostname = Symbiosis::Host.fqdn
 
       #
       # If this is the primary hostname, then add in more local mailboxes
