@@ -1,3 +1,9 @@
+symbiosis-common (2015:1027) stable; urgency=medium
+
+  * Added Symbiosis::Host#fqdn method.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 27 Oct 2015 22:53:44 +0000
+
 symbiosis-common (2015:1012) stable; urgency=medium
 
   * Tidied up password hashing code to remove unused variable.
