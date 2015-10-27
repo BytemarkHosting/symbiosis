@@ -28,6 +28,17 @@ class TestEximLive < Test::Unit::TestCase
     @domain.destroy unless $DEBUG
   end
 
+  def do_skip(msg)
+    if self.respond_to?(:skip)
+      skip msg
+    elsif self.respond_to?(:omit)
+      omit msg
+    else
+      puts "Skipping #{self.method_name} -- #{msg}"
+    end
+    return nil
+  end
+
   def fetch_test_user
     test_user = nil
     begin

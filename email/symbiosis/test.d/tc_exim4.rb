@@ -93,6 +93,8 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def do_skip(msg)
     if self.respond_to?(:skip)
       skip msg
+    elsif self.respond_to?(:omit)
+      omit msg
     else
       puts "Skipping #{self.method_name} -- #{msg}"
     end
