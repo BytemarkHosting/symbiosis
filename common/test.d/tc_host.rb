@@ -1,4 +1,6 @@
+# Encoding: UTF-8
 require 'test/unit'
+require "mocha/test_unit"
 require 'symbiosis/host'
 require 'symbiosis/ipaddr'
 
@@ -27,6 +29,24 @@ class HostTest < Test::Unit::TestCase
     assert(Host.is_bytemark_ip?(IPAddr.new("2001:41c8::1/64")))
     assert(!Host.is_bytemark_ip?(IPAddr.new("2001:fa8::1/128")))
     assert(!Host.is_bytemark_ip?(IPAddr.new("2001:41c0::/31")))
+  end
+
+  def test_fqdn
+    [
+     ["foo",        "foo",         "foo.bar.quux", "foo.bar.quux"],
+     ["",           "localhost",   "localhost",    "localhost"],
+     ["",           "localhost",   "",             "localhost"],
+     ["80.68.80.24","80.68.80.24", "80.68.80.24",  "80.68.80.24"],
+     ["räksmörgås", "räksmörgås",  "xn--rksmrgs-5wao1o.bar.quux", "xn--rksmrgs-5wao1o.bar.quux"],
+    ].each do |hostname, addrinfo_in, addrinfo_out, expected_result|
+
+      Socket.expects(:gethostname).returns(hostname)
+      Socket.expects(:getaddrinfo).
+        with(addrinfo_in,  nil, nil, nil,Socket::SOCK_DGRAM, Socket::AI_CANONNAME | 0x0040).
+        returns([["AF_INET", 0, addrinfo_out, "127.0.1.1", 2, 3, 2]])
+
+      assert_equal(Symbiosis::Host.fqdn, expected_result)
+    end
   end
   
   def test_ip_addresses
