@@ -94,6 +94,13 @@ class TestDovecot < Test::Unit::TestCase
       imap.logout
       imap.disconnect unless imap.disconnected?
     end
+
+    assert_nothing_raised do
+      imap = Net::IMAP.new('localhost', 143, false)
+      imap.login(test_user.name, password)
+      imap.logout
+      imap.disconnect unless imap.disconnected?
+    end 
   end
 
   def test_imap_auth_login

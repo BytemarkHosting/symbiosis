@@ -117,6 +117,13 @@ class TestEximLive < Test::Unit::TestCase
         smtp.auth_login(username, password)
       end
     end
+
+
+    smtp.start do
+      assert_nothing_raised("AUTH PLAIN failed for the local user (with no domain)") do
+        smtp.auth_plain(test_user.name, password)
+      end
+    end
   end
 
   def test_smtp_auth_crypt
