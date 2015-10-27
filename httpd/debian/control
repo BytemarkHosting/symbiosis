@@ -9,11 +9,8 @@ XS-Ruby-Versions: all
 
 Package: symbiosis-httpd
 Architecture: all
-Depends: php5-mysql, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark (>= 2015:0101), ${misc:Depends}, symbiosis-httpd-static, symbiosis-common (>= 2015:0101), ruby | ruby-interpreter, ruby-eventmachine, geoip-database
-Replaces: bytemark-vhost-httpd, symbiosis-test, symbiosis-monit (<< 2011:1206), symbiosis-httpd-static
-Breaks: symbiosis-monit (<< 2011:1206)
-Provides: bytemark-vhost-httpd, symbiosis-httpd-static
-Conflicts: bytemark-vhost-httpd, symbiosis-httpd-static, symbiosis-test
+Depends: libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark (>= 2015:0101), ${misc:Depends}, symbiosis-common (>= 2015:0101), ruby | ruby-interpreter, ruby-eventmachine
+Recommends: php5-mysql | php5-mysqli |  php5-mysqlnd, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, geoip-database
 Description: Tools to manage Apache virtual hosting in Symbiosis
  This package contains tools to manage the virtual hosting of websites
  with Apache2.
