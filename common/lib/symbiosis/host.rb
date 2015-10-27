@@ -56,7 +56,7 @@ module Symbiosis
         #
         # The FQDN is the name returned by getaddrinfo with the AI_CANONNAME hint
         #
-        getaddrinfo = Socket.getaddrinfo(localhost, nil, nil, nil, Socket::SOCK_DGRAM, Socket::AI_CANONNAME)
+        getaddrinfo = Socket.getaddrinfo(localhost, nil, nil, nil, Socket::SOCK_DGRAM, Socket::AI_CANONNAME | 0x0040)
       rescue SocketError
         # do nothing
       end
