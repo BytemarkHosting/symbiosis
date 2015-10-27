@@ -1,3 +1,10 @@
+symbiosis-httpd (2015:1027) stable; urgency=medium
+
+  * Reduced the number of dependencies this package has; most have been moved
+    to recommended packages.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 27 Oct 2015 22:58:03 +0000
+
 symbiosis-httpd (2015:1021) stable; urgency=medium
 
   * Ensure OCSP stapling is explictly diabled in the SSL templates.
