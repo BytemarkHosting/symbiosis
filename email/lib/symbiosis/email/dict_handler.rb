@@ -108,15 +108,18 @@ module Symbiosis
           # add userdb_ to each key in res
           passdb_res = {}
           res.collect{|k,v| passdb_res["userdb_#{k}"] = v}
-        
-          real_password = mailbox.password
-          if real_password =~ /^(\{(?:crypt|CRYPT)\})?(\$(?:1|2a|5|6)\$[a-zA-Z0-9.\/]{1,16}\$[a-zA-Z0-9\.\/]+)$/
-            password = real_password
-          else
-            password = mailbox.domain.crypt_password(real_password)
-          end
 
-          passdb_res["password"] = password 
+          if mailbox.password        
+            real_password = mailbox.password
+            if real_password =~ /^(\{(?:crypt|CRYPT)\})?(\$(?:1|2a|5|6)\$[a-zA-Z0-9.\/]{1,16}\$[a-zA-Z0-9\.\/]+)$/
+              password = real_password
+            else
+              password = mailbox.domain.crypt_password(real_password)
+            end
+
+            passdb_res["password"] = password 
+          end
+            
           res = passdb_res
         end
 
