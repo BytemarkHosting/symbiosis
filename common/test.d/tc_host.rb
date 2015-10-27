@@ -47,6 +47,9 @@ class HostTest < Test::Unit::TestCase
 
       assert_equal(Symbiosis::Host.fqdn, expected_result)
     end
+
+    Socket.unstub(:gethostname)
+    Socket.unstub(:getaddrinfo)
   end
   
   def test_ip_addresses
