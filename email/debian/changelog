@@ -1,3 +1,11 @@
+symbiosis-email (2015:1027) stable; urgency=medium
+
+  * Local users no longer have to append the hostname to their logins for them
+    to work.
+  * Added tests for the dict proxy server.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 27 Oct 2015 22:55:03 +0000
+
 symbiosis-email (2015:1021) stable; urgency=medium
 
   * Added poppassd to provide an interface to change mailbox passwords.
