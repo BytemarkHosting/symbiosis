@@ -22,6 +22,61 @@ module Symbiosis
     end
 
     #
+    # Returns the machine's hostname.  This follows the a simliar code path to
+    # hostname(1).  If the hostname is not returned by getaddrinfo(3), or looks
+    # like junk, "localhost" is returned.
+    #
+    def self.fqdn
+      #
+      # Start by working out our localhost name
+      #
+      localhost = nil
+
+      begin
+        localhost = Socket.gethostname
+      rescue Socket
+        # do nothing
+      end
+ 
+      localhost = localhost.to_s
+ 
+      #
+      # If our localhost name is junk set it to localhost
+      #
+      unless localhost =~ /^[A-Za-z0-9-]+/
+        localhost = "localhost"
+      end
+
+      #
+      # Set up our getaddrinfo array, in case the socket lookup fails.
+      #
+      getaddrinfo = [[]]
+
+      begin
+        #
+        # The FQDN is the name returned by getaddrinfo with the AI_CANONNAME hint
+        #
+        getaddrinfo = Socket.getaddrinfo(localhost, nil, nil, nil, Socket::SOCK_DGRAM, Socket::AI_CANONNAME)
+      rescue SocketError
+        # do nothing
+      end
+
+      #
+      # Get addrinfo returns an array of arrays.  We want the third component of the first array.
+      #
+      fqdn = getaddrinfo[0][2].to_s.downcase
+
+      #
+      # If the fqdn is empty or junk, return our original localhost
+      #
+      unless fqdn =~ /^[a-z0-9\.-]+/
+        fqdn = localhost
+      end
+
+      return fqdn
+    end
+
+    #
     # Returns all IP addresses in use by a machine, in the order they were
     # configured on the interfaces, as an array of IPAddr objects.
     #
