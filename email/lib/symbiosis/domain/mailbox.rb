@@ -1,7 +1,7 @@
 
 require 'symbiosis/domains'
 require 'symbiosis/domain'
-require 'socket'
+require 'symbiosis/host'
 
 module Symbiosis
 
