@@ -343,13 +343,10 @@ module Symbiosis
       def password=(pw)
         self.create
 
-        if pw != self.password
-
-          if @encrypt_password 
-            set_param(self.dot + "password", self.domain.crypt_password(pw), self.directory, :mode => 0600)
-          else
-            set_param(self.dot + "password", pw, self.directory, :mode => 0600)
-          end
+        if @encrypt_password
+          set_param(self.dot + "password", self.domain.crypt_password(pw), self.directory, :mode => 0600)
+        else
+          set_param(self.dot + "password", pw, self.directory, :mode => 0600)
         end
 
         return pw
