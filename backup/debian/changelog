@@ -1,3 +1,10 @@
+symbiosis-backup (2015:1028) stable; urgency=medium
+
+  * Added in missing libswitch-perl dependency.
+  * Made output of check-availspace pre-backup script more useful.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 28 Oct 2015 14:04:48 +0000
+
 symbiosis-backup (2015:0825) stable; urgency=medium
 
   * If the pre-backup scripts fail, the backup will not be taken.
