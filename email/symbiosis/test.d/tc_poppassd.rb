@@ -172,4 +172,62 @@ class TestEmailPoppassd < Test::Unit::TestCase
     assert(!@mailbox.login(new_password))
   end
 
+  def do_skip(msg)
+    if self.respond_to?(:skip)
+      skip msg
+    elsif self.respond_to?(:omit)
+      omit msg
+    else
+      puts "Skipping #{self.method_name} -- #{msg}"
+    end
+    return nil
+  end
+
+  def fetch_test_user
+    test_user = nil
+    begin
+      test_user = Etc.getpwnam("symbiosis-test")
+    rescue ArgumentError
+      # do nothing
+    end
+    test_user
+  end
+
+  def test_shell_user
+    test_user = fetch_test_user
+    do_skip "No test user" if test_user.nil?
+
+    hostname = Symbiosis::Host.fqdn
+    #
+    # Create the domain
+    #
+    domain = Symbiosis::Domain.new(hostname, @prefix)
+    domain.create
+
+    mailbox = Symbiosis::Domains.find_mailbox(test_user.name + "@" + hostname)
+    mailbox.create
+
+    # do the test twice, with and without the hostname
+    [test_user.name, mailbox.username].each do |username|
+      old_password = "abc"
+      mailbox.password = old_password
+      assert(mailbox.login(old_password))
+      new_password = " this is a super secure password."
+
+      results = do_test_script(["USER #{username}", "PASS #{old_password}", "NEWPASS #{new_password}", "QUIT"])
+
+      # we should get back 200 (hello), 300 (please log in), 200 (authd), 200 (changed), 200 (bye)
+      expected_results = [/^2\d\d /, /^3\d\d /, /^2\d\d/, /^2\d\d /, /^2\d\d /]
+
+      results.zip(expected_results).each do |r, e|
+        assert_match e, r, "Unexpected output when using #{username}"
+      end
+
+      # now see if we can log in.
+      assert(!mailbox.login(old_password))
+      assert(mailbox.login(new_password))
+    end
+
+  end
 end
+
