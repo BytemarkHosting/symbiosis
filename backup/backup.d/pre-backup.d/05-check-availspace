@@ -12,7 +12,7 @@ print "=> Checking there is enough free space for a backup...\n\n";
 
 unless ($has_filesysdf)
 {
-        print "** Perl module Filesys::Df is not installed, exiting and so not completing backup\n\n";
+        print "!! Perl module Filesys::Df is not installed, exiting and so not completing backup\n\n";
         $rv = 1;
 }
 else
@@ -46,7 +46,7 @@ else
                                 case "TB"       {  $divis = 1e3; }
                                 else            {  $divis = 1;}
                         }
-                        my $value_in_gb = $+{int} * $divis * 1e3;
+                        my $value_in_gb = $+{int} * $divis;
 
                         printf "*  Estimated backup size:                %8.1f GB\n\n", $value_in_gb;
 
