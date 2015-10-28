@@ -523,7 +523,16 @@ module Symbiosis
       address = address.downcase.split("@")
 
       domain = address.pop
-      local_part = address.join("@")
+
+      #
+      # If there was only one entry in the address array, then assume it is a local user.
+      #
+      if address.empty?
+        local_part = domain
+        domain = Symbiosis::Host.fqdn
+      else
+        local_part = address.join("@")
+      end
 
       domain = find(domain, prefix)
       return nil if domain.nil?

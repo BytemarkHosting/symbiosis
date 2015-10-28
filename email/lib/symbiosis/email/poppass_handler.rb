@@ -93,10 +93,6 @@ module Symbiosis
           return "400 Please send your username first!\r\n"
         end
 
-        unless @username =~ /@/
-          @username += "@"+Symbiosis::Host.fqdn
-        end
-
         @mailbox = Symbiosis::Domains.find_mailbox(@username, self.prefix)
 
         if @mailbox.nil?

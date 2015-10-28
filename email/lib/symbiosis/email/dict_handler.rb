@@ -66,13 +66,6 @@ module Symbiosis
       def do_lookup(l)
         (namespace, type, username) = l[1..-1].split('/',3)
 
-        #
-        # Append our local hostname if none has been given.
-        #
-        unless username =~ /@/
-          username = username +  "@" + Symbiosis::Host.fqdn.to_s
-        end
-
         mailbox = Symbiosis::Domains.find_mailbox(username, prefix)
 
         if mailbox.nil?
@@ -81,7 +74,7 @@ module Symbiosis
         end
 
         res = {
-          'user' => username,
+          'user' => mailbox.username,
           'home' => mailbox.directory,
           'uid' =>  mailbox.uid,
           'gid' =>  mailbox.gid,
