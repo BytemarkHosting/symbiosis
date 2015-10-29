@@ -3,7 +3,7 @@ Description=Symbiosis: email poppass daemon
 
 [Service]
 Type=simple
-ExecStart=/usr/sbin/symbiosis-email-poppassd --foreground
+ExecStart=/usr/sbin/symbiosis-email-poppassd
 Restart=always
 
 [Install]

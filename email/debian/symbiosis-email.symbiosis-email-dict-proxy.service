@@ -3,7 +3,7 @@ Description=Symbiosis: email dict proxy
 
 [Service]
 Type=simple
-ExecStart=/usr/sbin/symbiosis-email-dict-proxy --foreground
+ExecStart=/usr/sbin/symbiosis-email-dict-proxy
 Restart=always
 
 [Install]

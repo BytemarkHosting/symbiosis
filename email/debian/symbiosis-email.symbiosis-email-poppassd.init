@@ -15,8 +15,42 @@ fi
 
 # Author: Patrick J Cherry <patrick@bytemark.co.uk>
 
-DESC="Symbiosis: email dict proxy"
-DAEMON=/usr/sbin/symbiosis-email-poppassd
-NAME="ruby"
+DESC="Symbiosis: email poppass daemon"
+DAEMON="/usr/bin/ruby"
+NAME="symbiosis-email-poppassd"
+PIDFILE="/run/${NAME}.pid"
+DAEMON_ARGS="/usr/sbin/symbiosis-email-poppassd"
 
+#####
+# These functions are cribbed from /lib/init/init-d-script and override them.
+#
+
+do_start_cmd() {
+	start-stop-daemon --start --quiet --pidfile ${PIDFILE} \
+	    --startas $DAEMON --exec $DAEMON --test > /dev/null \
+	    || return 1
+
+	start-stop-daemon --start --quiet --pidfile ${PIDFILE} \
+	    --make-pidfile --background \
+	    --startas $DAEMON --exec $DAEMON -- $DAEMON_ARGS \
+	    || return 2
+}
+
+do_stop_cmd() {
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 \
+	    --pidfile ${PIDFILE} --exec $DAEMON
+
+	RETVAL="$?"
+
+	[ "$RETVAL" = 2 ] && return 2
+
+	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 \
+	    --pidfile ${PIDFILE} --exec $DAEMON
+
+	[ "$?" = 2 ] && return 2
+
+	rm -f $PIDFILE
+
+	return $RETVAL
+}
 

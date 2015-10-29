@@ -33,14 +33,12 @@ manual = help = false
 opts = GetoptLong.new(
          [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
          [ '--manual',     '-m', GetoptLong::NO_ARGUMENT ],
-         [ '--foreground', '-f', GetoptLong::NO_ARGUMENT ],
          [ '--prefix',     '-p', GetoptLong::OPTIONAL_ARGUMENT ],
          [ '--port',       '-P', GetoptLong::OPTIONAL_ARGUMENT ]
        )
 
 prefix = "/srv"
 port = 106
-foreground = false
 
 opts.each do |opt,arg|
   case opt
@@ -52,8 +50,6 @@ opts.each do |opt,arg|
     prefix = arg
   when '--port'
     port = arg
-  when '--foreground'
-    foreground = true
   end
 end
 
@@ -78,7 +74,6 @@ end
 # Require these bits here, so we can generate the manpage without needing extra
 # build-deps.
 #
-require 'daemons'
 require 'eventmachine'
 require 'syslog'
 require 'symbiosis/utils'
@@ -98,13 +93,6 @@ Symbiosis::Email::PoppassHandler.syslog = syslog
 #   systemd_socket = Socket.for_fd(SD_LISTEN_FDS_START + 0)
 #   syslog.info "Got socket #{SD_LISTEN_FDS_START + 0} from systemd"
 # end
-
-Daemons.daemonize({
-  :app_name   => "ruby",
-  :ontop      => foreground,
-  :dir_mode   => :system,
-  :log_output => false
-})
 
 EventMachine.run do
   begin
