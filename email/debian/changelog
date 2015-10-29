@@ -11,8 +11,9 @@ symbiosis-email (2015:1029) stable; urgency=medium
   * The automatic password hashing program (symbiosis-email-encrypt-passwords)
     now skips empty passwords, and has a "verbose" flag to say what is going
     on.
+  * Mail passwords are now automatically hashed on a daily basis.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 29 Oct 2015 09:55:35 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 29 Oct 2015 11:25:12 +0000
 
 symbiosis-email (2015:1021) stable; urgency=medium
 
