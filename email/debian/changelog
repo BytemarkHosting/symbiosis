@@ -1,11 +1,18 @@
-symbiosis-email (2015:1027) stable; urgency=medium
+symbiosis-email (2015:1029) stable; urgency=medium
 
   * Local users no longer have to append the hostname to their logins for them
     to work.
   * Added tests for the dict proxy server.
   * Added dependency for latest common package to get Symbiosis::Host#fqdn.
+  * The poppassd and dict-proxy daemons are now managed by start-stop-daemon
+    when sysvinit is used.
+  * Users will shell accounts can login now with just their username, as the
+    hostname is now added automatically.
+  * The automatic password hashing program (symbiosis-email-encrypt-passwords)
+    now skips empty passwords, and has a "verbose" flag to say what is going
+    on.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 27 Oct 2015 22:55:03 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 29 Oct 2015 09:55:35 +0000
 
 symbiosis-email (2015:1021) stable; urgency=medium
 
