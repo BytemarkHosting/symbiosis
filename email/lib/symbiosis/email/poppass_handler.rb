@@ -104,13 +104,13 @@ module Symbiosis
         begin
           @authorised = @mailbox.login(passwd)
         rescue ArgumentError => err
-          syslog.notice "Unable to login to mailbox #{@username.inspect} because #{err.to_s}"
+          syslog.notice "Unable to login to mailbox #{@mailbox.username} because #{err.to_s}"
           sleep @fail_timeout
           return "500 Incorrect login\r\n"
         end
 
         unless @authorised
-          syslog.notice "Incorrect password given for mailbox #{@username.inspect}"
+          syslog.notice "Incorrect password given for mailbox #{@mailbox.username}"
           sleep @fail_timeout
           return "500 Incorrect login\r\n"
         end
@@ -126,18 +126,18 @@ module Symbiosis
         c = CrackLib::Fascist(passwd)
 
         unless c.ok?
-          syslog.notice "Password change failed for user #{@username.inspect} -- #{c.reason}"
+          syslog.notice "Password change failed for user #{@mailbox.username} -- #{c.reason}"
           return "400 Sorry, that password is too weak -- #{c.reason}\r\n"
         end
 
         begin
           @mailbox.password = passwd
         rescue StandardError => err
-          syslog.err "Password change failed for user #{@username.inspect} because #{err.to_s}"
+          syslog.err "Password change failed for user #{@mailbox.username} because #{err.to_s}"
           return "400 Sorry, it was not possible to change your password due to a system error.\r\n"
         end
 
-        syslog.info "Password changed for user #{@username.inspect}"
+        syslog.info "Password changed for user #{@mailbox.username}"
         return "200 Password changed\r\n"
       end
     end
