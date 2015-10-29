@@ -13,7 +13,7 @@ symbiosis-email (2015:1029) stable; urgency=medium
     on.
   * Mail passwords are now automatically hashed on a daily basis.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 29 Oct 2015 11:25:12 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 29 Oct 2015 16:13:32 +0000
 
 symbiosis-email (2015:1021) stable; urgency=medium
 
