@@ -329,7 +329,7 @@ class TestCrontabRecord < Test::Unit::TestCase
     assert_kind_of(Time, expected)
     assert_kind_of(Time, actual)
     %w(year mon day hour min).each do |m|
-      assert_equal(expected.__send__(m), actual.__send__(m), "#{m} is should be #{expected.__send__(m)} in #{actual.to_s}")
+      assert_equal(expected.__send__(m), actual.__send__(m), "#{m} should be #{expected.__send__(m)} in #{actual.to_s}")
     end 
   end
 
