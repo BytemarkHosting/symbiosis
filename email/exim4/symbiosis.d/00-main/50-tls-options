@@ -16,7 +16,7 @@ tls_advertise_hosts = *
 # need the first setting, or in separate files, in which case you need both
 # options.
 
-tls_certificate = /etc/ssl/ssl.crt
+tls_certificate = /etc/ssl/ssl.combined
 tls_privatekey = /etc/ssl/ssl.key
 
 # In order to support roaming users who wish to send email from anywhere,

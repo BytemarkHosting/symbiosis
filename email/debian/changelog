@@ -1,3 +1,10 @@
+symbiosis-email (2015:1103) stable; urgency=medium
+
+  * Changed SSL certificate path to use /etc/ssl/ssl.combined, which should
+    include the certificate bundle, where appropriate.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 03 Nov 2015 17:23:26 +0000
+
 symbiosis-email (2015:1029) stable; urgency=medium
 
   * Local users no longer have to append the hostname to their logins for them
