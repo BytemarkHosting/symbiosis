@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 #
 
+    require 'pp'
 require 'test/unit'
 require 'symbiosis/crontab'
 
@@ -271,15 +272,34 @@ class TestCrontabRecord < Test::Unit::TestCase
   end
 
   def test_silly_combinations
-    today = DateTime.new(2011,10,1,0,0,0)
 
-    # This should be the next Monday in October 
+    #    October 2011      
+    # Su Mo Tu We Th Fr Sa  
+    #                    1  
+    #  2  3  4  5  6  7  8  
+    #  9 10 11 12 13 14 15  
+    # 16 17 18 19 20 21 22  
+    # 23 24 25 26 27 28 29  
+    # 30 31
+    #
+    today = Time.new(2011,9,30,0,0,0)
+
+    # This should be any Monday in October
     crontab_record = Symbiosis::CrontabRecord.parse("11 11  *  10 1 echo \"monday in october\"")
-    assert_equal_date( DateTime.new(2011,10,3,11,11,0), crontab_record.next_due(today) )
+    assert_equal_date( Time.new(2011,10,3,11,11,0), crontab_record.next_due(today) )
 
-    # This should run on the next 10th October, which is a Sunday.
-    crontab_record = Symbiosis::CrontabRecord.parse("10 10  10  10 0 echo \"Sunday 10th October\"")
-    assert_equal_date( DateTime.new(2021,10,10,10,10,0), crontab_record.next_due(today) )
+    # This should run on the next 10th October, and any Sunday in October
+    crontab_record = Symbiosis::CrontabRecord.parse("10 10  10  10 0 echo \"Sunday or 10th October\"")
+
+    x = crontab_record.next_due(today)
+    assert_equal_date( Time.new(2011,10,2,10,10,0), x )
+
+    x = crontab_record.next_due(x + 120) 
+    assert_equal_date( Time.new(2011,10,9,10,10,0), x )
+
+    x = crontab_record.next_due(x + 120)
+    assert_equal_date( Time.new(2011,10,10,10,10,0), x )
+
 
     # This should be run at midnight on 31st Sept, i.e. never.
     crontab_record = Symbiosis::CrontabRecord.parse("0  0   31 9  * echo \"impossible?\"")
@@ -297,28 +317,29 @@ class TestCrontabRecord < Test::Unit::TestCase
   #
   def test_ticket_569757
     crontab_record = Symbiosis::CrontabRecord.parse("30 7 * * 5 /do/some/stuff")
-    now = DateTime.new(2014,1,15,17,0,0)
+    now = Time.new(2014,1,15,17,0,0)
 
-    assert_equal_date(DateTime.new(2014,1,17,7,30,0), crontab_record.next_due(now))
+    assert_equal_date(Time.new(2014,1,17,7,30,0), crontab_record.next_due(now))
   end
 
   #
   # This checks the date, to the nearest minute.
   #
   def assert_equal_date(expected, actual)
-    assert_kind_of(DateTime, expected)
-    assert_kind_of(DateTime, actual)
+    assert_kind_of(Time, expected)
+    assert_kind_of(Time, actual)
     %w(year mon day hour min).each do |m|
       assert_equal(expected.__send__(m), actual.__send__(m), "#{m} is should be #{expected.__send__(m)} in #{actual.to_s}")
     end 
   end
 
   def test_return_sensible_error
-    today = DateTime.new(2011,10,1,0,0,0)
+    today = Time.new(2011,10,1,0,0,0)
     assert_raise(Symbiosis::CrontabFormatError) do
       # This is missing a field.
       Symbiosis::CrontabRecord.parse("*/5 * * * /usr/bin/php /srv/domain.co.uk/public/htdocs/cron.php")
     end
   end
+
 
 end

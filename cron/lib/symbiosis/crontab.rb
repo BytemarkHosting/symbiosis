@@ -121,7 +121,7 @@ module Symbiosis
     # This prints the cron environment, and the date/time when each job will
     # next run.
     #
-    def test(t = DateTime.now)
+    def test(t = Time.now)
       cron_env = @environment.merge(ENV){|k,o,n| o}
       puts "Environment\n"+"-"*72
       %w(HOME LOGNAME PATH MAILTO).each do |k|
@@ -178,7 +178,7 @@ module Symbiosis
         %w(SHELL PATH HOME LOGNAME).each do |k|
           mail << "X-Cron-Env: <#{k}=#{cron_env[k]}>" if ENV.has_key?(k)
         end
-        mail << "Date: #{DateTime.now.to_time.rfc2822}"
+        mail << "Date: #{Time.now.rfc2822}"
         mail << ""
         mail << output.join
         if @mail_output
@@ -197,7 +197,7 @@ module Symbiosis
     #
     # Returns any records that are ready to run now.
     #
-    def grep(now = DateTime.now)
+    def grep(now = Time.now)
       @records.select{|record| record.ready?(now)}
     end
 
@@ -306,6 +306,12 @@ module Symbiosis
       # normalize weekdays
       @wday = @wday.collect{|w| w == 7 ? 0 : w }.sort.uniq
 
+      #
+      # If both mday and wday are restricted, then match on either mday or
+      # wday.
+      #
+      @lazy_mday_wday_match = (@mday != (1..31).to_a and @wday != (0..6).to_a)
+
       self.command = command
     end
 
@@ -320,21 +326,30 @@ module Symbiosis
     #
     # Returns true if the record should be run at time set by now.
     #
-    def ready?(now = DateTime.now)  
-      min.include?  now.min  and
-      hour.include? now.hour and
-      mday.include? now.mday and
-      mon.include?  now.mon  and
-      wday.include? now.wday
+    def ready?(now = Time.now) 
+      now = now.to_time 
+      if @lazy_mday_wday_match
+        min.include?  now.min  and
+        hour.include? now.hour and
+        mon.include?  now.mon  and
+        ( mday.include? now.mday or
+          wday.include? now.wday )
+      else
+        min.include?  now.min  and
+        hour.include? now.hour and
+        mon.include?  now.mon  and
+        mday.include? now.mday  and
+        wday.include? now.wday
+      end
     end
 
     #
-    # Determines when the record is next due to be run.  Returns a DateTime if
+    # Determines when the record is next due to be run.  Returns a Time if
     # the time could be determined, or nil if the record is not due to run any
     # time in the 30 years after now.
     #
-    def next_due(now = DateTime.now)
-      time      = now
+    def next_due(now = Time.now)
+      time      = now.to_time
       orig_time = time
 
       while !ready?(time)
@@ -344,9 +359,11 @@ module Symbiosis
 
           if min.length == ind
             # Roll on time to the beginning of the next hour
-            time += (60 - time.min + min.first)/ (60*24.0)
+            #
+            time += 3600
+            time = Time.local(time.year, time.mon, time.day, time.hour, time.min) 
           else
-            time += (min[ind] - time.min) / (60 * 24.0)
+            time = Time.local(time.year, time.mon, time.day, time.hour, min[ind]) 
           end
         end
 
@@ -355,49 +372,73 @@ module Symbiosis
           ind = (hour + [time.hour]).sort.index(time.hour)
 
           if hour.length == ind
-            # Roll on time to the beginning of the next our
-            time += (24 - time.hour + hour.first)/ 24.0
+            # Roll on time to the beginning of the next day
+            dtime = time.to_date + 1
+            time = Time.local(dtime.year, dtime.mon, dtime.day)
           else
-            time += (hour[ind] - time.hour) / 24.0
+            time = Time.local(time.year, time.mon, time.day, hour[ind], time.min, 0) 
           end
         end  
+        
+        time_a = time_b = nil
 
-        # find the next hour that matches
-        unless mday.include?(time.mday)
+        # find the next month or week day that matches
+        if (!mday.include?(time.mday) or @lazy_mday_wday_match)
           ind = (mday + [time.mday]).sort.index(time.mday)
 
           if mday.length == ind
-            # Roll on time to the beginning of the next our
-            time = (time >> 1) - time.mday + mday.first
+            dtime = time.to_date >> 1
+            time_a = Time.local(dtime.year, dtime.mon, dtime.mday) 
           else
-            time += mday[ind] - time.mday
+            begin
+              time_a = Time.local(time.year, time.mon, mday[ind], time.hour, time.min) 
+            rescue ArgumentError
+              dtime = time.to_date >> 1
+              time_a = Time.local(dtime.year, dtime.mon)
+            end
           end
-        end  
+
+          time = time_a unless @lazy_mday_wday_match
+        end
+
+        if (!wday.include?(time.wday) or @lazy_mday_wday_match)
+          ind = (wday + [time.wday]).sort.index(time.wday)
+
+          if wday.length == ind
+            # Roll on time to the beginning of the next week, and add the first day.
+            dtime = time.to_date + (7 - time.wday + wday.first)
+            time_b = Time.local(dtime.year, dtime.mon, dtime.mday)
+          else
+            dtime = time.to_date + (wday.first - time.wday) 
+            time_b = Time.local(dtime.year, dtime.mon, dtime.mday, time.hour, time.min)
+          end
+
+          time = time_b unless @lazy_mday_wday_match
+        end
+
+        if @lazy_mday_wday_match and time_a.is_a?(Time) and time_b.is_a?(Time)
+          time = (time_a < time_b ? time_a : time_b)
+        end
 
         # The next month that matches
         unless mon.include?(time.mon)
           ind = (mon + [time.mon]).sort.index(time.mon)
 
           if mon.length == ind
-            # Roll on time to the beginning of the next our
-            time = time >> (12 - time.mon + mon.first)
+            # Roll on time to the beginning of the next year 
+            time = Time.local(time.year + 1)
           else
-            time = time >> (mon.first - time.mon)
+            begin
+              time = Time.local(time.year, mon[ind], time.mday, time.hour, time.min)
+            rescue ArgumentError
+              dtime = time.to_date >> 1
+              time = Time.local(dtime.year, dtime.mon)
+            end
           end
         end
-
-        unless wday.include?(time.wday)
-          ind = (wday + [time.wday]).sort.index(time.wday)
-          if wday.length == ind
-            # Roll on time to the beginning of the next week, and add the first day.
-            time = time + (7 - time.wday + wday.first)
-          else
-            time = time + (wday.first - time.wday)
-          end
-        end
-
+        
         # Break if we get 30 years into the future!
-        if time > (orig_time >> 360)
+        if time.year - orig_time.year > 30
           time = nil
           break
         end
