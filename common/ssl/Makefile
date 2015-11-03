@@ -1,6 +1,6 @@
+#!/usr/bin/make -f
 
-
-# hostname := $(shell hostname -f)
+HOSTNAME ?= $(shell hostname -f)
 tempext  := symbiosis.$(shell echo $$$$)
 
 check: ssl.combined ssl.crt ssl.key
@@ -17,11 +17,11 @@ check: ssl.combined ssl.crt ssl.key
 	fi
 
 ssl.crt:
-	@if [ -z "$(hostname)" ]  ; then \
+	@if [ -z "$(HOSTNAME)" ]  ; then \
 		echo "W: Could not determine hostname"; \
 		exit 1 ; \
 	fi
-	@openssl req -subj "/C=GB/ST=England/L=York/CN=$(hostname)" -new \
+	@openssl req -subj "/C=GB/ST=England/L=York/CN=$(HOSTNAME)" -new \
 		-x509 -days 3650 -nodes -out ssl.crt.$(tempext) -newkey rsa:2048 \
 		-keyout ssl.key.$(tempext) -sha256 > /dev/null
 	@mv ssl.crt.$(tempext) ssl.crt
