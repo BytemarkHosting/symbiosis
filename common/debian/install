@@ -2,3 +2,4 @@ bin        usr/
 sbin       usr/
 test.d     etc/symbiosis/
 sudoers.d  etc/
+ssl        etc/

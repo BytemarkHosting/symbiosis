@@ -85,23 +85,8 @@ if ! [ -e /etc/ssl/ssl.crt -a -e /etc/ssl/ssl.key ]; then
     [ -e /etc/ssl/ssl.$i ] && mv /etc/ssl/ssl.$i /etc/ssl/ssl.$i.dpkg-old
   done
 
-  if [ -n "$HOSTNAME" ] ; then
-    #
-    #  Make the cert + key
-    #
-    echo "I: Generating a new SSL certificate for $HOSTNAME"
-    openssl req -subj "/C=GB/ST=England/L=York/CN=$HOSTNAME" -new -x509 -days 3650 -nodes -out  /etc/ssl/ssl.crt -keyout /etc/ssl/ssl.key
+  cd /etc/ssl && make check || true
 
-    #
-    #  Combine Cert + Key
-    #
-    cat /etc/ssl/ssl.key /etc/ssl/ssl.crt > /etc/ssl/ssl.combined
-  else
-    #
-    # No hostname, no certificate
-    #
-    echo "W: Could not work out hostname to generate a self-signed SSL certificate."
-  fi
 fi
 
 #DEBHELPER#
