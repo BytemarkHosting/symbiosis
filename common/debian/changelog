@@ -4,8 +4,9 @@ symbiosis-common (2015:1104) stable; urgency=medium
     of certificate, bundle, and key, which is required for the FTP and email
     servers.  Any files that don't verify in the existing set up are moved out
     of the way.
+  * The makefile can also generate certificate requests.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 04 Nov 2015 12:14:55 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 04 Nov 2015 16:22:50 +0000
 
 symbiosis-common (2015:1027) stable; urgency=medium
 
