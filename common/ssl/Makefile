@@ -43,8 +43,8 @@ ssl.crt:
 	@openssl req -subj "/C=GB/ST=England/L=York/CN=$(HOSTNAME)" -new \
 		-x509 -days 3650 -nodes -out ssl.crt.$(tempext) -newkey rsa:2048 \
 		-keyout ssl.key.$(tempext) -sha256 > /dev/null
-	@mv ssl.crt.$(tempext) ssl.crt
-	@mv ssl.key.$(tempext) ssl.key
+	@mv -b ssl.crt.$(tempext) ssl.crt
+	@mv -b ssl.key.$(tempext) ssl.key
 	@echo "I: Created a self-signed certificate and key."
 
 ssl.key: ssl.crt
@@ -60,7 +60,7 @@ ssl.combined: ssl.crt ssl.key
 		fi ; \
 	fi
 	@cat ssl.key >> ssl.combined.$(tempext)
-	@mv ssl.combined.$(tempext) ssl.combined
+	@mv -b ssl.combined.$(tempext) ssl.combined
 	@chmod 600 ssl.combined
 	@echo "I: Created combined certificate, bundle, and key."
 
