@@ -48,6 +48,7 @@ ssl.crt:
 	@echo "I: Created a self-signed certificate and key."
 
 ssl.key: ssl.crt
+	@chmod 600 ssl.key
 
 ssl.combined: ssl.crt ssl.key 
 	@cp ssl.crt ssl.combined.$(tempext)
@@ -60,6 +61,7 @@ ssl.combined: ssl.crt ssl.key
 	fi
 	@cat ssl.key >> ssl.combined.$(tempext)
 	@mv ssl.combined.$(tempext) ssl.combined
+	@chmod 600 ssl.combined
 	@echo "I: Created combined certificate, bundle, and key."
 
 clean:
