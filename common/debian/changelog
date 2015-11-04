@@ -2,9 +2,10 @@ symbiosis-common (2015:1104) stable; urgency=medium
 
   * Added Makefile in /etc/ssl to generate certificate, key, and combined form
     of certificate, bundle, and key, which is required for the FTP and email
-    servers.
+    servers.  Any files that don't verify in the existing set up are moved out
+    of the way.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 04 Nov 2015 12:09:14 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 04 Nov 2015 12:14:55 +0000
 
 symbiosis-common (2015:1027) stable; urgency=medium
 
