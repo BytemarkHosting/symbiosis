@@ -17,7 +17,7 @@ tls_advertise_hosts = *
 # options.
 
 tls_certificate = /etc/ssl/ssl.combined
-tls_privatekey = /etc/ssl/ssl.key
+tls_privatekey  = /etc/ssl/ssl.combined
 
 # In order to support roaming users who wish to send email from anywhere,
 # you may want to make Exim listen on other ports as well as port 25, in
