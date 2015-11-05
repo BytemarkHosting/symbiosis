@@ -76,6 +76,14 @@ if [ -n "$HOSTNAME" -a "$(find /srv -maxdepth 1 -mindepth 1 -type d | wc -l)" = 
   chown -R admin:admin /srv/$HOSTNAME
 fi
 
+if [ -e /etc/ssl/ssl.crt ] && [ -e /etc/ssl/ssl.key ] ; then
+  #
+  # Make sure the certificate is at least as recent as the key, to avoid
+  # overwriting it.
+  #
+  touch -r /etc/ssl/ssl.key /etc/ssl/ssl.crt
+fi
+
 #
 # Generate SSL certificates.
 #
