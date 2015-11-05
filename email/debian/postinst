@@ -25,6 +25,15 @@ if ! ( groups clamav | grep -q Debian-exim ) ; then
   adduser clamav Debian-exim > /dev/null 2>&1
 fi
 
+#
+# Debian-exim needs to be part of the ssl-cert group, so it can read the
+# cert/key in /etc/ssl/ssl.combined.
+#
+if ! ( groups Debian-exim | grep -q ssl-cert ) ; then
+  echo "I: Adding Debian-exim user to ssl-cert group"
+  adduser Debian-exim ssl-cert > /dev/null 2>&1
+fi
+
 if ( grep -q '^AllowSupplementaryGroups \+false' /etc/clamav/clamd.conf ) ; then
   echo "I: Allowing clamav to operate using its supplementary groups"
   #
