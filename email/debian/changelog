@@ -2,9 +2,11 @@ symbiosis-email (2015:1104) stable; urgency=medium
 
   * Changed SSL certificate and key paths in Exim4 and Dovecot to use
     /etc/ssl/ssl.combined, which should include the certificate, bundle (where
-    appropriate) and key..
+    appropriate) and key.
+  * Add Debian-exim user to ssl-cert group so it can read the keys in
+    /etc/ssl.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 04 Nov 2015 12:06:44 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 05 Nov 2015 14:21:09 +0000
 
 symbiosis-email (2015:1029) stable; urgency=medium
 
