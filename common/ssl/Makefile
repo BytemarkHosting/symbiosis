@@ -18,9 +18,8 @@ define check_key_with_certificate
 		echo "I: Mode on $(2) is $$mode."; \
 	fi
 	@group=`stat --format '%G' $(2)` ; \
-	if [ "root" = "$$USERNAME" ] && [ "ssl-cert" != "$$group" ] ; then \
-		echo "I: Changing group on $(2) from $$group to ssl-cert." ; \
-		chgrp ssl-cert $(2) ; \
+	if [ "ssl-cert" != "$$group" ] ; then \
+		chgrp ssl-cert $(2) 2>/dev/null && echo "I: Changing group on $(2) from $$group to ssl-cert." || true ; \
 	fi
 	@if [ "$$(openssl x509 -noout -modulus -in $(1) 2>/dev/null )" = "$$(openssl rsa -noout -modulus -in $(2))" ] ; then \
 		echo "I: Successfully verified that the key in $(2) and certificate in $(1) match." ; \
@@ -72,9 +71,6 @@ ssl.crt: ssl.key
 
 ssl.key: 
 	@openssl genrsa -out ssl.key.$(tempext) 2048
-	@if [ "root" = "$$USERNAME" ] ; then \
-		chgrp ssl-cert ssl.key.$(tempext) ; \
-	fi
 	@mv -b ssl.key.$(tempext) ssl.key
 	@echo "I: Created a key."
 
