@@ -79,15 +79,7 @@ fi
 #
 # Generate SSL certificates.
 #
-if ! [ -e /etc/ssl/ssl.crt -a -e /etc/ssl/ssl.key ]; then
-
-  for i in key crt cobined ; do
-    [ -e /etc/ssl/ssl.$i ] && mv /etc/ssl/ssl.$i /etc/ssl/ssl.$i.dpkg-old
-  done
-
-  cd /etc/ssl && make check || true
-
-fi
+cd /etc/ssl && make check || true
 
 #DEBHELPER#
 
