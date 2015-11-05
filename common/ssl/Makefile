@@ -4,42 +4,50 @@ HOSTNAME ?= $(shell hostname -f)
 DAYS     ?= 3650
 
 ifneq "$(HOSTNAME)" ""
-SUBJECT  ?= /C=GB/ST=England/L=York/CN=$(HOSTNAME)
+SUBJECT  ?= /CN=$(HOSTNAME)
 endif
 
 tempext  := symbiosis.$(shell echo $$$$)
 
-check: check_crt check_combined
-
-check_combined: ssl.combined 
-	@if [ "$$(openssl x509 -noout -modulus -in $< 2>/dev/null )" = "$$(openssl rsa -noout -modulus -in $<)" ] ; then \
-		echo "I: Successfully verified that the key and certificates in $< match." ; \
+define check_key_with_certificate 
+	@mode=`stat --format '%a' $(2)` ; \
+	if [ '640' != "$$mode" ] ; then \
+		echo "I: Changing mode on $(2) from $$mode to 640." ; \
+		chmod 640 $(2) ; \
 	else \
-		echo "W: The key and certificates in $< do not match." ; \
+		echo "I: Mode on $(2) is $$mode."; \
 	fi
-	@if ( openssl verify -CAfile ssl.combined ssl.combined 2>&1 > /dev/null ) ; then \
-    echo "I: Successfully verified the certificate (and bundle) in $<."; \
+	@group=`stat --format '%G' $(2)` ; \
+	if [ "root" = "$$USERNAME" ] && [ "ssl-cert" != "$$group" ] ; then \
+		echo "I: Changing group on $(2) from $$group to ssl-cert." ; \
+		chgrp ssl-cert $(2) ; \
+	fi
+	@if [ "$$(openssl x509 -noout -modulus -in $(1) 2>/dev/null )" = "$$(openssl rsa -noout -modulus -in $(2))" ] ; then \
+		echo "I: Successfully verified that the key in $(2) and certificate in $(1) match." ; \
 	else \
-     echo "W: Warning: Cannot verify $< -- maybe a bundle is missing?" ; \
+		echo "W: The key in $(2) and certificate in $(1) do not match." ; \
 	fi
-
-check_crt: ssl.crt ssl.key
-	@if ( openssl x509 -in ssl.bundle -noout > /dev/null 2>&1 ) ; then \
-		if ( openssl verify -CAfile ssl.bundle $< > /dev/null 2>&1 ) ; then \
-    	echo "I: Successfully verified $< with ssl.bundle."; \
+	@if ( openssl x509 -in $(3) -noout > /dev/null 2>&1 ) ; then \
+		if ( openssl verify -CAfile $(3) $(1)  > /dev/null 2>&1 ) ; then \
+    	echo "I: Successfully verified $(3) with $(1)."; \
 		else \
-			echo "W: Cannot verify $< using ssl.bundle.  Maybe the bundle is wrong?" ; \
+			echo "W: Cannot verify $(1) using $(3).  Maybe the bundle is wrong?" ; \
 		fi ; \
-	elif ( openssl verify -CAfile $< $< > /dev/null 2>&1  ) ; then \
-   	echo "I: The certificate in $< is self-signed."; \
+	elif ( openssl verify -CAfile $(1) $(1) > /dev/null 2>&1  ) ; then \
+   	echo "I: The certificate in $(1) is self-signed."; \
 	else \
-		echo "W: Cannot verify $<.  Maybe a bundle is missing?" ; \
+		echo "W: Cannot verify $(1).  Maybe a bundle is missing?" ; \
 	fi
-	@if [ "$$(openssl x509 -noout -modulus -in ssl.crt)" = "$$(openssl rsa -noout -modulus -in ssl.key)" ] ; then \
-		echo "I: Successfully verified that ssl.key matches the certificate in ssl.crt" ; \
-	else \
-		echo "W: The key in ssl.key does not match the certificate in ssl.crt." ; \
-	fi
+endef
+
+
+check: check_crt_and_key check_combined
+
+check_combined: ssl.combined
+	$(call check_key_with_certificate,ssl.combined,ssl.combined,ssl.combined)
+
+check_crt_and_key: ssl.crt ssl.key
+	$(call check_key_with_certificate,ssl.crt,ssl.key,ssl.bundle)
 
 ssl.csr: ssl.key
 	@if [ -z "$(SUBJECT)" ]  ; then \
@@ -64,8 +72,10 @@ ssl.crt: ssl.key
 
 ssl.key: 
 	@openssl genrsa -out ssl.key.$(tempext) 2048
+	@if [ "root" = "$$USERNAME" ] ; then \
+		chgrp ssl-cert ssl.key.$(tempext) ; \
+	fi
 	@mv -b ssl.key.$(tempext) ssl.key
-	@chmod 600 ssl.key
 	@echo "I: Created a key."
 
 ssl.combined: ssl.crt ssl.key 
@@ -79,7 +89,6 @@ ssl.combined: ssl.crt ssl.key
 	fi
 	@cat ssl.key >> ssl.combined.$(tempext)
 	@mv -b ssl.combined.$(tempext) ssl.combined
-	@chmod 600 ssl.combined
 	@echo "I: Created combined certificate, bundle, and key."
 
 csr: ssl.csr
