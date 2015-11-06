@@ -1,0 +1,24 @@
+#!/bin/sh -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+  echo "I: Skipping configuration"
+  exit 0
+fi
+
+#
+# OK icky bit for wheezy->jessie upgrade.
+#
+# The upgrade seems to leave the old mod_bytemark_vhost.conf file symlinked
+# into mods-enabled.
+#
+if [ -L /etc/apache2/mods-enabled/mod_vhost_bytemark.load ] ; then
+  echo "I: Removing old mod_vhost_bytemark link from /etc/apache2/mods-enabled."
+  rm -f /etc/apache2/mods-enabled/mod_vhost_bytemark.load
+fi
+
+#DEBHELPER#
+
+exit 0

@@ -18,6 +18,23 @@ if [ "$1" != "configure" ]; then
 fi
 
 #
+# OK icky bit for wheezy->jessie upgrade
+#
+# Because we used a diversion for a corrected ports.conf in wheezy, and the
+# ordering isn't working out on upgrade, the new ports.conf ends up at
+# ports.conf.dpkg-symbiosis-orig.dpkg-new.  So this next bit of code checks
+# that ports.conf has the same md5sum as that which is shipped with wheezy, and
+# that ports.conf.dpkg-symbiosis-orig.dpkg-new has the same md5 sum as the
+# ports.conf shipped with jessie.  If they match, we'll move the jessie one on
+# top of the wheezy one.
+#
+if ( echo "38b31d20326f3640a8dfbe1ff5d1c4ad  /etc/apache2/ports.conf" | md5sum -c --status 2>/dev/null ) && \
+   ( echo "a961f23471d985c2b819b652b7f64321  /etc/apache2/ports.conf.dpkg-symbiosis-orig.dpkg-new" | md5sum -c --status 2>/dev/null ) ; then
+  echo "I: Overwriting ports.conf with ports.conf.dpkg-symbiosis-orig.dpkg-new"
+  mv -b /etc/apache2/ports.conf.dpkg-symbiosis-orig.dpkg-new /etc/apache2/ports.conf
+fi
+
+#
 # Remove 000-default site
 #
 if [ -L /etc/apache2/sites-enabled/000-default.conf ] ; then
