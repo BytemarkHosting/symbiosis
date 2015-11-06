@@ -3,6 +3,7 @@ Description=Pure FTPd: Authentication daemon
 
 [Service]
 Type=simple
+ExecStartPre=/bin/mkdir -p /var/run/pure-ftpd
 ExecStart=/usr/sbin/pure-authd --run /usr/sbin/symbiosis-ftpd-check-password --socket /var/run/pure-ftpd/pure-authd.sock
 Restart=always
 
