@@ -1,3 +1,14 @@
+symbiosis-httpd (2015:1106) stable; urgency=medium
+
+  * Added no-effort SNI support for domains running on the primary IP address,
+    with an SSL certificate in place.
+  * Updated postinst scripts to use the jessie version of
+    /etc/apache2/ports.conf instead of the wheezy one.
+  * Updated the libapache2-mod-vhost-bytemark postinst to remove the old
+    module load snipped in /etc/apache2/mods-enabled.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 06 Nov 2015 15:09:52 +0000
+
 symbiosis-httpd (2015:1027) stable; urgency=medium
 
   * Reduced the number of dependencies this package has; most have been moved

@@ -1,3 +1,9 @@
+symbiosis-common (2015:1106) stable; urgency=medium
+
+  * Added dependency on make.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 06 Nov 2015 15:08:22 +0000
+
 symbiosis-common (2015:1105) stable; urgency=medium
 
   * Added Makefile in /etc/ssl to generate certificate, key, and combined form

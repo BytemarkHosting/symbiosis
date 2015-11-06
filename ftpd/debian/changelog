@@ -1,3 +1,10 @@
+symbiosis-ftpd (2015:1106) stable; urgency=medium
+
+  * Fixed systemd unit to create the socket directory before starting the
+    pure authentication daemon.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 06 Nov 2015 15:09:16 +0000
+
 symbiosis-ftpd (2015:1103) stable; urgency=medium
 
   * Updated to depend on the new SSL handling povided in symbiosis-common.
