@@ -189,22 +189,22 @@ end
 #
 # Works out the mercurial identity for the current RCS repo.
 #
-def hg_id
-  return @hg_id if defined? @hg_id
+def git_id
+  return @git_id if defined? @git_id
 
-  @hg_id = `hg id -i -r tip`.chomp
-  @hg_id = nil if 0 != $?
-  @hg_id
+  @git_id = `git log -n 1 --format=%h`.chomp
+  @git_id = nil if 0 != $?
+  @git_id
 end
 
 #
 # Returns the name of the repository directory.
 #
 def repo_dir 
-  if hg_id.nil?
+  if git_id.nil?
     File.join("repo", distro)
   else
-    File.join("repo", hg_id)
+    File.join("repo", git_id)
   end
 end
 
@@ -312,13 +312,13 @@ end
 desc "Check which packages need their changelogs updating"
 task "check_changelogs" do
   need_updating = []
-  br = `hg branch`.chomp
+  br = `git branch`.split($/).find{|b| b =~ /^\* /}.sub(/^\* +/,"")
   source_dirs.each do |d|
-    ch_r = `hg log -b #{br} -l 1 --template '{rev}' #{d}/debian/changelog`.to_i
-    d_r  = `hg log -b #{br} -l 1 --template '{rev}' #{d}/**`.to_i
-    if ch_r < d_r
-      ch_ch = `hg log -b #{br} -r #{ch_r} --template 'changelog: {rev}: {author|user}: {date|shortdate}'`
-      d_ch =  `hg log -b #{br} -r #{d_r} --template 'directory: {rev}: {author|user}: {date|shortdate}'`
+    ch_t = `git log -n 1 --format='%at' #{br} #{d}/debian/changelog`.to_i
+    d_t  = `git log -n 1 --format='%at' #{br} #{d}/**`.to_i
+    if ch_t < d_t
+      ch_ch = `git log -n 1 --format='changelog: %h: %an: %ai' #{br} #{d}/debian/changelog`.chomp
+      d_ch =  `git log -n 1 --format='directory: %h: %an: %ai' #{br} #{d}/**`.chomp
       need_updating << d + "\n    " + ch_ch + "\n    " + d_ch
     end
   end
