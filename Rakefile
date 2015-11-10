@@ -118,7 +118,7 @@ def all_packages
      end,
      :packages => bin_pkgs,
      :version => version,
-     :distro  => distro,
+     :distro  => DISTRO, 
      :targz   => source_version+".tar.gz",
      :diffgz  => source_version+".diff.gz",
      :dsc     => source_version+".dsc",
