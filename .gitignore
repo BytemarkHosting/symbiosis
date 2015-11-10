@@ -1,9 +1,4 @@
 #
-#
-#
-#syntax: glob
-
-#
 #  GLobal
 #
 Release
@@ -12,148 +7,130 @@ Packages
 Sources
 Packages.gz
 Sources.gz
-*/build-stamp
-*/configure-stamp
+build-stamp
+configure-stamp
 */debian/*.log
 */debian/*.substvars
 */debian/files
 */debian/*.debhelper
 */debian/check_file_copies/*
 */debian/transform_file_copies/*
+*/man/*.man
 *.deb
 *.build
 *.changes
 *.dsc
 *.tar.gz
-./repo/*
+*.tar.*
+repo/*
 
 #
 #  Per-Package
 #
 
 #
-#  Apache
+#  httpd 
 #
-./apache/*/.libs/*
-./apache/debian/libapache2-mod-ruid/
-./apache/debian/libapache2-mod-vhost-bytemark
-./apache/debian/symbiosis-httpd-static/
-./apache/debian/symbiosis-httpd/
-./apache/ruid/mod_ruid.la
-./apache/ruid/mod_ruid.lo
-./apache/ruid/mod_ruid.slo
-./apache/vhost-alias/mod_vhost_bytemark.la
-./apache/vhost-alias/mod_vhost_bytemark.lo
-./apache/vhost-alias/mod_vhost_bytemark.slo
-./apache/vhost-alias/test-strip
+httpd/debian/libapache2-mod-vhost-bytemark
+httpd/debian/symbiosis-httpd-static/
+httpd/debian/symbiosis-httpd/
+httpd/vhost-alias/mod_vhost_bytemark.la
+httpd/vhost-alias/mod_vhost_bytemark.lo
+httpd/vhost-alias/mod_vhost_bytemark.slo
+httpd/vhost-alias/test-strip
+httpd/vhost-alias/.libs/
 
 #
 #  Backup
 #
-./backup/debian/symbiosis-backup/
+backup/debian/symbiosis-backup/
 
 #
 #  Common
 #
-./common/debian/symbiosis-common/
-./common/man/
-
-
-#
-#  Crack
-#
-./crack/debian/symbiosis-crack/
-
+common/debian/symbiosis-common/
+common/test.d/RootCA/ec8a87ff.0
 
 #
 #  Cron
 #
-./cron/debian/symbiosis-cron/
+cron/debian/symbiosis-cron/
+cron/wrapper/symbiosis-all-crontabs
 
 #
 # Docs
 #
-./doc/debian/symbiosis-api-doc/
-./doc/html/
+doc/debian/symbiosis-api-doc/
+doc/html/
 
 #
 #  DNS
 #
-./dns/debian/symbiosis-tinydns/
+dns/debian/symbiosis-dns/
 
 #
 #  Email
 #
-./email/debian/symbiosis-email/
-./email/man/*.man
+email/debian/symbiosis-email/
+email/debian/symbiosis-email-activesync/
 
 #
 #  Firewall
 #
-./firewall/ext/*.o
-./firewall/ext/*.so
-./firewall/man/
-./firewall/debian/symbiosis-firewall/
-./firewall/.config-symbiosis-firewall
-./firewall/InstalledFiles
-./firewall/debian-setup.rb
-./firewall/ext/Makefile
+firewall/ext/*.o
+firewall/ext/*.so
+firewall/ext/.RUBYARCHDIR.time
+firewall/ext/Makefile
+firewall/manpages/
+firewall/debian/symbiosis-firewall/
 
 #
 #  FTP
 #
-./ftpd/debian/symbiosis-ftpd/
-./ftpd/debian/*.debhelper
+ftpd/debian/symbiosis-ftpd/
 
 #
 #  Meta
 #
-./meta/debian/bytemark-symbiosis/
-./meta/debian/*.debhelper
-./meta/debian/bytemark-vhost/
+meta/debian/bytemark-symbiosis/
+meta/debian/symbiosis-pam/
+meta/debian/symbiosis-key/
 
 #
 #  Monit
 #
-./monit/rdoc/
-./monit/debian/symbiosis-monit/
+#
+monit/debian/symbiosis-monit/
 
 #
 #  MySQL
 #
-./mysql/debian/symbiosis-mysql/
-
+mysql/debian/symbiosis-mysql/
 
 #
 #  PAM
 #
-./pam/debian/symbiosis-pam/
+pam/debian/symbiosis-pam/
 
 #
 #  PHPMyAdmin
 #
-./phpmyadmin/debian/symbiosis-phpmyadmin/
-
-#
-#  Range
-#
-./range/debian/symbiosis-range/
-./range/man/*.man
-
-#
-#  Test
-#
-./test/debian/symbiosis-test/
+phpmyadmin/debian/symbiosis-phpmyadmin/
 
 #
 #  Updater
 #
-./updater/debian/symbiosis-updater/
-./updater/*.1
+updater/debian/symbiosis-updater/
 
 
 #
 #  Webmail
 #
-./webmail/debian/symbiosis-webmail/
+webmail/debian/symbiosis-webmail/
+webmail/debian/symbiosis-webmail-squirrelmail/
+webmail/debian/symbiosis-webmail-roundcube/
 
+#
+# XMPP
+#
+xmpp/debian/symbiosis-xmpp/
