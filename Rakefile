@@ -8,7 +8,7 @@ require 'pp'
 DEBEMAIL=ENV["DEBEMAIL"] || "symbiosis@bytemark.co.uk"
 DEB_BUILD_ARCH=`dpkg-architecture -qDEB_BUILD_ARCH`.chomp
 # REPONAME, DISTRO = File.dirname(File.expand_path(__FILE__)).split("/").last(2)
-DISTRO="oldstable"
+DISTRO="oldoldstable"
 REPONAME="symbiosis"
 
 #
