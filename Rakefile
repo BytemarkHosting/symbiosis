@@ -8,7 +8,7 @@ require 'pp'
 DEBEMAIL = ENV["DEBEMAIL"] || "symbiosis@bytemark.co.uk"
 DEB_BUILD_ARCH = ENV["BUILD_ARCH"] || `dpkg-architecture -qDEB_BUILD_ARCH`.chomp
 DISTRO   = (ENV["DISTRO"]   || "debian").downcase
-RELEASE  = (ENV["RELEASE"]  || "stable").downcase
+RELEASE  = (ENV["RELEASE"]  || "wheezy").downcase
 REPONAME = (ENV["REPONAME"] || "symbiosis").downcase
 PARALLEL_BUILD = ENV.has_key?("PARALLEL_BUILD")
 
