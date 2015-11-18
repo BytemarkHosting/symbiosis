@@ -1,3 +1,10 @@
+symbiosis-email (2015:1118) stable; urgency=medium
+
+  * Updated the interface expansion in the remote_smtp transports to work.  It
+    turns out $value gets reset outside the ${extract } expansion.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 18 Nov 2015 14:30:10 +0000
+
 symbiosis-email (2015:1104) stable; urgency=medium
 
   * Changed SSL certificate and key paths in Exim4 and Dovecot to use
