@@ -9,15 +9,16 @@ remote_smtp:
   # $sender_address_domain, or a default value kept in
   # /etc/symbiosis/config/ip(s).
   #
-  interface = <, ${if !eq\
-      {${extract {1}{:}{${filter\
-          {VHOST_DIR/$sender_address_domain/config/ip:VHOST_DIR/$sender_address_domain/config/ips:/etc/symbiosis/config/ip:/etc/symbiosis/config/ips}\
-          {exists{$item}}\
+  interface = <, ${extract {1}{:}\
+      {${filter\
+        {VHOST_DIR/$sender_address_domain/config/ip:VHOST_DIR/$sender_address_domain/config/ips:/etc/symbiosis/config/ip:/etc/symbiosis/config/ips}\
+        {exists{$item}}\
+      }}\
+      {${if !eq{$value}{}{\
+        ${filter\
+          {<,${readfile{$value}}}\
+          {isip{$item}}\
         }}\
       }}\
-      {}\
-      {${filter\
-        {<,${readfile{$value}}}{isip{$item}}\
-      }}\
     }
- 
+
