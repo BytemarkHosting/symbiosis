@@ -155,9 +155,13 @@ EventMachine.run do
   %w(HUP USR1).each do |sig|
     trap(sig) do
       warn "#{$0}: Caught #{sig}" if $VERBOSE 
-      EventMachine.add_timer(0) do
-        logger.close_filehandles
-        logger.resume
+      if EventMachine.reactor_running?
+       EventMachine.add_timer(0) do
+         if logger.is_a?(Symbiosis::ApacheLogger)
+          logger.close_filehandles
+          logger.resume
+         end
+       end
       end
     end
   end
@@ -168,9 +172,13 @@ EventMachine.run do
   %w(QUIT TERM INT).each do |sig|
     trap(sig) do
       warn "#{$0}: Caught #{sig}" if $VERBOSE 
-      EventMachine.add_timer(0) do
-        logger.close_filehandles
-        EventMachine.stop
+      if EventMachine.reactor_running?
+       EventMachine.add_timer(0) do
+         if logger.is_a?(Symbiosis::ApacheLogger)
+          logger.close_filehandles
+         end
+         EventMachine.stop
+       end
       end
       exit 0
     end
