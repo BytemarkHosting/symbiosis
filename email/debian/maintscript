@@ -3,5 +3,6 @@ rm_conffile /etc/dovecot/symbiosis.d/30-authentication/85-userdb-checkpasswd 201
 rm_conffile /etc/symbiosis/test.d/tc_checkpassword.rb 2014:1231
 rm_conffile /etc/symbiosis/monit.d/clamav-daemon 2014:1231
 rm_conffile /etc/symbiosis/monit.d/clamav-freshclam 2014:1231
-
-
+rm_conffile /etc/symbiosis/test.d/exim4_acl_tests/testy 2010:0101
+rm_conffile /etc/symbiosis/test.d/exim4_acl_tests/test2 2010:0101
+rm_conffile /etc/symbiosis/test.d/exim4_acl_tests/test3 2010:0101
