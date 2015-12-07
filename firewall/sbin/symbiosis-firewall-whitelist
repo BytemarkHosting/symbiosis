@@ -278,12 +278,12 @@ Symbiosis::Utmp.read(wtmp_file).each do |entry|
   #
   # Check filename without .auto first.
   #
-  if Symbiosis::Utils.get_param(setting, whitelist_d) == false
+  if !Symbiosis::Utils.get_param(setting, whitelist_d)
     #
     # Automatically whitelist.
     #
     setting += ".auto"
-    value = Symbiosis::Utils.get_param(setting, whitelist_d)
+    value = !!Symbiosis::Utils.get_param(setting, whitelist_d)
 
     if false == value
       puts "\tAdding whitelist entry" if  $VERBOSE
