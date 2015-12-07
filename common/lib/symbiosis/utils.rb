@@ -173,10 +173,10 @@ module Symbiosis
     #
     # Allow arbitrary parameters in parent_dir to be retrieved.
     #
-    # * false is returned if the file does not exist, or is not readable
-    # * true is returned if the file exists, but is of zero length
+    # * nil is returned if the file does not exist, or is not readable
+    # * true is returned if the file exists, but is of zero length, or if the file contains the word "yes" or "true"
+    # * false is returned if the file contains the word "false" or "no"
     # * otherwise the files contents are returned as a string.
-    #
     #
     def get_param(setting, parent_dir, opts = {})
       fn = File.join(parent_dir, setting)
@@ -184,7 +184,7 @@ module Symbiosis
       #
       # Return false unless we can read the file
       #
-      return false unless File.exist?(fn) and File.readable?(fn)
+      return nil unless File.exist?(fn) and File.readable?(fn)
 
       #
       # Read the file.
@@ -192,9 +192,14 @@ module Symbiosis
       contents = safe_open(fn, File::RDONLY, opts){|fh| fh.read}.to_s
       
       #
-      # Return true if the file was empty
+      # Return true if the file was empty, or the contents are "true" or "yes"
       #
-      return true if contents.empty?
+      return true if contents.empty? or contents =~ /\A\s*(true|yes)\s*\Z/i
+
+      #
+      # Return false if the file is set to "false" or "no"
+      #
+      return false if contents =~ /\A\s*(false|no)\s*\Z/i
 
       #
       # Otherwise return the contents

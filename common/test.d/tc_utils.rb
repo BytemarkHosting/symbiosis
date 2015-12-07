@@ -18,7 +18,7 @@ class TestUtils < Test::Unit::TestCase
 
   def teardown
     if Process.uid == 0
-      Process.euid = 0 
+      Process.euid = 0
       Process.egid = 0
     end
 
@@ -60,7 +60,7 @@ class TestUtils < Test::Unit::TestCase
     assert_raise(Errno::ENOTDIR) { mkdir_p(filedir) }
 
 
-    # 
+    #
     # Make sure we can't overwrite a symlink
     #
     syml = File.expand_path(File.join(dir,"..","bb"))
@@ -71,12 +71,12 @@ class TestUtils < Test::Unit::TestCase
 
     #
     # Make sure we can create a directory the other side of a symlink
-    # 
+    #
     symldir = File.join(syml,"cc")
 
     assert_nothing_raised { mkdir_p(symldir) }
-    
-    assert(File.directory?(File.join(dir,"cc")))    
+
+    assert(File.directory?(File.join(dir,"cc")))
 
   end
 
@@ -96,10 +96,20 @@ class TestUtils < Test::Unit::TestCase
     fn = File.join(@prefix, param)
 
     assert(!File.exist?(fn))
-    assert_equal(false,get_param(param, @prefix))
+    assert_equal(nil,get_param(param, @prefix))
 
     FileUtils.touch(fn)
     assert_equal(true,get_param(param, @prefix))
+
+    %w(true True TRUE yes).each do |value|
+      File.open(fn,"w"){|fh| fh.write value }
+      assert_equal(true,get_param(param, @prefix))
+    end
+
+    %w(false False FaLsE no).each do |value|
+      File.open(fn,"w"){|fh| fh.write value }
+      assert_equal(false,get_param(param, @prefix))
+    end
 
     value = "this value"
     File.open(fn,"w"){|fh| fh.write value }
@@ -115,7 +125,7 @@ class TestUtils < Test::Unit::TestCase
     # If we're running as root, make sure the directory is owned by a
     # non-system user.
     #
-    if 0 == Process.uid 
+    if 0 == Process.uid
       File.chown(1000,1000,@prefix)
       Process.egid = 1000
       Process.euid = 1000
@@ -126,7 +136,7 @@ class TestUtils < Test::Unit::TestCase
 
     value = false
     assert_nothing_raised do
-      assert_equal(value, set_param(param, value, @prefix)) 
+      assert_equal(value, set_param(param, value, @prefix))
     end
     assert(!File.exist?(fn))
 
@@ -147,7 +157,7 @@ class TestUtils < Test::Unit::TestCase
       assert_equal(value, set_param(param, value, @prefix))
     end
     assert_equal(value, File.read(fn))
-    
+
     value = "test-val\nother-val\n"
     assert_nothing_raised do
       assert_equal(value, set_param(param, value, @prefix))
@@ -164,7 +174,7 @@ class TestUtils < Test::Unit::TestCase
     #
     # Make sure we return to root.
     #
-    if 0 == Process.uid 
+    if 0 == Process.uid
       Process.euid = 0
       Process.egid = 0
     end
@@ -192,7 +202,7 @@ class TestUtils < Test::Unit::TestCase
     #
     Process.euid = 0
     FileUtils.touch(fn)
-   
+
     #
     # Make sure the directory is owned by our malicious user.
     #
@@ -265,7 +275,7 @@ class TestUtils < Test::Unit::TestCase
 
     opts = {:mode => 0600}
     opts = {:uid => 1000, :gid => 2000}.merge(opts) if Process.euid == 0
-    
+
     safe_open(fn, "a+", opts) {|fh| fh.puts fn }
     #
     # and check
