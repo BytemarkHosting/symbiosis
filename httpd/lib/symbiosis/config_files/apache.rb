@@ -1,5 +1,6 @@
 require 'symbiosis/config_file'
 require 'symbiosis/domain/http'
+require 'symbiosis/host'
 require 'tempfile'
 
 module Symbiosis
@@ -276,11 +277,11 @@ module Symbiosis
       end
     
       #
-      # TODO: Should be elsewhere
+      # This returns the FQDN
       #
       def hostname
         return @hostname if defined? @hostname and @hostname.is_a?(String)
-        @hostname = Symbiosis::Utils.get_param("hostname","/etc")
+        @hostname = Symbiosis::Host.fqdn
       end
 
     end
