@@ -120,6 +120,43 @@ class TestUtils < Test::Unit::TestCase
     assert_equal(value, get_param(param, @prefix))
   end
 
+  def test_get_param_with_dir_stack
+    dirs = %w(a b c).map{|d| File.join(@prefix, d)}
+    param = "test"
+
+    #
+    # Create each value in reverse order.  We should get the most recently
+    # created variable back.
+    #
+    dirs.reverse.each do |dir|
+      Dir.mkdir(dir)
+      value = File.basename(dir)
+
+      File.open(File.join(dir, param), "w") do |fh|
+        fh.print(value)
+      end
+
+      assert_equal(value, get_param_with_dir_stack(param, dirs))
+    end
+
+    #
+    # Now set the "top" value to false.  This should return false.
+    #
+    value = "false"
+    dir = dirs.first
+    File.open(File.join(dir, param), "w") do |fh|
+      fh.print(value)
+    end
+    assert_equal(false, get_param_with_dir_stack(param, dirs))
+
+    #
+    # Now remove the file.  This should now fall through to the second value.
+    #
+    File.unlink(File.join(dir, param))
+    value = File.basename(dirs[1])
+    assert_equal(value, get_param_with_dir_stack(param, dirs))
+  end
+
   def test_set_param
     #
     # If we're running as root, make sure the directory is owned by a

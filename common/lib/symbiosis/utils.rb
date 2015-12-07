@@ -208,6 +208,22 @@ module Symbiosis
     end
 
     #
+    # This returns the first setting of a parameter in a stack of directories.
+    #
+    # Returns the first non-
+    #
+    def get_param_with_dir_stack(setting, dir_stack, opts = {})
+      var = nil
+
+      [dir_stack].flatten.each do |dir|
+        var = get_param(setting, dir, opts)
+        break unless var.nil?
+      end
+
+      var
+    end
+
+    #
     # Records a parameter.
     #
     # * true is stored as an empty file
