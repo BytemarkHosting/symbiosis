@@ -75,7 +75,7 @@ module Symbiosis
       @dkim_selector = if selector.is_a?(String) and selector =~ selector_regex
         $1.to_s
   
-      elsif selector == false
+      elsif selector == false or selector.nil?
         nil
 
       else

@@ -165,7 +165,7 @@ module Symbiosis
         #
         # If it doesn't exist/is unreadble, return nil.
         #
-        next if false == contents
+        next unless contents.is_a?(String)
  
         this_fn = File.join(self.config_dir, "ssl.#{ext}")
 
