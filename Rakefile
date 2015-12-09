@@ -461,7 +461,12 @@ namespace :pkg do
         # Now call sautobuild and debsign
         #
         if has_sautobuild?
-          sh "/usr/bin/sautobuild --no-repo --dist=#{DISTRO}_#{RELEASE} #{pkg[:dir]}"
+          if File.exists?("#{pkg[:source]}-sources.list")
+            sources_list = "--sources-list=#{pkg[:source]}-sources.list"
+          else
+            sources_list = ""
+          end
+          sh "/usr/bin/sautobuild #{sources_list} --no-repo --dist=#{DISTRO}_#{RELEASE} #{pkg[:dir]}"
         else
           sh "cd #{pkg[:dir]} && debuild -us -uc -sa"
         end
