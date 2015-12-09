@@ -334,36 +334,6 @@ module Symbiosis
 
   end
 
-  class Domain
-
-    def ssl_from_letsencrypt(endpoint = nil)
-      client = Symbiosis::SSL::LetsEncrypt.new(self)
-      client.config()[:endpoint] = endpoint if endpoint
-      
-      client.register
-      client.verify
-      client.certificate
-
-      store = self.ssl_certificate_store
-      store.add_cert(client.bundle.last) unless client.bundle.empty?
-
-      self.ssl_verify(client.certificate, client.key, store, true)
-
-      issue = nil
-
-      Dir.glob(File.join(client.config_dirs.last, self.name, "*")).each do |d|
-        next unless File.directory?(d)
-        d = File.basename(d)
-        if d =~ /^\d+$/
-          issue = Integer(d)
-        end
-      end
-
-
-    end
-
-  end
-
 end
 
 
