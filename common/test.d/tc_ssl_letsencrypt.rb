@@ -8,11 +8,13 @@ if RUBY_VERSION =~ /^[2-9]\./
 end
 
 require 'webmock/test_unit'
+WebMock.allow_net_connect!
 
 class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def setup
     omit "acme-client requires ruby > 2.0"  unless defined? Symbiosis::SSL::LetsEncrypt
+    WebMock.disable_net_connect!
 
     @prefix = Dir.mktmpdir("srv")
     @prefix.freeze
@@ -40,6 +42,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
   end
 
   def teardown
+    WebMock.allow_net_connect!
     unless $DEBUG
       @domain.destroy  if @domain.is_a?( Symbiosis::Domain)
       FileUtils.rm_rf(@prefix) if @prefix and File.directory?(@prefix)
