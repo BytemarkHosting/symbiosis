@@ -1,4 +1,5 @@
 require 'symbiosis/domain'
+require 'symbiosis/ssl'
 require 'openssl'
 require 'erb'
 
@@ -96,9 +97,9 @@ module Symbiosis
     # Returns the certificate chain filename, if one exists, or one has been
     # set, or nil if nothing could be found.
     #
-    def ssl_certificate_chain_file
-      if get_param("ssl.bundle", self.config_dir)
-        File.join( self.config_dir,"ssl.bundle" )
+    def ssl_certificate_chain_file(dir = self.config_dir)
+      if get_param("ssl.bundle", dir)
+        File.join( dir,"ssl.bundle" )
       else
         nil
       end
@@ -124,14 +125,14 @@ module Symbiosis
     #
     # This is regenerated on every call.
     #
-    def ssl_certificate_store
+    def ssl_certificate_store(dir = self.config_dir)
       @ssl_ca_paths ||= []
 
       certificate_store = OpenSSL::X509::Store.new
       certificate_store.set_default_paths
 
       @ssl_ca_paths.each{|path| certificate_store.add_path(path)}
-      certificate_store.add_file(self.ssl_certificate_chain_file) unless self.ssl_certificate_chain_file.nil?
+      certificate_store.add_file(self.ssl_certificate_chain_file(dir)) unless self.ssl_certificate_chain_file(dir).nil?
       certificate_store
     end
 
@@ -149,7 +150,7 @@ module Symbiosis
     # <code>[[certificates] , [keys]]</code>.  If a file contains both a
     # certificate and key, it will appear in both arrays.
     #
-    def ssl_available_files
+    def ssl_available_files(dir = self.config_dir)
       certificates = []
       key_files = []
 
@@ -160,14 +161,14 @@ module Symbiosis
         #
         # See if the file exists.
         #
-        contents = get_param("ssl.#{ext}", self.config_dir)
+        contents = get_param("ssl.#{ext}", dir)
 
         #
         # If it doesn't exist/is unreadble, return nil.
         #
         next unless contents.is_a?(String)
  
-        this_fn = File.join(self.config_dir, "ssl.#{ext}")
+        this_fn = File.join(dir, "ssl.#{ext}")
 
         this_cert = nil
         this_key = nil
@@ -249,11 +250,11 @@ module Symbiosis
     # The order in which keys and certficates are matched is determined by
     # ssl_available_files.
     #
-    def ssl_find_matching_certificate_and_key
+    def ssl_find_matching_certificate_and_key(dir = self.config_dir)
       #
       # Find the certificates and keys
       #
-      certificate_files, key_files = self.ssl_available_files
+      certificate_files, key_files = self.ssl_available_files(dir)
 
       return nil if certificate_files.empty? or key_files.empty?
 
@@ -292,8 +293,7 @@ module Symbiosis
     # If either of these last two checks fail, a
     # OpenSSL::X509::CertificateError is raised.
     #
-    def ssl_verify(certificate = self.ssl_x509_certificate, key = self.ssl_key, store = self.ssl_certificate_store, strict_checking=false)
-
+    def ssl_verify(certificate = self.ssl_certificate, key = self.ssl_key, store = self.ssl_certificate_store, strict_checking=false)
       #
       # Firstly check that the certificate is valid for the domain or one of its aliases.
       #
@@ -363,6 +363,121 @@ module Symbiosis
       end
 
       true
+    end
+
+    #
+    # Returns the SSL provider name.  If the `ssl-provider` is unset, the first
+    # available provider is chosen.  If the name is set to `false` then false
+    # is returned.  If no provider could be found, false is returned.  If the
+    # provider name is "bad", false is returned.
+    #
+    def ssl_provider
+      provider = get_param("ssl-provider", self.config_dir)
+
+      return false if false == provider
+
+      if provider.nil?
+        if Symbiosis::SSL::PROVIDERS.first.to_s =~ /.*::([^:]+)$/
+          provider = $1.downcase
+        end
+      end
+
+      return false unless provider.is_a?(String)
+
+      unless provider =~ /^[a-z0-9_]+$/
+        warn "\tBad ssl-provider for #{self.name}" if $VERBOSE
+        return false
+      end
+
+      provider.chomp
+    end
+
+    #
+    # Returns the SSL provider class, or nil if `ssl-provider` is explicitly
+    # set to "false" for this domain.  If `ssl-provider` class is unset, the
+    # first available provider is used.  The `ssl-provider` doesn't map to a
+    # class name, then nil is returned.
+    #
+    def ssl_provider_class
+      provider_name = self.ssl_provider
+
+      return nil if false == provider_name
+
+      if provider_name.is_a?(String)
+        provider = Symbiosis::SSL::PROVIDERS.find{|k| k.to_s =~ /::#{provider_name}$/i}
+      else
+        provider = Symbiosis::SSL::PROVIDERS.first
+      end
+
+      provider
+    end
+
+    #
+    # This fetches the certificate from using ssl_provider_class.  If
+    # ssl_provider_class does not return a suitable Class, nil is returned. 
+    #
+    # Returns an hash of
+    #
+    #  { :key, :certificate, :request, :bundle}
+    #
+    def ssl_fetch_certificate
+      ssl_provider_class = self.ssl_provider_class
+
+      unless ssl_provider_class.is_a?(Class) and
+        ssl_provider_class.instance_methods.include?(:verify_and_request_certificate!)
+        return nil 
+      end
+
+      ssl_provider = ssl_provider_class.new(self)
+      ssl_provider.register unless ssl_provider.registered?
+      ssl_provider.verify_and_request_certificate!
+
+
+      return { :key         => ssl_provider.key,
+        :request     => ssl_provider.request,
+        :bundle      => ssl_provider.bundle,
+        :certificate => ssl_provider.certificate }
+    end
+
+    #
+    # Returns the directory for the ssl provider.
+    #
+    def ssl_provider_dir
+      return nil if self.ssl_provider == false
+
+      File.expand_path(File.join(self.config_dir, self.ssl_provider))
+    end
+
+    #
+    # Returns the 
+    #
+    #
+    def ssl_latest_issue
+      issues = []
+
+      Dir.glob(File.join(self.ssl_provider_dir,'*')).each do |cert_dir|
+        next unless File.directory?(cert_dir)
+        this_issue = File.basename(cert_dir)
+
+        unless  (this_cert, this_key = ssl_find_matching_certificate_and_key(cert_dir)).nil?
+          this_store = self.certificate_store(cert_dir)
+
+          #
+          # If this certificate verifies, add it to our list
+          #
+          begin
+            self.ssl_verify(this_cert, this_key, this_store, true)
+          rescue OpenSSL::Error
+            next
+          end
+        end
+      end
+
+      return issues.sort.last
+    end
+
+    def ssl_rollover
+      
     end
 
   end

@@ -3,6 +3,10 @@ $:.unshift  "../lib/" if File.directory?("../lib")
 require 'test/unit'
 require 'tmpdir'
 require 'symbiosis/domain/ssl'
+require 'mocha/test_unit'
+
+class Symbiosis::SSL::Dummy
+end
 
 class SSLTest < Test::Unit::TestCase
 
@@ -16,6 +20,11 @@ class SSLTest < Test::Unit::TestCase
   end
 
   def teardown
+    #
+    # Empty the SSL providers array.
+    #
+    while Symbiosis::SSL::PROVIDERS.pop ; end
+
     unless $DEBUG
       @domain.destroy  if @domain.is_a?( Symbiosis::Domain)
       FileUtils.rm_rf(@prefix) if File.directory?(@prefix)
@@ -614,6 +623,97 @@ class SSLTest < Test::Unit::TestCase
     # This should not verify.
     #
     assert_raise(OpenSSL::X509::CertificateError){ third_domain.ssl_verify(crt, key, nil, true) }
+  end
+
+  def test_ssl_provider
+
+    assert_equal(false, @domain.ssl_provider, "#ssl_provider should return false if no providers available")
+
+    #
+    # Add our provider in
+    #
+    Symbiosis::SSL::PROVIDERS << Symbiosis::SSL::Dummy
+    assert_equal("dummy", @domain.ssl_provider, "#ssl_provider should return the first available provider")
+
+    [[ "dummy", "dummy" ],
+      [  "../../../evil", false ],
+      [  "false", false ]].each do |contents, result|
+
+      File.open(@domain.directory+"/config/ssl-provider","w+"){|fh| fh.puts(contents)}
+      assert_equal(result, @domain.ssl_provider)
+    end
+
+  end
+
+  def test_ssl_provider_class
+    assert_equal(nil, @domain.ssl_provider_class, "#ssl_provider_class should return nil if no providers available")
+
+    #
+    # Add our provider in
+    #
+    Symbiosis::SSL::PROVIDERS << Symbiosis::SSL::Dummy
+    assert_equal(Symbiosis::SSL::Dummy, @domain.ssl_provider_class, "#ssl_provider_class should return the first available provider")
+
+    
+    [[ "dummy", Symbiosis::SSL::Dummy ],
+      [  "../../../evil", nil ],
+      [  "false", nil ]].each do |contents, result|
+
+      File.open(@domain.directory+"/config/ssl-provider","w+"){|fh| fh.puts(contents)}
+      assert_equal(result, @domain.ssl_provider_class)
+    end
+  end
+
+  def test_ssl_provider_dir
+    assert_equal(nil, @domain.ssl_provider_dir, "#ssl_provider_dir should return nil if no providers available")
+
+    #
+    # Add our provider in
+    #
+    Symbiosis::SSL::PROVIDERS << Symbiosis::SSL::Dummy
+    assert_equal(File.join(@domain.config_dir, "dummy"), @domain.ssl_provider_dir, "#ssl_provider_dir should return the first available provider")
+
+    [[ "dummy", File.join(@domain.config_dir, "dummy") ],
+      [  "../../../evil", nil ],
+      [  "false", nil ]].each do |contents, result|
+  
+      File.open(@domain.directory+"/config/ssl-provider","w+"){|fh| fh.puts(contents)}
+      assert_equal(result, @domain.ssl_provider_dir)
+    end
+
+  end
+
+  def test_ssl_fetch_certificate
+    assert_equal(nil, @domain.ssl_fetch_certificate, "#ssl_fetch_certificate should return nil if no providers available")
+
+    Symbiosis::SSL::PROVIDERS << Symbiosis::SSL::Dummy
+    assert_equal(nil, @domain.ssl_fetch_certificate, "#ssl_fetch_certificate should return nil if the provider does not look compatible")
+
+    #
+    # Use our intermediate CA, and generate and sign the certificate
+    #
+    int_ca_path = File.expand_path(File.join(File.dirname(__FILE__), "IntermediateCA"))
+    ca_cert = OpenSSL::X509::Certificate.new(File.read("#{int_ca_path}/IntermediateCA.crt"))
+    ca_key  = OpenSSL::PKey::RSA.new(File.read("#{int_ca_path}/IntermediateCA.key"))
+    request = OpenSSL::X509::Request.new
+    key, cert = do_generate_key_and_crt(@domain.name, {:ca_key => ca_key, :ca_cert => ca_cert})    
+   
+    #
+    # Set up our dummy provider
+    #
+    Symbiosis::SSL::Dummy.any_instance.expects(:initialize).with(@domain).returns(true)
+    Symbiosis::SSL::Dummy.any_instance.expects(:verify_and_request_certificate!).returns(true)
+    Symbiosis::SSL::Dummy.any_instance.expects(:register).returns(true)
+    Symbiosis::SSL::Dummy.any_instance.expects(:registered?).returns(false)
+    Symbiosis::SSL::Dummy.any_instance.expects(:key).returns(key)
+    Symbiosis::SSL::Dummy.any_instance.expects(:certificate).returns(cert)
+    Symbiosis::SSL::Dummy.any_instance.expects(:bundle).returns(ca_cert)
+    Symbiosis::SSL::Dummy.any_instance.expects(:request).returns(request)
+
+    assert_equal({:bundle => ca_cert, :key => key, :certificate => cert, :request => request}, @domain.ssl_fetch_certificate) 
+  end
+
+  def ssl_latest_issue
   end
 
 end
