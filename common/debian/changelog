@@ -1,3 +1,13 @@
+symbiosis-common (2015:1209) UNRELEASED; urgency=medium
+
+  * Added letsencrypt library support.
+  * Added ruby-test-unit as an explicit depends.
+  * Removed ruby-mocha, ruby-webmock and ruby-acme-client from build-deps.
+  * Utils#get_param now returns nil if the file is missing/unreadable.
+  * Added Utils#get_param_from_dir_stack.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 09 Dec 2015 15:13:58 +0000
+
 symbiosis-common (2015:1106) stable; urgency=medium
 
   * Added dependency on make.
