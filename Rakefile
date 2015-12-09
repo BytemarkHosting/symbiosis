@@ -461,12 +461,16 @@ namespace :pkg do
         # Now call sautobuild and debsign
         #
         if has_sautobuild?
+          extra_opts = []
           if File.exists?("#{pkg[:source]}-sources.list")
-            sources_list = "--sources-list=#{pkg[:source]}-sources.list"
-          else
-            sources_list = ""
+            extra_opts << "--sources-list=#{pkg[:source]}-sources.list"
           end
-          sh "/usr/bin/sautobuild #{sources_list} --no-repo --dist=#{DISTRO}_#{RELEASE} #{pkg[:dir]}"
+
+          if File.exists?("#{pkg[:source]}-sources.key")
+            extra_opts << "--apt-key=#{pkg[:source]}-sources.key"
+          end
+
+          sh "/usr/bin/sautobuild #{extra_opts.join(" ")} --no-repo --dist=#{DISTRO}_#{RELEASE} #{pkg[:dir]}"
         else
           sh "cd #{pkg[:dir]} && debuild -us -uc -sa"
         end
