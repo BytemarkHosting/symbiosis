@@ -451,7 +451,7 @@ module Symbiosis
         stat = File.lstat(current_dir)
       rescue Errno::ENOENT
         warn "\t#{current_dir} not found" if $VERBOSE
-        return
+        return nil
       end
 
       while stat.symlink? do
@@ -565,8 +565,8 @@ module Symbiosis
       # To create a symlink with the correct uid/gid when running as root, we
       # need to set our effective UID/GID.
       #
-      Process.egid = @domain.gid if Process.gid == 0
-      Process.euid = @domain.uid if Process.uid == 0
+      Process.egid = self.gid if Process.gid == 0
+      Process.euid = self.uid if Process.uid == 0
 
       File.unlink(current_dir) unless stat.nil?
       File.symlink(latest, current_dir)
