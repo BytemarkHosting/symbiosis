@@ -6,6 +6,7 @@ require 'symbiosis/domain/ssl'
 require 'mocha/test_unit'
 
 class Symbiosis::SSL::Dummy
+  def initialize(domain); end
 end
 
 class SSLTest < Test::Unit::TestCase
@@ -701,7 +702,6 @@ class SSLTest < Test::Unit::TestCase
     #
     # Set up our dummy provider
     #
-    Symbiosis::SSL::Dummy.any_instance.expects(:initialize).with(@domain).returns(true)
     Symbiosis::SSL::Dummy.any_instance.expects(:verify_and_request_certificate!).returns(true)
     Symbiosis::SSL::Dummy.any_instance.expects(:register).returns(true)
     Symbiosis::SSL::Dummy.any_instance.expects(:registered?).returns(false)
