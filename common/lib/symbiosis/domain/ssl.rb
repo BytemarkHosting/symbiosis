@@ -220,14 +220,14 @@ module Symbiosis
       now = Time.now
       certificate_files = certificates.sort_by { |fn, cert|
         score = cert.not_after.to_i
-        score -= not_before.to_i if cert.not_before > now
+        score -= cert.not_before.to_i if cert.not_before > now
         score -= now.to_i if now > cert.not_after
         -score
       }.map { |fn, cert| fn }
 
       [certificate_files, key_files]
     end
-    
+
     #
     # This returns an array of files for the domain that contain valid certificates.
     #
