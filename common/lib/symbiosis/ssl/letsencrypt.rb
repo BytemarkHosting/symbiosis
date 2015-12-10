@@ -53,10 +53,10 @@ module Symbiosis
         # This last path is the default one that gets created.
         #
         if ENV["HOME"]
-          paths << File.join(ENV["HOME"],".symbiosis", "letsencrypt")
+          paths << File.join(ENV["HOME"],".symbiosis", "ssl", "letsencrypt")
         end
         
-        paths << "/etc/symbiosis/config/letsencrypt"
+        paths << "/etc/symbiosis/config/ssl/letsencrypt"
 
         @config_dirs = paths.reject{|p| !File.directory?(p) }
 
