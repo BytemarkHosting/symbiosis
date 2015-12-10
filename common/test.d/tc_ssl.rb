@@ -17,13 +17,13 @@ class SSLTest < Test::Unit::TestCase
     #
     # Create our srv prefix as user 1000, if we're running as root.
     #
-    Process.egid = 1000 if Process.gid = 0
-    Process.euid = 1000 if Process.uid = 0
+    Process.egid = 1000 if Process.gid == 0
+    Process.euid = 1000 if Process.uid == 0
 
     @prefix = Dir.mktmpdir("srv")
 
-    Process.uid = 1000 if Process.uid = 0
-    Process.gid = 1000 if Process.gid = 0
+    Process.euid = 0 if Process.uid == 0
+    Process.egid = 0 if Process.gid == 0
 
     @prefix.freeze
     @domain = Symbiosis::Domain.new(nil, @prefix)
