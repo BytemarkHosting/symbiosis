@@ -47,7 +47,7 @@ module Symbiosis
       def config_dirs
         return @config_dirs if @config_dirs        
 
-        paths = [ File.join(self.domain.config_dir,"letsencrypt") ]
+        paths = [ File.join(self.domain.config_dir, "ssl", "letsencrypt") ]
 
         #
         # This last path is the default one that gets created.
@@ -124,7 +124,7 @@ module Symbiosis
           account_key = OpenSSL::PKey::RSA.new(self.config[:account_key])
         else
           account_key = OpenSSL::PKey::RSA.new(self.rsa_key_size)
-          set_param( "account_key", account_key.to_pem, self.config_dirs.first, :mode => 0600)
+          set_param( "account_key", account_key.to_pem, self.config_dirs.first, :mode => 0600, :uid => @domain.uid, :gid => @domain.gid)
         end
 
         @config[:account_key] = account_key
@@ -206,11 +206,13 @@ module Symbiosis
         authorisation = self.client.authorize(domain: name)
         challenge     = authorisation.http01
 
-        mkdir_p(File.join(self.docroot, File.dirname(challenge.filename)))
+        mkdir_p(File.join(self.docroot, File.dirname(challenge.filename)), 
+          :uid => @domain.uid, :gid => @domain.gid)
 
         set_param(challenge.file_content,
           File.basename(challenge.filename), 
-          File.join(self.docroot, File.dirname(challenge.filename)))
+          File.join(self.docroot, File.dirname(challenge.filename)), 
+          :uid => @domain.uid, :gid => @domain.gid)
 
         if challenge.request_verification
           20.times do
