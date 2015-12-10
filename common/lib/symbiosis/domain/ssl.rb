@@ -26,10 +26,10 @@ module Symbiosis
     # Searches for the domain's SSL certificate using
     # ssl_find_matching_certificate_and_key, and returns the certificate's filename, or
     # nil if nothing could be found.
-    # 
+    #
     def ssl_x509_certificate_file
       @ssl_x509_certificate_file ||= nil
-      
+
       if @ssl_x509_certificate_file.nil?
         @ssl_x509_certificate_file, @ssl_key_file = self.ssl_find_matching_certificate_and_key
       end
@@ -111,7 +111,7 @@ module Symbiosis
     # Add a path with extra SSL certs (for testing).
     #
     def ssl_add_ca_path(path)
-      @ssl_ca_paths ||= [] 
+      @ssl_ca_paths ||= []
 
       @ssl_ca_paths << path if File.directory?(path)
     end
@@ -154,7 +154,7 @@ module Symbiosis
       certificates = []
       key_files = []
 
-      # 
+      #
       # Try a number of permutations
       #
       %w(combined key crt cert pem).each do |ext|
@@ -167,7 +167,7 @@ module Symbiosis
         # If it doesn't exist/is unreadble, return nil.
         #
         next unless contents.is_a?(String)
- 
+
         this_fn = File.join(dir, "ssl.#{ext}")
 
         this_cert = nil
@@ -199,7 +199,7 @@ module Symbiosis
           this_key = nil
         end
 
-        # 
+        #
         # Finally, if we have a key and certificate in one file, check they
         # match, otherwise reject.
         #
@@ -235,7 +235,7 @@ module Symbiosis
       self.ssl_available_files.first
     end
 
-    # 
+    #
     # This returns an array of files for the domain that contain valid keys.
     #
     def ssl_available_key_files
@@ -284,7 +284,7 @@ module Symbiosis
     # * Is the certificate valid for this domain name or any of its aliases
     # * Has the certificate started yet?
     # * Has the certificate expired?
-    # 
+    #
     # If any of these checks fail, a warning is raised.
     #
     # * Does the key match the certificate?
@@ -307,9 +307,9 @@ module Symbiosis
       end
 
       # Check that the certificate is current
-      # 
       #
-      if certificate.not_before > Time.now 
+      #
+      if certificate.not_before > Time.now
         msg = "The certificate for #{self.name} is not valid yet."
         if strict_checking
           raise OpenSSL::X509::CertificateError, msg
@@ -318,7 +318,7 @@ module Symbiosis
         end
       end
 
-      if certificate.not_after < Time.now 
+      if certificate.not_after < Time.now
         msg = "The certificate for #{self.name} has expired."
         if strict_checking
           raise OpenSSL::X509::CertificateError, msg
@@ -333,8 +333,8 @@ module Symbiosis
       unless certificate.check_private_key(key)
         raise OpenSSL::X509::CertificateError, "The certificate's public key does not match the supplied private key for #{self.name}."
       end
-     
-      # 
+
+      #
       # Now check the signature.
       #
       # First see if we can verify it using our own private key, i.e. the
@@ -414,7 +414,7 @@ module Symbiosis
 
     #
     # This fetches the certificate from using ssl_provider_class.  If
-    # ssl_provider_class does not return a suitable Class, nil is returned. 
+    # ssl_provider_class does not return a suitable Class, nil is returned.
     #
     # Returns an hash of
     #
@@ -425,7 +425,7 @@ module Symbiosis
 
       unless ssl_provider_class.is_a?(Class) and
         ssl_provider_class.instance_methods.include?(:verify_and_request_certificate!)
-        return nil 
+        return nil
       end
 
       ssl_provider = ssl_provider_class.new(self)
@@ -440,44 +440,141 @@ module Symbiosis
     end
 
     #
-    # Returns the directory for the ssl provider.
+    # We expect the certificate, key, and bundle in a pattern like
+    # /srv/example.com/config/ssl/set/.
     #
-    def ssl_provider_dir
-      return nil if self.ssl_provider == false
+    def ssl_current_set
+      current_dir = File.join(self.config_dir, "ssl", "current")
+      stat = nil
 
-      File.expand_path(File.join(self.config_dir, self.ssl_provider))
-    end
+      begin
+        stat = File.lstat(current_dir)
+      rescue Errno::ENOENT
+        warn "\t#{current_dir} not found" if $VERBOSE
+        return
+      end
 
-    #
-    # Returns the 
-    #
-    #
-    def ssl_latest_issue
-      issues = []
-
-      Dir.glob(File.join(self.ssl_provider_dir,'*')).each do |cert_dir|
-        next unless File.directory?(cert_dir)
-        this_issue = File.basename(cert_dir)
-
-        unless  (this_cert, this_key = ssl_find_matching_certificate_and_key(cert_dir)).nil?
-          this_store = self.certificate_store(cert_dir)
-
-          #
-          # If this certificate verifies, add it to our list
-          #
-          begin
-            self.ssl_verify(this_cert, this_key, this_store, true)
-          rescue OpenSSL::Error
-            next
-          end
+      while stat.symlink? do
+        parent_dir  = File.dirname(current_dir)
+        current_dir = File.expand_path(File.readlink(current_dir), parent_dir)
+        begin
+          stat = File.lstat(current_dir)
+        rescue Errno::ENOENT
+          break
         end
       end
 
-      return issues.sort.last
+      unless stat.directory?
+        warn "\tUnable to determine current SSL set -- #{current_dir} isn't a directory." if $VERBOSE
+        return nil
+      end
+
+      parent_dir, set = File.split(current_dir)
+      unless parent_dir == File.join(self.config_dir, "ssl")
+        warn "\tTHe current set of certificates (#{current_dir}) are outside the domain's ssl directory. Ignoring." if $VERBOSE
+        return nil
+      end
+
+      set
     end
 
+    #
+    # Returns the directory
+    #
+    def ssl_available_sets
+      sets = []
+
+      Dir.glob(File.join(self.config_dir, 'ssl' ,'*')).each do |cert_dir|
+
+        #
+        # Not interested in files etc.
+        #
+        next unless File.directory?(cert_dir)
+
+
+        this_set = File.basename(cert_dir)
+
+        #
+        # Always miss out the "current" set
+        #
+        next if this_set == "current"
+
+        #
+        # If a matching key/cert pair cannot be found, move on.
+        #
+        next if (this_cert, this_key = ssl_find_matching_certificate_and_key(cert_dir)).nil?
+
+        begin
+          this_cert  = OpenSSL::X509::Certificate.new(get_param(File.basename(this_cert), cert_dir))
+          this_key   = OpenSSL::PKey::RSA.new(get_param(File.basename(this_key), cert_dir))
+          this_store = self.ssl_certificate_store(cert_dir)
+        rescue OpenSSL::OpenSSLError => err
+          warn "\t#{err.to_s}" if $VERBOSE
+          next
+        end
+
+        #
+        # If this certificate verifies, add it to our list
+        #
+        begin
+          self.ssl_verify(this_cert, this_key, this_store, true)
+        rescue OpenSSL::OpenSSLError => err
+          warn "\t#{err.to_s}" if $VERBOSE
+          next
+        end
+
+        sets << this_set
+      end
+
+      return sets.sort
+    end
+
+    #
+    # This method symlinks /srv/example.com/config/ssl/current to the latest
+    # set of certificates discovered by #ssl_available_sets. This returns true
+    # if a rollover was performed, or false otherwise.
+    #
     def ssl_rollover
-      
+      current = self.ssl_current_set
+      latest  = self.ssl_available_sets.last
+
+      if latest.nil?
+        warn "\tNo valid sets of certificates found." if $VERBOSE
+        return false
+      end
+
+      #
+      # If the current certificate is current, do nothing.
+      #
+      return false if current == latest
+
+      current_dir = File.join(self.config_dir, "ssl", "current")
+
+      begin
+        stat = File.lstat(current_dir)
+      rescue Errno::ENOENT
+        stat = nil
+      end
+
+      unless stat.nil? or stat.symlink?
+        warn "\t#{current_dir} is not a symlink.  Unwilling to roll over." if $VERBOSE
+        return false
+      end
+
+      #
+      # To create a symlink with the correct uid/gid when running as root, we
+      # need to set our effective UID/GID.
+      #
+      Process.egid = @domain.gid if Process.gid == 0
+      Process.euid = @domain.uid if Process.uid == 0
+
+      File.unlink(current_dir) unless stat.nil?
+      File.symlink(latest, current_dir)
+
+      Process.euid = 0 if Process.uid == 0
+      Process.egid = 0 if Process.gid == 0
+
+      return true
     end
 
   end
