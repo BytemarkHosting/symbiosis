@@ -28,19 +28,11 @@ class SSLSelfSignedTest < Test::Unit::TestCase
     end
   end
 
-  #####
-  #
-  # Helper methods
-  #
-  #####
-  
-
   ####
   #
   # Tests start here.
   #
   #####
-
 
   def test_request
     omit unless @client
@@ -71,19 +63,17 @@ class SSLSelfSignedTest < Test::Unit::TestCase
   end  
 
   def test_key
-    omit unless @client
     assert_kind_of(OpenSSL::PKey::PKey, @client.key)
     assert_kind_of(OpenSSL::PKey::RSA,  @client.rsa_key)
   end
 
   def test_certificate
-    omit unless @client
     assert_kind_of(OpenSSL::X509::Certificate, @client.certificate)
-    assert(@domain.ssl_verify(@client.certificate, @client.key, nil, true))
-  end
 
-  def test_domain_ssl_from_letsencrypt
-   #    @domain.ssl_from_letsencrypt(@endpoint)
+    #
+    # Make sure our new certificate is valid
+    #
+    assert(@domain.ssl_verify(@client.certificate, @client.key, nil, true))
   end
 
 end
