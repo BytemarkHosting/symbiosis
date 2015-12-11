@@ -1,35 +1,29 @@
 require 'symbiosis/ssl'
+require 'symbiosis/ssl/selfsigned'
 require 'symbiosis/domain'
 require 'symbiosis/domain/ssl'
+require 'symbiosis/host'
+require 'symbiosis/utils'
+require 'time'
+require 'acme-client'
+
 begin
   require 'symbiosis/domain/http'
 rescue LoadError
    # Do nothing
 end
 
-require 'symbiosis/host'
-require 'symbiosis/utils'
-require 'time'
-require 'acme-client'
-
-
 module Symbiosis
 
   class SSL
 
-    class LetsEncrypt
-
-      include Symbiosis::Utils
+    class LetsEncrypt < Symbiosis::SSL::SelfSigned
 
       ENDPOINT = "https://acme-v01.api.letsencrypt.org/directory"
 
-      attr_reader :config, :domain
-
       def initialize(domain)
-        @domain = domain
-        @prefix = domain.prefix
-        @names  = ([domain.name] + domain.aliases).uniq
-        @config = {}
+        super
+        @config = {:email => nil, :server => nil, :rsa_key_size => nil, :docroot => nil, :account_key => nil}
       end
 
       #
@@ -37,80 +31,6 @@ module Symbiosis
       #
       def client
         @client ||= Acme::Client.new(private_key: self.account_key, endpoint: self.endpoint)
-      end
-
-      #
-      # This returns a list of configuration directories.
-      #
-      # TODO: This is probably a site-wide thing.
-      #
-      def config_dirs
-        return @config_dirs if @config_dirs        
-
-        paths = [ File.join(self.domain.config_dir, "ssl", "letsencrypt") ]
-
-        #
-        # This last path is the default one that gets created.
-        #
-        if ENV["HOME"]
-          paths << File.join(ENV["HOME"],".symbiosis", "ssl", "letsencrypt")
-        end
-        
-        paths << "/etc/symbiosis/config/ssl/letsencrypt"
-
-        @config_dirs = paths.reject{|p| !File.directory?(p) }
-
-        if @config_dirs.empty?
-          mkdir_p(paths.first, {:uid => self.domain.uid, :gid => self.domain.gid})
-          @config_dirs << paths.first
-        end
-
-        @config_dirs
-      end
-
-      def config_dir
-        File.join(self.config_dirs.first, self.domain.name)
-      end
-
-      #
-      # Reads and returns the LetsEncrypt configuration
-      #
-      def config
-        return @config unless @config.empty?
-
-        @config = {:email => nil, :server => nil, :rsa_key_size => nil, :docroot => nil, :account_key => nil}
-
-        @config.each do |param, value|
-          @config[param] = get_param_with_dir_stack(param.to_s, self.config_dirs)
-        end
-
-        @config
-      end
-
-      #
-      # This returns the rsa_key_size.  Defaults to 2048.
-      #
-      def rsa_key_size
-        return @config[:rsa_key_size] if @config[:rsa_key_size].is_a?(Integer) and @config[:rsa_key_size] >= 2048
-
-        rsa_key_size = nil
-
-        if self.config[:rsa_key_size].is_a?(String)
-          begin
-            rsa_key_size = Integer(self.config[:rsa_key_size])
-          rescue ArgumentError
-            # do nothing, but maybe we should warn.
-          end
-        end
- 
-        #
-        # Default to 2048
-        # 
-        if !rsa_key_size.is_a?(Integer) or rsa_key_size <= 2048
-          rsa_key_size = 2048 
-        end
-
-        @config[:rsa_key_size] = rsa_key_size
       end
 
       #
@@ -124,7 +44,7 @@ module Symbiosis
           account_key = OpenSSL::PKey::RSA.new(self.config[:account_key])
         else
           account_key = OpenSSL::PKey::RSA.new(self.rsa_key_size)
-          set_param( "account_key", account_key.to_pem, self.config_dirs.first, :mode => 0600, :uid => @domain.uid, :gid => @domain.gid)
+          set_param( "account_key", account_key.to_pem, self.config_dirs.first, :mode => 0600)
         end
 
         @config[:account_key] = account_key
@@ -186,17 +106,6 @@ module Symbiosis
       alias :registered? :register
 
       #
-      # Verifies all the names for a domain 
-      #
-      def verify(names = @names)
-        names.map do |name|
-          self.verify_name(name)
-        end.all?
-      end
-
-      alias :verified? :verify
-
-      #
       # This does the authorization.  Returns true if the verification succeeds.
       #
       def verify_name(name)
@@ -206,13 +115,11 @@ module Symbiosis
         authorisation = self.client.authorize(domain: name)
         challenge     = authorisation.http01
 
-        mkdir_p(File.join(self.docroot, File.dirname(challenge.filename)), 
-          :uid => @domain.uid, :gid => @domain.gid)
+        mkdir_p(File.join(self.docroot, File.dirname(challenge.filename)))
 
         set_param(challenge.file_content,
           File.basename(challenge.filename), 
-          File.join(self.docroot, File.dirname(challenge.filename)), 
-          :uid => @domain.uid, :gid => @domain.gid)
+          File.join(self.docroot, File.dirname(challenge.filename)))
 
         if challenge.request_verification
           20.times do
@@ -226,85 +133,18 @@ module Symbiosis
         end
       end
 
-      def rsa_key
-        return @rsa_key if @rsa_key.is_a?(OpenSSL::PKey::RSA)
-
-        #
-        # Generate our expire our request, and generate the key.
-        #
-        @request     = nil
-        @rsa_key = OpenSSL::PKey::RSA.new(self.rsa_key_size)
-      end
-
-      alias :key :rsa_key
-
-      def request(key = self.key, verify_names = true)
-        return @request if @request.is_a?(OpenSSL::X509::Request)
-
-        @acme_certificate = nil
-
-        #
-        # Here's the request.
-        #
-        request = OpenSSL::X509::Request.new
-        request.public_key = key.public_key
-
-        # 
-        # Stick the domain name in
-        #
-        request.subject = OpenSSL::X509::Name.new([
-          ['CN', self.domain.name, OpenSSL::ASN1::UTF8STRING]
-        ])
-
-        #
-        # Add in our X509v3 extensions.
-        #
-        exts = []
-        ef = OpenSSL::X509::ExtensionFactory.new
-
-        #
-        # OK here we want to verify each domain before adding them to the cert
-        #
-        if verify_names
-          names = @names.reject{|name| !self.verify_name(name)} 
-        else
-          names = @names
-        end
-
-        #
-        # Use the subjectAltName if one has been given.  This is for SNI, i.e. SSL
-        # name-based virtual hosting (ish).
-        #
-        exts << ef.create_extension(
-             "subjectAltName", 
-             names.collect{|a| "DNS:#{a}" }.join(","),
-             false
-        )
-
-        #
-        # Wrap our extension in a Set and Sequence
-        #
-        attrval = OpenSSL::ASN1::Set([OpenSSL::ASN1::Sequence(exts)])
-        request.add_attribute(OpenSSL::X509::Attribute.new("extReq", attrval))
-        request.sign(key, OpenSSL::Digest::SHA256.new)
-
-        @request = request 
-      end
-
-      alias :verify_and_request_certificate! :request
-
       def acme_certificate(request = self.request)
-        return @acme_certificate if @acme_certificate.is_a?(Acme::Certificate)
+        return @certificate if @certificate.is_a?(Acme::Certificate)
 
         acme_certificate = client.new_certificate(request)
 
         if acme_certificate.is_a?(Acme::Certificate)
-          @acme_certificate = acme_certificate 
+          @certificate = acme_certificate 
         else
-          @acme_certificate = nil
+          @certificate = nil
         end
 
-        @acme_certificate
+        @certificate
       end
 
       #
@@ -317,7 +157,6 @@ module Symbiosis
           nil
         end
       end
-
 
       #
       # Returns the CA bundle as an array
