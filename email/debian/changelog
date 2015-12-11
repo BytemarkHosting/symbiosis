@@ -1,3 +1,11 @@
+symbiosis-email (2015:1211) stable; urgency=medium
+
+  * Removed useless test files from /etc/symbiosis/test.d/exim4_acl_tests.
+  * Home direcotory now set for the vhost_vacation router in Exim.
+  * Updated usage of get_param to match new spec in symbiosis-common.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 11 Dec 2015 10:16:09 +0000
+
 symbiosis-email (2015:1118) stable; urgency=medium
 
   * Updated the interface expansion in the remote_smtp transports to work.  It
