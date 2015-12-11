@@ -16,12 +16,19 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     omit "acme-client requires ruby > 2.0"  unless defined? Symbiosis::SSL::LetsEncrypt
     WebMock.disable_net_connect!
 
+    Process.egid = 1000 if Process.gid == 0
+    Process.euid = 1000 if Process.uid == 0
+
     @prefix = Dir.mktmpdir("srv")
+
+    Process.euid = 0 if Process.uid == 0
+    Process.egid = 0 if Process.gid == 0
+
     @prefix.freeze
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
-    
-    @endpoint = "https://imaginary.test.endpoint:443" 
+
+    @endpoint = "https://imaginary.test.endpoint:443"
     @http01_challenge =  {} # This is where we store our challenges
     @authz_template = Addressable::Template.new "#{@endpoint}/acme/authz/{sekrit}/0"
 
@@ -34,7 +41,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     stub_request(:post, @authz_template).to_return{|r| do_post_authz(r)}
     stub_request(:get,  @authz_template).to_return{|r| do_get_authz(r)}
     stub_request(:post, "#{@endpoint}/acme/new-cert").to_return{|r| do_post_new_cert(r)}
-    stub_request(:get,  "#{@endpoint}/bundle").to_return{|r| do_get_bundle(r)} 
+    stub_request(:get,  "#{@endpoint}/bundle").to_return{|r| do_get_bundle(r)}
 
 
     @client = Symbiosis::SSL::LetsEncrypt.new(@domain)
@@ -54,7 +61,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
   # Helper methods
   #
   #####
-  
+
   def setup_root_ca
     #
     # Our root CA.
@@ -71,9 +78,9 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
   end
 
   def do_post_new_reg(request)
-    {:status => 201, 
+    {:status => 201,
       :headers => {
-        "Location" => "#{@endpoint}/acme/reg/asdf", 
+        "Location" => "#{@endpoint}/acme/reg/asdf",
         "Link" => "<#{@endpoint}/acme/new-authz>;rel=\"next\",<#{@endpoint}/acme/terms>;rel=\"terms-of-service\""
       }
     }
@@ -87,7 +94,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     @http01_challenge[sekrit] = {
       "type" => "http-01",
       "uri" => "#{@endpoint}/acme/authz/#{sekrit}/0",
-      "token" => Symbiosis::Utils.random_string(20) 
+      "token" => Symbiosis::Utils.random_string(20)
     }
 
     response_payload = {
@@ -209,7 +216,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     ext_req.value.first.value.each do |ext|
       extensions << OpenSSL::X509::Extension.new(ext)
     end
-    
+
     san_ext = extensions.find{|e| "subjectAltName" == e.oid}
 
     assert_kind_of(OpenSSL::X509::Extension, san_ext, "subjectAltName missing from CSR")
@@ -219,7 +226,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
     assert((san_domains - expected_domains).empty?, "Extra domains were found in subjectAltName in the request: " + (san_domains - expected_domains).join(", ") )
     assert((expected_domains - san_domains).empty?, "Domains were missing from subjectAltName in the request: " + (expected_domains - san_domains).join(", ") )
-  end  
+  end
 
   def test_key
     omit unless @client
@@ -230,10 +237,6 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
   def test_acme_certificate
     omit unless @client
     assert_kind_of(Acme::Certificate, @client.acme_certificate)
-  end
-
-  def test_domain_ssl_from_letsencrypt
-   #    @domain.ssl_from_letsencrypt(@endpoint)
   end
 
 end
