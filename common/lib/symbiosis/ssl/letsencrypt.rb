@@ -121,8 +121,8 @@ module Symbiosis
 
         mkdir_p(File.join(self.docroot, File.dirname(challenge.filename)))
 
-        set_param(challenge.file_content,
-          File.basename(challenge.filename), 
+        set_param(File.basename(challenge.filename),
+          challenge.file_content,
           File.join(self.docroot, File.dirname(challenge.filename)))
 
         if challenge.request_verification
