@@ -93,7 +93,7 @@ module Symbiosis
     end
 
     def ssl_find_matching_certificate_and_key
-      return [] unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
       self.ssl_current_set.find_matching_certificate_and_key
     end
 
