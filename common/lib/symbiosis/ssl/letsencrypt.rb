@@ -23,7 +23,7 @@ module Symbiosis
 
       def initialize(domain)
         super
-        @config = {:email => nil, :server => nil, :rsa_key_size => nil, :docroot => nil, :account_key => nil}
+        @config = {:email => nil, :server => nil, :endpoint => nil, :rsa_key_size => nil, :docroot => nil, :account_key => nil}
       end
 
       #
