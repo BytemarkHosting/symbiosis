@@ -115,7 +115,17 @@ module Symbiosis
     def ssl_provider
       provider = get_param("ssl-provider", self.config_dir)
 
-      return provider unless provider.is_a?(String)
+      return false if false == provider
+
+      if provider.nil?
+        if defined? Symbiosis::SSL::LetsEncrypt
+          provider = "letsencrypt"
+        else Symbiosis::SSL::PROVIDERS.first.to_s =~ /.*::([^:]+)$/
+          provider = $1.downcase
+        end
+      end
+
+      return false unless provider.is_a?(String)
 
       unless provider =~ /^[a-z0-9_]+$/
         warn "\tBad ssl-provider for #{self.name}" if $VERBOSE
