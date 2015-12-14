@@ -730,6 +730,13 @@ class SSLTest < Test::Unit::TestCase
     current = File.join(@domain.config_dir, "ssl", "c")
     Symbiosis::Utils.mkdir_p(current)
 
+    #
+    # We need to write out a key+cert for the set to be valid
+    #
+    key, crt = do_generate_key_and_crt(@domain.name)
+    Symbiosis::Utils.set_param("ssl.key", key, current)
+    Symbiosis::Utils.set_param("ssl.crt", crt, current)
+
     FileUtils.ln_sf(current, File.join(@domain.config_dir, "ssl", "b"))
     FileUtils.ln_sf("b", File.join(@domain.config_dir, "ssl", "current"))
 
