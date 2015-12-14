@@ -28,6 +28,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
 
+    @registered_keys = []
+
     @endpoint = "https://imaginary.test.endpoint:443"
     @http01_challenge =  {} # This is where we store our challenges
     @authz_template = Addressable::Template.new "#{@endpoint}/acme/authz/{sekrit}/0"
@@ -78,12 +80,27 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
   end
 
   def do_post_new_reg(request)
-    {:status => 201,
-      :headers => {
-        "Location" => "#{@endpoint}/acme/reg/asdf",
-        "Link" => "<#{@endpoint}/acme/new-authz>;rel=\"next\",<#{@endpoint}/acme/terms>;rel=\"terms-of-service\""
+    req     = JSON.load(request.body)
+    protect = JSON.load(UrlSafeBase64.decode64(req["protected"]))
+    key     = protect["jwk"]["n"]
+
+    if @registered_keys.include?(key)
+      {:status => 409,
+        :headers => {
+          "Location" => "#{@endpoint}/acme/reg/asdf",
+          "Content-Type"=>"application/problem+json",
+        },
+        :body => "{\"type\":\"urn:acme:error:malformed\",\"detail\":\"Registration key is already in use\",\"status\":409}",
       }
-    }
+    else
+      @registered_keys << key
+      {:status => 201,
+        :headers => {
+          "Location" => "#{@endpoint}/acme/reg/asdf",
+          "Link" => "<#{@endpoint}/acme/new-authz>;rel=\"next\",<#{@endpoint}/acme/terms>;rel=\"terms-of-service\""
+        }
+      }
+    end
   end
 
   def do_post_new_authz(request)
@@ -188,8 +205,10 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     omit unless @client
     result = nil
     result = @client.register
-
     assert(result, "#register should return true")
+    
+    result = @client.register
+    assert(result, "#register should return true, even on the second attempt")
   end
 
   def test_verify
