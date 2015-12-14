@@ -28,6 +28,7 @@ module Symbiosis
         @prefix = domain.prefix
         @names  = ([domain.name] + domain.aliases).uniq
         @config = {:rsa_key_size => nil, :lifetime => nil}
+        @rsa_key = nil
       end
 
       #
