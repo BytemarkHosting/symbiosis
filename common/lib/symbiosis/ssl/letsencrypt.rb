@@ -47,12 +47,13 @@ module Symbiosis
           set_param( "account_key", account_key.to_pem, self.config_dirs.first, :mode => 0600)
         end
 
+
         @config[:account_key] = account_key
       end
 
       #
       # Returns the document root for the HTTP01 challenge
-      # 
+      #
       def docroot
         return self.config[:docroot] if self.config[:docroot].is_a?(String) and File.directory?(self.config[:docroot])
 
@@ -95,12 +96,15 @@ module Symbiosis
         #
         registration = self.client.register(contact: 'mailto:'+self.email)
 
-        # 
+        #
         # Should probably check we accept the terms.
         #
         registration.agree_terms
 
-        true
+        return true
+      rescue Acme::Error::Malformed => err
+        warn "\t#{err.to_s} (when registering)" if $VERBOSE
+        return true
       end
 
       alias :registered? :register
@@ -109,7 +113,7 @@ module Symbiosis
       # This does the authorization.  Returns true if the verification succeeds.
       #
       def verify_name(name)
-        # 
+        #
         # Set up the authorisation for the http01 challenge
         #
         authorisation = self.client.authorize(domain: name)
@@ -139,7 +143,7 @@ module Symbiosis
         acme_certificate = client.new_certificate(request)
 
         if acme_certificate.is_a?(Acme::Certificate)
-          @certificate = acme_certificate 
+          @certificate = acme_certificate
         else
           @certificate = nil
         end
@@ -176,5 +180,4 @@ module Symbiosis
   end
 
 end
-
 
