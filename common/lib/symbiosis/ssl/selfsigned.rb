@@ -29,6 +29,7 @@ module Symbiosis
         @names  = ([domain.name] + domain.aliases).uniq
         @config = {:rsa_key_size => nil, :lifetime => nil}
         @rsa_key = nil
+        @config_dirs = []
       end
 
       #
@@ -37,18 +38,20 @@ module Symbiosis
       # TODO: This is probably a site-wide thing.
       #
       def config_dirs
-        return @config_dirs if @config_dirs
+        return @config_dirs unless @config_dirs.empty?
 
-        paths = [ File.join(self.domain.config_dir, "ssl", "selfsigned") ]
+        provider = self.class.to_s.split("::").last.downcase
+
+        paths = [ File.join(self.domain.config_dir, "ssl", provider) ]
 
         #
         # This last path is the default one that gets created.
         #
         if ENV["HOME"]
-          paths << File.join(ENV["HOME"],".symbiosis", "ssl", "selfsigned")
+          paths << File.join(ENV["HOME"],".symbiosis", "ssl", provider)
         end
 
-        paths << "/etc/symbiosis/config/ssl/selfsigned"
+        paths << "/etc/symbiosis/config/ssl/#{provider}"
 
         @config_dirs = paths.reject{|p| !File.directory?(p) }
 
@@ -138,8 +141,11 @@ module Symbiosis
 
       alias :key :rsa_key
 
+      def register; true ; end
+      def registered?; true ; end
+
       #
-      # Verifies all the names for a domain 
+      # Verifies all the names for a domain
       #
       def verify(names = @names)
         names.map do |name|
@@ -184,7 +190,7 @@ module Symbiosis
         names = ([self.domain.name] + self.domain.aliases).uniq
 
         if verify_names
-          names = @names.reject{|name| !self.verify_name(name)} 
+          names = @names.reject{|name| !self.verify_name(name)}
         else
           names = @names
         end

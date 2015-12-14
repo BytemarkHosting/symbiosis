@@ -1,0 +1,145 @@
+#!/usr/bin/ruby
+# 
+# NAME
+#
+#   symbiosis-ssl - Manage and generate SSL certificates 
+#
+# SYNOPSIS
+#
+#   symbiosis-ssl [ --no-generate ] [ --no-rollover ] [ --verbose ] [ --manual ]
+#     [ --help ] [ DOMAIN DOMAIN ...]
+#
+# OPTIONS
+#
+#  --no-generate    Do not try and generate keys or certificates.
+#
+#  --no-rollover    Do not try and generate keys or certificates.
+#
+#  --prefix PREFIX  Set the directory prefix for Symbiosis.  Defaults to /srv.
+#
+#   --help        Show the help information for this script.
+#
+#   --manual      Show the manual for this script
+#
+#   --verbose     Show debugging information.
+#
+# AUTHOR
+#
+#   Patrick J. Cherry <patrick@bytemark.co.uk>
+#
+
+#
+#  Modules we require
+#
+
+require 'getoptlong'
+
+opts = GetoptLong.new(
+    [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+    [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
+    [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+    [ '--no-generate', '-G', GetoptLong::NO_ARGUMENT ],
+    [ '--no-rollover', '-R', GetoptLong::NO_ARGUMENT ],
+    [ '--prefix', '-p', GetoptLong::REQUIRED_ARGUMENT ]
+)
+
+manual = help = false
+$VERBOSE = false
+prefix = nil
+provider = "letsencrypt"
+
+opts.each do |opt,arg|
+  case opt
+    when '--help'
+      help = true
+    when '--manual'
+      manual = true
+    when '--verbose'
+      $VERBOSE = true
+  end
+end
+
+#
+# Output help as required.
+#
+if help or manual
+  require 'symbiosis/utils'
+  Symbiosis::Utils.show_help(__FILE__) if help
+  Symbiosis::Utils.show_manual(__FILE__) if manual
+  exit 0
+end
+
+require 'symbiosis/domain/ssl'
+require 'symbiosis/ssl'
+
+domains = []
+
+ARGV.each do |arg|
+  domain = Symbiosis::Domains.find(arg.to_s, prefix)
+
+  if domain.nil?
+    warn "** Unable to find/parse domain #{arg.inspect}" 
+    next
+  end
+
+  domains << domain
+end
+
+if ARGV.empty?
+  domains = Symbiosis::Domains.all(prefix)
+end
+
+now = Time.now
+threshold = 14
+
+domains.each do |domain|
+  puts "* Examining certificates for #{domain.name}" if $VERBOSE
+
+
+  #
+  # Stage 0: verify and check expiriy
+  #
+  cert_fn, key_fn = domain.ssl_find_matching_certificate_and_key
+  expires_in = nil
+
+  if cert_fn and key_fn
+    domain.ssl_verify(cert_fn, key_fn)
+
+    expires_in = ((domain.ssl_certificate.not_after - now)/86400.0).round
+    if expires_in < 14
+      puts "\t* The certificate is due to expire in #{expires_in} days"
+    end
+
+  else
+    puts "\t* No valid certificates found."
+  end
+
+  #
+  # Stage 1: Generate
+  #
+  if false == domain.ssl_provider
+    puts "\t * Skipping because the ssl-provider has been set to false."
+  elsif (expires_in.is_a?(Integer) and expires_in < threshold) or cert_fn.nil?
+    #
+    # Default to letsencrypt
+    #
+    domain.ssl_provider = "letsencrypt" if domain.ssl_provider.nil?
+
+    puts "\t * Fetching a new certificate from #{domain.ssl_provider}."
+
+    set = domain.ssl_fetch_certificate
+    domain.ssl_write_set(set)
+
+  end
+
+
+  #
+  # Stage 2: Roll over
+  #
+  domain.ssl_rollover
+
+  
+end
+
+
+

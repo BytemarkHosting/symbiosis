@@ -675,11 +675,11 @@ class SSLTest < Test::Unit::TestCase
     end
   end
 
-  def test_ssl_fetch_certificate
-    assert_equal(nil, @domain.ssl_fetch_certificate, "#ssl_fetch_certificate should return nil if no providers available")
+  def test_ssl_fetch_new_certificate
+    assert_equal(nil, @domain.ssl_fetch_new_certificate, "#ssl_fetch_new_certificate should return nil if no providers available")
 
     Symbiosis::SSL::PROVIDERS << Symbiosis::SSL::Dummy
-    assert_equal(nil, @domain.ssl_fetch_certificate, "#ssl_fetch_certificate should return nil if the provider does not look compatible")
+    assert_equal(nil, @domain.ssl_fetch_new_certificate, "#ssl_fetch_new_certificate should return nil if the provider does not look compatible")
 
     #
     # Use our intermediate CA, and generate and sign the certificate
@@ -699,10 +699,31 @@ class SSLTest < Test::Unit::TestCase
     Symbiosis::SSL::Dummy.any_instance.expects(:registered?).returns(false)
     Symbiosis::SSL::Dummy.any_instance.expects(:key).returns(key)
     Symbiosis::SSL::Dummy.any_instance.expects(:certificate).returns(cert)
-    Symbiosis::SSL::Dummy.any_instance.expects(:bundle).returns(ca_cert)
+    Symbiosis::SSL::Dummy.any_instance.expects(:bundle).returns([ca_cert])
     Symbiosis::SSL::Dummy.any_instance.expects(:request).returns(request)
 
-    assert_equal({:bundle => ca_cert, :key => key, :certificate => cert, :request => request}, @domain.ssl_fetch_certificate)
+    set = @domain.ssl_fetch_new_certificate
+
+    assert_equal({:bundle => [ca_cert], :key => key, :certificate => cert, :request => request}, set)
+
+    #
+    # Now write our set out.
+    #
+    dir = @domain.ssl_write_set(set)
+    expected_dir = File.join(@prefix, @domain.name, "config", "ssl", "0")
+    assert_equal(File.join(@prefix, @domain.name, "config", "ssl", "0"), dir)
+
+    #
+    # make sure everything verifies OK, both as key, crt, bundle, and combined.
+    #
+    [ %w(key crt bundle), %w(combined)*3 ].each do |exts|
+      key = OpenSSL::PKey::RSA.new(File.read(File.join(dir, "ssl.#{exts[0]}")))
+      cert = OpenSSL::X509::Certificate.new(File.read(File.join(dir, "ssl.#{exts[1]}")))
+      store = OpenSSL::X509::Store.new
+      store.add_file(File.join(dir, "ssl.#{exts[2]}"))
+      assert(@domain.ssl_verify(cert, key, store))
+    end
+
   end
 
   def test_ssl_current_set
@@ -715,7 +736,7 @@ class SSLTest < Test::Unit::TestCase
     assert_equal("b", File.readlink(File.join(@domain.config_dir, "ssl", "current")))
     assert_equal(current, File.readlink(File.join(@domain.config_dir, "ssl", "b")))
 
-    assert_equal("c",@domain.ssl_current_set)
+    assert_equal("c",@domain.ssl_current_set.name)
   end
 
   def test_ssl_latest_set_and_rollover
@@ -756,10 +777,10 @@ class SSLTest < Test::Unit::TestCase
     available_sets = @domain.ssl_available_sets
 
     assert(!available_sets.include?("current"), "The avaialble sets should not include the 'current' symlink")
-    missing_sets = (%w(1 2) - available_sets)
+    missing_sets = (%w(1 2) - available_sets.map(&:name))
     assert(missing_sets.empty?, "Some sets were missing: #{missing_sets.join(", ")}")
 
-    extra_sets = (available_sets - %w(1 2))
+    extra_sets = (available_sets.map(&:name) - %w(1 2))
     assert(extra_sets.empty?, "Extra sets were returned: #{extra_sets.join(", ")}")
 
     #
