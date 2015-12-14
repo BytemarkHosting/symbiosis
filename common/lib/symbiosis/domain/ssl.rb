@@ -98,7 +98,12 @@ module Symbiosis
     end
 
     def ssl_verify(*args)
-      self.ssl_current_set.verify(*args)
+      if self.ssl_current_set.nil?
+        set = Symbiosis::SSL::Set.new(self, self.config_dir)
+        set.verify(*args)
+      else
+        self.ssl_current_set.verify(*args)
+      end
     end
 
     #
