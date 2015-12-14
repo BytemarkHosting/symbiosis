@@ -126,8 +126,9 @@ module Symbiosis
           File.join(self.docroot, File.dirname(challenge.filename)))
 
         if challenge.request_verification
-          20.times do
-            sleep(0.5)
+          puts "\tRequesting verification for #{name} from #{endpoint}" if $VERBOSE
+          60.times do
+            sleep(1)
             break if challenge.verify_status == "valid"
           end
 
