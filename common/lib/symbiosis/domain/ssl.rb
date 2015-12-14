@@ -110,15 +110,7 @@ module Symbiosis
     def ssl_provider
       provider = get_param("ssl-provider", self.config_dir)
 
-      return false if false == provider
-
-      if provider.nil?
-        if Symbiosis::SSL::PROVIDERS.first.to_s =~ /.*::([^:]+)$/
-          provider = $1.downcase
-        end
-      end
-
-      return false unless provider.is_a?(String)
+      return provider unless provider.is_a?(String)
 
       unless provider =~ /^[a-z0-9_]+$/
         warn "\tBad ssl-provider for #{self.name}" if $VERBOSE
@@ -126,6 +118,16 @@ module Symbiosis
       end
 
       provider.chomp
+    end
+
+    def ssl_provider=(provider)
+
+      unless provider =~ /^[a-z0-9_]+$/
+        warn "\tBad ssl-provider for #{self.name}" if $VERBOSE
+        return nil 
+      end
+
+      set_param("ssl-provider", provider, self.config_dir)
     end
 
     #
@@ -141,8 +143,6 @@ module Symbiosis
 
       if provider_name.is_a?(String)
         provider = Symbiosis::SSL::PROVIDERS.find{|k| k.to_s =~ /::#{provider_name}$/i}
-      else
-        provider = Symbiosis::SSL::PROVIDERS.first
       end
 
       provider
@@ -211,6 +211,11 @@ module Symbiosis
 
       Process.euid = 0 if Process.uid == 0
       Process.egid = 0 if Process.gid == 0
+      
+      #
+      # Clear the cache of what is available
+      #
+      @ssl_available_sets = nil
 
       return next_set_dir
     end
@@ -241,46 +246,53 @@ module Symbiosis
         end
       end
 
-      this_set = nil
-      begin
-        this_set = Symbiosis::SSL::Set.new(self, current_dir)
-      rescue StandardError => err
-        warn "\t#{err.to_s} -- ignoring SSL set in #{current_dir} for #{self.name}" if $VERBOSE
-        return self.ssl_legacy_set
+      this_set = self.ssl_available_sets.find{|s| s.directory == current_dir}
+
+      if this_set.nil?
+        begin
+          this_set = Symbiosis::SSL::Set.new(self, current_dir)
+          this_set = nil unless this_set.verify
+	rescue Errno::ENOENT, Errno::ENODIR
+	  # do nothing
+          this_set = nil
+        rescue StandardError => err
+          this_set = nil
+          warn "\t#{err.to_s} -- ignoring SSL set in #{current_dir} for #{self.name}" if $VERBOSE
+        end
       end
       
-      begin
-        this_set.verify(this_set.certificate, this_set.key, this_set.certificate_store, true)
-      rescue OpenSSL::OpenSSLError => err
-        warn "\tUnable to verfity set in #{current_dir} for #{self.name}" if $VERBOSE
-        return self.ssl_legacy_set
+      this_set = self.ssl_legacy_set if this_set.nil?
+
+      if this_set.is_a?(Symbiosis::SSL::Set)
+        puts "\tCurrent set is #{this_set.name}" if $VERBOSE
       end
 
-      return self.ssl_legacy_set if this_set.nil?
-
-      this_set
+      @ssl_current_set = this_set
     end
 
     def ssl_legacy_set
       this_set = Symbiosis::SSL::Set.new(self, self.config_dir)
 
-      this_set.verify(this_set.certificate, this_set.key, this_set.certificate_store, true)
+      this_set = nil unless this_set.verify
 
       this_set
-    rescue OpenSSL::OpenSSLError => err
-      warn "\t#{err.to_s}" if $VERBOSE
-      nil
     end
 
     #
     # Returns the directory
     #
     def ssl_available_sets
-      sets = []
+      @ssl_available_sets ||= []
 
-      Dir.glob(File.join(self.config_dir, 'ssl' ,'*')).each do |cert_dir|
+      return @ssl_available_sets unless @ssl_available_sets.empty?
 
-        this_set = Symbiosis::SSL::Set.new(self, cert_dir)
+      Dir.glob(File.join(self.config_dir, 'ssl' ,'*')).sort.each do |cert_dir|
+
+	begin
+          this_set = Symbiosis::SSL::Set.new(self, cert_dir)
+        rescue Errno::ENOENT, Errno::ENOTDIR
+          next
+        end
 
         #
         # Always miss out the "current" set
@@ -290,17 +302,12 @@ module Symbiosis
         #
         # If this certificate verifies, add it to our list
         #
-        begin
-          this_set.verify(this_set.certificate, this_set.key, this_set.certificate_store, true)
-        rescue OpenSSL::OpenSSLError => err
-          warn "\t#{err.to_s}" if $VERBOSE
-          next
-        end
+        next unless this_set.verify
 
-        sets << this_set
+        @ssl_available_sets << this_set
       end
 
-      return sets.sort
+      return @ssl_available_sets.sort!
     end
 
     #
@@ -310,7 +317,7 @@ module Symbiosis
     #
     def ssl_rollover
       current = self.ssl_current_set
-      latest  = self.ssl_available_sets.last
+      latest  = self.ssl_available_sets.sort.last
 
       if latest.nil?
         warn "\tNo valid sets of certificates found." if $VERBOSE
@@ -320,7 +327,7 @@ module Symbiosis
       #
       # If the current certificate is current, do nothing.
       #
-      return false if current.name == latest.name
+      return false if current and current.name == latest.name
 
       current_dir = File.join(self.config_dir, "ssl", "current")
 
@@ -347,6 +354,11 @@ module Symbiosis
 
       Process.euid = 0 if Process.uid == 0
       Process.egid = 0 if Process.gid == 0
+
+      #
+      # Update our latest 
+      #
+      @ssl_current_set = latest
 
       return true
     end

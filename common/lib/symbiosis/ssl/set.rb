@@ -20,7 +20,7 @@ module Symbiosis
         raise Errno::ENOENT.new directory unless File.exist?(directory)
         raise Errno::ENOTDIR.new directory unless File.directory?(directory)
 
-        @directory = directory
+        @directory = File.expand_path(directory)
         @domain    = domain
 
         if @directory == @domain.config_dir
@@ -71,7 +71,7 @@ module Symbiosis
         return OpenSSL::X509::Certificate.new(data)
 
       rescue OpenSSL::OpenSSLError => err
-        warn "\tCould not parse data in #{self.certificate_file}: #{err}"
+        warn "\tSSL set #{name}: Could not parse data in #{self.certificate_file}: #{err}"
         return nil
       end
 
@@ -109,7 +109,7 @@ module Symbiosis
         return OpenSSL::PKey::RSA.new(data)
 
       rescue OpenSSL::OpenSSLError => err
-        warn "\tCould not parse data in #{self.key_file}: #{err}"
+        warn "\tSSL set #{name}: Could not parse data in #{self.key_file}: #{err}"
         return nil 
       end
 
@@ -156,7 +156,7 @@ module Symbiosis
         begin
           certificate_store.add_file(chain_file) unless chain_file.nil?
         rescue OpenSSL::X509::StoreError
-           warn "\tUnable to add chain file to the store."
+           warn "\tSSL set #{name}: Unable to add chain file to the store."
         end
         certificate_store
       end
@@ -324,7 +324,6 @@ module Symbiosis
           return false
         end
 
-
         #
         # Firstly check that the certificate is valid for the domain or one of its aliases.
         #
@@ -333,7 +332,7 @@ module Symbiosis
           if strict_checking
             raise OpenSSL::X509::CertificateError, msg
           else
-            warn "\t#{msg}" if $VERBOSE
+            warn "\tSSL set #{name}: #{msg}" if $VERBOSE
           end
         end
 
@@ -345,7 +344,7 @@ module Symbiosis
           if strict_checking
             raise OpenSSL::X509::CertificateError, msg
           else
-            warn "\t#{msg}" if $VERBOSE
+            warn "\tSSL set #{name}: #{msg}" if $VERBOSE
           end
         end
 
@@ -354,7 +353,7 @@ module Symbiosis
           if strict_checking
             raise OpenSSL::X509::CertificateError, msg
           else
-            warn "\t#{msg}" if $VERBOSE
+            warn "\tSSL set #{name}: #{msg}" if $VERBOSE
           end
         end
 
@@ -372,14 +371,14 @@ module Symbiosis
         # certificate is self-signed.
         #
         if certificate.verify(key)
-          puts "\tUsing a self-signed certificate for #{@domain.name}." if $VERBOSE
+          puts "\tSSL set #{name}: self-signed certificate for #{@domain.name}." if $VERBOSE
 
         #
         # Otherwise see if we can verify it using the certificate store,
         # including any bundle that has been uploaded.
         #
         elsif store.is_a?(OpenSSL::X509::Store) and store.verify(certificate)
-          puts "\tUsing certificate signed by #{certificate.issuer.to_s} for #{@domain.name}" if $VERBOSE
+          puts "\tSSL set #{name}: certificate signed by \"#{certificate.issuer.to_s}\" for #{@domain.name}" if $VERBOSE
 
         #
         # If we can't verify -- raise an error if strict_checking is enabled
@@ -389,7 +388,7 @@ module Symbiosis
           if strict_checking
             raise OpenSSL::X509::CertificateError, msg
           else
-            warn "\t#{msg}" if $VERBOSE
+            warn "\tSSL set #{name}: #{msg}" if $VERBOSE
           end
         end
 

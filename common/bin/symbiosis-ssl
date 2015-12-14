@@ -45,8 +45,7 @@ opts = GetoptLong.new(
 
 manual = help = false
 $VERBOSE = false
-prefix = nil
-provider = "letsencrypt"
+prefix = "/srv"
 
 opts.each do |opt,arg|
   case opt
@@ -69,8 +68,24 @@ if help or manual
   exit 0
 end
 
+#
+# The required spawn a massive stack of warnings in verbose mode.  So let's
+# hide them.
+#
+v = $VERBOSE
+$VERBOSE = false
+
+require 'symbiosis/domains'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/ssl'
+require 'symbiosis/ssl/letsencrypt'
+require 'symbiosis/ssl/selfsigned'
+
+#
+# And unhide.  Ugh.
+#
+$VERBOSE = v
+
 
 domains = []
 
@@ -95,41 +110,40 @@ threshold = 14
 domains.each do |domain|
   puts "* Examining certificates for #{domain.name}" if $VERBOSE
 
-
   #
   # Stage 0: verify and check expiriy
   #
-  cert_fn, key_fn = domain.ssl_find_matching_certificate_and_key
+  set = domain.ssl_current_set
+  set = domain.ssl_available_sets.last unless set.is_a?(Symbiosis::SSL::Set)
+
   expires_in = nil
 
-  if cert_fn and key_fn
-    domain.ssl_verify(cert_fn, key_fn)
-
-    expires_in = ((domain.ssl_certificate.not_after - now)/86400.0).round
+  if set.is_a?(Symbiosis::SSL::Set)
+    expires_in = ((set.certificate.not_after - now)/86400.0).round
     if expires_in < 14
-      puts "\t* The certificate is due to expire in #{expires_in} days"
+      puts "\tThe certificate is due to expire in #{expires_in} days" if $VERBOSE
     end
 
   else
-    puts "\t* No valid certificates found."
+    puts "\tNo valid certificates found." if $VERBOSE
   end
 
   #
   # Stage 1: Generate
   #
   if false == domain.ssl_provider
-    puts "\t * Skipping because the ssl-provider has been set to false."
-  elsif (expires_in.is_a?(Integer) and expires_in < threshold) or cert_fn.nil?
+    puts "\tSkipping because the ssl-provider has been set to false." if $VERBOSE
+
+  elsif (expires_in.is_a?(Integer) and expires_in < threshold) or set.nil?
     #
     # Default to letsencrypt
     #
     domain.ssl_provider = "letsencrypt" if domain.ssl_provider.nil?
 
-    puts "\t * Fetching a new certificate from #{domain.ssl_provider}."
+    puts "\tFetching a new certificate from #{domain.ssl_provider}." if $VERBOSE
 
-    set = domain.ssl_fetch_certificate
+    set = domain.ssl_fetch_new_certificate
     domain.ssl_write_set(set)
-
   end
 
 
@@ -137,8 +151,6 @@ domains.each do |domain|
   # Stage 2: Roll over
   #
   domain.ssl_rollover
-
-  
 end
 
 
