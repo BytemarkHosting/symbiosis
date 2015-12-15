@@ -30,14 +30,14 @@ module Symbiosis
       return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
       self.ssl_current_set.certificate_file
     end
-    
+
     alias :ssl_certificate_file :ssl_x509_certificate_file
-    
+
     def ssl_x509_certificate_file=(f)
       @ssl_current_set ||= Symbiosis::SSL::Set.new(self, self.config_dir)
       self.ssl_current_set.certificate_file=f
     end
-    
+
     alias :ssl_certificate_file= :ssl_x509_certificate_file=
 
     def ssl_x509_certificate
@@ -51,7 +51,7 @@ module Symbiosis
       return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
       self.ssl_current_set.key_file
     end
-    
+
     def ssl_key_file=(f)
       @ssl_current_set ||= Symbiosis::SSL::Set.new(self, self.config_dir)
       self.ssl_current_set.key_file=f
@@ -140,7 +140,7 @@ module Symbiosis
 
       unless provider =~ /^[a-z0-9_]+$/
         warn "\tBad ssl-provider for #{self.name}" if $VERBOSE
-        return nil 
+        return nil
       end
 
       set_param("ssl-provider", provider, self.config_dir)
@@ -203,7 +203,7 @@ module Symbiosis
 
       combined = [:certificate, :bundle, :key].map{|k| set[k]}.flatten.compact
 
-      set_param("ssl.key",set[:key].to_pem, tmpdir) 
+      set_param("ssl.key",set[:key].to_pem, tmpdir)
       set_param("ssl.crt",set[:certificate].to_pem, tmpdir)
       set_param("ssl.csr",set[:request].to_pem, tmpdir) if set[:request]
       set_param("ssl.bundle",set[:bundle].map(&:to_pem).join("\n"), tmpdir) if set[:bundle] and !set[:bundle].empty?
@@ -211,7 +211,7 @@ module Symbiosis
 
       last_set = self.ssl_available_sets.last
       if last_set.nil?
-        last_set = "0" 
+        last_set = "0"
       else
         last_set.succ!
       end
@@ -227,7 +227,7 @@ module Symbiosis
 
       Process.euid = 0 if Process.uid == 0
       Process.egid = 0 if Process.gid == 0
-      
+
       #
       # Clear the cache of what is available
       #
@@ -323,7 +323,7 @@ module Symbiosis
 
       Dir.glob(File.join(self.config_dir, 'ssl' ,'*')).sort.each do |cert_dir|
 
-	begin
+        begin
           this_set = Symbiosis::SSL::Set.new(self, cert_dir)
         rescue Errno::ENOENT, Errno::ENOTDIR
           next
@@ -337,7 +337,7 @@ module Symbiosis
         #
         # If this certificate verifies, add it to our list
         #
-        next unless this_set.verify
+        next unless this_set.verify == 0
 
         @ssl_available_sets << this_set
       end
@@ -354,15 +354,10 @@ module Symbiosis
       current = self.ssl_current_set
       latest  = self.ssl_available_sets.sort.last
 
-      if latest.nil?
+      if latest.nil? or !File.directory?(latest.directory)
         warn "\tNo valid sets of certificates found." if $VERBOSE
         return false
       end
-
-      #
-      # If the current certificate is current, do nothing.
-      #
-      return false if current and current.name == latest.name
 
       current_dir = File.join(self.config_dir, "ssl", "current")
 
@@ -374,6 +369,10 @@ module Symbiosis
 
       unless stat.nil? or stat.symlink?
         warn "\t#{current_dir} is not a symlink.  Unwilling to roll over." if $VERBOSE
+        return false
+      end
+
+      if !stat.nil? and current and current.name == latest.name
         return false
       end
 
@@ -391,7 +390,7 @@ module Symbiosis
       Process.egid = 0 if Process.gid == 0
 
       #
-      # Update our latest 
+      # Update our latest
       #
       @ssl_current_set = latest
 

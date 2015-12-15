@@ -17,11 +17,12 @@ module Symbiosis
       attr_reader :directory, :domain, :name
 
       def initialize(domain, directory)
-        raise Errno::ENOENT.new directory unless File.exist?(directory)
-        raise Errno::ENOTDIR.new directory unless File.directory?(directory)
+        raise Errno::ENOTDIR.new directory if File.exist?(directory) and !File.directory?(directory)
 
         @directory = File.expand_path(directory)
         @domain    = domain
+
+        @certificate_file = @key_file = @bundle_file = nil
 
         if @directory == @domain.config_dir
           @name = "legacy"
@@ -110,7 +111,7 @@ module Symbiosis
 
       rescue OpenSSL::OpenSSLError => err
         warn "\tSSL set #{name}: Could not parse data in #{self.key_file}: #{err}"
-        return nil 
+        return nil
       end
 
       #
@@ -336,27 +337,6 @@ module Symbiosis
           end
         end
 
-        # Check that the certificate is current
-        #
-        #
-        if certificate.not_before > Time.now
-          msg = "The certificate for #{@domain.name} is not valid yet."
-          if strict_checking
-            raise OpenSSL::X509::CertificateError, msg
-          else
-            warn "\tSSL set #{name}: #{msg}" if $VERBOSE
-          end
-        end
-
-        if certificate.not_after < Time.now
-          msg = "The certificate for #{@domain.name} has expired."
-          if strict_checking
-            raise OpenSSL::X509::CertificateError, msg
-          else
-            warn "\tSSL set #{name}: #{msg}" if $VERBOSE
-          end
-        end
-
         # Next check that the key matches the certificate.
         #
         #
@@ -365,26 +345,37 @@ module Symbiosis
         end
 
         #
-        # Now check the signature.
+        # We always need a store
         #
-        # First see if we can verify it using our own private key, i.e. the
-        # certificate is self-signed.
-        #
-        if certificate.verify(key)
-          puts "\tSSL set #{name}: self-signed certificate for #{@domain.name}." if $VERBOSE
+        store = OpenSSL::X509::Store.new unless store.is_a?(OpenSSL::X509::Store)
 
         #
-        # Otherwise see if we can verify it using the certificate store,
+        # See if we can verify it using the certificate store,
         # including any bundle that has been uploaded.
         #
-        elsif store.is_a?(OpenSSL::X509::Store) and store.verify(certificate)
+        if store.verify(certificate)
           puts "\tSSL set #{name}: certificate signed by \"#{certificate.issuer.to_s}\" for #{@domain.name}" if $VERBOSE
 
-        #
-        # If we can't verify -- raise an error if strict_checking is enabled
-        #
+        elsif store.error == 18
+          puts "\tSSL set #{name}: self-signed certificate for #{@domain.name}." if $VERBOSE
+
         else
-          msg =  "Certificate signature does not verify for #{@domain.name} -- maybe a bundle is missing?"
+          msg =  "Certificate is not valid for #{@domain.name} -- "
+          case store.error
+            when 2, 20
+              msg += "the intermediate bundle is missing"
+            else
+              msg += store.error_string
+          end
+
+          #
+          # The numeric errors are detailed in /usr/include/openssl/x509_vfy.h
+          #
+          msg += " (#{store.error})"
+
+          #
+          # If we can't verify -- raise an error if strict_checking is enabled
+          #
           if strict_checking
             raise OpenSSL::X509::CertificateError, msg
           else
@@ -392,7 +383,7 @@ module Symbiosis
           end
         end
 
-        true
+        store.error
       end
 
     end
