@@ -241,8 +241,6 @@ module Symbiosis
     # /srv/example.com/config/ssl/set/.
     #
     def ssl_current_set
-      return @ssl_current_set if defined? @ssl_current_set and @ssl_current_set.is_a?(Symbiosis::SSL::Set)
-
       current_dir = File.join(self.config_dir, "ssl", "current")
       stat = nil
 
@@ -262,21 +260,31 @@ module Symbiosis
         end
       end
 
+      #
+      # Expire our cached version if the path has changed
+      #
+      if defined? @ssl_current_set and
+          @ssl_current_set.is_a?(Symbiosis::SSL::Set) and
+          @ssl_current_set.directory == current_dir
+
+        return @ssl_current_set
+      end
+
       this_set = self.ssl_available_sets.find{|s| s.directory == current_dir}
 
       if this_set.nil?
         begin
           this_set = Symbiosis::SSL::Set.new(self, current_dir)
           this_set = nil unless this_set.verify
-	rescue Errno::ENOENT, Errno::ENODIR
-	  # do nothing
+         rescue Errno::ENOENT, Errno::ENODIR
+          # do nothing
           this_set = nil
         rescue StandardError => err
           this_set = nil
           warn "\t#{err.to_s} -- ignoring SSL set in #{current_dir} for #{self.name}" if $VERBOSE
         end
       end
-      
+
       this_set = self.ssl_legacy_set if this_set.nil?
 
       if this_set.is_a?(Symbiosis::SSL::Set)
