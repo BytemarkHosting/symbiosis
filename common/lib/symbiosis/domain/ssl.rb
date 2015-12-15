@@ -247,7 +247,18 @@ module Symbiosis
       begin
         stat = File.lstat(current_dir)
       rescue Errno::ENOENT
-        return self.ssl_legacy_set
+        #
+        # Unless the current set is defined, and pointing to "legacy", set it
+        # it legacy.
+        #
+        unless defined? @ssl_current_set and
+          @ssl_current_set.is_a?(Symbiosis::SSL::Set) and
+          @ssl_current_set.name == "legacy"
+
+          @ssl_current_set = self.ssl_legacy_set
+        end
+
+        return @ssl_current_set
       end
 
       while stat.symlink? do
