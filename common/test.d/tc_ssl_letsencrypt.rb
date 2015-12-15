@@ -82,7 +82,13 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
   def do_post_new_reg(request)
     req     = JSON.load(request.body)
     protect = JSON.load(UrlSafeBase64.decode64(req["protected"]))
-    key     = protect["jwk"]["n"]
+    key = nil
+    if protect.is_a?(Hash) and 
+      protect.has_key?("jwk") and
+      protect["jwk"].is_a?(Hash) and 
+      protect["jwk"].has_key?("n")
+      key     = protect["jwk"]["n"]
+    end
 
     if @registered_keys.include?(key)
       {:status => 409,
@@ -93,7 +99,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
         :body => "{\"type\":\"urn:acme:error:malformed\",\"detail\":\"Registration key is already in use\",\"status\":409}",
       }
     else
-      @registered_keys << key
+      @registered_keys << key unless key.nil?
       {:status => 201,
         :headers => {
           "Location" => "#{@endpoint}/acme/reg/asdf",
