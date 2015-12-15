@@ -118,9 +118,10 @@ module Symbiosis
       return false if false == provider
 
       if provider.nil?
-        if defined? Symbiosis::SSL::LetsEncrypt
+        if defined? Symbiosis::SSL::LetsEncrypt and
+          Symbiosis::SSL::PROVIDERS.include?(Symbiosis::SSL::LetsEncrypt)
           provider = "letsencrypt"
-        else Symbiosis::SSL::PROVIDERS.first.to_s =~ /.*::([^:]+)$/
+        elsif Symbiosis::SSL::PROVIDERS.first.to_s =~ /.*::([^:]+)$/
           provider = $1.downcase
         end
       end
