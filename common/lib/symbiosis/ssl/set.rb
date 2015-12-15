@@ -357,8 +357,10 @@ module Symbiosis
           puts "\tSSL set #{name}: certificate signed by \"#{certificate.issuer.to_s}\" for #{@domain.name}" if $VERBOSE
 
         elsif store.error == 18
+          unless certificate.verify(key)
+            raise OpenSSL::X509::CertificateError, "\tSSL set #{name}: Certificate is self signed, but the signature doesn't validate."
+          end
           puts "\tSSL set #{name}: self-signed certificate for #{@domain.name}." if $VERBOSE
-
         else
           msg =  "Certificate is not valid for #{@domain.name} -- "
           case store.error
