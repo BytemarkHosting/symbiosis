@@ -1,3 +1,10 @@
+symbiosis-httpd (2015:1107) stable; urgency=medium
+
+  * Updated zz-mass-hosting templates to have a wildcard alias in order to
+    work when sharing the IP with other name-based virtual hosts.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 17 Dec 2015 16:23:13 +0000
+
 symbiosis-httpd (2015:1106) stable; urgency=medium
 
   * Added no-effort SNI support for domains running on the primary IP address,
