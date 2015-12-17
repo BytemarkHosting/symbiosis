@@ -11,6 +11,14 @@
 
 <VirtualHost <%= ips.collect{|ip| ip+":80"}.join(" ") %>>
 
+
+        #
+        # The ServerName has been explicitly set here to the machine's
+        # hostname, because that is what it defaults to anyway.  See below for
+        # where we set the alias.
+        #
+        ServerName  <%= hostname %>
+
         #
         #  This is the directory people are redirected to
         # if their site is empty.
@@ -60,6 +68,12 @@
         </IfModule>
 
         <IfModule vhost_bytemark_module>
+                #
+                # We need a wildcard server alias, so Apache knows to check
+                # where when names don't match elsewhere.
+                #
+                ServerAlias *
+
                 #
                 #  The document root + CGI-directories.
                 #

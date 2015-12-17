@@ -12,6 +12,13 @@
 
 <VirtualHost <%= ips.collect{|ip| ip+":443"}.join(" ") %>> 
 
+        #
+        # The ServerName has been explicitly set here to the machine's
+        # hostname, because that is what it defaults to anyway.  See below
+        # where we set the ServerAlias.
+        #
+        ServerName  <%= hostname %>
+
         <IfModule ssl_module>
                 SSLEngine On
 
@@ -93,6 +100,12 @@
         </IfModule>
 
         <IfModule vhost_bytemark_module>
+                #
+                # We need a wildcard server alias, so Apache knows to check
+                # where when names don't match elsewhere.
+                #
+                ServerAlias *
+
                 #
                 #  The document root + CGI-directories.
                 #
