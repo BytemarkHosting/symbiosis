@@ -1,6 +1,6 @@
 require 'symbiosis/domain'
 require 'symbiosis/ssl'
-require 'symbiosis/ssl/set'
+require 'symbiosis/ssl/certificate_set'
 require 'openssl'
 require 'tmpdir'
 require 'erb'
@@ -27,83 +27,79 @@ module Symbiosis
     end
 
     def ssl_x509_certificate_file
-      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
       self.ssl_current_set.certificate_file
     end
 
     alias :ssl_certificate_file :ssl_x509_certificate_file
 
     def ssl_x509_certificate_file=(f)
-      @ssl_current_set ||= Symbiosis::SSL::Set.new(self, self.config_dir)
+      @ssl_current_set ||= Symbiosis::SSL::CertificateSet.new(self, self.config_dir)
       self.ssl_current_set.certificate_file=f
     end
 
     alias :ssl_certificate_file= :ssl_x509_certificate_file=
 
     def ssl_x509_certificate
-      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
       self.ssl_current_set.certificate
     end
 
     alias :ssl_certificate :ssl_x509_certificate
 
     def ssl_key_file
-      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
       self.ssl_current_set.key_file
     end
 
     def ssl_key_file=(f)
-      @ssl_current_set ||= Symbiosis::SSL::Set.new(self, self.config_dir)
+      @ssl_current_set ||= Symbiosis::SSL::CertificateSet.new(self, self.config_dir)
       self.ssl_current_set.key_file=f
     end
 
     def ssl_key
-      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
       self.ssl_current_set.key
     end
 
     def ssl_certificate_chain_file
-      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
       self.ssl_current_set.certificate_chain_file
     end
 
     def ssl_add_ca_path(p)
-      @ssl_current_set ||= Symbiosis::SSL::Set.new(self, self.config_dir)
+      @ssl_current_set ||= Symbiosis::SSL::CertificateSet.new(self, self.config_dir)
       self.ssl_current_set.add_ca_path(p)
     end
 
     def ssl_certificate_store
-      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
       self.ssl_current_set.certificate_store
     end
 
     def ssl_available_files
-      return [] unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
+      return [] unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
       self.ssl_current_set.available_files
     end
 
     def ssl_available_certificate_files
-      return [] unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
+      return [] unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
       self.ssl_current_set.available_certificate_files
     end
 
     def ssl_available_key_files
-      return [] unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
+      return [] unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
       self.ssl_current_set.available_key_files
     end
 
     def ssl_find_matching_certificate_and_key
-      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::Set)
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
       self.ssl_current_set.find_matching_certificate_and_key
     end
 
     def ssl_verify(*args)
-      if self.ssl_current_set.nil?
-        set = Symbiosis::SSL::Set.new(self, self.config_dir)
-        set.verify(*args)
-      else
-        self.ssl_current_set.verify(*args)
-      end
+      set = Symbiosis::SSL::CertificateSet.new(self, self.config_dir)
+      set.verify(*args)
     end
 
     #
@@ -184,56 +180,19 @@ module Symbiosis
       ssl_provider.register unless ssl_provider.registered?
       ssl_provider.verify_and_request_certificate!
 
-      return { :key         => ssl_provider.key,
-               :request     => ssl_provider.request,
-               :bundle      => ssl_provider.bundle,
-               :certificate => ssl_provider.certificate }
+      return ssl_provider
     end
 
-    def ssl_write_set(set)
-      #
-      # Drop effective privs if needed.
-      #
-      Process.egid = self.gid if Process.gid == 0
-      Process.euid = self.uid if Process.uid == 0
+    def ssl_next_set
+      next_set = self.ssl_available_sets.last
 
-      tmpdir = Dir.mktmpdir(self.name+"-ssl-")
-
-      raise ArgumentError, "The SSL set must contain a certificate and key as a minimum" unless set[:key] and set[:certificate]
-
-      combined = [:certificate, :bundle, :key].map{|k| set[k]}.flatten.compact
-
-      set_param("ssl.key",set[:key].to_pem, tmpdir)
-      set_param("ssl.crt",set[:certificate].to_pem, tmpdir)
-      set_param("ssl.csr",set[:request].to_pem, tmpdir) if set[:request]
-      set_param("ssl.bundle",set[:bundle].map(&:to_pem).join("\n"), tmpdir) if set[:bundle] and !set[:bundle].empty?
-      set_param("ssl.combined", combined.map(&:to_pem).join("\n"), tmpdir)
-
-      last_set = self.ssl_available_sets.last
-      if last_set.nil?
-        last_set = "0"
+      if next_set.nil?
+        next_set = "0"
       else
-        last_set.succ!
+        next_set.succ!
       end
 
-      next_set_dir = File.join(self.config_dir, "ssl", last_set)
-
-      while File.exist?(next_set_dir)
-        next_set_dir.succ!
-      end
-
-      mkdir_p(File.dirname(next_set_dir))
-      FileUtils.mv(tmpdir, next_set_dir)
-
-      Process.euid = 0 if Process.uid == 0
-      Process.egid = 0 if Process.gid == 0
-
-      #
-      # Clear the cache of what is available
-      #
-      @ssl_available_sets = nil
-
-      return next_set_dir
+      next_set     
     end
 
     #
@@ -252,7 +211,7 @@ module Symbiosis
         # it legacy.
         #
         unless defined? @ssl_current_set and
-          @ssl_current_set.is_a?(Symbiosis::SSL::Set) and
+          @ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet) and
           @ssl_current_set.name == "legacy"
 
           @ssl_current_set = self.ssl_legacy_set
@@ -275,7 +234,7 @@ module Symbiosis
       # Expire our cached version if the path has changed
       #
       if defined? @ssl_current_set and
-          @ssl_current_set.is_a?(Symbiosis::SSL::Set) and
+          @ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet) and
           @ssl_current_set.directory == current_dir
 
         return @ssl_current_set
@@ -285,7 +244,7 @@ module Symbiosis
 
       if this_set.nil?
         begin
-          this_set = Symbiosis::SSL::Set.new(self, current_dir)
+          this_set = Symbiosis::SSL::CertificateSet.new(self, current_dir)
           this_set = nil unless this_set.verify
          rescue Errno::ENOENT, Errno::ENODIR
           # do nothing
@@ -298,7 +257,7 @@ module Symbiosis
 
       this_set = self.ssl_legacy_set if this_set.nil?
 
-      if this_set.is_a?(Symbiosis::SSL::Set)
+      if this_set.is_a?(Symbiosis::SSL::CertificateSet)
         puts "\tCurrent set is #{this_set.name}" if $VERBOSE
       end
 
@@ -306,7 +265,7 @@ module Symbiosis
     end
 
     def ssl_legacy_set
-      this_set = Symbiosis::SSL::Set.new(self, self.config_dir)
+      this_set = Symbiosis::SSL::CertificateSet.new(self, self.config_dir)
 
       this_set = nil unless this_set.verify
 
@@ -324,7 +283,7 @@ module Symbiosis
       Dir.glob(File.join(self.config_dir, 'ssl' ,'*')).sort.each do |cert_dir|
 
         begin
-          this_set = Symbiosis::SSL::Set.new(self, cert_dir)
+          this_set = Symbiosis::SSL::CertificateSet.new(self, cert_dir)
         rescue Errno::ENOENT, Errno::ENOTDIR
           next
         end

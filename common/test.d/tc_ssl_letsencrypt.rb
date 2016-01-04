@@ -45,7 +45,6 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     stub_request(:post, "#{@endpoint}/acme/new-cert").to_return{|r| do_post_new_cert(r)}
     stub_request(:get,  "#{@endpoint}/bundle").to_return{|r| do_get_bundle(r)}
 
-
     @client = Symbiosis::SSL::LetsEncrypt.new(@domain)
     @client.config()[:endpoint] = @endpoint
   end

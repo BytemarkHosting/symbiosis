@@ -1,31 +1,22 @@
 require 'symbiosis/ssl'
+require 'symbiosis/ssl/certificate_set'
 require 'symbiosis/domain'
 require 'symbiosis/domain/ssl'
-begin
-  require 'symbiosis/domain/http'
-rescue LoadError
-   # Do nothing
-end
-
-require 'symbiosis/host'
 require 'symbiosis/utils'
 require 'time'
-require 'acme-client'
-
 
 module Symbiosis
 
   class SSL
 
-    class SelfSigned
+    class SelfSigned < CertificateSet
 
       include Symbiosis::Utils
 
       attr_reader :config, :domain
 
-      def initialize(domain)
-        @domain = domain
-        @prefix = domain.prefix
+      def initialize(domain, directory = nil)
+        super
         @names  = ([domain.name] + domain.aliases).uniq
         @config = {:rsa_key_size => nil, :lifetime => nil}
         @rsa_key = nil

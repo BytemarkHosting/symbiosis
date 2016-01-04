@@ -21,7 +21,7 @@ module Symbiosis
 
       ENDPOINT = "https://acme-v01.api.letsencrypt.org/directory"
 
-      def initialize(domain)
+      def initialize(domain, directory = nil)
         super
         @config = {:email => nil, :server => nil, :endpoint => nil, :rsa_key_size => nil, :docroot => nil, :account_key => nil}
       end

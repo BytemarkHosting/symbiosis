@@ -74,6 +74,7 @@ class SSLSelfSignedTest < Test::Unit::TestCase
     # Make sure our new certificate is valid
     #
     assert(@domain.ssl_verify(@client.certificate, @client.key, nil, true))
+
   end
 
 end

@@ -4,9 +4,10 @@ require 'test/unit'
 require 'tmpdir'
 require 'symbiosis/domain/ssl'
 require 'mocha/test_unit'
+require 'pp'
 
-class Symbiosis::SSL::Dummy
-  def initialize(domain); end
+class Symbiosis::SSL::Dummy < Symbiosis::SSL::CertificateSet
+# def initialize(domain); end
 end
 
 class SSLTest < Test::Unit::TestCase
@@ -694,22 +695,28 @@ class SSLTest < Test::Unit::TestCase
     #
     # Set up our dummy provider
     #
-    Symbiosis::SSL::Dummy.any_instance.expects(:verify_and_request_certificate!).returns(true)
-    Symbiosis::SSL::Dummy.any_instance.expects(:register).returns(true)
-    Symbiosis::SSL::Dummy.any_instance.expects(:registered?).returns(false)
-    Symbiosis::SSL::Dummy.any_instance.expects(:key).returns(key)
-    Symbiosis::SSL::Dummy.any_instance.expects(:certificate).returns(cert)
-    Symbiosis::SSL::Dummy.any_instance.expects(:bundle).returns([ca_cert])
-    Symbiosis::SSL::Dummy.any_instance.expects(:request).returns(request)
+    Symbiosis::SSL::Dummy.any_instance.stubs(:verify_and_request_certificate!).returns(true)
+    Symbiosis::SSL::Dummy.any_instance.stubs(:register).returns(true)
+    Symbiosis::SSL::Dummy.any_instance.stubs(:registered?).returns(false)
+    Symbiosis::SSL::Dummy.any_instance.stubs(:key).returns(key)
+    Symbiosis::SSL::Dummy.any_instance.stubs(:certificate).returns(cert)
+    Symbiosis::SSL::Dummy.any_instance.stubs(:bundle).returns([ca_cert])
+    Symbiosis::SSL::Dummy.any_instance.stubs(:request).returns(request)
 
     set = @domain.ssl_fetch_new_certificate
 
-    assert_equal({:bundle => [ca_cert], :key => key, :certificate => cert, :request => request}, set)
+    assert_equal(set.bundle, [ca_cert])
+    assert_equal(set.key, key)
+    assert_equal(set.certificate, cert)
+    assert_equal(set.request, request)
+
+    assert_equal("0", @domain.ssl_next_set)
+    set.name = "0"
 
     #
     # Now write our set out.
     #
-    dir = @domain.ssl_write_set(set)
+    dir = set.write
     expected_dir = File.join(@prefix, @domain.name, "config", "ssl", "0")
     assert_equal(File.join(@prefix, @domain.name, "config", "ssl", "0"), dir)
 
