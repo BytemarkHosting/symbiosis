@@ -114,11 +114,11 @@ domains.each do |domain|
   # Stage 0: verify and check expiriy
   #
   set = domain.ssl_current_set
-  set = domain.ssl_available_sets.last unless set.is_a?(Symbiosis::SSL::Set)
+  set = domain.ssl_available_sets.last unless set.is_a?(Symbiosis::SSL::CertificateSet)
 
   expires_in = nil
 
-  if set.is_a?(Symbiosis::SSL::Set)
+  if set.is_a?(Symbiosis::SSL::CertificateSet)
     expires_in = ((set.certificate.not_after - now)/86400.0).round
     if expires_in < 14
       puts "\tThe certificate is due to expire in #{expires_in} days" if $VERBOSE
@@ -142,8 +142,9 @@ domains.each do |domain|
 
     puts "\tFetching a new certificate from #{domain.ssl_provider}." if $VERBOSE
 
-    set = domain.ssl_fetch_new_certificate
-    domain.ssl_write_set(set)
+    cert_set = domain.ssl_fetch_new_certificate
+    cert_set.name = domain.ssl_next_set
+    cert_set.write
   end
 
 
