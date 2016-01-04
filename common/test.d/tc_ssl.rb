@@ -23,9 +23,6 @@ class SSLTest < Test::Unit::TestCase
 
     @prefix = Dir.mktmpdir("srv")
 
-    Process.euid = 0 if Process.uid == 0
-    Process.egid = 0 if Process.gid == 0
-
     @prefix.freeze
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
@@ -41,6 +38,9 @@ class SSLTest < Test::Unit::TestCase
       @domain.destroy  if @domain.is_a?( Symbiosis::Domain)
       FileUtils.rm_rf(@prefix) if File.directory?(@prefix)
     end
+
+    Process.euid = 0 if Process.uid == 0
+    Process.egid = 0 if Process.gid == 0
   end
 
   #####
