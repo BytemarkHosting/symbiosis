@@ -4,7 +4,6 @@ require 'test/unit'
 require 'tmpdir'
 require 'symbiosis/domain/ssl'
 require 'mocha/test_unit'
-require 'pp'
 
 class Symbiosis::SSL::Dummy < Symbiosis::SSL::CertificateSet
 # def initialize(domain); end
@@ -15,6 +14,12 @@ class SSLTest < Test::Unit::TestCase
   @@serial=0
 
   def setup
+    #
+    # Check the root CA before starting.  This needs to write a symlink, so do
+    # it before dropping privs.
+    #
+    do_check_root_ca
+
     #
     # Create our srv prefix as user 1000, if we're running as root.
     #
