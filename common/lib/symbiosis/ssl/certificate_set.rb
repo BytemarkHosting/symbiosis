@@ -18,8 +18,8 @@ module Symbiosis
         raise ArgumentError, "domain must be a Symbiosis::Domain" unless domain.is_a?(Symbiosis::Domain)
 
         @domain           = domain
-        @certificate      = @key      = @bundle      = @request = nil
-        @certificate_file = @key_file = @bundle_file = @request_file = nil
+        @certificate      = @key      = @certificate_chain      = @request = nil
+        @certificate_file = @key_file = @certificate_chain_file = @request_file = nil
         @name = @directory = nil
 
         self.directory = directory if directory
