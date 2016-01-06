@@ -294,9 +294,10 @@ module Symbiosis
         next if this_set.name == "current"
 
         #
-        # If this certificate verifies, add it to our list
+        # If this certificate verifies, add it to our list.  We allow 18 as an
+        # error code, as this covers self-signed certificates.
         #
-        next unless this_set.verify == 0
+        next unless [0,18].include?(this_set.verify)
 
         @ssl_available_sets << this_set
       end
