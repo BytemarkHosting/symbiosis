@@ -476,7 +476,7 @@ module Symbiosis
       def write
         raise ArgumentError, "The directory for this SSL certificate set has been given" if self.directory.nil?
 
-        raise Errno::EEXIST.new self.directory if File.exists?(self.directory)
+        raise Errno::EEXIST.new self.directory if File.exist?(self.directory)
         mkdir_p(File.dirname(self.directory))
 
         tmpdir = Dir.mktmpdir(self.name+"-ssl-")
