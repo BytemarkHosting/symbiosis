@@ -144,9 +144,15 @@ domains.each do |domain|
 
     puts "\tFetching a new certificate from #{domain.ssl_provider}." if $VERBOSE
 
-    cert_set = domain.ssl_fetch_new_certificate
-    cert_set.name = domain.ssl_next_set
-    cert_set.write
+    begin
+      cert_set = domain.ssl_fetch_new_certificate
+      cert_set.name = domain.ssl_next_set
+      cert_set.write
+    rescue StandardError => err
+      puts "\t!! Failed: #{err.to_s.gsub($/,'')}" if $VERBOSE
+      puts err.backtrace.join("\n") if $DEBUG
+    end
+
   end
 
 

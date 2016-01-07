@@ -78,6 +78,30 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     {:status => 405, :headers => {"Replay-Nonce" => Symbiosis::Utils.random_string(20)}}
   end
 
+  def do_check_key(request)
+    protect = JSON.load(UrlSafeBase64.decode64(request["protected"]))
+    key = nil
+    if protect.is_a?(Hash) and
+      protect.has_key?("jwk") and
+      protect["jwk"].is_a?(Hash) and
+      protect["jwk"].has_key?("n")
+      key     = protect["jwk"]["n"]
+    end
+
+    if @registered_keys.include?(key)
+      true
+    else
+      {:status => 409,
+        :headers => {
+          "Location" => "#{@endpoint}/acme/reg/asdf",
+          "Content-Type"=>"application/problem+json",
+        },
+        :body => "{\"type\":\"urn:acme:error:unauthorized\",\"detail\":\"No registration exists matching provided key\",\"status\":409}",
+      }
+    end
+
+  end
+
   def do_post_new_reg(request)
     req     = JSON.load(request.body)
     protect = JSON.load(UrlSafeBase64.decode64(req["protected"]))
@@ -110,6 +134,10 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def do_post_new_authz(request)
     req     = JSON.load(request.body)
+
+    result = do_check_key(req)
+    return result unless result == true
+
     payload = JSON.load(UrlSafeBase64.decode64(req["payload"]))
     sekrit  = Symbiosis::Utils.random_string(20).downcase
 
@@ -131,6 +159,10 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def do_post_authz(request)
     req     = JSON.load(request.body)
+
+    result = do_check_key(req)
+    return result unless result == true
+
     payload = JSON.load(UrlSafeBase64.decode64(req["payload"]))
     sekrit  = @authz_template.extract(request.uri)["sekrit"]
 
@@ -154,6 +186,10 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def do_post_new_cert(request)
     req = JSON.load(request.body)
+
+    result = do_check_key(req)
+    return result unless result == true
+
     payload = JSON.load(UrlSafeBase64.decode64(req["payload"]))
     csr = OpenSSL::X509::Request.new(UrlSafeBase64.decode64(payload["csr"]))
 
@@ -208,12 +244,17 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def test_register
     omit unless @client
-    result = nil
+
+    result = @client.registered?
+    assert(!result, "#registered? should return false if we're not registered yet")
+
     result = @client.register
     assert(result, "#register should return true")
-    
-    result = @client.register
-    assert(result, "#register should return true, even on the second attempt")
+
+    result = @client.registered?
+    assert(result, "#registered? should return true once registered")
+
+    assert_raise(Acme::Error::Malformed, "#register should return raise an error on second attempt") { @client.register }
   end
 
   def test_verify

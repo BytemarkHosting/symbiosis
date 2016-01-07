@@ -102,12 +102,18 @@ module Symbiosis
         registration.agree_terms
 
         return true
-      rescue Acme::Error::Malformed => err
-        warn "\t#{err.to_s} (when registering)" if $VERBOSE
-        return true
       end
 
-      alias :registered? :register
+      #
+      # Tests to see if we're registered by doing a pre-emptive authorize
+      # request.
+      #
+      def registered?
+        self.client.authorize(domain: name)
+        return true
+      rescue Acme::Error::Unauthorized
+        return false
+      end
 
       #
       # This does the authorization.  Returns true if the verification succeeds.
