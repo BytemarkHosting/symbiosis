@@ -168,7 +168,7 @@ module Symbiosis
     #
     #  { :key, :certificate, :request, :bundle}
     #
-    def ssl_fetch_new_certificate(write = true)
+    def ssl_fetch_new_certificate
       ssl_provider_class = self.ssl_provider_class
 
       unless ssl_provider_class.is_a?(Class) and
