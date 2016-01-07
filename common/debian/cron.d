@@ -10,3 +10,5 @@
 # weekly check
 @weekly root [ -x /usr/sbin/symbiosis-password-test ] && /usr/sbin/symbiosis-password-test --weekly
 
+# daily check of SSL certificates
+@daily root [ -x /usr/bin/symbiosis-ssl ] && /usr/bin/symbiosis-ssl
