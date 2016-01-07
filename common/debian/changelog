@@ -1,12 +1,18 @@
-symbiosis-common (2015:1209) UNRELEASED; urgency=medium
+symbiosis-common (2015:1210) stable; urgency=medium
 
-  * Added letsencrypt library support.
   * Added ruby-test-unit as an explicit depends.
-  * Removed ruby-mocha, ruby-webmock and ruby-acme-client from build-deps.
+  * Removed ruby-mocha, ruby-webmock and ruby-acme-client from build-deps, and
+    added them to the dependencies for the package itself for testing.
   * Utils#get_param now returns nil if the file is missing/unreadable.
   * Added Utils#get_param_from_dir_stack.
+  * Refactored SSL code to use "certificate sets", allowing SSL certificate
+    rollover.
+  * Added "letsencrypt" as an SSL provider.
+  * Added a "selfsigned" provider to mirror the letsencrypt class.
+  * Introduced new symbiosis-ssl command to handle all this.
+  * This gets run on a weekly basis to do rollover.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 09 Dec 2015 15:13:58 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 07 Jan 2016 16:01:06 +0000
 
 symbiosis-common (2015:1106) stable; urgency=medium
 
