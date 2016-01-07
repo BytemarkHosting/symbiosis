@@ -108,6 +108,7 @@ end
 
 now = Time.now
 threshold = 14
+exit_code = 0
 
 domains.each do |domain|
   puts "* Examining certificates for #{domain.name}" if $VERBOSE
@@ -151,10 +152,10 @@ domains.each do |domain|
     rescue StandardError => err
       puts "\t!! Failed: #{err.to_s.gsub($/,'')}" if $VERBOSE
       puts err.backtrace.join("\n") if $DEBUG
+      exit_code = 1
     end
 
   end
-
 
   #
   # Stage 2: Roll over
@@ -163,4 +164,5 @@ domains.each do |domain|
 end
 
 
+exit exit_code
 
