@@ -259,6 +259,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def test_verify
     omit unless @client
+    @client.register
+
     result = nil
     result = @client.verify
 
@@ -267,6 +269,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def test_request
     omit unless @client
+    @client.register
+
     req = nil
     req = @client.request
 
@@ -301,6 +305,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def test_acme_certificate
     omit unless @client
+    @client.register
     assert_kind_of(Acme::Certificate, @client.acme_certificate)
   end
 
