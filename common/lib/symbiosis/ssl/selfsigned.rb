@@ -13,7 +13,7 @@ module Symbiosis
 
       include Symbiosis::Utils
 
-      attr_reader :config, :domain
+      attr_reader :domain
 
       def initialize(domain, directory = nil)
         super
