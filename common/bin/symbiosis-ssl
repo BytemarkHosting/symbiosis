@@ -121,63 +121,32 @@ if ARGV.empty?
   domains = Symbiosis::Domains.all(prefix)
 end
 
-now = Time.now
-threshold = 14
 exit_code = 0
 
-domains.each do |domain|
-  puts "* Examining certificates for #{domain.name}" if $VERBOSE
+#
+#
+#
+%w(QUIT INT TERM).each do |sig|
+  trap(sig) do
 
-  #
-  # Stage 0: verify and check expiriy
-  #
-  set = domain.ssl_current_set
-  set = domain.ssl_available_sets.last unless set.is_a?(Symbiosis::SSL::CertificateSet)
-
-  expires_in = nil
-
-  if set.is_a?(Symbiosis::SSL::CertificateSet)
-    expires_in = ((set.certificate.not_after - now)/86400.0).round
-    if expires_in < 14
-      puts "\tThe certificate is due to expire in #{expires_in} days" if $VERBOSE
+    if 0 == Process.uid
+      Process.euid = 0
+      Process.egid = 0
     end
 
-  else
-    puts "\tNo valid certificates found." if $VERBOSE
+    exit exit_code
   end
-
-  #
-  # Stage 1: Generate
-  #
-  if false == domain.ssl_provider
-    puts "\tSkipping because the ssl-provider has been set to false." if $VERBOSE
-
-  elsif (expires_in.is_a?(Integer) and expires_in < threshold) or set.nil?
-    #
-    # Default to letsencrypt
-    #
-    domain.ssl_provider = "letsencrypt" if domain.ssl_provider.nil?
-
-    puts "\tFetching a new certificate from #{domain.ssl_provider}." if $VERBOSE
-
-    begin
-      cert_set = domain.ssl_fetch_new_certificate
-      cert_set.name = domain.ssl_next_set
-      cert_set.write
-    rescue StandardError => err
-      puts "\t!! Failed: #{err.to_s.gsub($/,'')}" if $VERBOSE
-      puts err.backtrace.join("\n") if $DEBUG
-      exit_code = 1
-    end
-
-  end
-
-  #
-  # Stage 2: Roll over
-  #
-  domain.ssl_rollover
 end
 
+now = Time.now
 
-exit exit_code
+domains.each do |domain|
+  begin
+    domain.ssl_magic(threshold, do_generate, do_rollover, now) 
+  rescue StandardError => err
+    puts "\t!! Failed: #{err.to_s.gsub($/,'')}" if $VERBOSE
+    puts err.backtrace.join("\n") if $DEBUG
+    exit_code = 1
+  end
+end
 

@@ -1,5 +1,5 @@
 module Symbiosis
   class SSL
-    PROVIDERS = []
+    PROVIDERS ||= []
   end
 end

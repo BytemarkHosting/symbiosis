@@ -130,6 +130,12 @@ class TestDomain < Test::Unit::TestCase
 
   end
 
+  def test_ips
+    domain = Domain.new()
+
+    domain.ips
+  end
+
   def test_crypt_password
     domain = Domain.new()
     password = "correct horse battery staple"

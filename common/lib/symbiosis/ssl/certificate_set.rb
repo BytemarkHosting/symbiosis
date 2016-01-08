@@ -45,7 +45,7 @@ module Symbiosis
           if "legacy" == @name
             self.directory = self.domain.config_dir
           elsif self.name.is_a?(String)
-            self.directory = File.join(self.domain.config_dir, "ssl", @name)
+            self.directory = File.join(self.domain.config_dir, "ssl", "sets", @name)
           end
         end
 
@@ -61,9 +61,9 @@ module Symbiosis
       # config directory.
       #
       def directory=(d)
-        raise Errno::ENOTDIR.new d if File.exist?(d) and !File.directory?(d)
+        raise ArgumentError unless d.is_a?(String)
         
-        @directory = File.expand_path(d, File.join(self.domain.config_dir, "ssl"))
+        @directory = File.expand_path(d, File.join(self.domain.config_dir, "ssl", "sets"))
 
         if self.name.nil?
           if self.domain.config_dir == @directory
@@ -404,7 +404,6 @@ module Symbiosis
       # OpenSSL::X509::CertificateError is raised.
       #
       def verify(certificate = self.certificate, key = self.key, store = self.certificate_store, strict_checking=false)
-
         unless certificate.is_a?(OpenSSL::X509::Certificate) and key.is_a?(OpenSSL::PKey::PKey)
           return false
         end
@@ -417,7 +416,7 @@ module Symbiosis
           if strict_checking
             raise OpenSSL::X509::CertificateError, msg
           else
-            warn "\tSSL set #{name}: #{msg}" if $VERBOSE
+            puts "\tSSL set #{name}: #{msg}" if $VERBOSE
           end
         end
 
@@ -438,15 +437,15 @@ module Symbiosis
         # including any bundle that has been uploaded.
         #
         if store.verify(certificate)
-          puts "\tSSL set #{name}: certificate signed by \"#{certificate.issuer.to_s}\" for #{@domain.name}" if $VERBOSE
+          puts "\tSSL set #{name}: Signed by \"#{certificate.issuer.to_s}\" for #{@domain.name}" if $DEBUG
 
         elsif store.error == 18
           unless certificate.verify(key)
-            raise OpenSSL::X509::CertificateError, "\tSSL set #{name}: Certificate is self signed, but the signature doesn't validate."
+            raise OpenSSL::X509::CertificateError, "\tSSL set #{name}: Self signed, but the signature doesn't validate."
           end
-          puts "\tSSL set #{name}: self-signed certificate for #{@domain.name}." if $VERBOSE
+          puts "\tSSL set #{name}: Self-signed certificate for #{@domain.name}." if $DEBUG
         else
-          msg =  "Certificate is not valid for #{@domain.name} -- "
+          msg =  "Not valid for #{@domain.name} -- "
           case store.error
             when 2, 20
               msg += "the intermediate bundle is missing"
@@ -465,13 +464,12 @@ module Symbiosis
           if strict_checking
             raise OpenSSL::X509::CertificateError, msg
           else
-            warn "\tSSL set #{name}: #{msg}" if $VERBOSE
+            puts "\tSSL set #{name}: #{msg}" if $VERBOSE
           end
         end
 
         store.error
       end
-
 
       def write
         raise ArgumentError, "The directory for this SSL certificate set has been given" if self.directory.nil?
@@ -479,7 +477,20 @@ module Symbiosis
         raise Errno::EEXIST.new self.directory if File.exist?(self.directory)
         mkdir_p(File.dirname(self.directory))
 
+        #
+        # Drop privs before creating the temporary directory, if required.
+        #
+        Process.egid = self.gid if Process.gid == 0
+        Process.euid = self.uid if Process.uid == 0
+
         tmpdir = Dir.mktmpdir(self.name+"-ssl-")
+
+        #
+        # Restore privs -- set_param will use the owner/group of the directory
+        # when writing files.
+        #       
+        Process.euid = 0 if Process.uid == 0
+        Process.egid = 0 if Process.gid == 0
 
         combined = [:certificate, :bundle, :key].map{|k| self.__send__(k) }.flatten.compact
 
@@ -493,6 +504,13 @@ module Symbiosis
         FileUtils.mv(tmpdir, self.directory)
 
         self.directory
+      ensure
+        #
+        # Make sure we restore privs.
+        #
+        Process.euid = 0 if Process.uid == 0 and Process.euid != Process.uid
+        Process.egid = 0 if Process.gid == 0 and Process.egid != Process.gid
+
       end
 
     end

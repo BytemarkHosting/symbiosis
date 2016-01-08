@@ -3,6 +3,7 @@ $:.unshift  "../lib/" if File.directory?("../lib")
 require 'test/unit'
 require 'tmpdir'
 require 'symbiosis/domain/ssl'
+require 'symbiosis/ssl/selfsigned'
 require 'mocha/test_unit'
 
 class Symbiosis::SSL::Dummy < Symbiosis::SSL::CertificateSet
@@ -38,6 +39,12 @@ class SSLTest < Test::Unit::TestCase
     # Empty the SSL providers array.
     #
     while Symbiosis::SSL::PROVIDERS.pop ; end
+
+    #
+    # And repopulate it with any existing providers
+    #
+    ObjectSpace.each_object(Class).select { |k| k < Symbiosis::SSL::CertificateSet }.
+      collect{|k| Symbiosis::SSL::PROVIDERS << k}
 
     unless $DEBUG
       @domain.destroy  if @domain.is_a?( Symbiosis::Domain)
@@ -643,6 +650,7 @@ class SSLTest < Test::Unit::TestCase
   end
 
   def test_ssl_provider
+    while Symbiosis::SSL::PROVIDERS.pop ; end
 
     assert_equal(false, @domain.ssl_provider, "#ssl_provider should return false if no providers available")
 
@@ -663,6 +671,8 @@ class SSLTest < Test::Unit::TestCase
   end
 
   def test_ssl_provider_class
+    while Symbiosis::SSL::PROVIDERS.pop ; end
+
     assert_equal(nil, @domain.ssl_provider_class, "#ssl_provider_class should return nil if no providers available")
 
     #
@@ -682,6 +692,8 @@ class SSLTest < Test::Unit::TestCase
   end
 
   def test_ssl_fetch_new_certificate
+    while Symbiosis::SSL::PROVIDERS.pop ; end
+
     assert_equal(nil, @domain.ssl_fetch_new_certificate, "#ssl_fetch_new_certificate should return nil if no providers available")
 
     Symbiosis::SSL::PROVIDERS << Symbiosis::SSL::Dummy
@@ -715,15 +727,15 @@ class SSLTest < Test::Unit::TestCase
     assert_equal(set.certificate, cert)
     assert_equal(set.request, request)
 
-    assert_equal("0", @domain.ssl_next_set)
+    assert_equal("0", @domain.ssl_next_set_name)
     set.name = "0"
 
     #
     # Now write our set out.
     #
     dir = set.write
-    expected_dir = File.join(@prefix, @domain.name, "config", "ssl", "0")
-    assert_equal(File.join(@prefix, @domain.name, "config", "ssl", "0"), dir)
+    expected_dir = File.join(@prefix, @domain.name, "config", "ssl", "sets", "0")
+    assert_equal(expected_dir, dir)
 
     #
     # make sure everything verifies OK, both as key, crt, bundle, and combined.
@@ -763,6 +775,8 @@ class SSLTest < Test::Unit::TestCase
     # Set up our stuff
     #
     now = Time.now
+    ssl_dir  = File.join(@domain.config_dir, "ssl")
+    sets_dir = File.join(ssl_dir, "sets")
 
     not_before = now - 86400*2
     not_after  = now - 1
@@ -779,7 +793,7 @@ class SSLTest < Test::Unit::TestCase
     4.times do |i|
       key, crt = do_generate_key_and_crt(@domain.name, {:ca_key => ca_key, :ca_cert => ca_cert, :not_before => not_before, :not_after => not_after})
 
-      set_dir = File.join(@domain.config_dir, "ssl", i.to_s)
+      set_dir = File.join(sets_dir, i.to_s)
       Symbiosis::Utils.mkdir_p(set_dir)
       Symbiosis::Utils.set_param("ssl.key", key, set_dir)
       Symbiosis::Utils.set_param("ssl.crt", crt, set_dir)
@@ -789,9 +803,9 @@ class SSLTest < Test::Unit::TestCase
       not_after  += 86400
     end
 
-    current_path = File.join(@domain.config_dir, "ssl", "current")
+    current_path = File.join(ssl_dir, "current")
 
-    FileUtils.ln_sf("2", current_path)
+    FileUtils.ln_sf(File.expand_path("sets/2", ssl_dir), current_path)
 
     available_sets = @domain.ssl_available_sets
 
@@ -807,29 +821,90 @@ class SSLTest < Test::Unit::TestCase
     # most recent set, so we should get false back, as nothing has changed.
     #
     assert_equal(false, @domain.ssl_rollover)
-    assert_equal("2", File.readlink(current_path))
+    assert_equal(File.expand_path("2", sets_dir), File.expand_path(File.readlink(current_path), ssl_dir))
 
     #
     # Now change the link, and it should get set back to "2"
     #
     File.unlink(current_path)
     assert_equal(true, @domain.ssl_rollover)
-    assert_equal("2", File.readlink(current_path))
+    assert_equal(File.expand_path("2", sets_dir), File.expand_path(File.readlink(current_path), ssl_dir))
 
     File.unlink(current_path)
-    File.symlink("1", current_path)
-    assert_equal("1", File.readlink(current_path))
+    File.symlink("sets/1", current_path)
+    assert_equal(File.expand_path("1", sets_dir), File.expand_path(File.readlink(current_path), ssl_dir))
     assert_equal(true, @domain.ssl_rollover)
-    assert_equal("2", File.readlink(current_path))
+    assert_equal(File.expand_path("2", sets_dir), File.expand_path(File.readlink(current_path), ssl_dir))
 
     #
-    # OK now remove all the valid sets of certs
+    # OK now remove the current set, and see if we cope with broken symlinks
     #
-    FileUtils.remove_entry_secure(File.join(@domain.config_dir, "ssl", "1"))
-    FileUtils.remove_entry_secure(File.join(@domain.config_dir, "ssl", "2"))
-    File.unlink(current_path)
+    FileUtils.remove_entry_secure(File.join(sets_dir, "2"))
+    assert_equal(true, @domain.ssl_rollover)
+    assert_equal(File.expand_path("1", sets_dir), File.expand_path(File.readlink(current_path), ssl_dir))
+  end
 
-    assert_equal(false, @domain.ssl_rollover)
+  def test_ssl_magic
+    #
+    # This requires the Self-signed provider to be in place
+    # 
+
+    @domain.ssl_provider = "selfsigned"
+    
+    ssl_dir  = File.join(@domain.config_dir, "ssl")
+    sets_dir = File.join(ssl_dir, "sets")
+
+    Symbiosis::Utils.mkdir_p(sets_dir)
+    #
+    # Test with the no_generate flag
+    #
+    result = nil
+    assert_nothing_raised{ result = @domain.ssl_magic(14, false) }
+    assert(!result)
+
+    assert(Dir.glob( File.join(sets_dir, '*') ).empty?, "There should be no sets generated if do_generate is false" )
+
+    #
+    # Test with the no_rollover flag.  This should generate a set, but not link it to current.
+    #
+
+    expected_dir = File.join(sets_dir, @domain.ssl_next_set_name)
+    current_dir  = File.join(ssl_dir, "current")
+
+    assert_nothing_raised{ result = @domain.ssl_magic(14, true, false) }
+    assert(File.directory?(expected_dir), "A set should have been generated in #{expected_dir}")
+    assert(!File.exist?(current_dir), "The link to current should not have been generated yet")
+
+    #
+    # Now run it normally. This should create the symlink
+    #
+    assert_nothing_raised{ result = @domain.ssl_magic(14) }
+    assert(File.exist?(current_dir), "The link to current should have been generated.")
+    assert_equal(expected_dir, File.readlink(current_dir))
+
+    #
+    # Now test rolling over lots of times
+    #
+    10.times do |s|
+      expected_dir = File.join(sets_dir, @domain.ssl_next_set_name)
+      assert_nothing_raised{ result = @domain.ssl_magic(500) }
+      assert(File.directory?(expected_dir), "Failed to generate set #{expected_dir} correctly")
+      assert_equal(expected_dir, File.readlink(current_dir))
+    end
+
+    #
+    # Now create a directory in the way
+    #
+    expected_dir = File.join(sets_dir, @domain.ssl_next_set_name)
+    Symbiosis::Utils.mkdir_p(expected_dir)
+    assert_nothing_raised{ result = @domain.ssl_magic(500) }
+
+    #
+    # Now create a file in the way
+    #
+    expected_dir = File.join(sets_dir, @domain.ssl_next_set_name)
+    FileUtils.touch(expected_dir)
+    assert_nothing_raised{ result = @domain.ssl_magic(500) }
 
   end
 

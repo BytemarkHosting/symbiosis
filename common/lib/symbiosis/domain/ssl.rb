@@ -2,7 +2,6 @@ require 'symbiosis/domain'
 require 'symbiosis/ssl'
 require 'symbiosis/ssl/certificate_set'
 require 'openssl'
-require 'tmpdir'
 require 'erb'
 
 module Symbiosis
@@ -183,16 +182,14 @@ module Symbiosis
       return ssl_provider
     end
 
-    def ssl_next_set
+    def ssl_next_set_name
       next_set = self.ssl_available_sets.last
 
       if next_set.nil?
-        next_set = "0"
+        "0"
       else
-        next_set.succ!
+        next_set.name.succ
       end
-
-      next_set     
     end
 
     #
@@ -258,7 +255,11 @@ module Symbiosis
       this_set = self.ssl_legacy_set if this_set.nil?
 
       if this_set.is_a?(Symbiosis::SSL::CertificateSet)
-        puts "\tCurrent set is #{this_set.name}" if $VERBOSE
+        if this_set.certificate.issuer == this_set.certificate.subject
+          puts "\tCurrent SSL set #{this_set.name}: self-signed for #{this_set.certificate.issuer}, expires #{this_set.certificate.not_after}" if $VERBOSE
+        else
+          puts "\tCurrent SSL set #{this_set.name}: signed by #{this_set.certificate.issuer}, expires #{this_set.certificate.not_after}" if $VERBOSE
+        end
       end
 
       @ssl_current_set = this_set
@@ -280,18 +281,17 @@ module Symbiosis
 
       return @ssl_available_sets unless @ssl_available_sets.empty?
 
-      Dir.glob(File.join(self.config_dir, 'ssl' ,'*')).sort.each do |cert_dir|
+      #
+      #
+      #
+      Dir.glob(File.join(self.config_dir, 'ssl', 'sets', '*')).
+        sort_by{|i| i.to_s.split(/(\d+)/).map{|e| [e.to_i, e]}}.each do |cert_dir|
 
         begin
           this_set = Symbiosis::SSL::CertificateSet.new(self, cert_dir)
         rescue Errno::ENOENT, Errno::ENOTDIR
           next
         end
-
-        #
-        # Always miss out the "current" set
-        #
-        next if this_set.name == "current"
 
         #
         # If this certificate verifies, add it to our list.  We allow 18 as an
@@ -302,7 +302,7 @@ module Symbiosis
         @ssl_available_sets << this_set
       end
 
-      return @ssl_available_sets.sort!
+      return @ssl_available_sets.sort!{|a,b| a.certificate.not_after <=> b.certificate.not_after}
     end
 
     #
@@ -311,8 +311,9 @@ module Symbiosis
     # if a rollover was performed, or false otherwise.
     #
     def ssl_rollover
+      @ssl_available_sets = []
       current = self.ssl_current_set
-      latest  = self.ssl_available_sets.sort.last
+      latest  = self.ssl_available_sets.last
 
       if latest.nil? or !File.directory?(latest.directory)
         warn "\tNo valid sets of certificates found." if $VERBOSE
@@ -344,17 +345,106 @@ module Symbiosis
       Process.euid = self.uid if Process.uid == 0
 
       File.unlink(current_dir) unless stat.nil?
-      File.symlink(latest.name, current_dir)
+      File.symlink(latest.directory, current_dir)
 
-      Process.euid = 0 if Process.uid == 0
-      Process.egid = 0 if Process.gid == 0
+      #
+      # Restore privileges
+      #
+      Process.euid = 0 if Process.uid == 0 and Process.euid != Process.uid
+      Process.egid = 0 if Process.gid == 0 and Process.egid != Process.gid
 
       #
       # Update our latest
       #
       @ssl_current_set = latest
+      puts "\tRolled over to SSL set #{latest.name}" if $VERBOSE
 
       return true
+    ensure
+      #
+      # Make sure we restore privs.
+      #
+      Process.euid = 0 if Process.uid == 0 and Process.euid != Process.uid
+      Process.egid = 0 if Process.gid == 0 and Process.egid != Process.gid
+    end
+
+    #
+    # This method does
+    #   * validation
+    #   * generation
+    #   * rollover
+    #
+    def ssl_magic(threshold = 14, do_generate = true, do_rollover = true, now = Time.now)
+
+      puts "* Examining certificates for #{self.name}" if $VERBOSE
+
+      #
+      # Stage 0: verify and check expiriy
+      #
+      set = self.ssl_current_set
+      set = self.ssl_available_sets.last unless set.is_a?(Symbiosis::SSL::CertificateSet)
+
+      expires_in = nil
+
+      if set.is_a?(Symbiosis::SSL::CertificateSet)
+        expires_in = ((set.certificate.not_after - now)/86400.0).round
+        if expires_in < 14
+          puts "\tThe certificate is due to expire in #{expires_in} days" if $VERBOSE
+        end
+
+      else
+        puts "\tNo valid certificates found." if $VERBOSE
+      end
+
+      #
+      # Stage 1: Generate
+      #
+      if do_generate and (set.nil? or (expires_in.is_a?(Integer) and expires_in < threshold))
+        #
+        # If ssl-provision has been disabled, move on.
+        #
+        if false == self.ssl_provider
+          puts "\tNot fetching new certificate as the ssl-provider has been set to 'false'" if $VERBOSE
+
+        elsif !self.ssl_provider_class.is_a?(Class) or !(self.ssl_provider_class <= Symbiosis::SSL::CertificateSet)
+          puts "\tNot fetching new certificate as the ssl-provider #{ssl_provider.inspect} cannot be found." if $VERBOSE
+
+        else
+          #
+          # Default to letsencrypt
+          #
+          puts "\tFetching a new certificate from #{self.ssl_provider_class.to_s.split("::").last}." if $VERBOSE
+
+          cert_set = self.ssl_fetch_new_certificate
+          raise RuntimeError, "Failed to fetch certificate" if cert_set.nil?
+
+          cert_set.name = self.ssl_next_set_name
+          begin
+            cert_set.write
+          rescue StandardError
+            cert_set.name = cert_set.name.succ!
+            cert_set.directory = cert_set.name
+            retry 
+          end
+
+          @ssl_available_sets << cert_set
+        end
+      end
+
+      #
+      # Stage 2: Roll over
+      #
+      if do_rollover and self.ssl_rollover
+        return true
+      else
+        return !do_rollover
+      end
+
+#    rescue StandardError => err
+#      puts "\t!! Failed: #{err.to_s.gsub($/,'')}" if $VERBOSE
+#      puts err.backtrace.join("\n") if $DEBUG
+#      return false
+
     end
 
   end
