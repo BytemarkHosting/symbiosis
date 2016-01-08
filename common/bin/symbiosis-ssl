@@ -6,10 +6,12 @@
 #
 # SYNOPSIS
 #
-#   symbiosis-ssl [ --no-generate ] [ --no-rollover ] [ --verbose ] [ --manual ]
+#   symbiosis-ssl [ --threshold N ] [ --no-generate ] [ --no-rollover ] [ --verbose ] [ --manual ]
 #     [ --help ] [ DOMAIN DOMAIN ...]
 #
 # OPTIONS
+#
+#  --threshold N    Number days before expiry that certificates should be renewed.  Defaults to 10.
 #
 #  --no-generate    Do not try and generate keys or certificates.
 #
@@ -38,6 +40,7 @@ opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
     [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
     [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+    [ '--threshold', '-t', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--no-generate', '-G', GetoptLong::NO_ARGUMENT ],
     [ '--no-rollover', '-R', GetoptLong::NO_ARGUMENT ],
     [ '--prefix', '-p', GetoptLong::REQUIRED_ARGUMENT ]
@@ -46,9 +49,21 @@ opts = GetoptLong.new(
 manual = help = false
 $VERBOSE = false
 prefix = "/srv"
+do_generate = do_rollover = true
+threshold = 10
 
 opts.each do |opt,arg|
   case opt
+    when '--no-generate'
+      do_generate = false
+    when '--no-rollover'
+      do_rollover = false
+    when '--threshold'
+      begin
+        threshold = Integer(arg)
+      rescue ArgumentError
+        warn "** Could not parse #{arg.inspect} as an integer for --threshold"
+      end
     when '--help'
       help = true
     when '--manual'
