@@ -419,12 +419,15 @@ module Symbiosis
           raise RuntimeError, "Failed to fetch certificate" if cert_set.nil?
 
           cert_set.name = self.ssl_next_set_name
+
+          retried = false
           begin
             cert_set.write
-          rescue StandardError
+          rescue Errno::ENOTDIR, Errno::EEXIST 
             cert_set.name = cert_set.name.succ!
             cert_set.directory = cert_set.name
-            retry 
+            retried = true
+            retry unless retried
           end
 
           @ssl_available_sets << cert_set
@@ -439,11 +442,6 @@ module Symbiosis
       else
         return !do_rollover
       end
-
-#    rescue StandardError => err
-#      puts "\t!! Failed: #{err.to_s.gsub($/,'')}" if $VERBOSE
-#      puts err.backtrace.join("\n") if $DEBUG
-#      return false
 
     end
 
