@@ -123,10 +123,7 @@ end
 
 exit_code = 0
 
-#
-#
-#
-%w(QUIT INT TERM).each do |sig|
+%w(INT TERM).each do |sig|
   trap(sig) do
 
     if 0 == Process.uid
@@ -134,7 +131,7 @@ exit_code = 0
       Process.egid = 0
     end
 
-    exit exit_code
+    exit 1
   end
 end
 
@@ -149,4 +146,6 @@ domains.each do |domain|
     exit_code = 1
   end
 end
+
+exit exit_code
 
