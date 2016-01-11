@@ -480,8 +480,8 @@ module Symbiosis
         #
         # Drop privs before creating the temporary directory, if required.
         #
-        Process.egid = self.gid if Process.gid == 0
-        Process.euid = self.uid if Process.uid == 0
+        Process.egid = self.domain.gid if Process.gid == 0
+        Process.euid = self.domain.uid if Process.uid == 0
 
         tmpdir = Dir.mktmpdir(self.name+"-ssl-")
 
