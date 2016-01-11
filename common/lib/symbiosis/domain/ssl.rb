@@ -66,6 +66,8 @@ module Symbiosis
       self.ssl_current_set.certificate_chain_file
     end
 
+    alias :ssl_bundle_file :ssl_certificate_chain_file
+
     def ssl_add_ca_path(p)
       @ssl_current_set ||= Symbiosis::SSL::CertificateSet.new(self, self.config_dir)
       self.ssl_current_set.add_ca_path(p)
