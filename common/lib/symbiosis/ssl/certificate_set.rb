@@ -2,7 +2,6 @@ require 'symbiosis/domain'
 require 'symbiosis/ssl'
 require 'symbiosis/utils'
 require 'openssl'
-require 'tmpdir'
 require 'erb'
 
 module Symbiosis
@@ -471,46 +470,42 @@ module Symbiosis
         store.error
       end
 
+      #
+      # This method writes the set out to the directory.  It tries to use the
+      # ssl-cert group, present on Debian as the group for the set directory,
+      # with a mode of 0750, to prevent unwanted processes reading the file.
+      #
+      # If this fails, we revert to 0755 (i.e. world-readable).
+      #
       def write
         raise ArgumentError, "The directory for this SSL certificate set has been given" if self.directory.nil?
 
         raise Errno::EEXIST.new self.directory if File.exist?(self.directory)
-        mkdir_p(File.dirname(self.directory))
 
-        #
-        # Drop privs before creating the temporary directory, if required.
-        #
-        Process.egid = self.domain.gid if Process.gid == 0
-        Process.euid = self.domain.uid if Process.uid == 0
+        ssl_cert_group = nil
+        mkdir_opts = {}
 
-        tmpdir = Dir.mktmpdir(self.name+"-ssl-")
+        begin
+          ssl_cert_group = Etc.getgrnam('ssl-cert')
+          Process.groups += [ssl_cert_group.gid] unless Process.groups.include?(ssl_cert_group.gid)
+          mkdir_opts = {:gid => ssl_cert_group.gid, :mode => 0750}
+        rescue ArgumentError, Errno::EPERM => err
+          puts "\tUnable to use 'ssl-cert' group (#{err.to_s}) when writing SSL Set #{self.name}" if $VERBOSE
+          mkdir_opts = {:mode => 0755}
+        end
 
-        #
-        # Restore privs -- set_param will use the owner/group of the directory
-        # when writing files.
-        #       
-        Process.euid = 0 if Process.uid == 0
-        Process.egid = 0 if Process.gid == 0
+        Symbiosis::Utils.mkdir_p(self.directory, mkdir_opts)
 
         combined = [:certificate, :bundle, :key].map{|k| self.__send__(k) }.flatten.compact
 
-        set_param("ssl.key",self.key.to_pem, tmpdir)
-        set_param("ssl.crt",self.certificate.to_pem, tmpdir)
-        set_param("ssl.csr",self.request.to_pem, tmpdir) if self.request
+        set_param("ssl.key",self.key.to_pem, self.directory)
+        set_param("ssl.crt",self.certificate.to_pem, self.directory)
+        set_param("ssl.csr",self.request.to_pem, self.directory) if self.request
 
-        set_param("ssl.bundle",self.bundle.map(&:to_pem).join("\n"), tmpdir) if self.bundle and !self.bundle.empty?
-        set_param("ssl.combined", combined.map(&:to_pem).join("\n"), tmpdir)
-
-        FileUtils.mv(tmpdir, self.directory)
+        set_param("ssl.bundle",self.bundle.map{|b| b.to_pem.chomp}.join("\n"), self.directory) if self.bundle and !self.bundle.empty?
+        set_param("ssl.combined", combined.map{|b| b.to_pem.chomp}.join("\n"), self.directory)
 
         self.directory
-      ensure
-        #
-        # Make sure we restore privs.
-        #
-        Process.euid = 0 if Process.uid == 0 and Process.euid != Process.uid
-        Process.egid = 0 if Process.gid == 0 and Process.egid != Process.gid
-
       end
 
     end
