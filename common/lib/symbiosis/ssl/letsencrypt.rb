@@ -111,7 +111,7 @@ module Symbiosis
       def registered?
         self.client.authorize(domain: name)
         return true
-      rescue Acme::Error::Unauthorized
+      rescue Acme::Client::Error::Unauthorized
         return false
       end
 
@@ -145,11 +145,11 @@ module Symbiosis
       end
 
       def acme_certificate(request = self.request)
-        return @certificate if @certificate.is_a?(Acme::Certificate)
+        return @certificate if @certificate.is_a?(Acme::Client::Certificate)
 
         acme_certificate = client.new_certificate(request)
 
-        if acme_certificate.is_a?(Acme::Certificate)
+        if acme_certificate.is_a?(Acme::Client::Certificate)
           @certificate = acme_certificate
         else
           @certificate = nil
@@ -162,7 +162,7 @@ module Symbiosis
       # Returns the signed X509 certificate for the request.
       #
       def certificate(request = self.request)
-        if self.acme_certificate(request).is_a?(Acme::Certificate)
+        if self.acme_certificate(request).is_a?(Acme::Client::Certificate)
           self.acme_certificate.x509
         else
           nil
@@ -173,7 +173,7 @@ module Symbiosis
       # Returns the CA bundle as an array
       #
       def bundle(request = self.request)
-        if self.acme_certificate(request).is_a?(Acme::Certificate)
+        if self.acme_certificate(request).is_a?(Acme::Client::Certificate)
           self.acme_certificate.x509_chain
         else
           []

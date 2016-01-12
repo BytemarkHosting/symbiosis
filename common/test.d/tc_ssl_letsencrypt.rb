@@ -254,7 +254,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     result = @client.registered?
     assert(result, "#registered? should return true once registered")
 
-    assert_raise(Acme::Error::Malformed, "#register should return raise an error on second attempt") { @client.register }
+    assert_raise(Acme::Client::Error::Malformed, "#register should return raise an error on second attempt") { @client.register }
   end
 
   def test_verify
@@ -306,7 +306,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
   def test_acme_certificate
     omit unless @client
     @client.register
-    assert_kind_of(Acme::Certificate, @client.acme_certificate)
+    assert_kind_of(Acme::Client::Certificate, @client.acme_certificate)
   end
 
 end
