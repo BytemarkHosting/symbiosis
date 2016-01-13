@@ -16,8 +16,29 @@ tls_advertise_hosts = *
 # need the first setting, or in separate files, in which case you need both
 # options.
 
-tls_certificate = /etc/ssl/ssl.combined
-tls_privatekey  = /etc/ssl/ssl.combined
+#
+# This does simple SNI based on a list of certificates/keys.  There is no
+# checking to see if a key matches a certificate.
+#
+tls_certificate = ${extract {1}{:}{\
+      ${filter {VHOST_DIR/${tls_sni}/config/ssl/current/ssl.combined:\
+                VHOST_DIR/${tls_sni}/config/ssl/current/ssl.crt:\
+                VHOST_DIR/${tls_sni}/config/ssl.combined:\
+                VHOST_DIR/${tls_sni}/config/ssl.crt:\
+                /etc/ssl/ssl.combined:\
+                /etc/ssl/ssl.crt}\
+      {exists{$item}}}\
+    }
+
+tls_privatekey = ${extract {1}{:}{\
+      ${filter {VHOST_DIR/${tls_sni}/config/ssl/current/ssl.combined:\
+                VHOST_DIR/${tls_sni}/config/ssl/current/ssl.key:\
+                VHOST_DIR/${tls_sni}/config/ssl.combined:\
+                VHOST_DIR/${tls_sni}/config/ssl.key:\
+                /etc/ssl/ssl.combined:\
+                /etc/ssl/ssl.key}\
+      {exists{$item}}}\
+    }
 
 # In order to support roaming users who wish to send email from anywhere,
 # you may want to make Exim listen on other ports as well as port 25, in
