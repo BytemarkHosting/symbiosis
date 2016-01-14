@@ -74,7 +74,7 @@ module Symbiosis
 
       @dkim_selector = if selector.is_a?(String) and selector =~ selector_regex
         $1.to_s
-  
+
       elsif selector == false or selector.nil?
         nil
 
@@ -94,7 +94,7 @@ module Symbiosis
         # We don't want localhost to be our selector.
         #
         hostname = ""  if hostname == "localhost"
-        
+
         unless hostname.empty? or hostname.include?(".")
           begin
             hostname = Socket.gethostbyname(hostname).first
@@ -103,16 +103,19 @@ module Symbiosis
           end
         end
 
-        #
-        # Default to "default" if the hostname doesn't match the regex.  This
-        # should never happen (I don't think!).
-        #
-        hostname = "default" unless hostname =~ selector_regex 
+        if hostname =~ selector_regex
+          #
+          # Just return the first component.
+          #
+          $2.to_s
+        else
+          #
+          # Default to "default" if the hostname doesn't match the regex.  This
+          # should never happen (I don't think!).
+          #
+          "default"
+        end
 
-        #
-        # Just return the first component.
-        #
-        $2.to_s
       end
     end
 
@@ -125,7 +128,7 @@ module Symbiosis
       # to both OpenSSL and Ruby1.9+, so we have to construct the correct
       # format ourselves.
       #
-      der_key = if RUBY_VERSION =~ /^1\.8/ 
+      der_key = if RUBY_VERSION =~ /^1\.8/
         OpenSSL::ASN1::Sequence.new([
           OpenSSL::ASN1::Sequence.new([
             OpenSSL::ASN1::ObjectId.new("rsaEncryption"),
