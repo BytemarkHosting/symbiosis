@@ -135,7 +135,7 @@ module Symbiosis
           puts "\tRequesting verification for #{name} from #{endpoint}" if $VERBOSE
           60.times do
             sleep(1)
-            break if challenge.verify_status == "valid"
+            break unless challenge.verify_status == "pending"
           end
 
           challenge.verify_status == "valid"
