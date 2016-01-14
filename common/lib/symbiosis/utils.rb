@@ -16,7 +16,7 @@ module Symbiosis
     # This method will show the manual to the caller.
     #
     def show_manual( filename )
-      show_help_or_usage( filename, false )
+      show_help_or_manual( filename, false )
     end
 
     #
@@ -25,15 +25,16 @@ module Symbiosis
     #
     # This method will show brief usage-information to the caller.
     #
-    def show_usage( filename )
-      show_help_or_usage( filename, true )
+    def show_help( filename )
+      show_help_or_manual( filename, true )
     end
 
+    alias :show_usage :show_help
 
     #
     #  Show either the manual, or the brief usage text.
     #
-    def show_help_or_usage( filename, help )
+    def show_help_or_manual( filename, help )
 
       #
       # Open the file, stripping the shebang line
@@ -504,7 +505,7 @@ module Symbiosis
       raise Errno::ENOLCK, "Unable to release lock -- #{err.to_s}"
     end
 
-    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock, :show_usage, :show_manual, :show_help_or_usage
+    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock, :show_help, :show_usage, :show_manual, :show_help_or_manual
 
   end
 

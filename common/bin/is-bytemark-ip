@@ -1,16 +1,13 @@
 #!/usr/bin/ruby
 #
 # NAME
-#
 #   is-bytemark-ip - Check if a system's IP addresses are on the Bytemark network.
 #
 # SYNOPSIS
-#
 #   is-bytemark-ip [ --ipv4 | -4 ] [ --ipv6 | -6 ]
 #                  [ --verbose | -v ] [ --help | -h ] [ <ip address> ]
 #
 # OPTIONS
-#
 #  --ipv4          Check IPv4 addresses
 #
 #  --ipv6          Check IPv6 addresses

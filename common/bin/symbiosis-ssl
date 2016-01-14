@@ -1,16 +1,13 @@
 #!/usr/bin/ruby
 # 
 # NAME
-#
 #   symbiosis-ssl - Manage and generate SSL certificates 
 #
 # SYNOPSIS
-#
 #   symbiosis-ssl [ --threshold N ] [ --no-generate ] [ --no-rollover ] [ --verbose ] [ --manual ]
 #     [ --help ] [ DOMAIN DOMAIN ...]
 #
 # OPTIONS
-#
 #  --threshold N    Number days before expiry that certificates should be renewed.  Defaults to 10.
 #
 #  --no-generate    Do not try and generate keys or certificates.
@@ -26,7 +23,6 @@
 #   --verbose     Show debugging information.
 #
 # AUTHOR
-#
 #   Patrick J. Cherry <patrick@bytemark.co.uk>
 #
 

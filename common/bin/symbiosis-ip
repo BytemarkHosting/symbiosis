@@ -1,15 +1,12 @@
 #!/usr/bin/ruby
 # 
 # NAME
-#
 #   symbiosis-ip - Determine the primary IP address of this system
 #
 # SYNOPSIS
-#
 #   symbiosis-ip [ --all ] [ --ipv4 ] [ --ipv6 ] [ --verbose ] [ --help ]
 #
 # OPTIONS
-#
 #   --all         Show all available addresses on the system, not just the
 #                 primary one.
 #

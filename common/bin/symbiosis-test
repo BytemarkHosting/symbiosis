@@ -1,15 +1,12 @@
 #!/usr/bin/ruby
 #
 # NAME
-#
-#  symbiosis-test - Test systems' functionality running under Symbiosis
+#   symbiosis-test - Test systems' functionality running under Symbiosis
 #
 # SYNOPSIS
-#
-#  symbiosis-test [ --help ] [ --manual ] [ --verbose ] [directory]
+#   symbiosis-test [ --help ] [ --manual ] [ --verbose ] [directory]
 #
 # OPTIONS
-#
 #   --help        Show a brief help message.
 #
 #  --manual       Show the full manual.
