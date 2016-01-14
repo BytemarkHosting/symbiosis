@@ -1,3 +1,9 @@
+symbiosis-xmpp (2015:1022) stable; urgency=medium
+
+  * Updated to work with new version of symbiosis-common.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 14 Jan 2016 16:44:04 +0000
+
 symbiosis-xmpp (2015:1021) stable; urgency=medium
 
   * Fixed bugs in configuration (missing semicolons).
