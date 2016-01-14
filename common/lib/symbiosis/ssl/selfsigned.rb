@@ -3,6 +3,7 @@ require 'symbiosis/ssl/certificate_set'
 require 'symbiosis/domain'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/utils'
+require 'etc'
 require 'time'
 
 module Symbiosis
@@ -33,13 +34,16 @@ module Symbiosis
 
         provider = self.class.to_s.split("::").last.downcase
 
+        #
+        # This first path is the default one that gets created.
+        #
         paths = [ File.join(self.domain.config_dir, "ssl", provider) ]
 
-        #
-        # This last path is the default one that gets created.
-        #
-        if ENV["HOME"]
-          paths << File.join(ENV["HOME"],".symbiosis", "ssl", provider)
+        begin
+          user = Etc.getpwuid(self.domain.uid)
+          paths << File.join(user.dir,".symbiosis", "ssl", provider)
+        rescue ArgumentError
+          # do nothing
         end
 
         paths << "/etc/symbiosis/config/ssl/#{provider}"
