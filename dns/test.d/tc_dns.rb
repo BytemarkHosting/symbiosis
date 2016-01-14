@@ -246,36 +246,14 @@ EOF
     #
     @domain.__send__(:set_param,'dmarc',true, @domain.config_dir)
     assert(@domain.has_dmarc?)
-    assert_equal("v=DMARC1;p=quarantine;sp=none", @domain.dmarc_record)
+    assert_equal("v=DMARC1; p=quarantine; sp=none", @domain.dmarc_record)
    
-    #
-    # Test with antispam
-    #
-    @domain.__send__(:set_param,'antispam',true, @domain.config_dir)
-    assert_equal("v=DMARC1;p=quarantine;pct=100;sp=none", @domain.dmarc_record)
-   
-
-    #
-    # Test it with SPF
-    #
-    @domain.__send__(:set_param,"spf", true, @domain.config_dir)
-    assert_equal("v=DMARC1;aspf=s;p=quarantine;pct=100;sp=none", @domain.dmarc_record)
-
-
-    #
-    # Test it with DKIM
-    #
-    @domain.__send__(:set_param,"dkim.key", dkim_private_key_pem, @domain.config_dir)
-    @domain.__send__(:set_param,"dkim", true, @domain.config_dir)
-    assert_equal("v=DMARC1;adkim=s;aspf=s;p=quarantine;pct=100;sp=none", @domain.dmarc_record)
-    
-
     #
     # Test a user-defined record 
     #
-    @domain.__send__(:set_param,'dmarc',"v=DMARC1;p=reject;pct=100;rua=mailto:postmaster@dmarcdomain.com", @domain.config_dir)
-    assert_equal("v=DMARC1;p=reject;pct=100;rua=mailto:postmaster@dmarcdomain.com", @domain.dmarc_record)
-    
+    @domain.__send__(:set_param,'dmarc',"v=DMARC1; p=reject; pct=100; rua=mailto:postmaster@dmarcdomain.com", @domain.config_dir)
+    assert_equal("v=DMARC1; p=reject; pct=100; rua=mailto\\072postmaster\\100dmarcdomain.com", @domain.dmarc_record)
+
     #
     # Now test the template
     #
@@ -284,7 +262,7 @@ EOF
     config.template = @dns_template
     txt = config.generate_config
 
-    assert_match(/^'_dmarc.#{Regexp.escape(@domain.name)}:v=DMARC1;p=reject;pct=100;rua=mailto\\072postmaster@dmarcdomain\.com:300$/,txt, "No line mentions a.nospam.bytemark.co.uk")
+    assert_match(/^'_dmarc.#{Regexp.escape(@domain.name)}:v=DMARC1; p=reject; pct=100; rua=mailto\\072postmaster\\100dmarcdomain\.com:300$/,txt, "")
   end
 
 end
