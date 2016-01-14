@@ -46,7 +46,7 @@ module Symbiosis
           # do nothing
         end
 
-        paths << "/etc/symbiosis/config/ssl/#{provider}"
+        paths << "/etc/symbiosis/ssl/#{provider}"
 
         @config_dirs = paths.reject{|p| !File.directory?(p) }
 
