@@ -109,7 +109,7 @@ module Symbiosis
       # request.
       #
       def registered?
-        self.client.authorize(domain: name)
+        self.client.authorize(domain: self.domain.name)
         return true
       rescue Acme::Client::Error::Unauthorized
         return false
