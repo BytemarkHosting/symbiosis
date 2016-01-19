@@ -1,3 +1,12 @@
+symbiosis-common (2015:1212) stable; urgency=medium
+
+  * Only poll the LetsEncrypt servers whilst the certificate request is still
+    pending, rather than waiting until it is verified.
+  * Fixed up --help opion to commands to output help.
+  * Fixed "!! Failed: Error creating new authz :: DNS name was empty" error.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 19 Jan 2016 11:40:35 +0000
+
 symbiosis-common (2015:1211) stable; urgency=medium
 
   * Added ruby-test-unit as an explicit depends.
