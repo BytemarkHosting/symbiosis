@@ -105,6 +105,15 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   end
 
+  def do_bad_nonce(request)
+    {:status => 409,
+      :headers => {
+        "Content-Type"=>"application/problem+json",
+      },
+      :body => "{\"type\":\"urn:acme:error:badNonce\",\"detail\":\"JWS has invalid anti-replay nonce\",\"status\":409}",
+    }
+  end
+
   def do_post_new_reg(request)
     req     = JSON.load(request.body)
     protect = JSON.load(UrlSafeBase64.decode64(req["protected"]))
@@ -377,6 +386,23 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       to_return{|r| do_get_authz_invalid(r)}
 
     assert_raises(ArgumentError, "No error raised when an invalid request is generated"){ @domain.ssl_magic }
+  end
+
+  def test_bad_nonce_retries
+    omit unless @client
+
+    #
+    # The client should retry "a reasonable" number of times.
+    #
+    stub_request(:post, "#{@endpoint}/acme/new-reg").
+      to_return{|r| do_bad_nonce(r)}.
+      to_return{|r| do_bad_nonce(r)}.
+      to_return{|r| do_bad_nonce(r)}.
+      to_return{|r| do_bad_nonce(r)}.
+      to_return{|r| do_bad_nonce(r)}.
+      to_return{|r| do_post_new_reg(r)}
+
+      assert_nothing_raised{ @client.register }
   end
 
 end

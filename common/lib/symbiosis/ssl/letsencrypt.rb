@@ -47,7 +47,6 @@ module Symbiosis
           set_param( "account_key", account_key.to_pem, self.config_dirs.first, :mode => 0600)
         end
 
-
         @config[:account_key] = account_key
       end
 
@@ -103,12 +102,12 @@ module Symbiosis
         #
         # Send the key to the server.
         #
-        registration = self.client.register(contact: 'mailto:'+self.email)
+        registration = do_with_nonce_debounce{ self.client.register(contact: 'mailto:'+self.email) }
 
         #
         # Should probably check we accept the terms.
         #
-        registration.agree_terms
+        do_with_nonce_debounce { registration.agree_terms }
 
         return true
       end
@@ -118,7 +117,7 @@ module Symbiosis
       # request.
       #
       def registered?
-        self.client.authorize(domain: self.domain.name)
+        do_with_nonce_debounce{ self.client.authorize(domain: self.domain.name) }
         return true
       rescue Acme::Client::Error::Unauthorized
         return false
@@ -131,8 +130,8 @@ module Symbiosis
         #
         # Set up the authorisation for the http01 challenge
         #
-        authorisation = self.client.authorize(domain: name)
-        challenge     = authorisation.http01
+        authorisation = do_with_nonce_debounce{ self.client.authorize(domain: name) }
+        challenge     = do_with_nonce_debounce{ authorisation.http01 }
 
         mkdir_p(File.join(self.docroot, File.dirname(challenge.filename)))
 
@@ -140,13 +139,14 @@ module Symbiosis
           challenge.file_content,
           File.join(self.docroot, File.dirname(challenge.filename)))
 
-        if challenge.request_verification
+        if do_with_nonce_debounce{ challenge.request_verification }
           puts "\tRequesting verification for #{name} from #{endpoint}" if $VERBOSE
 
           vs = nil # Record the verify status
 
           60.times do
-            break unless (vs = challenge.verify_status) == "pending"
+            vs = do_with_nonce_debounce { challenge.verify_status }
+            break unless vs == "pending"
             sleep(1)
           end
 
@@ -166,7 +166,7 @@ module Symbiosis
 
         raise ArgumentError, "Invalid certificate request" unless request.is_a?(OpenSSL::X509::Request)
 
-        acme_certificate = client.new_certificate(request)
+        acme_certificate = do_with_nonce_debounce{ client.new_certificate(request) }
 
         if acme_certificate.is_a?(Acme::Client::Certificate)
           @certificate = acme_certificate
@@ -197,6 +197,37 @@ module Symbiosis
         else
           []
         end
+      end
+
+      #
+      # The letsencrypt servers sometimes complain about bad replay nonces.
+      # The client should retry a reasonable number of times, so this is our
+      # wrapper to retry any request up to 5 times.
+      #
+      # https://community.letsencrypt.org/t/getting-the-client-sent-an-unacceptable-anti-replay-nonce/9172
+      # https://github.com/letsencrypt/boulder/issues/1217
+      #
+      def do_with_nonce_debounce(&block)
+        retries = 0
+
+        begin
+          yield
+
+        rescue Acme::Client::Error::BadNonce => err
+
+          if retries < 5
+            retries += 1
+            sleep 0.5 # Don't hammer the servers too quickly
+            retry
+          end
+
+          #
+          # Ugh, something is going wrong.  Lets bail out.
+          #
+          raise
+
+        end
+
       end
 
     end
