@@ -661,7 +661,7 @@ class SSLTest < Test::Unit::TestCase
     assert_equal("dummy", @domain.ssl_provider, "#ssl_provider should return the first available provider")
 
     [[ "dummy", "dummy" ],
-      [  "../../../evil", false ],
+      [  "../../../evil", "evil" ],
       [  "false", false ]].each do |contents, result|
 
       File.open(@domain.directory+"/config/ssl-provider","w+"){|fh| fh.puts(contents)}
@@ -847,10 +847,10 @@ class SSLTest < Test::Unit::TestCase
   def test_ssl_magic
     #
     # This requires the Self-signed provider to be in place
-    # 
+    #
 
     @domain.ssl_provider = "selfsigned"
-    
+
     ssl_dir  = File.join(@domain.config_dir, "ssl")
     sets_dir = File.join(ssl_dir, "sets")
 

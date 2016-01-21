@@ -125,12 +125,7 @@ module Symbiosis
 
       return false unless provider.is_a?(String)
 
-      unless provider =~ /^[a-z0-9_]+$/
-        warn "\tBad ssl-provider for #{self.name}" if $VERBOSE
-        return false
-      end
-
-      provider.chomp
+      provider.gsub(/[^A-Za-z0-9_]/,"")
     end
 
     def ssl_provider=(provider)
