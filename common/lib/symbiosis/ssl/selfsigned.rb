@@ -170,13 +170,6 @@ module Symbiosis
         request.public_key = key.public_key
 
         #
-        # Stick the domain name in
-        #
-        request.subject = OpenSSL::X509::Name.new([
-          ['CN', self.domain.name, OpenSSL::ASN1::UTF8STRING]
-        ])
-
-        #
         # Add in our X509v3 extensions.
         #
         exts = []
@@ -190,6 +183,12 @@ module Symbiosis
           names = @names
         end
 
+        #
+        # Stick the domain name in
+        #
+        request.subject = OpenSSL::X509::Name.new([
+          ['CN', names.first, OpenSSL::ASN1::UTF8STRING]
+        ])
 
         #
         # Use the subjectAltName if one has been given.  This is for SNI, i.e. SSL
@@ -246,7 +245,6 @@ module Symbiosis
         crt.extensions = [
           ef.create_extension("basicConstraints","CA:FALSE", true),
           ef.create_extension("subjectKeyIdentifier", "hash")
-#          ef.create_extension("authorityKeyIdentifier", "keyid:always,issuer:always")
         ]
 
         #
