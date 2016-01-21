@@ -25,11 +25,8 @@ module Symbiosis
       spf = "v=spf1 +a +mx ?all" if spf === true
 
       if spf.is_a?(String)
-        # We encode just the first line.
-        line = spf.split($/).first
-
-        # But we make sure we remove any trailing \r, or \n characeters
-        line = line.tr( "\n\r", "" )
+        # We encode just the first line, and remove any whitespace from the ends.
+        line = spf.split($/).first.strip
 
         tinydns_encode(line)
       else

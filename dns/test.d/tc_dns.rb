@@ -156,8 +156,6 @@ EOF
     # Now stick a different record in.
     #
     spf_record = "v=spf1 ip6:2001:41c8:1:2:3::4 -all"
-    encoded_spf_record = "ip6:2001:41c8:1:2:3::4 -all"
-    encoded_spf_record = "v=spf1 ip6\\0721080\\072\\0728\\072800\\07268/96 -all"
     @domain.__send__(:set_param,"spf", spf_record, @domain.config_dir)
     txt = config.generate_config
     spf_records = txt.split($/).select{|l| l =~ basic_spf_record_match}
@@ -168,6 +166,19 @@ EOF
     #
     spf_records.each do |r|
       assert_match(/^'#{Regexp.escape(@domain.name)}:#{Regexp.escape(spf_record.gsub(":",'\\\\072'))}:/, r)
+    end
+
+    #
+    # Test a record with a newline
+    #
+    spf_record = "v=spf1 ip6:2001:41c8:1:2:3::4 -all\r\n"
+    @domain.__send__(:set_param,"spf", spf_record, @domain.config_dir)
+    txt = config.generate_config
+    spf_records = txt.split($/).select{|l| l =~ basic_spf_record_match}
+    assert_not_equal([], spf_records, "SPF record(s) not found when custom SPF record with newline was set")
+
+    spf_records.each do |r|
+      assert_match(/^'#{Regexp.escape(@domain.name)}:#{Regexp.escape(spf_record.strip.gsub(":",'\\\\072'))}:/, r, "SPF record generation failed when newlines were added")
     end
 
   end
