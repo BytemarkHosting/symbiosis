@@ -180,6 +180,7 @@ module Symbiosis
       ssl_provider = ssl_provider_class.new(self)
       ssl_provider.register unless ssl_provider.registered?
       ssl_provider.verify_and_request_certificate!
+      ssl_provider.certificate
 
       return ssl_provider
     end
@@ -413,7 +414,6 @@ module Symbiosis
 
         else
           #
-          # Default to letsencrypt
           #
           puts "\tFetching a new certificate from #{self.ssl_provider_class.to_s.split("::").last}." if $VERBOSE
 

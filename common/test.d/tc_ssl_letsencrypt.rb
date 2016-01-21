@@ -34,6 +34,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     @http01_challenge =  {} # This is where we store our challenges
     @authz_template = Addressable::Template.new "#{@endpoint}/acme/authz/{sekrit}/0"
 
+
     #
     # Stub requests to our imaginary endpoint
     #
@@ -47,6 +48,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
     @client = Symbiosis::SSL::LetsEncrypt.new(@domain)
     @client.config()[:endpoint] = @endpoint
+
+    Symbiosis::Utils.set_param("endpoint", @endpoint, File.join(@domain.config_dir, "ssl", "letsencrypt"))
   end
 
   def teardown
@@ -106,9 +109,9 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     req     = JSON.load(request.body)
     protect = JSON.load(UrlSafeBase64.decode64(req["protected"]))
     key = nil
-    if protect.is_a?(Hash) and 
+    if protect.is_a?(Hash) and
       protect.has_key?("jwk") and
-      protect["jwk"].is_a?(Hash) and 
+      protect["jwk"].is_a?(Hash) and
       protect["jwk"].has_key?("n")
       key     = protect["jwk"]["n"]
     end
@@ -180,6 +183,22 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       "status" => "valid",
       "validated" => Time.now,
       "expires" =>  (Date.today + 90) })
+
+    {:status => 200, :body => JSON.dump(@http01_challenge[sekrit]),  :headers => {"Content-Type" => "application/json"}}
+  end
+
+  def do_get_authz_pending(request)
+    sekrit = @authz_template.extract(request.uri)["sekrit"]
+
+    @http01_challenge[sekrit].merge!({"status" => "pending"})
+
+    {:status => 200, :body => JSON.dump(@http01_challenge[sekrit]),  :headers => {"Content-Type" => "application/json"}}
+  end
+
+  def do_get_authz_invalid(request)
+    sekrit = @authz_template.extract(request.uri)["sekrit"]
+
+    @http01_challenge[sekrit].merge!({"status" => "invalid"})
 
     {:status => 200, :body => JSON.dump(@http01_challenge[sekrit]),  :headers => {"Content-Type" => "application/json"}}
   end
@@ -271,6 +290,14 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     omit unless @client
     @client.register
 
+    #
+    # Give pending back a few times.
+    #
+    stub_request(:get,  @authz_template).
+      to_return{|r| do_get_authz_pending(r)}.
+      to_return{|r| do_get_authz_pending(r)}.
+      to_return{|r| do_get_authz(r)}
+
     req = nil
     req = @client.request
 
@@ -297,6 +324,35 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     assert((expected_domains - san_domains).empty?, "Domains were missing from subjectAltName in the request: " + (expected_domains - san_domains).join(", ") )
   end
 
+  def test_register_with_duff_domains
+    omit unless @client
+    @client.register
+
+    stub_request(:get,  @authz_template).
+      to_return{|r| do_get_authz_pending(r)}.
+      to_return{|r| do_get_authz_pending(r)}.
+      to_return{|r| do_get_authz_invalid(r)}
+    assert_nil(@client.request)
+
+    @client.instance_variable_set(:@names, [])
+    assert_nil(@client.request)
+    assert_raise(ArgumentError){ @client.acme_certificate }
+  end
+
+  def test_register_when_first_name_fails_to_verify
+    omit unless @client
+    @client.register
+
+    stub_request(:get,  @authz_template).
+      to_return{|r| do_get_authz_invalid(r)}.
+      to_return{|r| do_get_authz(r)}
+
+    req = @client.request
+
+    assert_kind_of(OpenSSL::X509::Request, req)
+    assert_equal("/CN=#{@domain.aliases.first}", req.subject.to_s)
+  end
+
   def test_key
     omit unless @client
     assert_kind_of(OpenSSL::PKey::PKey, @client.key)
@@ -307,6 +363,20 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     omit unless @client
     @client.register
     assert_kind_of(Acme::Client::Certificate, @client.acme_certificate)
+  end
+
+  def test_ssl_magic_works
+    omit unless @client
+    @domain.ssl_magic
+  end
+
+  def test_ssl_magic_breaks_nicely
+    omit unless @client
+
+    stub_request(:get,  @authz_template).
+      to_return{|r| do_get_authz_invalid(r)}
+
+    assert_raises(ArgumentError, "No error raised when an invalid request is generated"){ @domain.ssl_magic }
   end
 
 end
