@@ -1,3 +1,9 @@
+symbiosis-common (2015:1214) stable; urgency=medium
+
+  * Retry (up to 5 times) if LetsEncrypt return a bad nonce error.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 21 Jan 2016 15:43:55 +0000
+
 symbiosis-common (2015:1213) stable; urgency=medium
 
   * Don't give duff emails (with newlines) to letsencrypt.
