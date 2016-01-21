@@ -73,9 +73,18 @@ module Symbiosis
       # Returns the account's email address, defaulting to root@fqdn if nothing set.
       #
       def email
-        return self.config[:email] if self.config[:email].is_a?(String)
+        unless self.config[:email].is_a?(String)
+          @config[:email] = "root@"+Symbiosis::Host.fqdn
+        end
 
-        @config[:email] = "root@"+Symbiosis::Host.fqdn
+        if @config[:email] =~ /([^\.@%!\/\|\s][^@%!\/\|\s]*@[a-z0-9\.-]+)/i
+          @config[:email] = $1
+        else
+          puts "\tAddress #{@config[:email].inspect} looks wrong.  Using default" if $VERBOSE
+          @config[:email] = "root@"+Symbiosis::Host.fqdn
+        end
+
+        return self.config[:email]
       end
 
       #
