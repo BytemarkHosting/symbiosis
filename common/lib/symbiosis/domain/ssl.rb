@@ -160,9 +160,8 @@ module Symbiosis
     # This fetches the certificate from using ssl_provider_class.  If
     # ssl_provider_class does not return a suitable Class, nil is returned.
     #
-    # Returns an hash of
-    #
-    #  { :key, :certificate, :request, :bundle}
+    # Returns the an ssl_provider instance, having requested the certificate
+    # etc.
     #
     def ssl_fetch_new_certificate
       ssl_provider_class = self.ssl_provider_class
@@ -372,7 +371,7 @@ module Symbiosis
     #   * generation
     #   * rollover
     #
-    def ssl_magic(threshold = 14, do_generate = true, do_rollover = true, now = Time.now)
+    def ssl_magic(threshold = 14, do_generate = true, do_rollover = true, force = false, now = Time.now)
 
       puts "* Examining certificates for #{self.name}" if $VERBOSE
 
@@ -386,18 +385,18 @@ module Symbiosis
 
       if set.is_a?(Symbiosis::SSL::CertificateSet)
         expires_in = ((set.certificate.not_after - now)/86400.0).round
-        if expires_in < 14
+        if expires_in < threshold
           puts "\tThe certificate is due to expire in #{expires_in} days" if $VERBOSE
         end
 
       else
-        puts "\tNo valid certificates found." if $VERBOSE
+        puts "\tNo valid certificate sets found." if $VERBOSE
       end
 
       #
       # Stage 1: Generate
       #
-      if do_generate and (set.nil? or (expires_in.is_a?(Integer) and expires_in < threshold))
+      if do_generate and (set.nil? or (expires_in.is_a?(Integer) and expires_in < threshold) or force)
         #
         # If ssl-provision has been disabled, move on.
         #
@@ -417,14 +416,20 @@ module Symbiosis
 
           cert_set.name = self.ssl_next_set_name
 
-          retried = false
+          retries = 0
           begin
             cert_set.write
-          rescue Errno::ENOTDIR, Errno::EEXIST 
-            cert_set.name = cert_set.name.succ!
+          rescue Errno::ENOTDIR, Errno::EEXIST => err
+            cert_set.name = cert_set.name.succ
             cert_set.directory = cert_set.name
-            retried = true
-            retry unless retried
+            retries += 1
+
+            #
+            # Retry if we've failed once already.
+            #
+            retry if retries <= 1
+
+            raise RuntimeError, "Failed to write set (#{err.to_s})"
           end
 
           @ssl_available_sets << cert_set

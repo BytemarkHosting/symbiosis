@@ -883,6 +883,12 @@ class SSLTest < Test::Unit::TestCase
     assert_equal(expected_dir, File.readlink(current_dir))
 
     #
+    # And run it again.  Nothing should change
+    #
+    assert_nothing_raised{ result = @domain.ssl_magic(14) }
+    assert_equal(expected_dir, File.readlink(current_dir))
+
+    #
     # Now test rolling over lots of times
     #
     10.times do |s|
@@ -905,6 +911,24 @@ class SSLTest < Test::Unit::TestCase
     expected_dir = File.join(sets_dir, @domain.ssl_next_set_name)
     FileUtils.touch(expected_dir)
     assert_nothing_raised{ result = @domain.ssl_magic(500) }
+
+    #
+    # Now test a forced roll-over
+    #
+    current_cert = @domain.ssl_certificate
+    @domain.ssl_magic(14,true,true,false)
+
+    #
+    # Make sure nothing happens with force set to false.
+    #
+    assert_equal(current_cert.to_pem, @domain.ssl_certificate.to_pem, "Existing certificate replaced, even with force off")
+
+    #
+    # And do it again, this time set the flag to true.  It should regenerate it.
+    #
+    @domain.ssl_magic(14,true,true,true)
+    assert(current_cert.to_pem != @domain.ssl_certificate.to_pem, "Certificate not replaced with force on")
+
 
   end
 

@@ -1,13 +1,15 @@
 #!/usr/bin/ruby
-# 
+#
 # NAME
-#   symbiosis-ssl - Manage and generate SSL certificates 
+#   symbiosis-ssl - Manage and generate SSL certificates
 #
 # SYNOPSIS
 #   symbiosis-ssl [ --threshold N ] [ --no-generate ] [ --no-rollover ] [ --verbose ] [ --manual ]
 #     [ --help ] [ DOMAIN DOMAIN ...]
 #
 # OPTIONS
+#  --force          Re-generate certificates even if they're not due to be renewed.
+#
 #  --threshold N    Number days before expiry that certificates should be renewed.  Defaults to 10.
 #
 #  --no-generate    Do not try and generate keys or certificates.
@@ -36,6 +38,7 @@ opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
     [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
     [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+    [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
     [ '--threshold', '-t', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--no-generate', '-G', GetoptLong::NO_ARGUMENT ],
     [ '--no-rollover', '-R', GetoptLong::NO_ARGUMENT ],
@@ -47,6 +50,7 @@ $VERBOSE = false
 prefix = "/srv"
 do_generate = do_rollover = true
 threshold = 10
+force = false
 
 opts.each do |opt,arg|
   case opt
@@ -54,6 +58,8 @@ opts.each do |opt,arg|
       do_generate = false
     when '--no-rollover'
       do_rollover = false
+    when '--force'
+      force = true
     when '--threshold'
       begin
         threshold = Integer(arg)
@@ -106,7 +112,7 @@ ARGV.each do |arg|
   domain = Symbiosis::Domains.find(arg.to_s, prefix)
 
   if domain.nil?
-    warn "** Unable to find/parse domain #{arg.inspect}" 
+    warn "** Unable to find/parse domain #{arg.inspect}"
     next
   end
 
@@ -135,7 +141,7 @@ now = Time.now
 
 domains.each do |domain|
   begin
-    domain.ssl_magic(threshold, do_generate, do_rollover, now) 
+    domain.ssl_magic(threshold, do_generate, do_rollover, force, now)
   rescue StandardError => err
     puts "\t!! Failed: #{err.to_s.gsub($/,'')}" if $VERBOSE
     puts err.backtrace.join("\n") if $DEBUG
