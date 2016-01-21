@@ -175,13 +175,16 @@ module Symbiosis
         exts = []
         ef = OpenSSL::X509::ExtensionFactory.new
 
-        names = ([self.domain.name] + self.domain.aliases).uniq
-
         if verify_names
-          names = @names.reject{|name| !self.verify_name(name)}
+          names = @names.select{|name| self.verify_name(name)}
         else
           names = @names
         end
+
+        #
+        # If no names verify, exit.
+        #
+        return nil if names.empty?
 
         #
         # Stick the domain name in

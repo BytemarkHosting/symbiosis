@@ -133,19 +133,29 @@ module Symbiosis
 
         if challenge.request_verification
           puts "\tRequesting verification for #{name} from #{endpoint}" if $VERBOSE
+
+          vs = nil # Record the verify status
+
           60.times do
+            break unless (vs = challenge.verify_status) == "pending"
             sleep(1)
-            break unless challenge.verify_status == "pending"
           end
 
-          challenge.verify_status == "valid"
-        else
-          false
+          return true if vs == "valid"
+
+          if $VERBOSE
+            puts "\t!! Unable to verify #{name} (status: #{vs})"
+            puts "\t!! Check http://#{name}/#{challenge.filename} works."
+          end
         end
+
+        false
       end
 
       def acme_certificate(request = self.request)
         return @certificate if @certificate.is_a?(Acme::Client::Certificate)
+
+        raise ArgumentError, "Invalid certificate request" unless request.is_a?(OpenSSL::X509::Request)
 
         acme_certificate = client.new_certificate(request)
 
