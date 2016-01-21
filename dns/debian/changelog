@@ -1,13 +1,9 @@
-symbiosis-dns (2016:0121) stable; urgency=low
-
- * Avoid generating invalid SPF records by stripping any potential
-   newline characters prior to generating them.
-
- -- Steve Kemp <steve@bytemark.co.uk>  Thu, 21 Jan 2016 11:33:11 +0100
-
 symbiosis-dns (2015:1010) stable; urgency=medium
 
   * Fixed up DMARC record generation to produce valid records.
+  * Avoid generating invalid SPF records by stripping any potential
+   newline characters prior to generating them.
+
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 14 Jan 2016 16:44:59 +0000
 
