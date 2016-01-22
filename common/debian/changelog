@@ -1,3 +1,12 @@
+symbiosis-common (2015:1215) stable; urgency=medium
+
+  * Rejigged the conditions that trigger generation and rollover of
+    certificates.
+  * The next certificate name is now based on the contents of the ssl/sets/
+    directory rather than the sets that are available for use.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 22 Jan 2016 15:22:48 +0000
+
 symbiosis-common (2015:1214) stable; urgency=medium
 
   * Retry (up to 5 times) if LetsEncrypt return a bad nonce error.
