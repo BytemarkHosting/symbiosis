@@ -436,13 +436,13 @@ module Symbiosis
         # including any bundle that has been uploaded.
         #
         if store.verify(certificate)
-          puts "\tSSL set #{name}: Signed by \"#{certificate.issuer.to_s}\" for #{@domain.name}" if $DEBUG
+          puts "\tSSL set #{name}: Signed by \"#{certificate.issuer.to_s}\" for #{@domain.name}, expires #{certificate.not_after}" if $DEBUG
 
         elsif store.error == 18
           unless certificate.verify(key)
             raise OpenSSL::X509::CertificateError, "\tSSL set #{name}: Self signed, but the signature doesn't validate."
           end
-          puts "\tSSL set #{name}: Self-signed certificate for #{@domain.name}." if $DEBUG
+          puts "\tSSL set #{name}: Self-signed certificate for #{@domain.name}, expires #{certificate.not_after}.." if $DEBUG
         else
           msg =  "Not valid for #{@domain.name} -- "
           case store.error

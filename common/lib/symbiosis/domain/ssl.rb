@@ -307,10 +307,15 @@ module Symbiosis
     # set of certificates discovered by #ssl_available_sets. This returns true
     # if a rollover was performed, or false otherwise.
     #
-    def ssl_rollover
-      @ssl_available_sets = []
+    def ssl_rollover(to_set = nil)
       current = self.ssl_current_set
-      latest  = self.ssl_available_sets.last
+
+      if to_set.is_a?(Symbiosis::SSL::CertificateSet)
+        latest = to_set
+      else
+        @ssl_available_sets = []
+        latest = self.ssl_available_sets.last
+      end
 
       if latest.nil? or !File.directory?(latest.directory)
         warn "\tNo valid sets of certificates found." if $VERBOSE
@@ -371,32 +376,72 @@ module Symbiosis
     #   * generation
     #   * rollover
     #
-    def ssl_magic(threshold = 14, do_generate = true, do_rollover = true, force = false, now = Time.now)
+    def ssl_magic(threshold = 14, do_generate = nil, do_rollover = nil, now = Time.now)
 
       puts "* Examining certificates for #{self.name}" if $VERBOSE
 
       #
       # Stage 0: verify and check expiriy
       #
-      set = self.ssl_current_set
-      set = self.ssl_available_sets.last unless set.is_a?(Symbiosis::SSL::CertificateSet)
+      current_set = self.ssl_current_set
+      latest_set = self.ssl_available_sets.last
 
-      expires_in = nil
+      current_set_expires_in = ((current_set.certificate.not_after - now)/86400.0).round if current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      latest_set_expires_in  = ((latest_set.certificate.not_after - now)/86400.0).round  if latest_set.is_a?(Symbiosis::SSL::CertificateSet)
 
-      if set.is_a?(Symbiosis::SSL::CertificateSet)
-        expires_in = ((set.certificate.not_after - now)/86400.0).round
-        if expires_in < threshold
-          puts "\tThe certificate is due to expire in #{expires_in} days" if $VERBOSE
+      if current_set.is_a?(Symbiosis::SSL::CertificateSet)
+        #
+        # If our current set is not due to expire, do nothing.
+        #
+        # Otherwise  we should generate a new certificate if there is no other
+        # set with an expiry date further into the future.
+        #
+        if current_set_expires_in > threshold
+          do_generate = false if do_generate.nil?
+
+        else
+          puts "\tThe current certificate expires in #{current_set_expires_in} days." if $VERBOSE
+          do_generate = (!latest_set_expires_in or latest_set_expires_in <= current_set_expires_in) if do_generate.nil?
+
+        end
+
+
+      elsif latest_set.is_a?(Symbiosis::SSL::CertificateSet)
+        #
+        # If there is no current certificate set, but there is another set
+        # avaialable, and it is not due to expire soon, then don't generate,
+        # but do roll over.
+        #
+        # Otherwise generate a new certificate.
+        #
+        if latest_set_expires_in > threshold
+          do_generate = false if do_generate.nil?
+          do_rollover = true  if do_rollover.nil?
+
+        else
+          puts "\tThe latest available certificate expires in #{latest_set_expires_in} days." if $VERBOSE
+          do_generate = true if do_generate.nil?
+
         end
 
       else
         puts "\tNo valid certificate sets found." if $VERBOSE
+        do_generate = true  if do_generate.nil?
+
       end
+
+      #
+      # If we generate a new set, always roll over to it, unless told
+      # otherwise.
+      #
+      do_rollover = do_generate if do_rollover.nil?
 
       #
       # Stage 1: Generate
       #
-      if do_generate and (set.nil? or (expires_in.is_a?(Integer) and expires_in < threshold) or force)
+      cert_set = nil
+
+      if do_generate
         #
         # If ssl-provision has been disabled, move on.
         #
@@ -439,10 +484,10 @@ module Symbiosis
       #
       # Stage 2: Roll over
       #
-      if do_rollover and self.ssl_rollover
-        return true
+      if do_rollover
+        return self.ssl_rollover(cert_set)
       else
-        return !do_rollover
+        return false
       end
 
     end

@@ -8,7 +8,8 @@
 #     [ --help ] [ DOMAIN DOMAIN ...]
 #
 # OPTIONS
-#  --force          Re-generate certificates even if they're not due to be renewed.
+#  --force          Re-generate certificates, and roll over to the new set even
+#                   if they're not due to be renewed.
 #
 #  --threshold N    Number days before expiry that certificates should be renewed.  Defaults to 10.
 #
@@ -48,9 +49,8 @@ opts = GetoptLong.new(
 manual = help = false
 $VERBOSE = false
 prefix = "/srv"
-do_generate = do_rollover = true
+do_generate = do_rollover = nil
 threshold = 10
-force = false
 
 opts.each do |opt,arg|
   case opt
@@ -59,7 +59,7 @@ opts.each do |opt,arg|
     when '--no-rollover'
       do_rollover = false
     when '--force'
-      force = true
+      do_generate = do_rollover = true
     when '--threshold'
       begin
         threshold = Integer(arg)
@@ -141,7 +141,7 @@ now = Time.now
 
 domains.each do |domain|
   begin
-    domain.ssl_magic(threshold, do_generate, do_rollover, force, now)
+    domain.ssl_magic(threshold, do_generate, do_rollover, now)
   rescue StandardError => err
     puts "\t!! Failed: #{err.to_s.gsub($/,'')}" if $VERBOSE
     puts err.backtrace.join("\n") if $DEBUG

@@ -708,11 +708,10 @@ class SSLTest < Test::Unit::TestCase
     request = OpenSSL::X509::Request.new
     key, cert = do_generate_key_and_crt(@domain.name, {:ca_key => ca_key, :ca_cert => ca_cert})
 
-
     #
     # Set up our dummy provider
     #
-    Symbiosis::SSL::Dummy.any_instance.stubs(:verify_and_request_certificate!).returns(true)
+    Symbiosis::SSL::Dummy.any_instance.stubs(:verify_and_request_certificate!).returns(request)
     Symbiosis::SSL::Dummy.any_instance.stubs(:register).returns(true)
     Symbiosis::SSL::Dummy.any_instance.stubs(:registered?).returns(false)
     Symbiosis::SSL::Dummy.any_instance.stubs(:key).returns(key)
@@ -913,20 +912,17 @@ class SSLTest < Test::Unit::TestCase
     assert_nothing_raised{ result = @domain.ssl_magic(500) }
 
     #
-    # Now test a forced roll-over
+    # Now test a forced roll-over. First make sure nothing happens with force
+    # set to false.
     #
     current_cert = @domain.ssl_certificate
-    @domain.ssl_magic(14,true,true,false)
-
-    #
-    # Make sure nothing happens with force set to false.
-    #
+    @domain.ssl_magic(14)
     assert_equal(current_cert.to_pem, @domain.ssl_certificate.to_pem, "Existing certificate replaced, even with force off")
 
     #
     # And do it again, this time set the flag to true.  It should regenerate it.
     #
-    @domain.ssl_magic(14,true,true,true)
+    @domain.ssl_magic(15,true,true)
     assert(current_cert.to_pem != @domain.ssl_certificate.to_pem, "Certificate not replaced with force on")
 
 
