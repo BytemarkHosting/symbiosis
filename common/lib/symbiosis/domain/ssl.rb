@@ -173,19 +173,33 @@ module Symbiosis
 
       ssl_provider = ssl_provider_class.new(self)
       ssl_provider.register unless ssl_provider.registered?
-      ssl_provider.verify_and_request_certificate!
+
+      req = ssl_provider.verify_and_request_certificate!
+
+      return nil unless req.is_a?(OpenSSL::X509::Request)
+
       ssl_provider.certificate
 
       return ssl_provider
     end
 
-    def ssl_next_set_name
-      next_set = self.ssl_available_sets.last
+    #
+    # Returns an array of set names in the set directory.
+    #
+    def ssl_possible_set_names
+      Dir.glob(File.join(self.config_dir, 'ssl', 'sets', '*')).
+        sort_by{|i| i.to_s.split(/(\d+)/).map{|e| [e.to_i, e]}}.
+        collect{|d| File.basename(d)}
+    end
 
-      if next_set.nil?
+
+    def ssl_next_set_name
+      last_set_name = self.ssl_possible_set_names.last
+
+      if last_set_name.nil?
         "0"
       else
-        next_set.name.succ
+        last_set_name.succ
       end
     end
 
@@ -279,10 +293,10 @@ module Symbiosis
       return @ssl_available_sets unless @ssl_available_sets.empty?
 
       #
+      # Use the list of possible set names and go through each one.
       #
-      #
-      Dir.glob(File.join(self.config_dir, 'ssl', 'sets', '*')).
-        sort_by{|i| i.to_s.split(/(\d+)/).map{|e| [e.to_i, e]}}.each do |cert_dir|
+      self.ssl_possible_set_names.each do |name|
+        cert_dir = File.join(self.config_dir, 'ssl', 'sets', name)
 
         begin
           this_set = Symbiosis::SSL::CertificateSet.new(self, cert_dir)

@@ -385,7 +385,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     stub_request(:get,  @authz_template).
       to_return{|r| do_get_authz_invalid(r)}
 
-    assert_raises(ArgumentError, "No error raised when an invalid request is generated"){ @domain.ssl_magic }
+    assert_raises(RuntimeError, "No error raised when an invalid request is generated"){ @domain.ssl_magic }
   end
 
   def test_bad_nonce_retries
