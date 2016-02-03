@@ -180,6 +180,11 @@ module Symbiosis
           ans << "cafile = \"/etc/ssl/ssl.bundle\"" if File.exist?("/etc/ssl/ssl.bundle")
         end
 
+        #
+        # If there is no SSL, return an empty string.
+        #
+        return "" if ans.empty?
+
         ans.join(";\n")+";\n"
       end
 
