@@ -1,3 +1,10 @@
+symbiosis-email (2015:1212) stable; urgency=medium
+
+  * Fixed symbiosis-email-encrypt-passwords not to have $VERBOSE flag set
+    permanently.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 03 Feb 2016 13:40:49 +0000
+
 symbiosis-email (2015:1211) stable; urgency=medium
 
   * Removed useless test files from /etc/symbiosis/test.d/exim4_acl_tests.
