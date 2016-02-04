@@ -1,3 +1,10 @@
+symbiosis-backup (2015:1029) stable; urgency=medium
+
+  * Updated the available space checker to parse the backup2l.conf more
+    accurately.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 04 Feb 2016 12:43:12 +0000
+
 symbiosis-backup (2015:1028) stable; urgency=medium
 
   * Added in missing libswitch-perl dependency.
