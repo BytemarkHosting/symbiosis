@@ -126,16 +126,15 @@
 % if mandatory_ssl?
         <IfModule rewrite_module>
                 #
-                #  All accesses redirect to the HTTPS version of
-                # the site.
+                # This redirects all accesses to the HTTPS version of the site.
                 #
                 RewriteEngine On
 
                 #
-                # Use the SERVER_NAME variable if HTTP_HOST it has not been set.
+                # Use our server nane if HTTP_HOST is empty. 
                 #
                 RewriteCond "%{HTTP_HOST}" ""
-                RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R=301,L]
+                RewriteRule ^/?(.*) https://<%= domain %>/$1 [R=301,L]
                 RewriteRule ^/?(.*) https://%{HTTP_HOST}/$1 [R=301,L]
         </IfModule>
 % else
