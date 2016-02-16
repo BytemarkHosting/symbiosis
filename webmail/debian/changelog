@@ -1,3 +1,9 @@
+symbiosis-webmail (2015:1022) stable; urgency=medium
+
+  * Fixed up login_lc check in symbiosis extra config.  Closes #12453. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 16 Feb 2016 09:12:37 +0000
+
 symbiosis-webmail (2015:1021) stable; urgency=medium
 
   * Enabled password change plugin in roundcube.
