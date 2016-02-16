@@ -1,3 +1,11 @@
+symbiosis-httpd (2015:1108) stable; urgency=medium
+
+  * When ssl-only is set, the SSL template should redirect to the HTTP Host
+    given in the request, instead of assuming that the request should go to
+    the "bare" domain.  Closes #12383.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 05 Feb 2016 12:55:02 +0000
+
 symbiosis-httpd (2015:1107) stable; urgency=medium
 
   * Updated zz-mass-hosting templates to have a wildcard alias in order to
