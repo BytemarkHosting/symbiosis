@@ -7,7 +7,7 @@ snippets     := $(shell find $(CURDIR)/$(snippets_dir) -mindepth 1 -regextype po
 ifeq ($(program),dovecot)
 test_args = -a -c $(conf_tmp)
 else ifeq ($(program),exim4)
-test_args = -bV -C /etc/exim4/$(conf_tmp)
+test_args = -bV -C $(CURDIR)/$(conf_tmp)
 endif
 
 all: $(conf)
