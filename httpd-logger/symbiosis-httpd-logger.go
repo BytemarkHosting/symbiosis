@@ -5,6 +5,28 @@
 // The command-line flags are 100% compatible with the old implementation
 // even though they are largely ignored.
 //
+//
+// Security Concerns
+// -----------------
+//
+// This might be running as root.  Input such as this will create
+// /etc/public/logs/accsss.log:
+//
+//    ../etc foo bar baz
+//
+// In the real world this isn't a concern, a request to Apache wouldn't
+// get as far as our logger:
+//
+//   curl -H "Host: ../etc" http://example.vm.bytemark.co.uk/
+//   -> HTTP 400
+//   -> Bad Request
+//
+// Since the user can't start this as root, unless already root, or
+// inject intput into the Apache-owned pipe this is not a concern.
+//
+// Suggested solution?  Filter ".." from host-names.  At the moment
+// that isn't done, by the rationale above.
+//
 // Steve
 // --
 //
