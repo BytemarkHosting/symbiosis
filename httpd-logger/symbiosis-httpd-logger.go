@@ -28,11 +28,17 @@ import (
 // This is global because we have to access it both in
 // our main-loop and also from our signal-handler
 //
+// The key to the hash is the path to the file on-disk, with
+// the value containing the handle object.
+//
 var handles = make(map[string]*os.File)
 
 //
 // Setup a handler for SIGHUP which will close all of our
 // open files.
+//
+// Every day /etc/cron.daily/symbiosis-httpd-rotate-logs will
+// send such a signal.
 //
 func setup_hup_handler() {
 	c := make(chan os.Signal, 1)
@@ -74,35 +80,35 @@ func exists(path string) (bool, error) {
 func main() {
 
 	//
-	// Handle command line flags: -s/--sync
+	// Define command-line flags: -s/--sync
 	//
 	var sync_text = "Should we immediately sync to disk?"
 	var sync_long *bool = flag.Bool("sync", false, sync_text)
 	var sync_short *bool = flag.Bool("s", false, sync_text)
 
 	//
-	// Handle command line flags: -f/--max-files
+	// Define command-line flags: -f/--max-files
 	//
 	var files_text = "Maxium number of log files to hold open"
 	var files_long *int = flag.Int("files", 0, files_text)
 	var files_short *int = flag.Int("f", 0, files_text)
 
 	//
-	// Handle command line flags: -l/--log-name
+	// Define command-line flags: -l/--log-name
 	//
 	var log_text = "The name of the logfile to write"
 	var log_long *string = flag.String("log-name", "access.log", log_text)
 	var log_short *string = flag.String("l", "access.log", log_text)
 
 	//
-	// Handle command line flags: -v/--verbose
+	// Define command-line flags: -v/--verbose
 	//
 	var verbose_text = "Should we be verbose?"
 	var verbose_long *bool = flag.Bool("verbose", false, verbose_text)
 	var verbose_short *bool = flag.Bool("v", false, verbose_text)
 
 	//
-	// Handle command line flags: -u/-g
+	// Define command-line flags: -u/-g
 	//
 	var uid_text = "Set the UID -- privileges are dropped if this is set"
 	var g_uid *int = flag.Int("u", 0, uid_text)
@@ -110,10 +116,7 @@ func main() {
 	var g_gid *int = flag.Int("g", 0, gid_text)
 
 	//
-	// Perform the actual parsing.
-	//
-	// The previous "handling" was merely to define the options
-	// we expect the user to supply.
+	// Perform the actual parsing of the arguments.
 	//
 	flag.Parse()
 
@@ -123,12 +126,10 @@ func main() {
 	sync_flag := *sync_long || *sync_short
 	verbose_flag := *verbose_long || *verbose_short
 	files_count := (*files_long + *files_short)
-	if files_count == 0 {
-		files_count = 50
-	}
 
 	//
-	// The name of the per-domain logfile to write
+	// The name of the per-domain logfile to write beneath
+        // directories such as /srv/example.com/public/logs/
 	//
 	default_log := "access.log"
 
@@ -149,14 +150,11 @@ func main() {
 	// name of the "default" logfile.
 	//
 	// In addition to writing per-vhost logfiles we'll copy
-	// all logs to this particular file.
+	// all logs to that particular file.
 	//
+        // The default is this:
+        //
 	default_file := "/var/log/apache2/zz-mass-hosting.log"
-
-	//
-	// If we have a dangling/non-flag argument then this is the
-	// name of the default-logfile to use.
-	//
 	if len(flag.Args()) > 0 {
 		default_file = flag.Args()[0]
 	}
@@ -179,7 +177,7 @@ func main() {
 	//
 	// At this point we'd ideally change UID/GID to those supplied
 	// on the command-line, however syscall.Setgid and syscall.Setuid
-	// don't actually work.
+	// don't actually work(!)
 	//
 	// We're living in exciting times with golang, so we'll not worry
 	// about it here.  Instead we'll set the UID/GID on the logfile(s)
@@ -195,7 +193,7 @@ func main() {
 	setup_hup_handler()
 
 	//
-	// A simple scanner to read (unbuffered) input, line-by-line.
+	// Instantiate a scanner to read (unbuffered) input, line-by-line.
 	//
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -290,21 +288,16 @@ func main() {
 		// here, so we need to open the file.
 		//
 		if h == nil {
-			// Open the file.
 			handles[logfile], _ = os.OpenFile(logfile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0664)
-
-			// Update the handle
 			h = handles[logfile]
-
-			// Ensure we don't leak
 			defer h.Close()
 
 			//
 			// If we've been given a UID/GID explicitly
 			// then we'll use them.
 			//
-			// If not we match that on the /srv/$domain
-			// directory
+			// If not we match the UID/GID of the top-level
+                        // /srv/$domain directory, which we found earlier.
 			//
 			if *g_uid != 0 {
 				uid = uint32(*g_uid)
