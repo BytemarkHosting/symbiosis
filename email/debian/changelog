@@ -1,3 +1,9 @@
+symbiosis-email (2015:1213) stable; urgency=medium
+
+  * Fixed incompatibility with updated exim4 (#12673).
+
+ -- James Carter <jcarter@bytemark.co.uk>  Thu, 17 Mar 2016 13:37:26 +0000
+
 symbiosis-email (2015:1212) stable; urgency=medium
 
   * Fixed symbiosis-email-encrypt-passwords not to have $VERBOSE flag set
