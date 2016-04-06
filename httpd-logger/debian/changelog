@@ -1,0 +1,5 @@
+symbiosis-httpd-logger (0.1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Wed, 06 Apr 2016 17:22:17 +0000

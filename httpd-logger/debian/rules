@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+
+
+include /usr/share/dpkg/default.mk
+
+override_dh_auto_build:
+	        go build ./symbiosis-httpd-logger.go
+
+%:
+	        dh $@
+

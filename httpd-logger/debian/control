@@ -1,0 +1,12 @@
+Source: symbiosis-httpd-logger
+Section: unknown
+Priority: extra
+Maintainer: Steve Kemp <steve@bytemark.co.uk>
+Build-Depends: debhelper (>=9), dh-golang, golang-go (>= 1.5.1)
+Standards-Version: 3.9.4
+
+Package: symbiosis-httpd-logger
+Built-Using: ${misc:Built-Using}
+Depends: ${misc:Depends}
+Architecture: all
+Description: Common logging library for BigV
