@@ -359,7 +359,10 @@ configurations.each do |config|
 
       else
         verbose "\tConfiguration is up-to date."
-        next
+
+        if config.enabled?(sites_enabled_file)
+          next
+        end
 
       end
 
