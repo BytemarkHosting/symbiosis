@@ -8,5 +8,8 @@ Standards-Version: 3.9.4
 Package: symbiosis-httpd-logger
 Built-Using: ${misc:Built-Using}
 Depends: ${misc:Depends}
-Architecture: all
-Description: Common logging library for BigV
+Architecture: any
+Description: golang based logging process.
+  .
+  This package replaces the original/default ruby-based logging process
+  which is executed by Apache, with the intention of saving RAM.
