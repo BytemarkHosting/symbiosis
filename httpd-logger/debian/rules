@@ -1,22 +1,8 @@
 #!/usr/bin/make -f
 
-export DH_VERBOSE=1
+export DH_GOPKG := symbiosis-httpd-logger
 
 include /usr/share/dpkg/default.mk
 
-override_dh_clean:
-	rm -f ./symbiosis-httpd-logger || true
-
-build:
-	go build ./symbiosis-httpd-logger.go
-	mkdir -p debian/tmp || true
-	cp symbiosis-httpd-logger debian/tmp
-
-
-override_dh_install:
-	go build ./symbiosis-httpd-logger.go
-	mkdir -p debian/symbiosis-httpd-logger/usr/sbin || true
-	cp symbiosis-httpd-logger debian/symbiosis-httpd-logger/usr/sbindebian/tmp
-
 %:
-	dh $@
+	dh $@ --buildsystem=golang --with=golang
