@@ -1,11 +1,17 @@
 #!/usr/bin/make -f
 
+export DH_VERBOSE=1
 
 include /usr/share/dpkg/default.mk
 
-override_dh_auto_build:
-	        go build ./symbiosis-httpd-logger.go
+override_dh_clean:
+	rm -f ./symbiosis-httpd-logger || true
+
+build:
+	go build ./symbiosis-httpd-logger.go
+	mkdir -p debian/tmp || true
+	mv symbiosis-httpd-logger debian/tmp
+	dh_auto_build
 
 %:
-	        dh $@
-
+	dh $@
