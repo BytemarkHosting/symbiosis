@@ -10,8 +10,13 @@ override_dh_clean:
 build:
 	go build ./symbiosis-httpd-logger.go
 	mkdir -p debian/tmp || true
-	mv symbiosis-httpd-logger debian/tmp
-	dh_auto_build
+	cp symbiosis-httpd-logger debian/tmp
+
+
+override_dh_install:
+	go build ./symbiosis-httpd-logger.go
+	mkdir -p debian/symbiosis-httpd-logger/usr/sbin || true
+	cp symbiosis-httpd-logger debian/symbiosis-httpd-logger/usr/sbindebian/tmp
 
 %:
 	dh $@
