@@ -1,0 +1,3 @@
+debian/files
+debian/tmp
+debian/symbiosis-httpd-logger
