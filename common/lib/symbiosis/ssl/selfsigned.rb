@@ -63,7 +63,7 @@ module Symbiosis
       end
 
       #
-      # Reads and returns the LetsEncrypt configuration
+      # Reads and returns the configuration
       #
       def config
         return @config unless @config.values.compact.empty?
