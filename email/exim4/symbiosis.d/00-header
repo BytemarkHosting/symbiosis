@@ -14,9 +14,3 @@
 #
 #   cd /etc/exim4
 #   make
-#
-# And then restart exim4
-#
-#   /etc/init.d/exim4 restart
-#
-
