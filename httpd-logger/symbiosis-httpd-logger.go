@@ -55,6 +55,13 @@ import (
 //
 var handles = make(map[string]*os.File)
 
+
+//
+// The number of files we'll keep open at any one time.
+//
+var files_count = 100
+
+
 //
 // Setup a handler for SIGHUP which will close all of our
 // open files.
@@ -80,6 +87,84 @@ func close_logfiles() {
 		handles[path] = nil
 	}
 	setup_hup_handler()
+}
+
+//
+// Open a file - and ensure that it is not a symlink
+//
+// This function requires a little bit of explanation, because it doesn't
+// work the way that it should.  Ideally we'd opne the file, then run a
+// stat against the handle.  However in wonderful golang this doesn't work.
+//
+// You can open a file, and then stat the handle, but you will get a result
+// which doesn't allow you to determine if the target is a symlink or not.
+//
+// This means you're reduced to stating on the file-path, via the `os.Lstat`
+// function.  The problem here is that this is racy:
+//
+//   1.  Test if file is symlink.
+//
+//   2.  Open file.
+//
+// A racy-attacker could switch the result at point 1.5.  As a compromise
+// we open the file, then run the check.  This means that we can't be
+// switched in the simple way - if a symlink is swapped in then our
+// existing/open handle won't point to it.
+//
+// You can prove this by running two terminals:
+//
+//    one: cat > foo
+//
+// Then in the other:
+//
+//    two: rm foo; ln -s /etc/passwd foo
+//
+// You will not overwrite the file.
+//
+// And on that note let us safely open a file.
+//
+func safeOpen(path string) *os.File {
+
+
+	//
+	// If we have too many open files then close them all.
+	//
+	if len(handles) > files_count {
+		for path, handle := range handles {
+			handle.Close()
+			handles[path] = nil
+		}
+	}
+
+	//
+	// Open the file.  If it fails report that.
+	//
+	handle, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Failed to open file:", path)
+		return nil
+	}
+
+	//
+	//  Now stat the file, to make sure it isn't a symlink.
+	//
+	//  We don't want to blindly write to symlinks because that
+	// can cause security issues.
+	//
+	fi, serr := os.Lstat(path)
+	if serr != nil {
+		fmt.Println("Failed to stat the file", path, serr)
+		handle.Close()
+		return nil
+	}
+
+	if fi.Mode()&os.ModeSymlink != 0 {
+		fmt.Println("Cowardly refusing to write to symlinked file", path)
+		handle.Close()
+		return nil
+	}
+
+	return handle
 }
 
 //
@@ -147,11 +232,11 @@ func main() {
 	//
 	sync_flag := *sync_long || *sync_short
 	verbose_flag := *verbose_long || *verbose_short
-	files_count := (*files_long + *files_short)
+	files_count = (*files_long + *files_short)
 
 	//
 	// The name of the per-domain logfile to write beneath
-        // directories such as /srv/example.com/public/logs/
+	// directories such as /srv/example.com/public/logs/
 	//
 	default_log := "access.log"
 
@@ -174,8 +259,8 @@ func main() {
 	// In addition to writing per-vhost logfiles we'll copy
 	// all logs to that particular file.
 	//
-        // The default is this:
-        //
+	// The default is this:
+	//
 	default_file := "/var/log/apache2/zz-mass-hosting.log"
 	if len(flag.Args()) > 0 {
 		default_file = flag.Args()[0]
@@ -241,15 +326,16 @@ func main() {
 		// This might be closed by the SIGHUP handler, for example.
 		//
 		if handles[default_file] == nil {
-			handles[default_file], _ = os.OpenFile(default_file, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0664)
-			defer handles[default_file].Close()
+			handles[default_file] = safeOpen(default_file)
 		}
 
 		//
 		// Before we do anything else write the new entry to
 		// the default logfile.
 		//
-		handles[default_file].WriteString(log + "\n")
+		if handles[default_file] != nil {
+			handles[default_file].WriteString(log + "\n")
+                }
 
 		//
 		// The line will contain the vhost-name as the initial
@@ -310,16 +396,15 @@ func main() {
 		// here, so we need to open the file.
 		//
 		if h == nil {
-			handles[logfile], _ = os.OpenFile(logfile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0664)
+			handles[logfile] = safeOpen(logfile)
 			h = handles[logfile]
-			defer h.Close()
 
 			//
 			// If we've been given a UID/GID explicitly
 			// then we'll use them.
 			//
 			// If not we match the UID/GID of the top-level
-                        // /srv/$domain directory, which we found earlier.
+			// /srv/$domain directory, which we found earlier.
 			//
 			if *g_uid != 0 {
 				uid = uint32(*g_uid)
@@ -337,7 +422,9 @@ func main() {
 		// Write the log-line, adding the newline which the
 		// scanner removed.
 		//
-		h.WriteString(rest + "\n")
+		if h != nil {
+			h.WriteString(rest + "\n")
+                }
 	}
 
 	// Check for errors during `Scan`. End of file is
@@ -348,11 +435,8 @@ func main() {
 	}
 
 	//
-	// Close all our open handles - shouldn't be required as the deferred
-	// close will do the necessary.
+	// Close all our open handles.
 	//
-	for _, handle := range handles {
-		handle.Close()
-	}
+        close_logfiles()
 	os.Exit(0)
 }
