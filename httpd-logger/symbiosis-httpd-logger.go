@@ -58,7 +58,16 @@ var handles = make(map[string]*os.File)
 //
 // The number of files we'll keep open at any one time.
 //
+// This may be changed by a command-line flag.
+//
 var files_count = 100
+
+//
+// Are we running verbosely?
+//
+// This may be changed by a command-line flag.
+//
+var verbose = false
 
 //
 // Setup a handler for SIGHUP which will close all of our
@@ -138,7 +147,9 @@ func safeOpen(path string) *os.File {
 	//
 	handle, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Failed to open file:", path)
+		if verbose {
+			fmt.Fprintln(os.Stderr, "Failed to open file:", path)
+		}
 		return nil
 	}
 
@@ -150,7 +161,10 @@ func safeOpen(path string) *os.File {
 	//
 	fi, serr := os.Lstat(path)
 	if serr != nil {
-		fmt.Println("Failed to stat the file", path, serr)
+		if verbose {
+
+			fmt.Println("Failed to stat the file", path, serr)
+		}
 		handle.Close()
 		return nil
 	}
@@ -228,7 +242,7 @@ func main() {
 	// Handle the possible short/long alternatives.
 	//
 	sync_flag := *sync_long || *sync_short
-	verbose_flag := *verbose_long || *verbose_short
+	verbose = *verbose_long || *verbose_short
 	files_count = (*files_long + *files_short)
 
 	//
@@ -267,9 +281,9 @@ func main() {
 	// If being verbose then dump state of the parsed-flags to
 	// the screen.  Most of these are ignored ..
 	//
-	if verbose_flag {
+	if verbose {
 		fmt.Fprintln(os.Stderr, "sync:", sync_flag)
-		fmt.Fprintln(os.Stderr, "verbose:", verbose_flag)
+		fmt.Fprintln(os.Stderr, "verbose:", verbose)
 		fmt.Fprintln(os.Stderr, "files:", files_count)
 		fmt.Fprintln(os.Stderr, "uid:", *g_uid)
 		fmt.Fprintln(os.Stderr, "gid:", *g_gid)
@@ -345,7 +359,10 @@ func main() {
 		//
 		match := re.FindStringSubmatch(log)
 		if match == nil {
-			fmt.Fprintln(os.Stderr, "Received malformed request-line:", log)
+			if verbose {
+
+				fmt.Fprintln(os.Stderr, "Received malformed request-line:", log)
+			}
 			continue
 
 		}
@@ -362,7 +379,10 @@ func main() {
 		//
 		stat, err := os.Stat(logfile)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Received request for vhost that doesn't exist:", err)
+			if verbose {
+
+				fmt.Fprintln(os.Stderr, "Received request for vhost that doesn't exist:", err)
+			}
 			continue
 		}
 		sys := stat.Sys()
@@ -429,7 +449,10 @@ func main() {
 	// Check for errors during `Scan`. End of file is
 	// expected and not reported by `Scan` as an error.
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "error:", err)
+		if verbose {
+
+			fmt.Fprintln(os.Stderr, "error:", err)
+		}
 		os.Exit(1)
 	}
 
