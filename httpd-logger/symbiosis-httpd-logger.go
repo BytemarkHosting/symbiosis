@@ -55,12 +55,10 @@ import (
 //
 var handles = make(map[string]*os.File)
 
-
 //
 // The number of files we'll keep open at any one time.
 //
 var files_count = 100
-
 
 //
 // Setup a handler for SIGHUP which will close all of our
@@ -124,7 +122,6 @@ func close_logfiles() {
 // And on that note let us safely open a file.
 //
 func safeOpen(path string) *os.File {
-
 
 	//
 	// If we have too many open files then close them all.
@@ -335,7 +332,7 @@ func main() {
 		//
 		if handles[default_file] != nil {
 			handles[default_file].WriteString(log + "\n")
-                }
+		}
 
 		//
 		// The line will contain the vhost-name as the initial
@@ -415,7 +412,9 @@ func main() {
 
 			// Ensure the UID/GID of the logfile match that on the
 			// virtual-hosts' directory
-			os.Chown(logfile, int(uid), int(gid))
+			if h != nil {
+				h.Chown(int(uid), int(gid))
+			}
 		}
 
 		//
@@ -424,7 +423,7 @@ func main() {
 		//
 		if h != nil {
 			h.WriteString(rest + "\n")
-                }
+		}
 	}
 
 	// Check for errors during `Scan`. End of file is
@@ -437,6 +436,6 @@ func main() {
 	//
 	// Close all our open handles.
 	//
-        close_logfiles()
+	close_logfiles()
 	os.Exit(0)
 }
