@@ -150,7 +150,10 @@ module Symbiosis
             sleep(1)
           end
 
-          return true if vs == "valid"
+          if vs == "valid"
+            puts "\tSuccessfully verified #{name}" if $VERBOSE
+            return true
+          end
 
           if $VERBOSE
             puts "\t!! Unable to verify #{name} (status: #{vs})"

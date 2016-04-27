@@ -491,6 +491,8 @@ module Symbiosis
             raise RuntimeError, "Failed to write set (#{err.to_s})"
           end
 
+          puts "\tSuccessfully fetched new certificate and created set #{cert_set.name}" if $VERBOSE
+
           @ssl_available_sets << cert_set
         end
       end
