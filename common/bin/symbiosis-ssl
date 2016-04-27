@@ -9,9 +9,9 @@
 #
 # OPTIONS
 #  --force          Re-generate certificates, and roll over to the new set even
-#                   if they're not due to be renewed.
+#                   if they're not due to be renewed.  Implies --verbose.
 #
-#  --threshold N    Number days before expiry that certificates should be renewed.  Defaults to 10.
+#  --threshold N    Number days before expiry that certificates should be renewed.  Defaults to 21.
 #
 #  --no-generate    Do not try and generate keys or certificates.
 #
@@ -50,7 +50,7 @@ manual = help = false
 $VERBOSE = false
 prefix = "/srv"
 do_generate = do_rollover = nil
-threshold = 10
+threshold = 21
 
 opts.each do |opt,arg|
   case opt
@@ -60,6 +60,7 @@ opts.each do |opt,arg|
       do_rollover = false
     when '--force'
       do_generate = do_rollover = true
+      $VERBOSE = true
     when '--threshold'
       begin
         threshold = Integer(arg)
