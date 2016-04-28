@@ -261,7 +261,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def do_get_bundle(r)
     setup_root_ca
-    {:status => 200, :body => @root_ca_crt}
+    {:status => 200, :body => @root_ca_crt.to_s}
   end
 
   ####
