@@ -1,3 +1,9 @@
+symbiosis-webmail (2014:1114) oldstable; urgency=medium
+
+  * Fix up to roundcube webmail configuration.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 13 May 2016 18:54:50 +0100
+
 symbiosis-webmail (2014:1113) stable; urgency=medium
 
   * Updated roundcube config to reflect the new jessie configuration.
