@@ -5,9 +5,9 @@
 #  symbiosis-httpd-configure - Auto-configure Apache2 sites with specified IPs
 #
 # SYNOPSIS
-#  symbiosis-httpd-configure [ --ssl-template | -s <file> ] 
-#                         [ --non-ssl-template | -t <file> ] 
-#                         [ --apache2-dir | -a <directory> ] 
+#  symbiosis-httpd-configure [ --ssl-template | -s <file> ]
+#                         [ --non-ssl-template | -t <file> ]
+#                         [ --apache2-dir | -a <directory> ]
 #                         [ --force | -f ] [ --no-reload | -n ]
 #                         [ --help | -h ] [ --manual | -m ] [ --verbose | -v ]
 #
@@ -81,10 +81,10 @@ $RELOAD=false
 # The root directory -- '/' by default.
 #
 root = "/"
-non_ssl_template = nil 
-ssl_template     = nil 
-mass_non_ssl_template = nil 
-mass_ssl_template     = nil 
+non_ssl_template = nil
+ssl_template     = nil
+mass_non_ssl_template = nil
+mass_ssl_template     = nil
 apache2_dir      = nil
 no_reload       = false
 
@@ -207,11 +207,16 @@ unless apache_mass_hosting_enabled
   verbose "Symbiosis automatic mass-hosting configuration disabled. Explicitly configuring all sites."
 end
 
+domains = Symbiosis::Domains.all(prefix)
+
+if domains_to_configure.length > 0
+  domains = domains.select{|domain| domains_to_configure.include?(domain.name)}
+end
 
 #
 #  For each domain.
 #
-Symbiosis::Domains.each(prefix) do |domain|
+domains.each do |domain|
   verbose "Domain: #{domain.name}"
 
   if domain.is_alias?
@@ -219,7 +224,7 @@ Symbiosis::Domains.each(prefix) do |domain|
     next
   end
 
-  if apache_mass_hosting_enabled and domain.ips.any?{|ip| primary_ips.include?(ip)} 
+  if apache_mass_hosting_enabled and domain.ips.any?{|ip| primary_ips.include?(ip)}
     if domain.ssl_enabled?
       verbose "\tThis site has SSL enabled, and is using the host's primary IPs -- continuing with SNI."
     else
@@ -250,7 +255,7 @@ end
 
   unless this_config.is_a?(Symbiosis::ConfigFiles::Apache)
     verbose "\tA valid configuration could not be created for this mass-hosting template.  Skipping."
-    next    
+    next
   end
 
   #
@@ -282,7 +287,13 @@ end
 filenames_available = configurations.collect{|c| c.filename }
 filenames_enabled   = filenames_available.collect{|filename| filename.sub("sites-available","sites-enabled") }
 
+
 Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
+  #
+  # No need to do anything here if there were domains on the command line
+  #
+  next if domains_to_configure.length >= 0
+
   #
   # Prepend full path before the filename
   #
@@ -296,7 +307,7 @@ Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
   next if File.directory?(filename)
 
   begin
-    verbose "Configuration file: #{filename}" 
+    verbose "Configuration file: #{filename}"
 
     #
     # We only deal with symlinks.
@@ -322,7 +333,7 @@ Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
       verbose "\tConfiguration #{filename_source} not managed by Symbiosis -- skipping"
       next
     end
-  
+
     verbose "\tRemoving orphaned configuration file"
     config.disable(filename, $FORCE)
 
