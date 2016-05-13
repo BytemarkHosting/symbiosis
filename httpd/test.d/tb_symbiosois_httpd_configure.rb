@@ -228,4 +228,35 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
     system("#{@script} --root-dir #{@root} --no-reload #{domain2.name}")
   end
 
+  def test_recreate_sites_enabled_links_if_missing
+    domain = Symbiosis::Domain.new(nil, @prefix)
+    domain.create
+    name = domain.name
+    FileUtils.mkdir_p(domain.htdocs_dir)
+
+    #
+    # These are the files we expect to be in place.
+    #
+    domain_conf_fn = File.join(@apache2_dir, "sites-enabled", domain.name+".conf")
+
+    #
+    # Don't create a public/htdocs directory for this domain and
+    # disable mass hosting
+    #
+    FileUtils.touch("#{@root}/etc/symbiosis/apache.d/disabled.zz-mass-hosting")
+
+    system("#{@script} --root-dir #{@root} --no-reload")
+
+    assert_equal(0,$?.exitstatus,"#{@script} exited with a non-zero status")
+
+    assert(File.exist?(domain_conf_fn), "File #{domain_conf_fn} is not present when it was on the cmd line.")
+
+    File.unlink(domain_conf_fn)
+
+    system("#{@script} --root-dir #{@root} --no-reload")
+
+    assert(File.exist?(domain_conf_fn), "File #{domain_conf_fn} is not present when it was on the cmd line.")
+
+  end
+
 end
