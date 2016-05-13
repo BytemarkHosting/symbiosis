@@ -9,7 +9,7 @@
 /*
  * Make sure the configuration array is defined.
  */
-if ! is_array( $rcmail_config ) {
+if ( ! is_array( $rcmail_config ) ) {
   $rcmail_config = array();
 }
 
@@ -58,7 +58,7 @@ if ( array_search("managesieve", $rcmail_config['plugins']) === false ) {
 
 if ( !array_key_exists('force_https', $rcmail_config) ) {
   /*
-   * Make sure all connections are secure. 
+   * Make sure all connections are secure.
    */
   $rcmail_config['force_https'] = true;
 }
