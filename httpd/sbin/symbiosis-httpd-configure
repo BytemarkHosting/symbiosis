@@ -241,6 +241,16 @@ Symbiosis::Domains.each(prefix) do |domain|
 end
 
 #
+# Sometimes, significant memory pressure can cause Etc.getpwuid(@uid).name
+# to fail. symbiosis-httpd-configure is then led to believe there aren't any
+# domains and will delete all sites from sites-enabled. Exit instead.
+#
+if configurations.empty?
+  verbose "\tNo domains detected. This could be due to memory pressure. Exiting."
+  exit 1
+end
+
+#
 # Now see to the mass hosting stuff.
 #
 [mass_non_ssl_template, mass_ssl_template].each do |template|
@@ -359,7 +369,10 @@ configurations.each do |config|
 
       else
         verbose "\tConfiguration is up-to date."
-        next
+
+        if config.enabled?(sites_enabled_file)
+          next
+        end
 
       end
 
