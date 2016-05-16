@@ -5,37 +5,37 @@
 #  symbiosis-httpd-configure - Auto-configure Apache2 sites with specified IPs
 #
 # SYNOPSIS
-#  symbiosis-httpd-configure [ --ssl-template | -s <file> ]
-#                         [ --non-ssl-template | -t <file> ]
-#                         [ --apache2-dir | -a <directory> ]
+#  symbiosis-httpd-configure [ --ssl-template | -s file ]
+#                         [ --non-ssl-template | -t file ]
+#                         [ --apache2-dir | -a directory ]
 #                         [ --force | -f ] [ --no-reload | -n ]
-#                         [ --help | -h ] [ --manual | -m ] [ --verbose | -v ]
+#                         [ --help | -h ] [ --manual | -m ] [ --verbose | -v ] [domain domain ...]
 #
 # OPTIONS
 #
-# --ssl-template, -s <file>      Specify the template file for SSL sites.
+# --ssl-template, -s file      Specify the template file for SSL sites.
 #                                Defaults to
 #                                /etc/symbiosis/apache.d/non_ssl.template.erb
 #
-# --non-ssl-template, -t <file>  Specify the template file for non-SSL sites.
+# --non-ssl-template, -t file  Specify the template file for non-SSL sites.
 #                                Defaults to
 #                                /etc/symbiosis/apache.d/non_ssl.template.erb
 #
-# --apache2-dir, -a <directory>  Specify the location of the apache2
+# --apache2-dir, -a directory  Specify the location of the Apache
 #                                configuration directory. Defaults to
 #                                /etc/apache2.
 #
-# --mass-ssl-template, -S <file>   Specify the template file for mass-hosted SSL
+# --mass-ssl-template, -S file   Specify the template file for mass-hosted SSL
 #                                  sites. Defaults to
 #                                  /etc/symbiosis/apache.d/zz-mass-hosting.ssl.template.erb
 #
-# --mass-non-ssl-template, -T <file>  Specify the template file for mass-hosted
+# --mass-non-ssl-template, -T file  Specify the template file for mass-hosted
 #                                     non-SSL sites. Defaults to
 #                                     /etc/symbiosis/apache.d/zz-mass-hosting.template.erb
 #
 # --force, -f       Force the re-creation of all sites.
 #
-# --no-reload, -n   Do not reload apache2 even if changes have taken place.
+# --no-reload, -n   Do not reload Apache even if changes have taken place.
 #
 # --manual, -m      Show the manual for this script.
 #
@@ -46,17 +46,50 @@
 # USAGE
 #
 # This script is designed to iterate over the domains hosted upon a Symbiosis
-# system, and configure Apache to listen appropriate when a domain is
-# configured for SSL hosting and not yet configured.
+# system, and configure Apache appropriately. Specifically it
+#  * creates and enables configurations based on the mass-hosting templates,
+#    using the bytemark-vhost Apache module;
+#  * creates and enables configurations for domains with requirements that mean
+#    they can't be hosted with the bytemark-vhost Apache module, specifically if
+#    they have an allocated IP address or SSL certificates;
+#  * updates templated configurations if the template changes;
+#  * preserves changes to manually edited configurations, or disabled/enabled sites;
+#  * prunes orphaned configurations that Symbiosis had previously managed;
+#  * checks Apache will accept the new configuration before enabling it.
+#
+# If a domain or template file is specified at as an argument, the script will
+# work solely on that one domain or template specified.
 #
 # This script can be disabled by creating the file
 # /etc/symbiosis/apache.d/disabled. This will also prevent any further package
-# updates from recreating these sites in the apache2 configuration. However it
+# updates from recreating these sites in the Apache configuration. However it
 # will not disable any sites that are currently in place. These should be
 # removed manually.
 #
-# AUTHOR
+# EXAMPLES
 #
+# To maintain all domains/templates on a server:
+#
+#     symbiosis-httpd-configure
+#
+# To specifically configure (if appropriate) and re-enable one domain
+# (example.com):
+#
+#     symbiosis-httpd-configure example.com
+#
+# To reset all domains back to their original, templated configuration, and
+# re-enable them all:
+#
+#     symbiosis-httpd-configure --force
+#
+# A list of one or more domains can be added to this last command to reset just
+# those domains.
+#
+# If further output is required, add the --verbose flag to any of these examples.
+#
+# AUTHORS
+#
+#   Patrick J Cherry <patrick@bytemark.co.uk>
 #   Steve Kemp <steve@bytemark.co.uk>
 #
 
@@ -194,7 +227,7 @@ configurations = []
 # Disable creation of mass hosting sites.
 #
 unless Symbiosis::Domains.apache_configuration_enabled?(File.join(root,"etc","symbiosis"))
-  verbose "Symbiosis automatic apache configuration disabled. Exiting."
+  verbose "*** Symbiosis automatic httpd configuration disabled. Exiting."
   exit 0
 end
 
@@ -249,6 +282,14 @@ end
 # Now see to the mass hosting stuff.
 #
 [mass_non_ssl_template, mass_ssl_template].each do |template|
+
+  #
+  # Skip if there were domains on the cmd line, and they don't include this template name.
+  #
+  unless domains_to_configure.empty? or domains_to_configure.include?(File.basename(template, ".template.erb"))
+    next
+  end
+
   verbose "Mass hosting template: #{template}"
 
   this_config = Symbiosis::Domains.apache_configuration(template, apache2_dir)
@@ -289,10 +330,13 @@ filenames_enabled   = filenames_available.collect{|filename| filename.sub("sites
 
 
 Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
+
   #
-  # No need to do anything here if there were domains on the command line
+  # Skip if there were domains on the cmd line, and they don't include this filename.
   #
-  next if domains_to_configure.length >= 0
+  unless domains_to_configure.empty? or domains_to_configure.include?(File.basename(filename, ".conf"))
+    next
+  end
 
   #
   # Prepend full path before the filename
@@ -322,7 +366,7 @@ Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
     config = Symbiosis::ConfigFiles::Apache.new(filename_source, "#")
 
     unless config.is_a?(Symbiosis::ConfigFiles::Apache)
-      verbose "\tFailed to parse #{filename_source} as a config file -- skipping"
+      verbose "\tFailed to parse #{filename_source} as a config file -- skipping."
       next
     end
 
@@ -330,11 +374,11 @@ Dir.foreach(File.join(apache2_dir, "sites-enabled")) do |filename|
     # If the configuration has changed, then remove it.
     #
     unless config.managed?
-      verbose "\tConfiguration #{filename_source} not managed by Symbiosis -- skipping"
+      verbose "\tConfiguration #{filename_source} not managed by Symbiosis -- skipping."
       next
     end
 
-    verbose "\tRemoving orphaned configuration file"
+    verbose "\tRemoving orphaned configuration file."
     config.disable(filename, $FORCE)
 
   rescue StandardError => err
@@ -356,55 +400,74 @@ configurations.each do |config|
 
     sites_enabled_file = config.filename.sub("sites-available", "sites-enabled")
 
+
+    #
+    # Always re-enable mass-hosting templates (which have a nil domain) and
+    # domains explicitly mentioned on the command line.
+    #
+    reenable = domains_to_configure.include?(File.basename(config.filename,".conf"))
+
+    #
+    # Don't re-create configurations by default (this is set out below)
+    #
+    recreate = false
+
     if ( $FORCE )
       verbose "\tForcing re-creation of configuration due to --force."
+      recreate = true
+      reenable = true
 
     elsif config.exists?
 
       if config.changed?
         verbose "\tNot updating configuration, as it has been edited by hand."
-        next
 
       elsif config.outdated?
         verbose "\tRe-creating configuration as it is out of date."
+        recreate = true
 
       else
         verbose "\tConfiguration is up-to date."
-
-        if config.enabled?(sites_enabled_file)
-          next
-        end
 
       end
 
     else
       verbose "\tConfiguring site for the first time"
+      recreate = true
+      reenable = true
 
     end
 
     #
     # This gets apache2 to check the configuration using a temporary file.
     #
-    if $FORCE or config.ok?
+    if recreate
+      if config.ok?
 
-      verbose "\tWriting configuration"
-      config.write
+        verbose "\tWriting configuration"
+        config.write
 
-      # Definitely reload if we've rewritten the config.
-      $RELOAD = true
+        # Definitely reload if we've rewritten the config, and the site is enabled.
+        $RELOAD = config.enabled?(sites_enabled_file)
 
-    else
-      verbose "\tApache has rejected the new configuration -- no changes have been made."
-      next
-
+      else
+        verbose "\tApache has rejected the new configuration -- no changes have been made."
+        next
+      end
     end
 
-    if $FORCE or not config.enabled?(sites_enabled_file)
-      verbose "\tEnabling site"
-      config.enable(sites_enabled_file, $FORCE)
+    if reenable
+      if not config.enabled?(sites_enabled_file)
+        verbose "\tEnabling site"
+        config.enable(sites_enabled_file, $FORCE)
 
-      # Definitely reload if we've enabled the site
-      $RELOAD = true
+        # Definitely reload if we've enabled the site
+        $RELOAD = true
+      else
+        verbose "\tThis site is already enabled."
+      end
+    else
+      verbose "\tThis site appears to be manually disabled."
     end
 
   #
@@ -422,5 +485,5 @@ end
 if ( $RELOAD and !no_reload )
   verbose "Reloading Apache"
 
-  system( "/etc/init.d/apache2 reload" )
+  system( "service apache2 reload" )
 end
