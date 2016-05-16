@@ -4,26 +4,47 @@
 #   symbiosis-ssl - Manage and generate SSL certificates
 #
 # SYNOPSIS
-#   symbiosis-ssl [ --threshold N ] [ --no-generate ] [ --no-rollover ] [ --verbose ] [ --manual ]
-#     [ --help ] [ DOMAIN DOMAIN ...]
+#   symbiosis-ssl [ --threshold days ] [ --no-generate ] [ --no-rollover ] [ --select set ] [ --list ]
+#     [ --prefix prefix ] [ --verbose ] [ --manual ] [ --help ] [ domain domain ... ]
 #
 # OPTIONS
 #  --force          Re-generate certificates, and roll over to the new set even
-#                   if they're not due to be renewed.  Implies --verbose.
+#                   if they're not due to be renewed. Implies --verbose.
 #
-#  --threshold N    Number days before expiry that certificates should be renewed.  Defaults to 21.
+#  --threshold days  Number of days before expiry that certificates should be renewed. Defaults to 21.
+#
+#  --select set     Select a specific set for a single domain. A domain must be specified.
+#
+#  --list           List available SSL certificate sets for a domain.
 #
 #  --no-generate    Do not try and generate keys or certificates.
 #
 #  --no-rollover    Do not try and generate keys or certificates.
 #
-#  --prefix PREFIX  Set the directory prefix for Symbiosis.  Defaults to /srv.
+#  --prefix prefix  Set the directory prefix for Symbiosis. Defaults to /srv.
 #
-#   --help        Show the help information for this script.
+#  --help           Show the help information for this script.
 #
-#   --manual      Show the manual for this script
+#  --manual         Show the manual for this script
 #
-#   --verbose     Show debugging information.
+#  --verbose        Show debugging information.
+#
+# USAGE
+#
+# This command is used to manage certificate sets automatically for domains on
+# a Symbiosis system. It can request certificates from LetsEncrypt or generate
+# self-signed ones (see PROVIDERS).
+#
+# PROVIDERS
+#
+# Currently two providers are supported, namely LetsEncrypt and SelfSigned. A
+# domain can be set up to use either provider by setting a file
+# /srv/example.com/config/ssl-provider with the name of the desired provider in
+# it.
+#
+# If the provider is set to something else (e.g. CertificateProviderDuJour)
+# then no certificates will be generated, but it is possible to manage updating
+# certificates with this program.
 #
 # AUTHOR
 #   Patrick J. Cherry <patrick@bytemark.co.uk>
@@ -40,16 +61,19 @@ opts = GetoptLong.new(
     [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
     [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
     [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
+    [ '--list', '-l', GetoptLong::NO_ARGUMENT ],
     [ '--threshold', '-t', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--no-generate', '-G', GetoptLong::NO_ARGUMENT ],
     [ '--no-rollover', '-R', GetoptLong::NO_ARGUMENT ],
+    [ '--select', '-s', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--prefix', '-p', GetoptLong::REQUIRED_ARGUMENT ]
 )
 
 manual = help = false
 $VERBOSE = false
 prefix = "/srv"
-do_generate = do_rollover = nil
+do_list = do_generate = do_rollover = nil
+rollover_to = nil
 threshold = 21
 
 opts.each do |opt,arg|
@@ -58,6 +82,8 @@ opts.each do |opt,arg|
       do_generate = false
     when '--no-rollover'
       do_rollover = false
+    when '--select'
+      rollover_to = arg.to_s
     when '--force'
       do_generate = do_rollover = true
       $VERBOSE = true
@@ -73,6 +99,8 @@ opts.each do |opt,arg|
       manual = true
     when '--prefix'
       prefix = arg
+    when '--list'
+      do_list = true
     when '--verbose'
       $VERBOSE = true
   end
@@ -120,6 +148,11 @@ ARGV.each do |arg|
   domains << domain
 end
 
+if rollover_to and ARGV.length != 1
+  warn "** Exactly one domain must be specfied when rolling over to a specific set."
+  exit 1
+end
+
 if ARGV.empty?
   domains = Symbiosis::Domains.all(prefix)
 end
@@ -140,7 +173,49 @@ end
 
 now = Time.now
 
-domains.each do |domain|
+domains.sort{|a,b| a.name <=> b.name}.each do |domain|
+
+  if do_list or rollover_to
+    puts "Certificate sets for #{domain}:"
+
+    if domain.ssl_available_sets.empty?
+      puts "\t** No sets found\n\n"
+      next
+    end
+
+    domain.ssl_available_sets.each do |this_set|
+      if this_set.certificate.issuer == this_set.certificate.subject
+        puts "\tSSL set #{this_set.name}: self-signed for #{this_set.certificate.issuer}, expires #{this_set.certificate.not_after}"
+      else
+        puts "\tSSL set #{this_set.name}: signed by #{this_set.certificate.issuer}, expires #{this_set.certificate.not_after}"
+      end
+    end
+
+    current = domain.ssl_current_set
+    puts "\tCurrent SSL set: #{current.name}\n" unless $VERBOSE
+
+    if rollover_to.nil?
+      next
+    end
+
+    to_set  = domain.ssl_available_sets.find{|s| s.name.to_s == rollover_to}
+
+    if to_set.nil?
+      puts "\tThere is no set '#{rollover_to}' available for this domain."
+      next
+    end
+
+    if to_set == current
+      puts "\tNo need to change to set #{to_set.name} as this is already current."
+      next
+    end
+
+    puts "\tRolling over from set #{current.name} to #{to_set.name}"
+    domain.ssl_rollover(to_set)
+    puts "\tCurrent SSL set now: #{domain.ssl_current_set.name}\n"
+    next
+  end
+
   begin
     domain.ssl_magic(threshold, do_generate, do_rollover, now)
   rescue StandardError => err
@@ -148,6 +223,7 @@ domains.each do |domain|
     puts err.backtrace.join("\n") if $DEBUG
     exit_code = 1
   end
+
 end
 
 exit exit_code
