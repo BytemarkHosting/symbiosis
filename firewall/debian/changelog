@@ -1,6 +1,6 @@
 symbiosis-firewall (2015:1023) stable; urgency=medium
 
-  * Updated code to work with the new version of symbiosis-common.
+  * Updated code to work with the new version of symbiosis-common. 
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 14 Jan 2016 16:42:37 +0000
 
