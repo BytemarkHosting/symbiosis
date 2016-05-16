@@ -1,3 +1,11 @@
+symbiosis-httpd (2015:1109) stable; urgency=medium
+
+  * Updated symbiosis-httpd-configure to allow single domains to be managed
+    from the command line.  This permits domains or configs to be re-enabled
+    manually.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 16 May 2016 12:10:55 +0100
+
 symbiosis-httpd (2015:1108) stable; urgency=medium
 
   * When ssl-only is set, the SSL template should redirect to the HTTP Host
