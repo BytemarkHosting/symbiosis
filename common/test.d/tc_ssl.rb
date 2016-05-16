@@ -808,7 +808,7 @@ class SSLTest < Test::Unit::TestCase
 
     available_sets = @domain.ssl_available_sets
 
-    assert(!available_sets.include?("current"), "The avaialble sets should not include the 'current' symlink")
+    assert(!available_sets.map(&:name).include?("current"), "The avaialble sets should not include the 'current' symlink")
     missing_sets = (%w(1 2) - available_sets.map(&:name))
     assert(missing_sets.empty?, "Some sets were missing: #{missing_sets.join(", ")}")
 
