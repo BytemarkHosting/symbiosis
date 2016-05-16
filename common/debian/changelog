@@ -1,3 +1,12 @@
+symbiosis-common (2015:1216) stable; urgency=medium
+
+  * Raise an error if the getpwent memory bug hits (closes #12783).
+  * Added more output to symbiosis-ssl
+  * Renew certificates at 21 days instead of 10, averting emails from
+    LetsEncrypt.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 16 May 2016 12:13:26 +0100
+
 symbiosis-common (2015:1215) stable; urgency=medium
 
   * Rejigged the conditions that trigger generation and rollover of
