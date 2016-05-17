@@ -39,9 +39,9 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"regexp"
 	"syscall"
-	"path/filepath"
 )
 
 //
@@ -177,6 +177,103 @@ func safeOpen(path string) *os.File {
 	}
 
 	return handle
+}
+
+func safeMkdir(dir string, uid uint32, gid uint32, mode uint32) error {
+
+	if uid < 1000 {
+		fmt.Fprintln(os.Stderr, "Refusing to create directory for system user", uid)
+		return os.ErrPermission
+	}
+
+	if gid < 1000 {
+		fmt.Fprintln(os.Stderr, "Refusing to create directory for system group", uid)
+		return os.ErrPermission
+	}
+
+	//
+	// Find the first directory that exists, and the first non-existent one.
+	//
+	parent, err := filepath.Abs(dir)
+	if err != nil {
+		return err
+	}
+
+	//
+	// Check the parent.
+	//
+	lstat_parent, err := os.Lstat(parent)
+
+	if lstat_parent != nil {
+		if lstat_parent.IsDir() {
+			//
+			// Nothing to do!
+			//
+			return nil
+		} else {
+			//
+			// Awooga, something already in the way.
+			//
+			return os.ErrExist
+		}
+	}
+
+	if err != nil {
+		return err
+	}
+
+	//
+	// Break down the directory until we find one that exists.
+	//
+	stack := []string{}
+
+	for lstat_parent == nil {
+		// 
+		// This sticks our parent on the *front* of the stack, i.e. prepend rather
+		// than append!
+		//
+		stack = append([]string{parent}, stack...)
+		parent, _ = filepath.Split(parent)
+		parent, err = filepath.Abs(parent)
+		if err != nil {
+			return err
+		}
+		lstat_parent, err = os.Lstat(parent)
+		if err != nil && !os.IsNotExist(err) {
+			return err
+		}
+	}
+
+	//
+	// Create our stack of directories in real life.
+	//
+	for _, sdir := range stack {
+		err = os.Mkdir(sdir, os.FileMode(mode))
+
+		//
+		// If an error is returned, and that is because there is something already
+		// there, we can continue if it is a directory, otherwise raise the alert!
+		//
+		if	err != nil {
+			if os.IsExist(err) {
+				lstat_sdir, _ := os.Lstat(sdir)
+
+				if lstat_sdir.IsDir() {
+					continue
+				}
+			}
+			return err
+		}
+
+		// Now try and lchown this new directory.  There is a TOCTOU race condition here if Mallory manages to replace our newly created directory with something else in the mean time, so we try to minimise this by using lchown 
+		err = os.Lchown(sdir, int(uid), int(gid))
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 //
@@ -364,17 +461,20 @@ func main() {
 		//
 		// This is the path to the per-vhost directory
 		//
-		logfile :=  filepath.Join(prefix, host)
+		logfile := filepath.Join(prefix, host)
+		logfile, err := filepath.EvalSymlinks(logfile)
+		if err != nil {
+			if !os.IsNotExist(err) {
+				fmt.Fprintln(os.Stderr, err)
+			}
+			continue
+		}
 
 		//
 		// Stat the directory to see who owns it
 		//
-		stat, err := os.Stat(logfile)
+		stat, err := os.Lstat(logfile)
 		if err != nil {
-			if verbose {
-
-				fmt.Fprintln(os.Stderr, "Received request for vhost that doesn't exist:", err)
-			}
 			continue
 		}
 		sys := stat.Sys()
@@ -385,9 +485,11 @@ func main() {
 		// If the /logs/ directory doesn't exist then create it.
 		//
 		logfile = filepath.Join(logfile, "public/logs")
-		exists, _ := exists(logfile)
-		if !exists {
-			os.MkdirAll(logfile, 0775)
+		err = safeMkdir(logfile, uid, gid, 0775)
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "Failed to create directory:", logfile, ":", err)
+			continue
 		}
 
 		//
