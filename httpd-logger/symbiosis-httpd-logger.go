@@ -41,6 +41,7 @@ import (
 	"os/signal"
 	"regexp"
 	"syscall"
+	"path/filepath"
 )
 
 //
@@ -363,7 +364,7 @@ func main() {
 		//
 		// This is the path to the per-vhost directory
 		//
-		logfile :=  prefix + host
+		logfile :=  filepath.Join(prefix, host)
 
 		//
 		// Stat the directory to see who owns it
@@ -383,7 +384,7 @@ func main() {
 		//
 		// If the /logs/ directory doesn't exist then create it.
 		//
-		logfile += "/public/logs/"
+		logfile = filepath.Join(logfile, "public/logs")
 		exists, _ := exists(logfile)
 		if !exists {
 			os.MkdirAll(logfile, 0775)
@@ -392,7 +393,7 @@ func main() {
 		//
 		// Now build up the complete logfile to the file we'll open
 		//
-		logfile += "/" + default_log
+		logfile = filepath.Join(logfile, default_log)
 
 		//
 		// Lookup the handle to the logfile in our cache.
