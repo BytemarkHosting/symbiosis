@@ -353,15 +353,32 @@ func main() {
 	}
 
 	//
+	// Change directory to our prefix
+	//
+	fh, err := os.Open(prefix)
+	if err != nil {
+		fmt.Println(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	err = fh.Chdir()
+	if err != nil {
+		fmt.Println(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	fh.Close()
+
+	//
 	// Sanity check flags
 	//
-	if ((*g_uid != 0 && *g_gid == 0) || (*g_uid == 0 && *g_gid != 0)) {
+	if (*g_uid != 0 && *g_gid == 0) || (*g_uid == 0 && *g_gid != 0) {
 		fmt.Println(os.Stderr, "UID and GID must be either both zero or both non-zero.")
 		*g_uid = 0
 		*g_gid = 0
 	}
 
-	if (files_count < 1) {
+	if files_count < 1 {
 		fmt.Println(os.Stderr, "The maximum number of files to hold open must be greater than zero.")
 		files_count = 50
 	}
@@ -411,6 +428,7 @@ func main() {
 	re := regexp.MustCompile("(?P<host>[a-zA-Z0-9-]+\\.(?:[a-zA-Z0-9-]+\\.?)+) (?P<rest>.*)")
 
 	//
+
 	// Get input, unbuffered.
 	//
 	for scanner.Scan() {
