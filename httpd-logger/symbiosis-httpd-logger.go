@@ -201,29 +201,29 @@ func main() {
 	// Define command-line flags: -s/--sync
 	//
 	var sync_text = "Should we immediately sync to disk?"
-	var sync_long *bool = flag.Bool("sync", false, sync_text)
-	var sync_short *bool = flag.Bool("s", false, sync_text)
+	var sync_flag bool
+	flag.BoolVar(&sync_flag, "s", false, sync_text)
 
 	//
 	// Define command-line flags: -f/--max-files
 	//
 	var files_text = "Maxium number of log files to hold open"
-	var files_long *int = flag.Int("files", 0, files_text)
-	var files_short *int = flag.Int("f", 0, files_text)
+	var files_count int
+	flag.IntVar(&files_count, "f", 0, files_text)
 
 	//
 	// Define command-line flags: -l/--log-name
 	//
 	var log_text = "The name of the logfile to write"
-	var log_long *string = flag.String("log-name", "access.log", log_text)
-	var log_short *string = flag.String("l", "access.log", log_text)
+	var default_log string
+	flag.StringVar(&default_log, "l", "access.log", log_text)
 
 	//
 	// Define command-line flags: -v/--verbose
 	//
 	var verbose_text = "Should we be verbose?"
-	var verbose_long *bool = flag.Bool("verbose", false, verbose_text)
-	var verbose_short *bool = flag.Bool("v", false, verbose_text)
+	var verbose bool
+	flag.BoolVar(&verbose, "v", false, verbose_text)
 
 	//
 	// Define command-line flags: -u/-g
@@ -237,31 +237,6 @@ func main() {
 	// Perform the actual parsing of the arguments.
 	//
 	flag.Parse()
-
-	//
-	// Handle the possible short/long alternatives.
-	//
-	sync_flag := *sync_long || *sync_short
-	verbose = *verbose_long || *verbose_short
-	files_count = (*files_long + *files_short)
-
-	//
-	// The name of the per-domain logfile to write beneath
-	// directories such as /srv/example.com/public/logs/
-	//
-	default_log := "access.log"
-
-	//
-	// If we've been given a different name via -l|--log-file
-	// then use that instead.
-	//
-	if (*log_long != "access.log") || (*log_short != "access.log") {
-		if *log_long == "access.log" {
-			default_log = *log_short
-		} else {
-			default_log = *log_long
-		}
-	}
 
 	//
 	// Now we should have one final argument, which is the
@@ -288,8 +263,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, "uid:", *g_uid)
 		fmt.Fprintln(os.Stderr, "gid:", *g_gid)
 		fmt.Fprintln(os.Stderr, "default_file:", default_file)
-		fmt.Fprintln(os.Stderr, "log_file:", *log_long)
-		fmt.Fprintln(os.Stderr, "log_file:", *log_short)
+		fmt.Fprintln(os.Stderr, "log_file:", default_log)
 	}
 
 	//
