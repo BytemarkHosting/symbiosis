@@ -206,8 +206,8 @@ func main() {
 	//
 	// Define command-line flags: -f/--max-files
 	//
-	var files_count int
-	flag.IntVar(&files_count, "f", 0, "Maxium number of log files to hold open")
+	var files_count uint
+	flag.UintVar(&files_count, "f", 50, "Maxium number of log files to hold open")
 
 	//
 	// Define command-line flags: -l/--log-name
@@ -225,9 +225,9 @@ func main() {
 	// Define command-line flags: -u/-g
 	//
 	var uid_text = "Set the default owner when writing files"
-	var g_uid *int = flag.Int("u", 0, uid_text)
+	var g_uid *uint = flag.Uint("u", 0, uid_text)
 	var gid_text = "Set the default group when writing files"
-	var g_gid *int = flag.Int("g", 0, gid_text)
+	var g_gid *uint = flag.Uint("g", 0, gid_text)
 
 	//
 	// Allow a prefix to be set for testing
@@ -252,6 +252,20 @@ func main() {
 	default_file := "/var/log/apache2/zz-mass-hosting.log"
 	if len(flag.Args()) > 0 {
 		default_file = flag.Args()[0]
+	}
+
+	//
+	// Sanity check flags
+	//
+	if ((*g_uid != 0 && *g_gid == 0) || (*g_uid == 0 && *g_gid != 0)) {
+		fmt.Println(os.Stderr, "UID and GID must be either both zero or both non-zero.")
+		*g_uid = 0
+		*g_gid = 0
+	}
+
+	if (files_count < 1) {
+		fmt.Println(os.Stderr, "The maximum number of files to hold open must be greater than zero.")
+		files_count = 50
 	}
 
 	//
