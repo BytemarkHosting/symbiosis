@@ -2,7 +2,5 @@
 
 export DH_GOPKG := symbiosis-httpd-logger
 
-include /usr/share/dpkg/default.mk
-
 %:
 	dh $@ --buildsystem=golang --with=golang

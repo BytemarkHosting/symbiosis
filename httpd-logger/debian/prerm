@@ -16,3 +16,6 @@ if dpkg-divert --list | grep -F "/usr/sbin/symbiosis-httpd-logger.distrib"
 then
         dpkg-divert --remove --rename /usr/sbin/symbiosis-httpd-logger
 fi
+
+#DEBHELPER#
+

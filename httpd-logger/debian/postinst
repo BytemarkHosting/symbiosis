@@ -16,3 +16,5 @@ fi
 
 
 dpkg-divert --add --rename "/usr/sbin/symbiosis-httpd-logger" 
+
+#DEBHELPER#
