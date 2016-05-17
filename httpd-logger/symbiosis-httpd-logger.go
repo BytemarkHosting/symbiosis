@@ -230,6 +230,12 @@ func main() {
 	var g_gid *int = flag.Int("g", 0, gid_text)
 
 	//
+	// Allow a prefix to be set for testing
+	//
+	var prefix string
+	flag.StringVar(&prefix, "p", "/srv", "Set the Symbiosis directory prefix")
+
+	//
 	// Perform the actual parsing of the arguments.
 	//
 	flag.Parse()
@@ -260,6 +266,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, "gid:", *g_gid)
 		fmt.Fprintln(os.Stderr, "default_file:", default_file)
 		fmt.Fprintln(os.Stderr, "log_file:", default_log)
+		fmt.Fprintln(os.Stderr, "prefix:", prefix)
 	}
 
 	//
@@ -342,7 +349,7 @@ func main() {
 		//
 		// This is the path to the per-vhost directory
 		//
-		logfile := "/srv/" + host
+		logfile :=  prefix + host
 
 		//
 		// Stat the directory to see who owns it
