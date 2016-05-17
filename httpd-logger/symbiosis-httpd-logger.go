@@ -200,37 +200,33 @@ func main() {
 	//
 	// Define command-line flags: -s/--sync
 	//
-	var sync_text = "Should we immediately sync to disk?"
 	var sync_flag bool
-	flag.BoolVar(&sync_flag, "s", false, sync_text)
+	flag.BoolVar(&sync_flag, "s", false, "Open log files in synchronous mode")
 
 	//
 	// Define command-line flags: -f/--max-files
 	//
-	var files_text = "Maxium number of log files to hold open"
 	var files_count int
-	flag.IntVar(&files_count, "f", 0, files_text)
+	flag.IntVar(&files_count, "f", 0, "Maxium number of log files to hold open")
 
 	//
 	// Define command-line flags: -l/--log-name
 	//
-	var log_text = "The name of the logfile to write"
 	var default_log string
-	flag.StringVar(&default_log, "l", "access.log", log_text)
+	flag.StringVar(&default_log, "l", "access.log", "The file name of the generated logs")
 
 	//
 	// Define command-line flags: -v/--verbose
 	//
-	var verbose_text = "Should we be verbose?"
 	var verbose bool
-	flag.BoolVar(&verbose, "v", false, verbose_text)
+	flag.BoolVar(&verbose, "v", false, "Show verbose output")
 
 	//
 	// Define command-line flags: -u/-g
 	//
-	var uid_text = "Set the UID -- privileges are dropped if this is set"
+	var uid_text = "Set the default owner when writing files"
 	var g_uid *int = flag.Int("u", 0, uid_text)
-	var gid_text = "Set the GID -- privileges are dropped if this is set"
+	var gid_text = "Set the default group when writing files"
 	var g_gid *int = flag.Int("g", 0, gid_text)
 
 	//
