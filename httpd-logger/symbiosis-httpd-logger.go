@@ -311,7 +311,7 @@ func main() {
 	// A regular expression to split a line into "first word" and
 	// "rest of line".
 	//
-	re := regexp.MustCompile("(?P<host>[^ \t]+)[ \t](?P<rest>.*)")
+	re := regexp.MustCompile("(?P<host>[a-zA-Z0-9-]+\\.(?:[a-zA-Z0-9-]+\\.?)+) (?P<rest>.*)")
 
 	//
 	// Get input, unbuffered.
