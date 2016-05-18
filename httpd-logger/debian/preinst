@@ -3,10 +3,10 @@
 set -e
 
 #
-# Skip, if we are not in "configure" state
+# Skip, if we are not in "install" state
 #
-if [ "$1" != "configure" ]; then
-        echo "I: Skipping configuration"
+if [ "$1" != "install" ]; then
+        echo "I: Skipping $1"
         exit 0
 fi
 
