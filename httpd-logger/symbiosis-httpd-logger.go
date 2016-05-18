@@ -179,20 +179,20 @@ func safeOpen(path string) *os.File {
 	return handle
 }
 
-func safeMkdir(dir string, uid uint32, gid uint32, mode uint32) error {
-
-	if uid < 1000 {
-		fmt.Fprintln(os.Stderr, "Refusing to create directory for system user", uid)
-		return os.ErrPermission
-	}
-
-	if gid < 1000 {
-		fmt.Fprintln(os.Stderr, "Refusing to create directory for system group", uid)
-		return os.ErrPermission
-	}
+//
+// Make directories in with as little race as possible.
+//
+// This function takes a directory path, finds the first existing member of the
+// path, and then creates all the subdirectories using the same ownerships and
+// permissions of the first member.
+//
+// It will not create directories inside directories owned by users/groups <
+// 1000
+//
+func safeMkdir(dir string) error {
 
 	//
-	// Find the first directory that exists, and the first non-existent one.
+	// Resolve the path into an absolute one.
 	//
 	parent, err := filepath.Abs(dir)
 	if err != nil {
@@ -204,6 +204,16 @@ func safeMkdir(dir string, uid uint32, gid uint32, mode uint32) error {
 	//
 	lstat_parent, err := os.Lstat(parent)
 
+	//
+	// If an error is returned (other than ENOEXIST) then raise it.
+	//
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+
+	//
+	// If the stat comes back non-nil, it found something.
+	//
 	if lstat_parent != nil {
 		if lstat_parent.IsDir() {
 			//
@@ -218,17 +228,16 @@ func safeMkdir(dir string, uid uint32, gid uint32, mode uint32) error {
 		}
 	}
 
-	if err != nil {
-		return err
-	}
-
 	//
 	// Break down the directory until we find one that exists.
 	//
 	stack := []string{}
 
+	//
+	// The lstat_parent is still nil from before.
+	//
 	for lstat_parent == nil {
-		// 
+		//
 		// This sticks our parent on the *front* of the stack, i.e. prepend rather
 		// than append!
 		//
@@ -245,6 +254,27 @@ func safeMkdir(dir string, uid uint32, gid uint32, mode uint32) error {
 	}
 
 	//
+	// Stat the parent directory owner/uid.
+	//
+	sys := lstat_parent.Sys()
+	uid := sys.(*syscall.Stat_t).Uid
+	gid := sys.(*syscall.Stat_t).Gid
+	mode := lstat_parent.Mode()
+
+	//
+	// Don't create directories in directories owned by system owners.
+	//
+	if uid < 1000 {
+		fmt.Fprintln(os.Stderr, "Refusing to create directory for system user", uid)
+		return os.ErrPermission
+	}
+
+	if gid < 1000 {
+		fmt.Fprintln(os.Stderr, "Refusing to create directory for system group", uid)
+		return os.ErrPermission
+	}
+
+	//
 	// Create our stack of directories in real life.
 	//
 	for _, sdir := range stack {
@@ -254,7 +284,7 @@ func safeMkdir(dir string, uid uint32, gid uint32, mode uint32) error {
 		// If an error is returned, and that is because there is something already
 		// there, we can continue if it is a directory, otherwise raise the alert!
 		//
-		if	err != nil {
+		if err != nil {
 			if os.IsExist(err) {
 				lstat_sdir, _ := os.Lstat(sdir)
 
@@ -265,8 +295,23 @@ func safeMkdir(dir string, uid uint32, gid uint32, mode uint32) error {
 			return err
 		}
 
-		// Now try and lchown this new directory.  There is a TOCTOU race condition here if Mallory manages to replace our newly created directory with something else in the mean time, so we try to minimise this by using lchown 
+		//
+		// Now try and lchown this new directory.  There is a TOCTOU race condition
+		// here if Mallory manages to replace our newly created directory with
+		// something else in the mean time, so we try to minimise this by using
+		// lchown
+		//
 		err = os.Lchown(sdir, int(uid), int(gid))
+
+		if err != nil {
+			return err
+		}
+
+		//
+		// Sadly golang is missing lchmod, so we're just going to use chmod
+		// instead.  Arse.
+		//
+		err = os.Chmod(sdir, mode)
 
 		if err != nil {
 			return err
@@ -503,7 +548,7 @@ func main() {
 		// If the /logs/ directory doesn't exist then create it.
 		//
 		logfile = filepath.Join(logfile, "public/logs")
-		err = safeMkdir(logfile, uid, gid, 0775)
+		err = safeMkdir(logfile)
 
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Failed to create directory:", logfile, ":", err)
