@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+
+#
+# Skip, if we are not in "configure" state
+#
+if [ "$1" != "configure" ]; then
+        echo "I: Skipping configuration"
+        exit 0
+fi
+
+
+package=symbiosis-httpd-logger
+bin=/usr/sbin/symbiosis-httpd-logger
+theirbin="$bin.dpkg-symbiosis.orig"
+
+if [ -e $bin ] && ( ! dpkg-divert --list "$package" | grep -xFq "diversion of $bin to $theirbin by $package" ) ; then
+  dpkg-divert --divert "$theirbin" --rename --package "$package" --add "$bin"
+fi
+
+#DEBHELPER#
