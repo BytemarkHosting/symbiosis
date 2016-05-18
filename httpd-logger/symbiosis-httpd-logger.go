@@ -173,7 +173,10 @@ func safeOpen(path string) *os.File {
 	}
 
 	if fi.Mode()&os.ModeSymlink != 0 {
-		fmt.Println("Cowardly refusing to write to symlinked file", path)
+		if verbose {
+
+			fmt.Println("Cowardly refusing to write to symlinked file", path)
+		}
 		handle.Close()
 		return nil
 	}
@@ -267,12 +270,16 @@ func safeMkdir(dir string) error {
 	// Don't create directories in directories owned by system owners.
 	//
 	if uid < 1000 {
-		fmt.Fprintln(os.Stderr, "Refusing to create directory for system user", uid)
+		if verbose {
+			fmt.Fprintln(os.Stderr, "Refusing to create directory for system user", uid)
+		}
 		return os.ErrPermission
 	}
 
 	if gid < 1000 {
-		fmt.Fprintln(os.Stderr, "Refusing to create directory for system group", uid)
+		if verbose {
+			fmt.Fprintln(os.Stderr, "Refusing to create directory for system group", uid)
+		}
 		return os.ErrPermission
 	}
 
@@ -420,13 +427,17 @@ func main() {
 	// Sanity check flags
 	//
 	if (*g_uid != 0 && *g_gid == 0) || (*g_uid == 0 && *g_gid != 0) {
-		fmt.Println(os.Stderr, "UID and GID must be either both zero or both non-zero.")
+		if verbose {
+			fmt.Println(os.Stderr, "UID and GID must be either both zero or both non-zero.")
+		}
 		*g_uid = 0
 		*g_gid = 0
 	}
 
 	if files_count < 1 {
-		fmt.Println(os.Stderr, "The maximum number of files to hold open must be greater than zero.")
+		if verbose {
+			fmt.Println(os.Stderr, "The maximum number of files to hold open must be greater than zero.")
+		}
 		files_count = 50
 	}
 
@@ -534,7 +545,7 @@ func main() {
 		logfile, err := filepath.EvalSymlinks(logfile)
 
 		if err != nil {
-			if !os.IsNotExist(err) {
+			if verbose && !os.IsNotExist(err) {
 				fmt.Fprintln(os.Stderr, err)
 			}
 			continue
@@ -558,7 +569,9 @@ func main() {
 		err = safeMkdir(logfile)
 
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Failed to create directory:", logfile, ":", err)
+			if verbose {
+				fmt.Fprintln(os.Stderr, "Failed to create directory:", logfile, ":", err)
+			}
 			continue
 		}
 
@@ -581,10 +594,10 @@ func main() {
 			h = handles[logfile]
 
 			//
-			// If not we match the UID/GID of the top-level
-			// /srv/$domain directory, which we found earlier.
+			// We match the UID/GID/mode of the handle to the top-level /srv/$domain
+			// directory, which we found earlier.
 			//
-			// Remove the executable bit
+			// Remove the executable bit though.
 			//
 			mode := (stat.Mode() - (stat.Mode() & 0111))
 
