@@ -5,5 +5,9 @@ export DH_GOPKG := symbiosis-httpd-logger
 %:
 	dh $@ --buildsystem=golang --with=golang
 
-override_dh_auto_test:
-	make test
+#
+# It would be nice to test as part of the build, but that required installing
+# symbiosis-common.
+#
+# override_dh_auto_test:
+#	make test
