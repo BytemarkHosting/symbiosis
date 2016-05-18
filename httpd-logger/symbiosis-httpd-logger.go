@@ -144,9 +144,11 @@ func safeOpen(path string) *os.File {
 	}
 
 	//
-	// Open the file.  If it fails report that.
+	// Open the file.  If it fails report that.  By default the file is set to
+	// owner r/w only but this will get changed later where necessary.
 	//
-	handle, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	handle, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+
 	if err != nil {
 		if verbose {
 			fmt.Fprintln(os.Stderr, "Failed to open file:", path)
@@ -341,31 +343,31 @@ func exists(path string) (bool, error) {
 func main() {
 
 	//
-	// Define command-line flags: -s/--sync
+	// Define command-line flags: -s (this is a no-op now)
 	//
 	var sync_flag bool
 	flag.BoolVar(&sync_flag, "s", false, "Open log files in synchronous mode")
 
 	//
-	// Define command-line flags: -f/--max-files
+	// Define command-line flags: -f
 	//
 	var files_count uint
 	flag.UintVar(&files_count, "f", 50, "Maxium number of log files to hold open")
 
 	//
-	// Define command-line flags: -l/--log-name
+	// Define command-line flags: -l
 	//
 	var default_log string
 	flag.StringVar(&default_log, "l", "access.log", "The file name of the generated logs")
 
 	//
-	// Define command-line flags: -v/--verbose
+	// Define command-line flags: -v
 	//
 	var verbose bool
 	flag.BoolVar(&verbose, "v", false, "Show verbose output")
 
 	//
-	// Define command-line flags: -u/-g
+	// Define command-line flags: -u/-g (these are no-ops now)
 	//
 	var uid_text = "Set the default owner when writing files"
 	var g_uid *uint = flag.Uint("u", 0, uid_text)
@@ -467,7 +469,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	//
-	// A regular expression to split a line into "first word" and
+	// A regular expression to split a line into "hostname" and
 	// "rest of line".
 	//
 	re := regexp.MustCompile("(?P<host>[a-zA-Z0-9-]+\\.(?:[a-zA-Z0-9-]+\\.?)+) (?P<rest>.*)")
@@ -525,7 +527,12 @@ func main() {
 		// This is the path to the per-vhost directory
 		//
 		logfile := filepath.Join(prefix, host)
+
+		//
+		// Resolve any symlinks to the true path.
+		//
 		logfile, err := filepath.EvalSymlinks(logfile)
+
 		if err != nil {
 			if !os.IsNotExist(err) {
 				fmt.Fprintln(os.Stderr, err)
@@ -574,23 +581,18 @@ func main() {
 			h = handles[logfile]
 
 			//
-			// If we've been given a UID/GID explicitly
-			// then we'll use them.
-			//
 			// If not we match the UID/GID of the top-level
 			// /srv/$domain directory, which we found earlier.
 			//
-			if *g_uid != 0 {
-				uid = uint32(*g_uid)
-			}
-			if *g_gid != 0 {
-				gid = uint32(*g_gid)
-			}
+			// Remove the executable bit
+			//
+			mode := (stat.Mode() - (stat.Mode() & 0111))
 
 			// Ensure the UID/GID of the logfile match that on the
 			// virtual-hosts' directory
 			if h != nil {
 				h.Chown(int(uid), int(gid))
+				h.Chmod(mode)
 			}
 		}
 
