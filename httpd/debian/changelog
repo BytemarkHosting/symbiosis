@@ -1,3 +1,10 @@
+symbiosis-httpd (2015:1110) stable; urgency=medium
+
+  * Fixed output in symbiosis-httpd-configure to correctly report pre-enabled
+    sites correctly.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 23 May 2016 16:20:37 +0100
+
 symbiosis-httpd (2015:1109) stable; urgency=medium
 
   * Updated symbiosis-httpd-configure to allow single domains to be managed
