@@ -456,25 +456,23 @@ configurations.each do |config|
       end
     end
 
-    if reenable
-      if not config.enabled?(sites_enabled_file)
-        verbose "\tEnabling site"
+    if config.enabled?(sites_enabled_file) and !$FORCE
+        verbose "\tAlready enabled."
+    elsif renable
+        verbose "\tEnabling configuration."
         config.enable(sites_enabled_file, $FORCE)
 
         # Definitely reload if we've enabled the site
         $RELOAD = true
-      else
-        verbose "\tThis site is already enabled."
-      end
     else
-      verbose "\tThis site appears to be manually disabled."
+      verbose "\t!! Configuration has been manually disabled."
     end
 
   #
   # Rescue errors for this domain, but continue for others.
   #
   rescue StandardError => err
-    verbose "\tUnable to configure site for #{File.basename(config.filename)} because #{err.to_s}"
+    verbose "\t!! Unable to configure site for #{File.basename(config.filename)} because #{err.to_s}"
   end
 
 end
