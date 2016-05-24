@@ -1,6 +1,7 @@
 require 'symbiosis/domain'
 require 'symbiosis/ssl'
 require 'symbiosis/ssl/certificate_set'
+require 'symbiosis/ssl/selfsigned'
 require 'openssl'
 require 'erb'
 
