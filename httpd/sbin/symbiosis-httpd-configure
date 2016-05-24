@@ -458,7 +458,7 @@ configurations.each do |config|
 
     if config.enabled?(sites_enabled_file) and !$FORCE
         verbose "\tAlready enabled."
-    elsif renable
+    elsif reenable
         verbose "\tEnabling configuration."
         config.enable(sites_enabled_file, $FORCE)
 
