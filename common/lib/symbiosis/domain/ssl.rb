@@ -292,6 +292,13 @@ module Symbiosis
 
       return @ssl_available_sets unless @ssl_available_sets.empty?
 
+      valid_codes = [0]
+
+      #
+      # Allow self-signed certificates if our provider class is SelfSigned
+      #
+      valid_codes << 18 if Symbiosis::SSL::SelfSigned == self.ssl_provider_class
+
       #
       # Use the list of possible set names and go through each one.
       #
@@ -305,10 +312,9 @@ module Symbiosis
         end
 
         #
-        # If this certificate verifies, add it to our list.  We allow 18 as an
-        # error code, as this covers self-signed certificates.
+        # If this certificate verifies, add it to our list.
         #
-        next unless [0,18].include?(this_set.verify)
+        next unless valid_codes.include?(this_set.verify)
 
         @ssl_available_sets << this_set
       end
