@@ -410,6 +410,16 @@ module Symbiosis
       current_set_expires_in = ((current_set.certificate.not_after - now)/86400.0).round if current_set.is_a?(Symbiosis::SSL::CertificateSet)
       latest_set_expires_in  = ((latest_set.certificate.not_after - now)/86400.0).round  if latest_set.is_a?(Symbiosis::SSL::CertificateSet)
 
+      #
+      # This is the set we'll eventually roll over to.
+      #
+      rollover_set = nil
+
+      if current_set.is_a?(Symbiosis::SSL::CertificateSet) and !self.ssl_available_sets.include?(current_set)
+        puts "\tThe current set is no longer valid for this domain." if $VERBOSE
+        current_set = current_set_expires_in = nil
+      end
+
       if current_set.is_a?(Symbiosis::SSL::CertificateSet)
         #
         # If our current set is not due to expire, do nothing.
@@ -428,6 +438,13 @@ module Symbiosis
 
 
       elsif latest_set.is_a?(Symbiosis::SSL::CertificateSet)
+
+        #
+        # We roll over to our latest set, unless we generate a new set, in
+        # which case this variable is changed to that one.
+        #
+        rollover_set = latest_set
+
         #
         # If there is no current certificate set, but there is another set
         # avaialable, and it is not due to expire soon, then don't generate,
@@ -460,7 +477,6 @@ module Symbiosis
       #
       # Stage 1: Generate
       #
-      cert_set = nil
 
       if do_generate
         #
@@ -477,17 +493,17 @@ module Symbiosis
           #
           puts "\tFetching a new certificate from #{self.ssl_provider_class.to_s.split("::").last}." if $VERBOSE
 
-          cert_set = self.ssl_fetch_new_certificate
-          raise RuntimeError, "Failed to fetch certificate" if cert_set.nil?
+          rollover_set = self.ssl_fetch_new_certificate
+          raise RuntimeError, "Failed to fetch certificate" if rollover_set.nil?
 
-          cert_set.name = self.ssl_next_set_name
+          rollover_set.name = self.ssl_next_set_name
 
           retries = 0
           begin
-            cert_set.write
+            rollover_set.write
           rescue Errno::ENOTDIR, Errno::EEXIST => err
-            cert_set.name = cert_set.name.succ
-            cert_set.directory = cert_set.name
+            rollover_set.name = rollover_set.name.succ
+            rollover_set.directory = rollover_set.name
             retries += 1
 
             #
@@ -498,17 +514,17 @@ module Symbiosis
             raise RuntimeError, "Failed to write set (#{err.to_s})"
           end
 
-          puts "\tSuccessfully fetched new certificate and created set #{cert_set.name}" if $VERBOSE
+          puts "\tSuccessfully fetched new certificate and created set #{rollover_set.name}" if $VERBOSE
 
-          @ssl_available_sets << cert_set
+          @ssl_available_sets << rollover_set
         end
       end
 
       #
       # Stage 2: Roll over
       #
-      if do_rollover
-        return self.ssl_rollover(cert_set)
+      if do_rollover and rollover_set.is_a?(Symbiosis::SSL::CertificateSet)
+        return self.ssl_rollover(rollover_set)
       else
         return false
       end
