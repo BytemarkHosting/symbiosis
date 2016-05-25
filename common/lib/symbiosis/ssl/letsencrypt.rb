@@ -1,7 +1,5 @@
 require 'symbiosis/ssl'
 require 'symbiosis/ssl/selfsigned'
-require 'symbiosis/domain'
-require 'symbiosis/domain/ssl'
 require 'symbiosis/host'
 require 'symbiosis/utils'
 require 'time'
@@ -227,7 +225,7 @@ module Symbiosis
           #
           # Ugh, something is going wrong.  Lets bail out.
           #
-          raise
+          raise err
 
         end
 

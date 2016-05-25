@@ -1,7 +1,5 @@
 require 'symbiosis/ssl'
 require 'symbiosis/ssl/certificate_set'
-require 'symbiosis/domain'
-require 'symbiosis/domain/ssl'
 require 'symbiosis/utils'
 require 'etc'
 require 'time'
