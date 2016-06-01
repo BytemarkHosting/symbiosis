@@ -4,8 +4,9 @@
 #   symbiosis-ssl - Manage and generate SSL certificates
 #
 # SYNOPSIS
-#   symbiosis-ssl [ --threshold days ] [ --no-generate ] [ --no-rollover ] [ --select set ] [ --list ]
-#     [ --prefix prefix ] [ --verbose ] [ --manual ] [ --help ] [ domain domain ... ]
+#   symbiosis-ssl [ --threshold days ] [ --no-generate ] [ --no-rollover ] [ --select set ]
+#     [ --list ] [ --prefix prefix ] [ --verbose ] [ --debug ] [ --manual ] [ --help ]
+#     [ domain domain ... ]
 #
 # OPTIONS
 #  --force          Re-generate certificates, and roll over to the new set even
@@ -27,7 +28,9 @@
 #
 #  --manual         Show the manual for this script
 #
-#  --verbose        Show debugging information.
+#  --verbose        Show verbose information.
+#
+#  --debug          Show debugging information.
 #
 # USAGE
 #
@@ -60,6 +63,7 @@ opts = GetoptLong.new(
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
     [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
     [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+    [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
     [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
     [ '--list', '-l', GetoptLong::NO_ARGUMENT ],
     [ '--threshold', '-t', GetoptLong::REQUIRED_ARGUMENT ],
@@ -71,6 +75,7 @@ opts = GetoptLong.new(
 
 manual = help = false
 $VERBOSE = false
+$DEBUG = false
 prefix = "/srv"
 do_list = do_generate = do_rollover = nil
 rollover_to = nil
@@ -103,6 +108,8 @@ opts.each do |opt,arg|
       do_list = true
     when '--verbose'
       $VERBOSE = true
+    when '--debug'
+      $DEBUG = true
   end
 end
 
