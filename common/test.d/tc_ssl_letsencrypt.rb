@@ -412,8 +412,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
     challenge_directory = "#{@prefix}/#{@domain}/public/htdocs/.well-known/acme-challenge"
     @http01_challenge.each do |key, hash|
-      refute(File.exist?("#{challenge_directory}/#{hash["token"]}"),
-        "#verify should cleanup ACME challenge files")
+      assert(File.exist?("#{challenge_directory}/#{hash["token"]}") == $DEBUG,
+        "#verify should cleanup ACME challenge files except when DEBUG == true")
     end
   end
 
