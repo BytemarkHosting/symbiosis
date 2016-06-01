@@ -132,7 +132,7 @@ module Symbiosis
         challenge     = do_with_nonce_debounce{ authorisation.http01 }
         challenge_directory = File.join(self.docroot, File.dirname(challenge.filename))
 
-        mkdir_p(File.join(self.docroot, File.dirname(challenge.filename)))
+        mkdir_p(challenge_directory)
 
         set_param(File.basename(challenge.filename), challenge.file_content, challenge_directory)
 
