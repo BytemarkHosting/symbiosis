@@ -405,4 +405,16 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       assert_nothing_raised{ @client.register }
   end
 
+  def test_challenge_file_cleanup
+    omit unless @client
+    @client.register
+    @client.verify
+
+    challenge_directory = "#{@prefix}/#{@domain}/public/htdocs/.well-known/acme-challenge"
+    @http01_challenge.each do |key, hash|
+      refute(File.exist?("#{challenge_directory}/#{hash["token"]}"),
+        "#verify should cleanup ACME challenge files")
+    end
+  end
+
 end
