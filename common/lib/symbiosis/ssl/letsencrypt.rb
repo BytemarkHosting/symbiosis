@@ -158,7 +158,7 @@ module Symbiosis
           end
         end
 
-        set_param(File.basename(challenge.filename), false, challenge_directory) if not $DEBUG
+        set_param(File.basename(challenge.filename), false, challenge_directory) unless $DEBUG
 
         if vs == "valid"
           return true
