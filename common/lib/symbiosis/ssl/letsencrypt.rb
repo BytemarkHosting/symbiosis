@@ -146,23 +146,18 @@ module Symbiosis
             break unless vs == "pending"
             sleep(1)
           end
-
-          if vs == "valid"
-            puts "\tSuccessfully verified #{name}" if $VERBOSE
-            break
-          end
-
-          if $VERBOSE
-            puts "\t!! Unable to verify #{name} (status: #{vs})"
-            puts "\t!! Check http://#{name}/#{challenge.filename} works."
-          end
         end
 
         set_param(File.basename(challenge.filename), false, challenge_directory) unless $DEBUG
 
         if vs == "valid"
+          puts "\tSuccessfully verified #{name}" if $VERBOSE
           return true
         else
+          if $VERBOSE
+            puts "\t!! Unable to verify #{name} (status: #{vs})"
+            puts "\t!! Check http://#{name}/#{challenge.filename} works."
+          end
           return false
         end
       end

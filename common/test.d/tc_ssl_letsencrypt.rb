@@ -2,6 +2,7 @@ $:.unshift  "../lib/" if File.directory?("../lib")
 
 require 'test/unit'
 require 'tmpdir'
+require 'symbiosis/domain/ssl'
 
 if RUBY_VERSION =~ /^[2-9]\./
   require 'symbiosis/ssl/letsencrypt'
@@ -405,16 +406,55 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       assert_nothing_raised{ @client.register }
   end
 
+  #
+  # This test gets run twice, with the DEBUG flag being flipped between runs.  Bit naughty really.
+  #
   def test_challenge_file_cleanup
+    #
+    # Record the current DEBUG state so we can set it
+    #
+    old_debug = $DEBUG
+
     omit unless @client
+
     @client.register
-    @client.verify
 
     challenge_directory = "#{@prefix}/#{@domain}/public/htdocs/.well-known/acme-challenge"
-    @http01_challenge.each do |key, hash|
-      assert(File.exist?("#{challenge_directory}/#{hash["token"]}") == $DEBUG,
-        "#verify should cleanup ACME challenge files except when DEBUG == true")
+
+    [false, true].each do |current_debug|
+
+      #
+      # Remove previous challenges
+      #
+      @http01_challenge = {}
+
+      #
+      # Now verify, setting/unsetting $DEBUG around it.
+      #
+      $DEBUG = current_debug
+      @client.verify
+      $DEBUG = old_debug
+
+      @http01_challenge.each do |key, hash|
+
+        fn = File.join(challenge_directory, hash["token"])
+
+        if current_debug
+          assert(File.exist?(fn),
+            "#verify should not remove ACME challenge files when $DEBUG is set")
+        else
+          refute(File.exist?(fn),
+            "#verify should remove ACME challenge files")
+        end
+
+      end
+
     end
+  ensure
+    #
+    # If we barf, reset the DEBUG flag.
+    #
+    $DEBUG = old_debug
   end
 
 end
