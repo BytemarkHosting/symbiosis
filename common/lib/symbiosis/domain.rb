@@ -19,7 +19,7 @@ module Symbiosis
     #
     # This is a regular expression that matches valid domain names.
     #
-    NAME_REGEXP = /^[a-z0-9-]+\.([a-z0-9-]+\.?)+$/i
+    NAME_REGEXP = /^[_a-z0-9-]+\.([_a-z0-9-]+\.?)+$/i
 
     #
     # This regular expression matches crypted passwords, putting the word
