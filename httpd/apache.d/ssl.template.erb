@@ -9,7 +9,7 @@
 #
 #  For SSL documenation please consult:
 #
-#  http://symbiosis.bytemark.co.uk/squeeze/docs/ch-ssl-hosting.html
+#  http://symbiosis.bytemark.co.uk/jessie/docs/ch-ssl-hosting.html
 #
 ##
 ###
@@ -133,7 +133,7 @@
                 #
                 # Use our server nane if HTTP_HOST is empty. 
                 #
-                RewriteCond "%{HTTP_HOST}" ""
+                RewriteCond "%{HTTP_HOST}" =""
                 RewriteRule ^/?(.*) https://<%= domain %>/$1 [R=301,L]
                 RewriteRule ^/?(.*) https://%{HTTP_HOST}/$1 [R=301,L]
         </IfModule>
