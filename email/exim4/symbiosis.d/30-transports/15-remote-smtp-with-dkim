@@ -3,7 +3,7 @@
 #
 # This constant is used to validate DKIM selectors.
 #
-DKIM_SELECTOR_REGEX = (?i)\N\b(([a-z0-9-]+)(\.[a-z0-9-]+)*)\b\N
+DKIM_SELECTOR_REGEX = (?i)\N\b(([_a-z0-9-]+)(\.[_a-z0-9-]+)*)\b\N
 
 remote_smtp_with_dkim:
   debug_print = "T: remote_smtp_with_dkim for $local_part@$domain ($sender_address_domain key)"
