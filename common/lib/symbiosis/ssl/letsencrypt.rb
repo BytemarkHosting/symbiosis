@@ -130,36 +130,36 @@ module Symbiosis
         #
         authorisation = do_with_nonce_debounce{ self.client.authorize(domain: name) }
         challenge     = do_with_nonce_debounce{ authorisation.http01 }
+        challenge_directory = File.join(self.docroot, File.dirname(challenge.filename))
 
-        mkdir_p(File.join(self.docroot, File.dirname(challenge.filename)))
+        mkdir_p(challenge_directory)
 
-        set_param(File.basename(challenge.filename),
-          challenge.file_content,
-          File.join(self.docroot, File.dirname(challenge.filename)))
+        set_param(File.basename(challenge.filename), challenge.file_content, challenge_directory)
+
+        vs = nil # Record the verify status
 
         if do_with_nonce_debounce{ challenge.request_verification }
           puts "\tRequesting verification for #{name} from #{endpoint}" if $VERBOSE
-
-          vs = nil # Record the verify status
 
           60.times do
             vs = do_with_nonce_debounce { challenge.verify_status }
             break unless vs == "pending"
             sleep(1)
           end
+        end
 
-          if vs == "valid"
-            puts "\tSuccessfully verified #{name}" if $VERBOSE
-            return true
-          end
+        set_param(File.basename(challenge.filename), false, challenge_directory) unless $DEBUG
 
+        if vs == "valid"
+          puts "\tSuccessfully verified #{name}" if $VERBOSE
+          return true
+        else
           if $VERBOSE
             puts "\t!! Unable to verify #{name} (status: #{vs})"
             puts "\t!! Check http://#{name}/#{challenge.filename} works."
           end
+          return false
         end
-
-        false
       end
 
       def acme_certificate(request = self.request)
