@@ -43,7 +43,7 @@ module Symbiosis
       #
       # If our localhost name is junk set it to localhost
       #
-      unless localhost =~ /^[A-Za-z0-9-]+/
+      unless localhost =~ /^[_a-z0-9-]+/i
         localhost = "localhost"
       end
 
@@ -69,7 +69,7 @@ module Symbiosis
       #
       # If the fqdn is empty or junk, return our original localhost
       #
-      unless fqdn =~ /^[a-z0-9\.-]+/
+      unless fqdn =~ /^[_a-z0-9\.-]+/i
         fqdn = localhost
       end
 
