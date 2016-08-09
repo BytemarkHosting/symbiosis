@@ -1,3 +1,10 @@
+symbiosis-httpd (2015:1111) stable; urgency=low
+
+  * Fixed a bug in the SSL Apache template, to make sure HTTP redirections go
+    to the domain in the Host: header, if specified.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 09 Aug 2016 12:37:02 +0100
+
 symbiosis-httpd (2015:1110) stable; urgency=medium
 
   * Fixed output in symbiosis-httpd-configure to correctly report pre-enabled
