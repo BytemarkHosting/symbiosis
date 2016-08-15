@@ -1,3 +1,11 @@
+symbiosis-common (2015:1220) stable; urgency=medium
+
+  * Allow underscores in hostnames.
+  * Clean up ACME challenge files after validation.
+  * Fixed symbiosis-ssl manpage.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 09 Aug 2016 17:34:57 +0100
+
 symbiosis-common (2015:1218) stable; urgency=medium
 
   * The current certificate is now marked for replacement if it is deemed
