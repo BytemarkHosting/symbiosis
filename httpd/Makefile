@@ -15,9 +15,14 @@ test:
 
 .PHONY: test clean all docs
  
-man/%.man: ./sbin/%
+man/%.txt: ./sbin/%
 	[ -d man ] || mkdir man
-	RUBYLIB=./lib:../common/lib $<  --manual | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
+	RUBYLIB=./lib:../common/lib $<  --manual > $@
+	test -s $@
+
+man/%.man: man/%.txt
+	sed -e 's/^=\+$$//' $< | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
+	test -s $@
 
 clean:
 	cd vhost-alias && make clean
