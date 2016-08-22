@@ -23,12 +23,12 @@ hostlist private_addresses = <; 0.0.0.0/8  ; 10.0.0.0/8     ; 100.64.0.0/10   ; 
 # defined in files in the Exim configuration directory, and used in the
 # smtp_rcpt access control list to accept/reject mail respectively.
 
-addresslist blacklisted_senders = ${if exists{ETC_DIR/exim4/blacklist/by_sender}    {lsearch*@;ETC_DIR/exim4/blacklist/by_sender}}
+addresslist blacklisted_senders = ${if exists{ETC_DIR/exim4/blacklist/by_sender}    {wildlsearch*@;ETC_DIR/exim4/blacklist/by_sender}}
 hostlist    blacklisted_hosts_by_ip       = ${if exists{ETC_DIR/exim4/blacklist/by_ip}      {net-iplsearch;ETC_DIR/exim4/blacklist/by_ip}}
 hostlist    blacklisted_hosts_by_hostname = ${if exists{ETC_DIR/exim4/blacklist/by_hostname}{wildlsearch;ETC_DIR/exim4/blacklist/by_hostname}}
 hostlist    blacklisted_hosts   = +blacklisted_hosts_by_ip : +blacklisted_hosts_by_hostname
 
-addresslist whitelisted_senders = ${if exists{ETC_DIR/exim4/whitelist/by_sender}    {lsearch*@;ETC_DIR/exim4/whitelist/by_sender}}
+addresslist whitelisted_senders = ${if exists{ETC_DIR/exim4/whitelist/by_sender}    {wildlsearch*@;ETC_DIR/exim4/whitelist/by_sender}}
 hostlist    whitelisted_hosts_by_ip       = ${if exists{ETC_DIR/exim4/whitelist/by_ip}      {net-iplsearch;ETC_DIR/exim4/whitelist/by_ip}}
 hostlist    whitelisted_hosts_by_hostname = ${if exists{ETC_DIR/exim4/whitelist/by_hostname}{wildlsearch;ETC_DIR/exim4/whitelist/by_hostname}}
 hostlist    whitelisted_hosts   = +whitelisted_hosts_by_ip : +whitelisted_hosts_by_hostname
