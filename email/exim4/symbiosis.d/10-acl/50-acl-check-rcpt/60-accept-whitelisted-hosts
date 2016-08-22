@@ -10,7 +10,11 @@
   accept  hosts = !+private_addresses : +whitelisted_hosts_by_hostname
           log_message = Hostname locally whitelisted
 
+  # OK, now we check whether the sender address is on a local blacklist
+  accept  sender_domains = +whitelisted_domains
+          log_message   = Domain locally whitelisted
+
   # Accept if the sender address is on a local whitelist
   accept  senders       = +whitelisted_senders
-          log_message   = Address/domain locally whitelisted
+          log_message   = Address locally whitelisted
 
