@@ -26,7 +26,7 @@ RCPT TO:<postmaster@local.domain>
 250
 # We don't want to accept mail otherwise.
 RCPT TO:<local.user@local.domain>
-550 Your email address is locally blacklisted.
+550 Your email address or domain is locally blacklisted.
 RSET
 250
 # Now test from a whitelisted domain in a blacklisted domain

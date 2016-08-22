@@ -330,7 +330,9 @@ class Exim4ConfigTest < Test::Unit::TestCase
     # setup the acl
     do_acl_setup()
 
-    %w(normal_ip blacklisted_ip whitelisted_ip).each do |test|
+    %w(normal_ip blacklisted_ip whitelisted_ip
+	whitelisted_sender1 whitelisted_sender2
+	blacklisted_sender1 blacklisted_sender2 blacklisted_sender3 blacklisted_sender4).each do |test|
       do_acl_script('exim4_acl_tests/'+test)
     end
   end
