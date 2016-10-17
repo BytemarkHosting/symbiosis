@@ -281,7 +281,7 @@ class ApacheLogger < EventMachine::Connection
       #
       if @default_filehandle.nil? or @default_filehandle.closed?
         warn "#{$0}: Opening default log file #{self.default_filename}" if $VERBOSE 
-        @default_filehandle = open_log(self.default_filename)
+        @default_filehandle = open_log(self.default_filename, {:sync => self.sync_io})
       end
 
       if @default_filehandle.is_a?(File) and not @default_filehandle.closed?
