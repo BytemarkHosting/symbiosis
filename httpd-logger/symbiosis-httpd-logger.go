@@ -41,6 +41,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"syscall"
 )
 
@@ -131,7 +132,7 @@ func close_logfiles() {
 //
 // And on that note let us safely open a file.
 //
-func safeOpen(path string) *os.File {
+func safeOpen(path string, mode os.FileMode, uid uint32, gid uint32, sync bool) *os.File {
 
 	//
 	// If we have too many open files then close them all.
@@ -144,14 +145,23 @@ func safeOpen(path string) *os.File {
 	}
 
 	//
+	// Set the flags we want when creating the file
+	//
+	var open_flags = os.O_CREATE | os.O_APPEND | os.O_WRONLY
+
+	if sync {
+		open_flags = open_flags | os.O_SYNC
+	}
+
+	//
 	// Open the file.  If it fails report that.  By default the file is set to
 	// owner r/w only but this will get changed later where necessary.
 	//
-	handle, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+	handle, err := os.OpenFile(path, open_flags, os.FileMode(mode))
 
 	if err != nil {
 		if verbose {
-			fmt.Fprintln(os.Stderr, "Failed to open file:", path)
+			fmt.Fprintln(os.Stderr, os.Args[0], "Failed to open file:", path, err)
 		}
 		return nil
 	}
@@ -162,11 +172,11 @@ func safeOpen(path string) *os.File {
 	//  We don't want to blindly write to symlinks because that
 	// can cause security issues.
 	//
-	fi, serr := os.Lstat(path)
-	if serr != nil {
+	fi, err := os.Lstat(path)
+	if err != nil {
 		if verbose {
 
-			fmt.Println("Failed to stat the file", path, serr)
+			fmt.Fprintln(os.Stderr, os.Args[0], "Failed to stat the file", path, err)
 		}
 		handle.Close()
 		return nil
@@ -175,10 +185,24 @@ func safeOpen(path string) *os.File {
 	if fi.Mode()&os.ModeSymlink != 0 {
 		if verbose {
 
-			fmt.Println("Cowardly refusing to write to symlinked file", path)
+			fmt.Fprintln(os.Stderr, os.Args[0], "Cowardly refusing to write to symlinked file", path)
 		}
 		handle.Close()
 		return nil
+	}
+
+	// Set the UID/GID of the logfile
+	err = handle.Chown(int(uid), int(gid))
+	if err != nil && verbose {
+
+		fmt.Fprintln(os.Stderr, os.Args[0], "Failed to change ownership on file", path, err)
+	}
+
+	// Set the mode of the logfile
+	err = handle.Chmod(mode)
+	if err != nil && verbose {
+
+		fmt.Fprintln(os.Stderr, os.Args[0], "Failed to change mode on file", path, err)
 	}
 
 	return handle
@@ -225,12 +249,11 @@ func safeMkdir(dir string) error {
 			// Nothing to do!
 			//
 			return nil
-		} else {
-			//
-			// Awooga, something already in the way.
-			//
-			return os.ErrExist
 		}
+		//
+		// Awooga, something already in the way.
+		//
+		return os.ErrExist
 	}
 
 	//
@@ -271,14 +294,14 @@ func safeMkdir(dir string) error {
 	//
 	if uid < 1000 {
 		if verbose {
-			fmt.Fprintln(os.Stderr, "Refusing to create directory for system user", uid)
+			fmt.Fprintln(os.Stderr, os.Args[0], "Refusing to create directory for system user", uid)
 		}
 		return os.ErrPermission
 	}
 
 	if gid < 1000 {
 		if verbose {
-			fmt.Fprintln(os.Stderr, "Refusing to create directory for system group", uid)
+			fmt.Fprintln(os.Stderr, os.Args[0], "Refusing to create directory for system group", uid)
 		}
 		return os.ErrPermission
 	}
@@ -344,10 +367,100 @@ func exists(path string) (bool, error) {
 	return true, err
 }
 
+/*
+	Write the log line to the correct file.
+
+
+*/
+func writeLog(prefix string, host string, log string, filename string, sync_flag bool) (terr error) {
+
+	//
+	// We build up the logfile name from the prefix, host, and filename args.
+	//
+	logfile := filepath.Join(prefix, host)
+
+	//
+	// Resolve any symlinks to the true path.  This raises an error if the path
+	// doesn't exist.  This is important as it prevents deleted domains from re-appearing.
+	//
+	logfile, err := filepath.EvalSymlinks(logfile)
+
+	if err != nil {
+		return err
+	}
+
+	//
+	// If the hostname is not empty, then we need to add public/logs to the path.
+	//
+	if host != "" {
+		logfile = filepath.Join(logfile, "public", "logs")
+	}
+
+	//
+	// Now make sure our directory exists
+	//
+	err = safeMkdir(logfile)
+
+	if err != nil {
+		return err
+	}
+
+	//
+	// Stat the directory to see who owns it
+	//
+	stat, err := os.Lstat(logfile)
+	if err != nil {
+		return err
+	}
+
+	sys := stat.Sys()
+	uid := sys.(*syscall.Stat_t).Uid
+	gid := sys.(*syscall.Stat_t).Gid
+
+	//
+	// Now build up the complete logfile to the file we'll open
+	//
+	logfile = filepath.Join(logfile, filename)
+
+	//
+	// Lookup the handle to the logfile in our cache.
+	//
+	h := handles[logfile]
+
+	//
+	// If that failed then this is the first time we've written
+	// here, so we need to open the file.
+	//
+	if h == nil {
+		//
+		// We match the UID/GID/mode of the handle to the top-level /srv/$domain
+		// directory, which we found earlier.
+		//
+		// Remove the executable bit though.
+		//
+		mode := (stat.Mode() - (stat.Mode() & 0111))
+
+		handles[logfile] = safeOpen(logfile, mode, uid, gid, sync_flag)
+		h = handles[logfile]
+	}
+
+	//
+	// Write the log-line, adding the newline which the
+	// scanner removed.
+	//
+	if h != nil {
+		h.WriteString(log + "\n")
+	}
+
+	return nil
+}
+
 //
 // The entry-point to our command-line tool.
 //
 func main() {
+
+	var err error
 
 	//
 	// Define command-line flags: -s (this is a no-op now)
@@ -364,8 +477,8 @@ func main() {
 	//
 	// Define command-line flags: -l
 	//
-	var default_log string
-	flag.StringVar(&default_log, "l", "access.log", "The file name of the generated logs")
+	var default_filename string
+	flag.StringVar(&default_filename, "l", "access.log", "The file name of the generated logs")
 
 	//
 	// Define command-line flags: -v
@@ -377,9 +490,9 @@ func main() {
 	// Define command-line flags: -u/-g (these are no-ops now)
 	//
 	var uid_text = "Set the default owner when writing files"
-	var g_uid *uint = flag.Uint("u", 0, uid_text)
+	var g_uid = flag.Uint("u", 0, uid_text)
 	var gid_text = "Set the default group when writing files"
-	var g_gid *uint = flag.Uint("g", 0, gid_text)
+	var g_gid = flag.Uint("g", 0, gid_text)
 
 	//
 	// Allow a prefix to be set for testing
@@ -398,12 +511,21 @@ func main() {
 	//
 	// In addition to writing per-vhost logfiles we'll copy
 	// all logs to that particular file.
+	var default_log string
+
+	if len(flag.Args()) > 0 {
+		default_log, err = filepath.Abs(flag.Args()[0])
+
+		if err != nil && verbose {
+			fmt.Fprintln(os.Stderr, os.Args[0], "Failed to work out the default log path", default_log, err)
+		}
+	}
+
 	//
 	// The default is this:
 	//
-	default_file := "/var/log/apache2/zz-mass-hosting.log"
-	if len(flag.Args()) > 0 {
-		default_file = flag.Args()[0]
+	if default_log == "" {
+		default_log = "/var/log/apache2/zz-mass-hosting.log"
 	}
 
 	//
@@ -411,13 +533,13 @@ func main() {
 	//
 	fh, err := os.Open(prefix)
 	if err != nil {
-		fmt.Println(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, os.Args[0], err)
 		os.Exit(1)
 	}
 
 	err = fh.Chdir()
 	if err != nil {
-		fmt.Println(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, os.Args[0], err)
 		os.Exit(1)
 	}
 
@@ -428,7 +550,7 @@ func main() {
 	//
 	if (*g_uid != 0 && *g_gid == 0) || (*g_uid == 0 && *g_gid != 0) {
 		if verbose {
-			fmt.Println(os.Stderr, "UID and GID must be either both zero or both non-zero.")
+			fmt.Fprintln(os.Stderr, os.Args[0], "UID and GID must be either both zero or both non-zero.")
 		}
 		*g_uid = 0
 		*g_gid = 0
@@ -436,7 +558,7 @@ func main() {
 
 	if files_count < 1 {
 		if verbose {
-			fmt.Println(os.Stderr, "The maximum number of files to hold open must be greater than zero.")
+			fmt.Fprintln(os.Stderr, os.Args[0], "The maximum number of files to hold open must be greater than zero.")
 		}
 		files_count = 50
 	}
@@ -451,8 +573,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, "files:", files_count)
 		fmt.Fprintln(os.Stderr, "uid:", *g_uid)
 		fmt.Fprintln(os.Stderr, "gid:", *g_gid)
-		fmt.Fprintln(os.Stderr, "default_file:", default_file)
-		fmt.Fprintln(os.Stderr, "log_file:", default_log)
+		fmt.Fprintln(os.Stderr, "default_log:", default_log)
+		fmt.Fprintln(os.Stderr, "default_filename:", default_filename)
 		fmt.Fprintln(os.Stderr, "prefix:", prefix)
 	}
 
@@ -483,9 +605,14 @@ func main() {
 	// A regular expression to split a line into "hostname" and
 	// "rest of line".
 	//
-	re := regexp.MustCompile("(?P<host>[a-zA-Z0-9-]+\\.(?:[a-zA-Z0-9-]+\\.?)+) (?P<rest>.*)")
+	re := regexp.MustCompile("([_a-zA-Z0-9-]+\\.(?:[_a-zA-Z0-9-]+\\.?)+) (.*)")
 
 	//
+	// Split some stuff up to work out our "default_prefix" (i.e.
+	// /var/log/apache2) and "default_log_filename" (i.e. "zz-mass-hosting.log")
+	// so we can use our writeLog() function with these values.
+	//
+	default_log_prefix, default_log_filename := filepath.Split(default_log)
 
 	// Get input, unbuffered.
 	//
@@ -497,23 +624,6 @@ func main() {
 		log := scanner.Text()
 
 		//
-		// Ensure that our default-file is open.
-		//
-		// This might be closed by the SIGHUP handler, for example.
-		//
-		if handles[default_file] == nil {
-			handles[default_file] = safeOpen(default_file)
-		}
-
-		//
-		// Before we do anything else write the new entry to
-		// the default logfile.
-		//
-		if handles[default_file] != nil {
-			handles[default_file].WriteString(log + "\n")
-		}
-
-		//
 		// The line will contain the vhost-name as the initial
 		// token, then the rest of the stuff that Apache generally
 		// shows.
@@ -523,98 +633,27 @@ func main() {
 		// input.
 		//
 		match := re.FindStringSubmatch(log)
-		if match == nil {
-			if verbose {
 
-				fmt.Fprintln(os.Stderr, "Received malformed request-line:", log)
+		//
+		// If we get a match, try and write it to a per-host log.
+		//
+		if match != nil {
+			err := writeLog(prefix, strings.ToLower(match[1]), match[2], default_filename, sync_flag)
+
+			if err == nil {
+				continue
 			}
-			continue
 
 		}
-		host := match[1]
-		rest := match[2]
 
 		//
-		// This is the path to the per-vhost directory
+		// Write to the default log if writing to the per-host log failed.  The
+		// host name is empty here to show that we're writing to the default log.
 		//
-		logfile := filepath.Join(prefix, host)
+		err := writeLog(default_log_prefix, "", log, default_log_filename, sync_flag)
 
-		//
-		// Resolve any symlinks to the true path.
-		//
-		logfile, err := filepath.EvalSymlinks(logfile)
-
-		if err != nil {
-			if verbose && !os.IsNotExist(err) {
-				fmt.Fprintln(os.Stderr, err)
-			}
-			continue
-		}
-
-		//
-		// Stat the directory to see who owns it
-		//
-		stat, err := os.Lstat(logfile)
-		if err != nil {
-			continue
-		}
-		sys := stat.Sys()
-		uid := sys.(*syscall.Stat_t).Uid
-		gid := sys.(*syscall.Stat_t).Gid
-
-		//
-		// If the /logs/ directory doesn't exist then create it.
-		//
-		logfile = filepath.Join(logfile, "public/logs")
-		err = safeMkdir(logfile)
-
-		if err != nil {
-			if verbose {
-				fmt.Fprintln(os.Stderr, "Failed to create directory:", logfile, ":", err)
-			}
-			continue
-		}
-
-		//
-		// Now build up the complete logfile to the file we'll open
-		//
-		logfile = filepath.Join(logfile, default_log)
-
-		//
-		// Lookup the handle to the logfile in our cache.
-		//
-		h := handles[logfile]
-
-		//
-		// If that failed then this is the first time we've written
-		// here, so we need to open the file.
-		//
-		if h == nil {
-			handles[logfile] = safeOpen(logfile)
-			h = handles[logfile]
-
-			//
-			// We match the UID/GID/mode of the handle to the top-level /srv/$domain
-			// directory, which we found earlier.
-			//
-			// Remove the executable bit though.
-			//
-			mode := (stat.Mode() - (stat.Mode() & 0111))
-
-			// Ensure the UID/GID of the logfile match that on the
-			// virtual-hosts' directory
-			if h != nil {
-				h.Chown(int(uid), int(gid))
-				h.Chmod(mode)
-			}
-		}
-
-		//
-		// Write the log-line, adding the newline which the
-		// scanner removed.
-		//
-		if h != nil {
-			h.WriteString(rest + "\n")
+		if err != nil && verbose {
+			fmt.Fprintln(os.Stderr, os.Args[0], "Failed to write to default log file", default_log, err)
 		}
 	}
 
@@ -622,8 +661,7 @@ func main() {
 	// expected and not reported by `Scan` as an error.
 	if err := scanner.Err(); err != nil {
 		if verbose {
-
-			fmt.Fprintln(os.Stderr, "error:", err)
+			fmt.Fprintln(os.Stderr, os.Args[0], "error:", err)
 		}
 		os.Exit(1)
 	}
