@@ -1,3 +1,11 @@
+symbiosis-httpd (2015:1112) stable; urgency=medium
+
+  * Fix HSTS config to make HSTS work by default
+  * Supply sync parameter when opening default apache log file.
+  * Split manpage generation into two stages.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Nov 2016 16:31:06 +0000
+
 symbiosis-httpd (2015:1111) stable; urgency=low
 
   * Fixed a bug in the SSL Apache template, to make sure HTTP redirections go

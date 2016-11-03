@@ -1,3 +1,9 @@
+symbiosis-xmpp (2015:1024) stable; urgency=medium
+
+  * Fixed template name in comment in template.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Nov 2016 16:33:32 +0000
+
 symbiosis-xmpp (2015:1023) stable; urgency=medium
 
   * XMPP configuration generated a line consisting of just a semi-colon when
