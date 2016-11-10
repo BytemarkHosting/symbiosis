@@ -9,7 +9,7 @@ vhost_mailbox:
   # Set the home directory for any routers/transports.
   router_home_directory    = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part
   transport_home_directory = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part
-  data  = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part/Maildir/${if eq{$h_X-Spam-Status:}{Spam}{.Spam/}{}}
+  data  = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part/Maildir/${if eq{$h_X-Spam-Status:}{spam}{.Spam/}{}}
   user  = ${extract{uid}{${stat:VHOST_DIR/$domain}}}
   group = ${extract{gid}{${stat:VHOST_DIR/$domain}}}
   directory_transport = address_directory
