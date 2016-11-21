@@ -35,6 +35,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -285,8 +286,15 @@ func safeMkdir(dir string) error {
 	// Stat the parent directory owner/uid.
 	//
 	sys := lstat_parent.Sys()
-	uid := sys.(*syscall.Stat_t).Uid
-	gid := sys.(*syscall.Stat_t).Gid
+	var uid, gid uint32
+
+	if stat_t, ok := sys.(*syscall.Stat_t); ok {
+		uid = stat_t.Uid
+		gid = stat_t.Gid
+	} else {
+		return errors.New("Could not determine UID/GID")
+	}
+
 	mode := lstat_parent.Mode()
 
 	//
@@ -369,21 +377,19 @@ func exists(path string) (bool, error) {
 
 /*
 	Write the log line to the correct file.
-
-
 */
 func writeLog(prefix string, host string, log string, filename string, sync_flag bool) (terr error) {
 
 	//
 	// We build up the logfile name from the prefix, host, and filename args.
 	//
-	logfile := filepath.Join(prefix, host)
+	logdir := filepath.Join(prefix, host)
 
 	//
 	// Resolve any symlinks to the true path.  This raises an error if the path
 	// doesn't exist.  This is important as it prevents deleted domains from re-appearing.
 	//
-	logfile, err := filepath.EvalSymlinks(logfile)
+	logdir, err := filepath.EvalSymlinks(logdir)
 
 	if err != nil {
 		return err
@@ -393,34 +399,13 @@ func writeLog(prefix string, host string, log string, filename string, sync_flag
 	// If the hostname is not empty, then we need to add public/logs to the path.
 	//
 	if host != "" {
-		logfile = filepath.Join(logfile, "public", "logs")
+		logdir = filepath.Join(logdir, "public", "logs")
 	}
-
-	//
-	// Now make sure our directory exists
-	//
-	err = safeMkdir(logfile)
-
-	if err != nil {
-		return err
-	}
-
-	//
-	// Stat the directory to see who owns it
-	//
-	stat, err := os.Lstat(logfile)
-	if err != nil {
-		return err
-	}
-
-	sys := stat.Sys()
-	uid := sys.(*syscall.Stat_t).Uid
-	gid := sys.(*syscall.Stat_t).Gid
 
 	//
 	// Now build up the complete logfile to the file we'll open
 	//
-	logfile = filepath.Join(logfile, filename)
+	logfile := filepath.Join(logdir, filename)
 
 	//
 	// Lookup the handle to the logfile in our cache.
@@ -432,6 +417,31 @@ func writeLog(prefix string, host string, log string, filename string, sync_flag
 	// here, so we need to open the file.
 	//
 	if h == nil {
+		//
+		// Now make sure our directory exists
+		//
+		if err = safeMkdir(logdir); err != nil {
+			return err
+		}
+
+		//
+		// Stat the directory to see who owns it
+		//
+		stat, err := os.Lstat(logdir)
+		if err != nil {
+			return err
+		}
+
+		sys := stat.Sys()
+		var uid, gid uint32
+
+		if stat_t, ok := sys.(*syscall.Stat_t); ok {
+			uid = stat_t.Uid
+			gid = stat_t.Gid
+		} else {
+			return errors.New("Could not determine UID/GID for log directory " + logdir)
+		}
+
 		//
 		// We match the UID/GID/mode of the handle to the top-level /srv/$domain
 		// directory, which we found earlier.
@@ -445,12 +455,17 @@ func writeLog(prefix string, host string, log string, filename string, sync_flag
 	}
 
 	//
+	// If the handle is still nil, error at this point.
+	//
+	if h == nil {
+		return errors.New("Could not find filehandle for log file " + logfile)
+	}
+
+	//
 	// Write the log-line, adding the newline which the
 	// scanner removed.
 	//
-	if h != nil {
-		h.WriteString(log + "\n")
-	}
+	h.WriteString(log + "\n")
 
 	return nil
 }
