@@ -474,9 +474,6 @@ func writeLog(prefix string, host string, log string, filename string, sync_flag
 // The entry-point to our command-line tool.
 //
 func main() {
-
-	var err error
-
 	//
 	// Define command-line flags: -s (this is a no-op now)
 	//
@@ -498,7 +495,6 @@ func main() {
 	//
 	// Define command-line flags: -v
 	//
-	var verbose bool
 	flag.BoolVar(&verbose, "v", false, "Show verbose output")
 
 	//
@@ -527,6 +523,7 @@ func main() {
 	// In addition to writing per-vhost logfiles we'll copy
 	// all logs to that particular file.
 	var default_log string
+	var err error
 
 	if len(flag.Args()) > 0 {
 		default_log, err = filepath.Abs(flag.Args()[0])
@@ -620,7 +617,7 @@ func main() {
 	// A regular expression to split a line into "hostname" and
 	// "rest of line".
 	//
-	re := regexp.MustCompile("([_a-zA-Z0-9-]+\\.(?:[_a-zA-Z0-9-]+\\.?)+) (.*)")
+	re := regexp.MustCompile(`([_a-zA-Z0-9-]+\.(?:[_a-zA-Z0-9-]+\.?)+) (.*)`)
 
 	//
 	// Split some stuff up to work out our "default_prefix" (i.e.
@@ -653,22 +650,23 @@ func main() {
 		// If we get a match, try and write it to a per-host log.
 		//
 		if match != nil {
-			err := writeLog(prefix, strings.ToLower(match[1]), match[2], default_filename, sync_flag)
-
-			if err == nil {
+			if err := writeLog(prefix, strings.ToLower(match[1]), match[2], default_filename, sync_flag); err != nil {
+				if verbose {
+					fmt.Fprintln(os.Stderr, os.Args[0], "Failed to write to per-domain log file for", strings.ToLower(match[1]), err)
+				}
+			} else {
 				continue
 			}
-
 		}
 
 		//
 		// Write to the default log if writing to the per-host log failed.  The
 		// host name is empty here to show that we're writing to the default log.
 		//
-		err := writeLog(default_log_prefix, "", log, default_log_filename, sync_flag)
-
-		if err != nil && verbose {
-			fmt.Fprintln(os.Stderr, os.Args[0], "Failed to write to default log file", default_log, err)
+		if err := writeLog(default_log_prefix, "", log, default_log_filename, sync_flag); err != nil {
+			if verbose {
+				fmt.Fprintln(os.Stderr, os.Args[0], "Failed to write to default log file", default_log_filename, err)
+			}
 		}
 	}
 
