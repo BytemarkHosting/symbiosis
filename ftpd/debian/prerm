@@ -14,8 +14,11 @@ fi
 # Revert the TLS cipher suites
 # 
 cs="/etc/pure-ftpd/conf/TLSCipherSuite"
-if [ -f "$cs" ] && echo "debef44fdd534db09718bd42c34d83af  $cs" | md5sum -c > /dev/null 2>&1 ; then
-  # OK this is the Debian ciphers
+if [ -f "$cs" ] && \
+   ( echo "debef44fdd534db09718bd42c34d83af  $cs" | md5sum -c > /dev/null 2>&1 || \
+     echo "973a17f2d4d760313a8928f21fa6d8fd  $cs" | md5sum -c > /dev/null 2>&1 ) ; then
+
+  # OK these ciphers have been supplied by Symbiosis at some point in the past
   echo "I: Reverting pure-ftpd cipher suite to Debian default"
   echo 'ALL:!aNULL:!SSLv3' > $cs
 fi
