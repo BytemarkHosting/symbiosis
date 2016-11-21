@@ -1,8 +1,9 @@
 symbiosis-xmpp (2015:1024) stable; urgency=medium
 
+  * Updated cipher lists.
   * Fixed template name in comment in template.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 03 Nov 2016 16:33:32 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 21 Nov 2016 13:50:51 +0000
 
 symbiosis-xmpp (2015:1023) stable; urgency=medium
 
