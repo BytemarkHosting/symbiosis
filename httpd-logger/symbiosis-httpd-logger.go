@@ -361,20 +361,6 @@ func safeMkdir(dir string) error {
 	return nil
 }
 
-//
-// Return true if the path/file exists, false otherwise.
-//
-func exists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return true, err
-}
-
 /*
 	Write the log line to the correct file.
 */
