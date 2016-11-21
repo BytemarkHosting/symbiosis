@@ -309,7 +309,7 @@ func safeMkdir(dir string) error {
 
 	if gid < 1000 {
 		if verbose {
-			fmt.Fprintln(os.Stderr, os.Args[0], "Refusing to create directory for system group", uid)
+			fmt.Fprintln(os.Stderr, os.Args[0], "Refusing to create directory for system group", gid)
 		}
 		return os.ErrPermission
 	}
