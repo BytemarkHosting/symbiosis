@@ -63,7 +63,7 @@ var handles = make(map[string]*os.File)
 //
 // This may be changed by a command-line flag.
 //
-var files_count = 100
+var filesCount = 100
 
 //
 // Are we running verbosely?
@@ -79,24 +79,24 @@ var verbose = false
 // Every day /etc/cron.daily/symbiosis-httpd-rotate-logs will
 // send such a signal.
 //
-func setup_hup_handler() {
+func setupHupHandler() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGHUP)
 	go func() {
 		<-c
-		close_logfiles()
+		closeLogfiles()
 	}()
 }
 
 //
 // Close all of our open logfiles.
 //
-func close_logfiles() {
+func closeLogfiles() {
 	for path, handle := range handles {
 		handle.Close()
 		handles[path] = nil
 	}
-	setup_hup_handler()
+	setupHupHandler()
 }
 
 //
@@ -138,7 +138,7 @@ func safeOpen(path string, mode os.FileMode, uid uint32, gid uint32, sync bool) 
 	//
 	// If we have too many open files then close them all.
 	//
-	if len(handles) > files_count {
+	if len(handles) > filesCount {
 		for path, handle := range handles {
 			handle.Close()
 			handles[path] = nil
@@ -148,17 +148,17 @@ func safeOpen(path string, mode os.FileMode, uid uint32, gid uint32, sync bool) 
 	//
 	// Set the flags we want when creating the file
 	//
-	var open_flags = os.O_CREATE | os.O_APPEND | os.O_WRONLY
+	var openFlags = os.O_CREATE | os.O_APPEND | os.O_WRONLY
 
 	if sync {
-		open_flags = open_flags | os.O_SYNC
+		openFlags = openFlags | os.O_SYNC
 	}
 
 	//
 	// Open the file.  If it fails report that.  By default the file is set to
 	// owner r/w only but this will get changed later where necessary.
 	//
-	handle, err := os.OpenFile(path, open_flags, os.FileMode(mode))
+	handle, err := os.OpenFile(path, openFlags, os.FileMode(mode))
 
 	if err != nil {
 		if verbose {
@@ -232,7 +232,7 @@ func safeMkdir(dir string) error {
 	//
 	// Check the parent.
 	//
-	lstat_parent, err := os.Lstat(parent)
+	lstatParent, err := os.Lstat(parent)
 
 	//
 	// If an error is returned (other than ENOEXIST) then raise it.
@@ -244,8 +244,8 @@ func safeMkdir(dir string) error {
 	//
 	// If the stat comes back non-nil, it found something.
 	//
-	if lstat_parent != nil {
-		if lstat_parent.IsDir() {
+	if lstatParent != nil {
+		if lstatParent.IsDir() {
 			//
 			// Nothing to do!
 			//
@@ -263,9 +263,9 @@ func safeMkdir(dir string) error {
 	stack := []string{}
 
 	//
-	// The lstat_parent is still nil from before.
+	// The lstatParent is still nil from before.
 	//
-	for lstat_parent == nil {
+	for lstatParent == nil {
 		//
 		// This sticks our parent on the *front* of the stack, i.e. prepend rather
 		// than append!
@@ -276,7 +276,7 @@ func safeMkdir(dir string) error {
 		if err != nil {
 			return err
 		}
-		lstat_parent, err = os.Lstat(parent)
+		lstatParent, err = os.Lstat(parent)
 		if err != nil && !os.IsNotExist(err) {
 			return err
 		}
@@ -285,17 +285,17 @@ func safeMkdir(dir string) error {
 	//
 	// Stat the parent directory owner/uid.
 	//
-	sys := lstat_parent.Sys()
+	sys := lstatParent.Sys()
 	var uid, gid uint32
 
-	if stat_t, ok := sys.(*syscall.Stat_t); ok {
-		uid = stat_t.Uid
-		gid = stat_t.Gid
+	if statT, ok := sys.(*syscall.Stat_t); ok {
+		uid = statT.Uid
+		gid = statT.Gid
 	} else {
 		return errors.New("Could not determine UID/GID")
 	}
 
-	mode := lstat_parent.Mode()
+	mode := lstatParent.Mode()
 
 	//
 	// Don't create directories in directories owned by system owners.
@@ -326,9 +326,9 @@ func safeMkdir(dir string) error {
 		//
 		if err != nil {
 			if os.IsExist(err) {
-				lstat_sdir, _ := os.Lstat(sdir)
+				lstatSdir, _ := os.Lstat(sdir)
 
-				if lstat_sdir.IsDir() {
+				if lstatSdir.IsDir() {
 					continue
 				}
 			}
@@ -378,7 +378,7 @@ func exists(path string) (bool, error) {
 /*
 	Write the log line to the correct file.
 */
-func writeLog(prefix string, host string, log string, filename string, sync_flag bool) (terr error) {
+func writeLog(prefix string, host string, log string, filename string, syncFlag bool) (terr error) {
 
 	//
 	// We build up the logfile name from the prefix, host, and filename args.
@@ -435,9 +435,9 @@ func writeLog(prefix string, host string, log string, filename string, sync_flag
 		sys := stat.Sys()
 		var uid, gid uint32
 
-		if stat_t, ok := sys.(*syscall.Stat_t); ok {
-			uid = stat_t.Uid
-			gid = stat_t.Gid
+		if statT, ok := sys.(*syscall.Stat_t); ok {
+			uid = statT.Uid
+			gid = statT.Gid
 		} else {
 			return errors.New("Could not determine UID/GID for log directory " + logdir)
 		}
@@ -450,7 +450,7 @@ func writeLog(prefix string, host string, log string, filename string, sync_flag
 		//
 		mode := (stat.Mode() - (stat.Mode() & 0111))
 
-		handles[logfile] = safeOpen(logfile, mode, uid, gid, sync_flag)
+		handles[logfile] = safeOpen(logfile, mode, uid, gid, syncFlag)
 		h = handles[logfile]
 	}
 
@@ -477,20 +477,20 @@ func main() {
 	//
 	// Define command-line flags: -s (this is a no-op now)
 	//
-	var sync_flag bool
-	flag.BoolVar(&sync_flag, "s", false, "Open log files in synchronous mode")
+	var syncFlag bool
+	flag.BoolVar(&syncFlag, "s", false, "Open log files in synchronous mode")
 
 	//
 	// Define command-line flags: -f
 	//
-	var files_count uint
-	flag.UintVar(&files_count, "f", 50, "Maxium number of log files to hold open")
+	var filesCount uint
+	flag.UintVar(&filesCount, "f", 50, "Maxium number of log files to hold open")
 
 	//
 	// Define command-line flags: -l
 	//
-	var default_filename string
-	flag.StringVar(&default_filename, "l", "access.log", "The file name of the generated logs")
+	var defaultFilename string
+	flag.StringVar(&defaultFilename, "l", "access.log", "The file name of the generated logs")
 
 	//
 	// Define command-line flags: -v
@@ -500,10 +500,10 @@ func main() {
 	//
 	// Define command-line flags: -u/-g (these are no-ops now)
 	//
-	var uid_text = "Set the default owner when writing files"
-	var g_uid = flag.Uint("u", 0, uid_text)
-	var gid_text = "Set the default group when writing files"
-	var g_gid = flag.Uint("g", 0, gid_text)
+	var uidText = "Set the default owner when writing files"
+	var gUID = flag.Uint("u", 0, uidText)
+	var gidText = "Set the default group when writing files"
+	var gGID = flag.Uint("g", 0, gidText)
 
 	//
 	// Allow a prefix to be set for testing
@@ -522,22 +522,22 @@ func main() {
 	//
 	// In addition to writing per-vhost logfiles we'll copy
 	// all logs to that particular file.
-	var default_log string
+	var defaultLog string
 	var err error
 
 	if len(flag.Args()) > 0 {
-		default_log, err = filepath.Abs(flag.Args()[0])
+		defaultLog, err = filepath.Abs(flag.Args()[0])
 
 		if err != nil && verbose {
-			fmt.Fprintln(os.Stderr, os.Args[0], "Failed to work out the default log path", default_log, err)
+			fmt.Fprintln(os.Stderr, os.Args[0], "Failed to work out the default log path", defaultLog, err)
 		}
 	}
 
 	//
 	// The default is this:
 	//
-	if default_log == "" {
-		default_log = "/var/log/apache2/zz-mass-hosting.log"
+	if defaultLog == "" {
+		defaultLog = "/var/log/apache2/zz-mass-hosting.log"
 	}
 
 	//
@@ -560,19 +560,19 @@ func main() {
 	//
 	// Sanity check flags
 	//
-	if (*g_uid != 0 && *g_gid == 0) || (*g_uid == 0 && *g_gid != 0) {
+	if (*gUID != 0 && *gGID == 0) || (*gUID == 0 && *gGID != 0) {
 		if verbose {
 			fmt.Fprintln(os.Stderr, os.Args[0], "UID and GID must be either both zero or both non-zero.")
 		}
-		*g_uid = 0
-		*g_gid = 0
+		*gUID = 0
+		*gGID = 0
 	}
 
-	if files_count < 1 {
+	if filesCount < 1 {
 		if verbose {
 			fmt.Fprintln(os.Stderr, os.Args[0], "The maximum number of files to hold open must be greater than zero.")
 		}
-		files_count = 50
+		filesCount = 50
 	}
 
 	//
@@ -580,13 +580,13 @@ func main() {
 	// the screen.  Most of these are ignored ..
 	//
 	if verbose {
-		fmt.Fprintln(os.Stderr, "sync:", sync_flag)
+		fmt.Fprintln(os.Stderr, "sync:", syncFlag)
 		fmt.Fprintln(os.Stderr, "verbose:", verbose)
-		fmt.Fprintln(os.Stderr, "files:", files_count)
-		fmt.Fprintln(os.Stderr, "uid:", *g_uid)
-		fmt.Fprintln(os.Stderr, "gid:", *g_gid)
-		fmt.Fprintln(os.Stderr, "default_log:", default_log)
-		fmt.Fprintln(os.Stderr, "default_filename:", default_filename)
+		fmt.Fprintln(os.Stderr, "files:", filesCount)
+		fmt.Fprintln(os.Stderr, "uid:", *gUID)
+		fmt.Fprintln(os.Stderr, "gid:", *gGID)
+		fmt.Fprintln(os.Stderr, "defaultLog:", defaultLog)
+		fmt.Fprintln(os.Stderr, "defaultFilename:", defaultFilename)
 		fmt.Fprintln(os.Stderr, "prefix:", prefix)
 	}
 
@@ -606,7 +606,7 @@ func main() {
 	// This is issued by the daily log-rotation-job, and should
 	// ensure that we reopen any closed logfiles.
 	//
-	setup_hup_handler()
+	setupHupHandler()
 
 	//
 	// Instantiate a scanner to read (unbuffered) input, line-by-line.
@@ -620,11 +620,11 @@ func main() {
 	re := regexp.MustCompile(`([_a-zA-Z0-9-]+\.(?:[_a-zA-Z0-9-]+\.?)+) (.*)`)
 
 	//
-	// Split some stuff up to work out our "default_prefix" (i.e.
-	// /var/log/apache2) and "default_log_filename" (i.e. "zz-mass-hosting.log")
+	// Split some stuff up to work out our "defaultPrefix" (i.e.
+	// /var/log/apache2) and "defaultLogFilename" (i.e. "zz-mass-hosting.log")
 	// so we can use our writeLog() function with these values.
 	//
-	default_log_prefix, default_log_filename := filepath.Split(default_log)
+	defaultLogPrefix, defaultLogFilename := filepath.Split(defaultLog)
 
 	// Get input, unbuffered.
 	//
@@ -650,7 +650,7 @@ func main() {
 		// If we get a match, try and write it to a per-host log.
 		//
 		if match != nil {
-			if err := writeLog(prefix, strings.ToLower(match[1]), match[2], default_filename, sync_flag); err != nil {
+			if err := writeLog(prefix, strings.ToLower(match[1]), match[2], defaultFilename, syncFlag); err != nil {
 				if verbose {
 					fmt.Fprintln(os.Stderr, os.Args[0], "Failed to write to per-domain log file for", strings.ToLower(match[1]), err)
 				}
@@ -663,9 +663,9 @@ func main() {
 		// Write to the default log if writing to the per-host log failed.  The
 		// host name is empty here to show that we're writing to the default log.
 		//
-		if err := writeLog(default_log_prefix, "", log, default_log_filename, sync_flag); err != nil {
+		if err := writeLog(defaultLogPrefix, "", log, defaultLogFilename, syncFlag); err != nil {
 			if verbose {
-				fmt.Fprintln(os.Stderr, os.Args[0], "Failed to write to default log file", default_log_filename, err)
+				fmt.Fprintln(os.Stderr, os.Args[0], "Failed to write to default log file", defaultLogFilename, err)
 			}
 		}
 	}
@@ -682,6 +682,6 @@ func main() {
 	//
 	// Close all our open handles.
 	//
-	close_logfiles()
+	closeLogfiles()
 	os.Exit(0)
 }
