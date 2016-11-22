@@ -36,7 +36,7 @@ tls_on_connect_ports = 465
 # removed unless the connecting port is 25, so ancient remote mail servers
 # don't break too badly.
 #
-tls_require_ciphers  = %SERVER_PRECEDENCE:%LATEST_RECORD_VERSION:%COMPAT:PFS:NORMAL:-VERS-SSL3.0:-MD5:-CURVE-SECP192R1:-CURVE-SECP224R1\
+tls_require_ciphers  = %SERVER_PRECEDENCE:%LATEST_RECORD_VERSION:%COMPAT:PFS:NORMAL:-VERS-SSL3.0:-MD5:-CURVE-SECP192R1:-CURVE-SECP224R1:\
                        -CAMELLIA-256-CBC:-CAMELLIA-192-CBC:-CAMELLIA-128-CBC:-CAMELLIA-128-GCM:-CAMELLIA-256-GCM\
                        ${if !eq{$received_port}{25}{:-ARCFOUR-128}}
 
