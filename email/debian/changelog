@@ -7,7 +7,7 @@ symbiosis-email (2015:1215) stable; urgency=medium
   * Updated cipher lists.
   * Fix typo ensuring tagged spam does get moved to Spam folder.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 21 Nov 2016 13:54:06 +0000
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 22 Nov 2016 12:16:24 +0000
 
 symbiosis-email (2015:1214) stable; urgency=low
 
