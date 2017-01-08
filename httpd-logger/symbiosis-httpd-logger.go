@@ -503,6 +503,12 @@ func main() {
 		//
 		if handles[default_file] == nil {
 			handles[default_file] = safeOpen(default_file)
+			h := handles[default_file]
+
+			if h != nil {
+				h.Chown(int(*g_uid), int(*g_gid))
+				h.Chmod(0644)
+			}
 		}
 
 		//
