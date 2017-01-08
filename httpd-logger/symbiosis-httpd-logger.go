@@ -503,6 +503,12 @@ func main() {
 		//
 		if handles[default_file] == nil {
 			handles[default_file] = safeOpen(default_file)
+			h := handles[default_file]
+
+			if h != nil {
+				h.Chown(int(*g_uid), int(*g_gid))
+				h.Chmod(0644)
+			}
 		}
 
 		//
@@ -597,9 +603,9 @@ func main() {
 			// We match the UID/GID/mode of the handle to the top-level /srv/$domain
 			// directory, which we found earlier.
 			//
-			// Remove the executable bit though.
+			// Remove the executable and non-permissions bits.
 			//
-			mode := (stat.Mode() - (stat.Mode() & 0111))
+			mode := stat.Mode() & (os.ModePerm &^ 0111)
 
 			// Ensure the UID/GID of the logfile match that on the
 			// virtual-hosts' directory
