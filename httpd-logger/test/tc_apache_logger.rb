@@ -12,7 +12,7 @@ class TestApacheLogger < Test::Unit::TestCase
     File.chown(1000, 1000, @prefix) if Process.uid < 1000
 
     @nonprefix = Dir.mktmpdir('other')
-    File.chown(0, 1, @nonprefix) if Process.uid < 1000
+    File.chown(1, 1, @nonprefix) if Process.uid < 1000
 
     @default_log = Tempfile.new('tc_httpd_logger', @nonprefix)
     @default_filename = @default_log.path
@@ -220,6 +220,6 @@ class TestApacheLogger < Test::Unit::TestCase
     dir_stat = File.stat(File.dirname(@default_filename))
 
     assert_equal(stat.uid, dir_stat.uid, 'UID does not match parent directory\'s UID')
-    ssert_equal(stat.gid, dir_stat.gid, 'GID is does not match parent directory\'s GID')
+    assert_equal(stat.gid, dir_stat.gid, 'GID is does not match parent directory\'s GID')
   end
 end
