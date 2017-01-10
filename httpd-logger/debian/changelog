@@ -1,3 +1,18 @@
+symbiosis-httpd-logger (0.2) stable; urgency=medium
+
+  * Non-maintainer upload.
+  * The sync flag is now obeyed (closes #44).
+  * Now creates log files with correct owner (closes #41).
+  * Fixed double logging to the default and per-host logs (closes #45).
+  * Verbose logging normalised.
+  * Debian packaging tidied simplified.
+  * Fixed up dpkg-divert to work properly.
+  * UID/GID for logs is always inherited from the log directory.
+  * Added stricter regex for log lines.
+  * Added prefix flag for testing.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 22 Nov 2016 12:06:58 +0000
+
 symbiosis-httpd-logger (0.1) unstable; urgency=low
 
   * Initial release.
