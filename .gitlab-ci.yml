@@ -37,8 +37,6 @@ package:httpd:
   <<: *package
 package:httpd-logger:
   <<: *package
-package:key:
-  <<: *package
 package:meta:
   <<: *package
 package:monit:
