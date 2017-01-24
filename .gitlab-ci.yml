@@ -3,6 +3,7 @@
 stages:
   - package
   - publish
+  - test
 
 .package: &package
   image: $CI_REGISTRY/docker-images/layers:$DISTRO-deb
@@ -63,6 +64,7 @@ publish:
     - publish
 
 .test: &test
+  stage: test
   image: $CI_REGISTRY/docker-images/base:$DISTRO
   variables:
     DISTRO: jessie
