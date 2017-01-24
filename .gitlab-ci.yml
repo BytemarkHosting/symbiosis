@@ -1,0 +1,55 @@
+
+
+stages:
+  - package
+
+.package: &package
+  image: $CI_REGISTRY/docker-images/layers:$DISTRO-deb
+  stage: package
+  variables:
+    DISTRO: jessie
+  script:
+    - echo "deb http://symbiosis.bytemark.co.uk/$DISTRO/ ./" >> /etc/apt/sources.list
+    - apt-get update
+#    - sed -i -e '/deb / p ; s/deb /deb-src / '  /etc/apt/sources.list
+    - export PACKAGE=${CI_BUILD_NAME##package:}
+    - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
+    - cd $PACKAGE
+    - package
+
+package:common:
+  <<: *package
+package:backup:
+  <<: *package
+package:cron:
+  <<: *package
+package:dns:
+  <<: *package
+package:doc:
+  <<: *package
+package:email:
+  <<: *package
+package:firewall:
+  <<: *package
+package:ftpd:
+  <<: *package
+package:httpd:
+  <<: *package
+package:httpd-logger:
+  <<: *package
+package:key:
+  <<: *package
+package:meta:
+  <<: *package
+package:monit:
+  <<: *package
+package:mysql:
+  <<: *package
+package:phpmyadmin:
+  <<: *package
+package:updater:
+  <<: *package
+package:webmail:
+  <<: *package
+package:xmpp:
+  <<: *package
