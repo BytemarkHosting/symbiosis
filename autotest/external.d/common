@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -e
+
+do_set_up() {
+  if [ -e "$(dirname $0)/VERBOSE" ] ; then 
+    set -x
+    VERBOSE="-v" 
+  fi
+
+  IP=${SSH_CLIENT%% *}
+  REMOTE_HOSTNAME=$1
+  OUTPUT=$(tempfile)
+  STATUS="PASS"
+  export PATH=$(dirname $0)/bin:$PATH
+  
+  exec 6<&1
+  exec 7<&2
+
+  exec &>$OUTPUT
+}
+
+do_catch_error() {
+  #
+  # Reset trap
+  #
+  trap - ERR
+
+  STATUS="FAIL"
+
+  exit 1
+}
+
+do_tidy_up() {
+  exec 1<&6
+  exec 2<&7
+
+  #
+  # Reset traps
+  #
+  trap - ERR
+  trap - EXIT
+
+  echo "$(basename $0): $STATUS"
+  if [ "$VERBOSE" ] || [ "$STATUS" == "FAIL" ] ; then cat $OUTPUT ; fi
+
+  rm $VERBOSE -f $OUTPUT
+}
+
+trap do_catch_error ERR
+trap do_tidy_up     EXIT
+
+do_set_up
+

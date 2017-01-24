@@ -1,0 +1,11 @@
+#!/bin/bash
+
+GATEWAY=$(/sbin/ip route | awk '/default/ { print $3 }')
+
+echo "I: Adding maker.bytemark.co.uk alias to /etc/hosts"
+echo "$GATEWAY maker2.bytemark.co.uk" >> /etc/hosts
+#
+# Just in case we still refer to maker.
+#
+echo "$GATEWAY maker.bytemark.co.uk" >> /etc/hosts
+

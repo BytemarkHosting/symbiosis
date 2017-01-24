@@ -1,0 +1,7 @@
+Symbiosis sautotest
+===================
+
+This is a collection of scripts that exit 0 when run with run-parts.
+
+They install, and configure symbiosis.
+

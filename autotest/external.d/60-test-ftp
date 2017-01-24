@@ -1,0 +1,10 @@
+#!/bin/bash
+
+. $(dirname $0)/common
+
+echo -e "\nNOOP\nQUIT" | socat EXEC:"socat-scripter",fdin=3,fdout=4 TCP:$IP:21
+
+# Not possible to check for FTP-with-STARTTLS connections using socat.
+#
+
+

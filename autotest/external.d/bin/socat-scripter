@@ -1,0 +1,54 @@
+#!/bin/bash
+
+#
+# This is stolen from the mail.sh example shipped with socat.
+#
+
+# source: mail.sh
+# Copyright Gerhard Rieger 2001-2009
+# Published under the GNU General Public License V.2, see file COPYING
+
+set -e
+
+
+do_socat_tidy_up() {
+  #
+  # Reset traps  
+  #
+  trap - ERR
+
+  # Close file descriptors
+  echo "FAIL" >&1
+  exec 3>&-
+  exec 4>&-
+  exit 1
+}
+
+trap do_socat_tidy_up ERR
+
+while read -r cmd; do 
+    #
+    # If the command is not blank, send it.
+    #
+    if [ -n "$cmd" ]; then 
+      echo "> $cmd" >&1
+      echo -e "$cmd" >&4
+    fi
+    
+    #
+    # This reads the first line of reply, and echoes it back.
+    #
+    read -t 5 -u 3 answer 
+    echo "< $answer" >&1
+
+    #
+    # This continues to read until a short timeout is reached, allowing for
+    # more than one line of text to be sent back.
+    #
+    while read -t 0.1 -u 3 answer ; do
+      echo "< $answer" >&1
+    done
+
+done
+
+exit 0

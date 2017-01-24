@@ -16,6 +16,9 @@ stages:
     - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
     - cd $PACKAGE
     - package
+  artifacts:
+    paths:
+      - pkg/
 
 package:common:
   <<: *package
@@ -58,5 +61,27 @@ publish:
     - shell
   script:
     - publish
+
+.test: &test
+  image: $CI_REGISTRY/docker-images/base:$DISTRO
+  variables:
+    DISTRO: jessie
+    VERBOSE: --verbose
+  script:
+    - cd autotest
+    - echo ${CI_BUILD_NAME##test:} > test.d/conf/action
+    - "echo deb http://internal.repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID ./ >> test.d/conf/maker-sources.list"
+    - run-parts $VERBOSE --new-session --exit-on-error $PWD/test.d 
+
+test:dist-upgrade:
+  <<: *test
+  variables:
+    DISTRO: wheezy 
+
+test:upgrade:
+  <<: *test
+
+test:fresh-install:
+  <<: *test
 
 
