@@ -54,7 +54,7 @@ package:xmpp:
 
 publish:
   stage: publish
-  tag:
+  tags:
     - shell
   script:
     - publish
