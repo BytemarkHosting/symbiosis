@@ -16,11 +16,11 @@ test: test1.9.1 test2.1
 
 test1.9.1:
 	cd test.d
-	[ -z "`which ruby1.9.1`" ] || ruby1.9.1 -I . ts_monit.rb
+	[ -z "`which ruby1.9.1`" ] || (cd test.d && ruby1.9.1 -I . ts_monit.rb)
 
 test2.1:
 	cd test.d
-	[ -z "`which ruby2.1`" ] ||  ruby2.1 -I . ts_monit.rb
+	[ -z "`which ruby2.1`" ] ||  (cd test.d && ruby2.1 -I . ts_monit.rb)
 
 clean:
 	$(RM) man/symbiosis-monit.man
