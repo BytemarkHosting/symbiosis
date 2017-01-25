@@ -6,12 +6,10 @@ stages:
   - test
 
 .package: &package
-  image: $CI_REGISTRY/docker-images/layers:$DISTRO-deb
+  image: $CI_REGISTRY/docker-images/layers:jessie-deb
   stage: package
-  variables:
-    DISTRO: jessie
   script:
-    - echo "deb http://symbiosis.bytemark.co.uk/$DISTRO/ ./" >> /etc/apt/sources.list
+    - echo "deb http://symbiosis.bytemark.co.uk/jessie/ ./" >> /etc/apt/sources.list
     - apt-get update
     - export PACKAGE=${CI_BUILD_NAME##package:}
     - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
@@ -58,6 +56,8 @@ package:xmpp:
 
 publish:
   stage: publish
+  variables:
+    RSYNC_HOSTNAME: repo.bytemark.co.uk
   tags:
     - shell
   script:
