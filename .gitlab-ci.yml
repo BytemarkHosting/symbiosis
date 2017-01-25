@@ -73,6 +73,8 @@ publish:
     VERBOSE: --verbose
   script:
     - rm -fv /usr/sbin/policy-rc.d
+    - echo "$(hostname).example.com" > /etc/hostname
+    - hostname -F /etc/hostname
     - cd autotest
     - echo ${CI_BUILD_NAME##test:} > test.d/conf/action
     - "echo deb http://internal.repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/jessie ./ >> test.d/conf/maker-sources.list"
