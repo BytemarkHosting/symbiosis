@@ -11,7 +11,7 @@ stages:
   stage: test
   image: $CI_REGISTRY/docker-images/layers:jessie-ruby
   script:
-    - adduser --gecos "Symbiosis Administrator,,,," admin
+    - adduser --home=/srv --shell=/bin/bash --no-create-home --disabled-login --gecos='Symbiosis Administrator,,,' admin
     - cp autotest/test.d/conf/maker-sources.list /etc/apt/sources.list.d/
     - "[ -z \"$TEST_DEPS\" ] || (apt-get update ; apt-get install $TEST_DEPS)"
     - export PACKAGE=${CI_BUILD_NAME##test:}
@@ -44,7 +44,7 @@ test:email:
 
 test:firewall:
   variables:
-    TEST_DEPS: ruby-linux-netlink ruby-sqlite3
+    TEST_DEPS: ruby-linux-netlink ruby-sqlite3 netbase
   <<: *test
 
 test:ftpd:
