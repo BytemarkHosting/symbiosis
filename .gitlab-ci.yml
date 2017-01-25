@@ -75,7 +75,7 @@ publish:
     - rm -fv /usr/sbin/policy-rc.d
     - cd autotest
     - echo ${CI_BUILD_NAME##test:} > test.d/conf/action
-    - "echo deb http://internal.repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/jessie ./ >> test.d/conf/maker-sources.list"
+    - "echo deb http://repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/ ./ >> test.d/conf/maker-sources.list"
     - run-parts $VERBOSE --new-session --exit-on-error $PWD/test.d 
 
 test:dist-upgrade:
