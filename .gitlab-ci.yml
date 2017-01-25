@@ -1,0 +1,63 @@
+
+
+stages:
+  - package
+  - publish
+
+.package: &package
+  image: $CI_REGISTRY/docker-images/layers:jessie-deb
+  stage: package
+  script:
+    - export PACKAGE=${CI_BUILD_NAME##package:}
+    - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
+    - cd $PACKAGE
+    - package
+  artifacts:
+    paths:
+      - pkg/
+
+package:common:
+  <<: *package
+package:backup:
+  <<: *package
+package:cron:
+  <<: *package
+package:dns:
+  <<: *package
+package:doc:
+  <<: *package
+package:email:
+  <<: *package
+package:firewall:
+  <<: *package
+package:ftpd:
+  <<: *package
+package:httpd:
+  <<: *package
+package:httpd-logger:
+  <<: *package
+package:meta:
+  <<: *package
+package:monit:
+  <<: *package
+package:mysql:
+  <<: *package
+package:phpmyadmin:
+  <<: *package
+package:updater:
+  <<: *package
+package:webmail:
+  <<: *package
+package:xmpp:
+  <<: *package
+
+publish:
+  stage: publish
+  variables:
+    RSYNC_HOSTNAME: repo.bytemark.co.uk
+  tags:
+    - shell
+  script:
+    - publish
+
+

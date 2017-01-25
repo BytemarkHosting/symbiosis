@@ -3,7 +3,7 @@ Section: doc
 Priority: extra
 Maintainer: James Carter <jcarter@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0)
+Build-Depends: debhelper (>= 7.0.0), rdoc
 Standards-Version: 3.9.6
 
 Package: symbiosis-api-doc
