@@ -16,6 +16,9 @@ stages:
     - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
     - cd $PACKAGE
     - package
+  artifacts:
+    paths:
+      - pkg/
 
 package:common:
   <<: *package
