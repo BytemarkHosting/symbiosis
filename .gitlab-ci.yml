@@ -9,7 +9,7 @@ stages:
 
 .test: &test
   stage: test
-  image: $CI_REGISTRY/docker-images/base:jessie
+  image: $CI_REGISTRY/docker-images/layers:jessie-ruby
   script:
     - "[ -z \"$TEST_DEPS\" ] || ( apt-get update; apt-get install $TEST_DEPS )"
     - export PACKAGE=${CI_BUILD_NAME##test:}
@@ -41,6 +41,8 @@ test:ftpd:
 test:httpd:
   <<: *test
 test:httpd-logger:
+  variables:
+    TEST_DEPS: golang-go
   <<: *test
 test:meta:
   <<: *test
