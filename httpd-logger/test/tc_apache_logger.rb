@@ -12,7 +12,7 @@ class TestApacheLogger < Test::Unit::TestCase
     File.chown(1000, 1000, @prefix) if Process.uid < 1000
 
     @nonprefix = Dir.mktmpdir('other')
-    File.chown(0, 1, @nonprefix) if Process.uid < 1000
+    File.chown(1, 1, @nonprefix) if Process.uid < 1000
 
     @default_log = Tempfile.new('tc_httpd_logger', @nonprefix)
     @default_filename = @default_log.path
@@ -187,6 +187,12 @@ class TestApacheLogger < Test::Unit::TestCase
 
     domain = Symbiosis::Domain.new('example.com', @prefix)
     domain.create
+    Symbiosis::Utils.mkdir_p(domain.log_dir, uid: domain.uid, gid: domain.gid)
+
+    # Add the set-group-id bit (to make sure it gets removed later)
+    File.chmod(02750, domain.log_dir)
+    log_dir_mode = (File.stat(domain.log_dir).mode & 0777)
+
     @domains << domain
 
     test_lines = []
@@ -209,17 +215,23 @@ class TestApacheLogger < Test::Unit::TestCase
     assert_equal(0, $CHILD_STATUS.exitstatus, "#{@binary} exited non-zero when testing flags")
 
     access_log = File.join(domain.log_dir, 'access.log')
-    assert(File.exist?(access_log), "Access log #{access_log} is missing!")
+    assert(File.exist?(access_log), "Per-domain access log #{access_log} is missing!")
     stat = File.stat(access_log)
 
-    assert_equal(domain.uid, stat.uid, 'UID does not match domain\'s UID')
-    assert_equal(domain.gid, stat.gid, 'GID does not match domain\'s GID')
+    assert_equal(domain.uid, stat.uid, "UID on the per-domain log #{access_log} does not match domain\'s UID")
+    assert_equal(domain.gid, stat.gid, "GID on the per-domain log #{access_log} does not match domain\'s GID")
+
+    # Test the mode twice, first make sure the file is not executable by anyone.
+    assert_equal(log_dir_mode & ~0111, stat.mode & 00777, "Mode on #{access_log} (0#{(stat.mode & 0777).to_s(8)}) is wrong")
+
+    # Now check that no sticky (etc) bits have been set.
+    assert_equal(0, stat.mode & 07000, "#{access_log} has non-permission mode bits set")
 
     assert(File.exist?(@default_filename), "Default access log #{@default_filename} is missing!")
     stat = File.stat(@default_filename)
     dir_stat = File.stat(File.dirname(@default_filename))
 
-    assert_equal(stat.uid, dir_stat.uid, 'UID does not match parent directory\'s UID')
-    ssert_equal(stat.gid, dir_stat.gid, 'GID is does not match parent directory\'s GID')
+    assert_equal(stat.uid, dir_stat.uid, "UID on the default log #{@default_filename} does not match parent directory\'s UID")
+    assert_equal(stat.gid, dir_stat.gid, "GID on the default log #{@default_filename} does not match parent directory\'s GID")
   end
 end
