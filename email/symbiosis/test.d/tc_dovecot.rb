@@ -8,6 +8,15 @@ require 'symbiosis/domain/mailbox'
 class TestDovecot < Test::Unit::TestCase
 
   def setup
+    #
+    # Change to user 1000 if we're running as root.
+    #
+    if 0 == Process.uid
+      File.chown(1000,1000,@prefix)
+      Process.egid = 1000
+      Process.euid = 1000
+    end
+
     @domain = Symbiosis::Domain.new()
     @domain.create
 
@@ -24,6 +33,14 @@ class TestDovecot < Test::Unit::TestCase
   end
 
   def teardown
+    #
+    # Return back to our roots
+    #
+    if Process.uid == 0
+      Process.euid = 0
+      Process.egid = 0
+    end
+
     @domain.destroy unless $DEBUG
   end
 
