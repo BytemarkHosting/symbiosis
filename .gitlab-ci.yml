@@ -67,7 +67,7 @@ test:meta:
 
 test:monit:
   variables:
-    TEST_DEPS: ruby-sqlite3
+    TEST_DEPS: ruby-sqlite3 ruby-log4r
   <<: *test
 
 test:mysql:
