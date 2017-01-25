@@ -15,12 +15,12 @@ clean:
 	$(RM) -r man
 
 test:
-	ruby -I ../common/lib -I lib symbiosis/test.d/ts_email.rb
+	cd symbiosis/test.d/ && ruby -I ../../../common/lib -I ../../lib ts_email.rb
 	make -C exim4/   test
 	make -C dovecot/ test
 
 all_tests: test
-	ruby -I ../common/lib -I lib symbiosis/test.d/ts_email_live.rb
+	cd symbiosis/test.d/ && ruby -I ../../../common/lib -I ../../lib ts_email_live.rb
 
 .PHONY: clean docs all test
 
