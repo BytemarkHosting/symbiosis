@@ -55,7 +55,7 @@ test:ftpd:
 test:httpd:
   variables:
     RUBYOPT: -v
-    TEST_DEPS: ruby-linux-netlink ruby-erubis
+    TEST_DEPS: ruby-linux-netlink ruby-erubis apache2
   <<: *test
 
 test:httpd-logger:
