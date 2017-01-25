@@ -39,7 +39,7 @@ test:doc:
 
 test:email:
   variables:
-    TEST_DEPS: exim4-daemon-heavy dovecot-common dovecot-core dovecot-sieve dovecot-managesieved dovecot-imapd dovecot-pop3d ruby-linux-netlink
+    TEST_DEPS: exim4-daemon-heavy dovecot-common dovecot-core dovecot-sieve dovecot-managesieved dovecot-imapd dovecot-pop3d ruby-linux-netlink ruby-eventmachine
   <<: *test
 
 test:firewall:
