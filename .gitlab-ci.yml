@@ -7,13 +7,13 @@ stages:
   - fresh-install
   - install
 
-.test:
+.test: &test
   stage: test
   image: $CI_REGISTRY/docker-images/base:jessie
   script:
     - export PACKAGE=${CI_BUILD_NAME##test:}
     - cd $PACKAGE
-    - [ ! -f Makefile ] || make test
+    - "[ ! -f Makefile ] || make test"
 
 test:common:
   <<: *test
