@@ -11,7 +11,7 @@ stages:
   stage: test
   image: $CI_REGISTRY/docker-images/layers:jessie-ruby
   script:
-    - adduser --gecos "Symbiosis Test User,,,," symbiosis-test
+    - adduser --gecos "Symbiosis Administrator,,,," admin
     - cp autotest/test.d/conf/maker-sources.list /etc/apt/sources.list.d/
     - "[ -z \"$TEST_DEPS\" ] || (apt-get update ; apt-get install $TEST_DEPS)"
     - export PACKAGE=${CI_BUILD_NAME##test:}
@@ -31,7 +31,7 @@ test:cron:
 
 test:dns:
   variables:
-    TEST_DEPS: ruby-linux-netlink
+    TEST_DEPS: ruby-linux-netlink ruby-erubis
   <<: *test
 
 test:doc:
@@ -39,7 +39,7 @@ test:doc:
 
 test:email:
   variables:
-    TEST_DEPS: exim4-daemon-heavy dovecot ruby-linux-netlink
+    TEST_DEPS: exim4-daemon-heavy dovecot-common dovecot-core dovecot-sieve dovecot-managesieved dovecot-imapd dovecot-pop3d ruby-linux-netlink
   <<: *test
 
 test:firewall:
