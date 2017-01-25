@@ -44,7 +44,7 @@ test:email:
 
 test:firewall:
   variables:
-    TEST_DEPS: ruby-linux-netlink ruby-sqlite3 netbase
+    TEST_DEPS: ruby-linux-netlink ruby-sqlite3 netbase iptables
   <<: *test
 
 test:ftpd:
@@ -66,6 +66,8 @@ test:meta:
   <<: *test
 
 test:monit:
+  variables:
+    TEST_DEPS: ruby-sqlite3
   <<: *test
 
 test:mysql:
