@@ -8,8 +8,6 @@ stages:
   image: $CI_REGISTRY/docker-images/layers:jessie-deb
   stage: package
   script:
-    - echo "deb http://symbiosis.bytemark.co.uk/jessie/ ./" >> /etc/apt/sources.list
-    - apt-get update
     - export PACKAGE=${CI_BUILD_NAME##package:}
     - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
     - cd $PACKAGE
