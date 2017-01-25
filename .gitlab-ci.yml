@@ -66,10 +66,13 @@ publish:
 .test: &test
   stage: test
   image: $CI_REGISTRY/docker-images/base:$DISTRO
+  tags:
+    - kvm
   variables:
     DISTRO: jessie
     VERBOSE: --verbose
   script:
+    - rm -fv /usr/sbin/policy-rc.d
     - cd autotest
     - echo ${CI_BUILD_NAME##test:} > test.d/conf/action
     - "echo deb http://internal.repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/jessie ./ >> test.d/conf/maker-sources.list"
