@@ -11,7 +11,6 @@ class TestEximLive < Test::Unit::TestCase
     # Change to user 1000 if we're running as root.
     #
     if 0 == Process.uid
-      File.chown(1000,1000,@prefix)
       Process.egid = 1000
       Process.euid = 1000
     end
