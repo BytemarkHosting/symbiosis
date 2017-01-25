@@ -15,10 +15,12 @@ docs: man/symbiosis-monit.man doc/index.html
 test: test1.9.1 test2.0
 
 test1.9.1:
-	cd test.d && ruby1.9.1 -I . ts_monit.rb
+	cd test.d
+	[ -z "`which ruby1.9.1`" ] || ruby1.9.1 -I . ts_monit.rb
 
-test2.0:
-	cd test.d && ruby2.0 ts_monit.rb
+test2.1:
+	cd test.d
+	[ -z "`which ruby2.1`" ] ||  ruby2.1 -I . ts_monit.rb
 
 clean:
 	$(RM) man/symbiosis-monit.man
