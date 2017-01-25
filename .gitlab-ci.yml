@@ -11,54 +11,75 @@ stages:
   stage: test
   image: $CI_REGISTRY/docker-images/layers:jessie-ruby
   script:
-    - "[ -z \"$TEST_DEPS\" ] || apt-get install $TEST_DEPS"
+    - adduser --gecos "Symbiosis Test User,,,," symbiosis-test
+    - cp autotest/test.d/conf/maker-sources.list /etc/apt/sources.list.d/
+    - "[ -z \"$TEST_DEPS\" ] || (apt-get update ; apt-get install $TEST_DEPS)"
     - export PACKAGE=${CI_BUILD_NAME##test:}
     - cd $PACKAGE
     - "[ ! -f Makefile ] || make test"
 
 test:backup:
   <<: *test
+
 test:common:
-  before_script:
-    - adduser --gecos "Symbiosis Test User,,,," symbiosis-test
-    - cp autotest/test.d/conf/maker-sources.list /etc/apt/sources.list.d/
-    - apt-get update
   variables:
     TEST_DEPS: ruby ruby-acme-client ruby-linux-netlink ruby-cracklib ruby-erubis ruby-mocha ruby-webmock ruby-test-unit openssl cracklib-runtime
-  
   <<: *test
+
 test:cron:
   <<: *test
+
 test:dns:
+  variables:
+    TEST_DEPS: ruby-linux-netlink
   <<: *test
+
 test:doc:
   <<: *test
+
 test:email:
   variables:
-    TEST_DEPS: exim4-daemon-heavy
+    TEST_DEPS: exim4-daemon-heavy dovecot ruby-linux-netlink
   <<: *test
+
 test:firewall:
+  variables:
+    TEST_DEPS: ruby-linux-netlink
   <<: *test
+
 test:ftpd:
+  variables:
+    TEST_DEPS: ruby-linux-netlink
   <<: *test
+
 test:httpd:
+  variables:
+    TEST_DEPS: ruby-linux-netlink
   <<: *test
+
 test:httpd-logger:
   variables:
-    TEST_DEPS: golang-go
+    TEST_DEPS: golang-go ruby-linux-netlink
   <<: *test
+
 test:meta:
   <<: *test
+
 test:monit:
   <<: *test
+
 test:mysql:
   <<: *test
+
 test:phpmyadmin:
   <<: *test
+
 test:updater:
   <<: *test
+
 test:webmail:
   <<: *test
+
 test:xmpp:
   <<: *test
 
