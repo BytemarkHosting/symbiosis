@@ -432,9 +432,9 @@ func writeLog(prefix string, host string, log string, filename string, syncFlag 
 		// We match the UID/GID/mode of the handle to the top-level /srv/$domain
 		// directory, which we found earlier.
 		//
-		// Remove the executable bit though.
+		// Remove the executable and non-permissions bits.
 		//
-		mode := (stat.Mode() - (stat.Mode() & 0111))
+		mode := stat.Mode() & (os.ModePerm &^ 0111)
 
 		handles[logfile] = safeOpen(logfile, mode, uid, gid, syncFlag)
 		h = handles[logfile]
