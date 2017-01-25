@@ -12,6 +12,7 @@ stages:
   image: $CI_REGISTRY/docker-images/layers:jessie-ruby
   script:
     - adduser --home=/srv --shell=/bin/bash --no-create-home --disabled-login --gecos='Symbiosis Administrator,,,' admin
+    - chown admin.admin /srv
     - cp autotest/test.d/conf/maker-sources.list /etc/apt/sources.list.d/
     - "[ -z \"$TEST_DEPS\" ] || (apt-get update ; apt-get install $TEST_DEPS)"
     - export PACKAGE=${CI_BUILD_NAME##test:}
