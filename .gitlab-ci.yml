@@ -33,6 +33,8 @@ test:dns:
 test:doc:
   <<: *test
 test:email:
+  variables:
+    TEST_DEPS: exim4-daemon-heavy
   <<: *test
 test:firewall:
   <<: *test
