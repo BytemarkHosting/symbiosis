@@ -12,7 +12,7 @@ man: man/symbiosis-monit.man
 
 docs: man/symbiosis-monit.man doc/index.html
 
-test: test1.9.1 test2.0
+test: test1.9.1 test2.1
 
 test1.9.1:
 	cd test.d
