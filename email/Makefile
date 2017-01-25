@@ -7,7 +7,6 @@ man/%.man: ./sbin/%
 
 docs: man/symbiosis-email-dict-proxy.man  man/symbiosis-email-encrypt-passwords.man  man/symbiosis-email-poppassd.man
 
-
 clean:
 	$(RM) exim4/exim4.conf
 	$(RM) exim4/exim4.conf.tmp
@@ -16,6 +15,7 @@ clean:
 	$(RM) -r man
 
 test:
+	ruby -I ../common/lib -I lib ../common/bin/symbiosis-test symbiosis/test.d/
 	make -C exim4/   test
 	make -C dovecot/ test
 
