@@ -39,8 +39,6 @@ test:doc:
   <<: *test
 
 test:email:
-  before_script:
-    - rm -f /usr/sbin/policy-rc.d
   variables:
     TEST_DEPS: exim4-daemon-heavy dovecot-common dovecot-core dovecot-sieve dovecot-managesieved dovecot-imapd dovecot-pop3d ruby-linux-netlink ruby-eventmachine ruby-cracklib cracklib-runtime
   <<: *test
