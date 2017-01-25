@@ -65,16 +65,14 @@ publish:
 
 .test: &test
   stage: test
-  image: $CI_REGISTRY/docker-images/base:$DISTRO
+  image: $CI_REGISTRY/docker-images/base:jessie
   tags:
     - kvm
   variables:
-    DISTRO: jessie
     VERBOSE: --verbose
+    HOSTNAME: testing.example.com
   script:
     - rm -fv /usr/sbin/policy-rc.d
-    - echo "$(hostname).example.com" > /etc/hostname
-    - hostname -F /etc/hostname
     - cd autotest
     - echo ${CI_BUILD_NAME##test:} > test.d/conf/action
     - "echo deb http://internal.repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/jessie ./ >> test.d/conf/maker-sources.list"
@@ -82,8 +80,7 @@ publish:
 
 test:dist-upgrade:
   <<: *test
-  variables:
-    DISTRO: wheezy 
+  image: $CI_REGISTRY/docker-images/base:wheezy
 
 test:upgrade:
   <<: *test
