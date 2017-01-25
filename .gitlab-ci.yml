@@ -1,9 +1,54 @@
 
 
 stages:
+  - test
   - package
   - publish
-  - test
+  - fresh-install
+  - install
+
+.test:
+  stage: test
+  image: $CI_REGISTRY/docker-images/base:jessie
+  script:
+    - export PACKAGE=${CI_BUILD_NAME##test:}
+    - cd $PACKAGE
+    - [ ! -f Makefile ] || make test
+
+test:common:
+  <<: *test
+test:backup:
+  <<: *test
+test:cron:
+  <<: *test
+test:dns:
+  <<: *test
+test:doc:
+  <<: *test
+test:email:
+  <<: *test
+test:firewall:
+  <<: *test
+test:ftpd:
+  <<: *test
+test:httpd:
+  <<: *test
+test:httpd-logger:
+  <<: *test
+test:meta:
+  <<: *test
+test:monit:
+  <<: *test
+test:mysql:
+  <<: *test
+test:phpmyadmin:
+  <<: *test
+test:updater:
+  <<: *test
+test:webmail:
+  <<: *test
+test:xmpp:
+  <<: *test
 
 .package: &package
   image: $CI_REGISTRY/docker-images/layers:jessie-deb
@@ -61,29 +106,30 @@ publish:
   script:
     - publish
 
-.test: &test
-  stage: test
+.install: &install
+  stage: install
   image: $CI_REGISTRY/docker-images/base:jessie
   tags:
     - kvm
   variables:
     VERBOSE: --verbose
-    HOSTNAME: testing.example.com
+    HOSTNAME: installing.example.com
   script:
     - rm -fv /usr/sbin/policy-rc.d
-    - cd autotest
-    - echo ${CI_BUILD_NAME##test:} > test.d/conf/action
-    - "echo deb http://repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/ ./ >> test.d/conf/maker-sources.list"
-    - run-parts $VERBOSE --new-session --exit-on-error $PWD/test.d 
+    - cd autoinstall
+    - echo ${CI_BUILD_NAME##install:} > install.d/conf/action
+    - "echo deb http://repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/ ./ >> install.d/conf/maker-sources.list"
+    - run-parts $VERBOSE --new-session --exit-on-error $PWD/install.d 
 
-test:dist-upgrade:
-  <<: *test
+install:dist-upgrade:
+  <<: *install
   image: $CI_REGISTRY/docker-images/base:wheezy
 
-test:upgrade:
-  <<: *test
+install:upgrade:
+  <<: *install
 
-test:fresh-install:
-  <<: *test
+install:fresh-install:
+  stage: install
+  <<: *install
 
 
