@@ -11,7 +11,7 @@ stages:
   stage: test
   image: $CI_REGISTRY/docker-images/layers:jessie-ruby
   script:
-    - "[ -z \"$TEST_DEPS\" ] || ( apt-get update; apt-get install $TEST_DEPS )"
+    - "[ -z \"$TEST_DEPS\" ] || apt-get install $TEST_DEPS"
     - export PACKAGE=${CI_BUILD_NAME##test:}
     - cd $PACKAGE
     - "[ ! -f Makefile ] || make test"
@@ -20,8 +20,9 @@ test:backup:
   <<: *test
 test:common:
   before_script:
-    - apt-get install adduser
-    - adduser symbiosis-test
+    - adduser --gecos "Symbiosis Test User,,,," symbiosis-test
+    - cp autotest/test.d/conf/maker-sources.list /etc/apt/sources.list.d/
+    - apt-get update
   variables:
     TEST_DEPS: ruby ruby-acme-client ruby-linux-netlink ruby-cracklib ruby-erubis ruby-mocha ruby-webmock ruby-test-unit openssl cracklib-runtime
   
