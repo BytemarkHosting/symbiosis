@@ -42,6 +42,7 @@ test:email:
   before_script:
     - adduser --shell=/bin/bash --disabled-login --gecos='Symbiosis Test User,,,' symbiosis-test
   variables:
+    HOSTNAME: test.example.com
     TEST_DEPS: exim4-daemon-heavy dovecot-common dovecot-core dovecot-sieve dovecot-managesieved dovecot-imapd dovecot-pop3d ruby-linux-netlink ruby-eventmachine ruby-cracklib cracklib-runtime
   <<: *test
 
