@@ -12,7 +12,7 @@ stages:
   image: $CI_REGISTRY/docker-images/base:jessie
   script:
     - cp autotest/test.d/conf/maker-sources.list /etc/apt/sources.list.d/
-    - "[ -z \"$TEST_DEPS\" ] || ( apt-get update; apt-get install $TEST_DEPS )
+    - "[ -z \"$TEST_DEPS\" ] || ( apt-get update; apt-get install $TEST_DEPS )"
     - export PACKAGE=${CI_BUILD_NAME##test:}
     - cd $PACKAGE
     - "[ ! -f Makefile ] || make test"
