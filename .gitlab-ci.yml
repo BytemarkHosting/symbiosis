@@ -44,7 +44,7 @@ test:email:
 
 test:firewall:
   variables:
-    TEST_DEPS: ruby-linux-netlink
+    TEST_DEPS: ruby-linux-netlink ruby-sqlite3
   <<: *test
 
 test:ftpd:
@@ -54,7 +54,7 @@ test:ftpd:
 
 test:httpd:
   variables:
-    TEST_DEPS: ruby-linux-netlink
+    TEST_DEPS: ruby-linux-netlink ruby-erubis
   <<: *test
 
 test:httpd-logger:
