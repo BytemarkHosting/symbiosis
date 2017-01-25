@@ -68,7 +68,7 @@ class TestApacheLogger < Test::Unit::TestCase
     IO.popen([@binary] + flags, 'r+') do |f|
       f.close_write; f.close_read
     end
-    assert_equal(0, $CHILD_STATUS.exitstatus, "#{@binary} exited non-zero when testing flags")
+    assert_equal(0, $?.exitstatus, "#{@binary} exited non-zero when testing flags")
   end
 
   def test_logging
@@ -212,7 +212,7 @@ class TestApacheLogger < Test::Unit::TestCase
       pi.close_read
       pi.close_write
     end
-    assert_equal(0, $CHILD_STATUS.exitstatus, "#{@binary} exited non-zero when testing flags")
+    assert_equal(0, $?.exitstatus, "#{@binary} exited non-zero when testing flags")
 
     access_log = File.join(domain.log_dir, 'access.log')
     assert(File.exist?(access_log), "Per-domain access log #{access_log} is missing!")
