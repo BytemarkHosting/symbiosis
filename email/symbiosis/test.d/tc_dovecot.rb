@@ -20,8 +20,6 @@ class TestDovecot < Test::Unit::TestCase
     @mailbox_crypt_password = Symbiosis::Utils.random_string
     @mailbox_crypt.password = @mailbox_crypt_password
 
-		`find /srv -ls`
-
     Net::IMAP.debug = true if $DEBUG
   end
 
