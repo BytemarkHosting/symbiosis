@@ -148,7 +148,7 @@ publish:
   stage: install
   image: $CI_REGISTRY/docker-images/base:jessie
   tags:
-    - kvm
+    - docker-socket
   variables:
     VERBOSE: --verbose
     HOSTNAME: installing.example.com
