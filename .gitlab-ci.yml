@@ -157,7 +157,7 @@ publish:
     - cd autotest
     - echo ${CI_BUILD_NAME##install:} > test.d/conf/action
     - "echo deb http://repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/ ./ >> test.d/conf/maker-sources.list"
-    - run-parts $VERBOSE --new-session --exit-on-error $PWD/test.d 
+    - 'run-parts $VERBOSE --new-session --exit-on-error $PWD/test.d  || ( grep ftp -B 10 -A 10 /var/log/* && false )'
 
 install:dist-upgrade:
   <<: *install
