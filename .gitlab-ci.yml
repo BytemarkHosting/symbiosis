@@ -10,6 +10,8 @@ stages:
 .test: &test
   stage: test
   image: $CI_REGISTRY/docker-images/layers:jessie-ruby
+  variables:
+    HOSTNAME: testing.example.com
   script:
     - adduser --home=/srv --shell=/bin/bash --no-create-home --disabled-login --gecos='Symbiosis Administrator,,,' admin
     - chown admin.admin /srv
