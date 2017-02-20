@@ -1,6 +1,7 @@
 require 'symbiosis/email/dict_handler'
 require 'socket'
 require 'test/unit'
+require 'mocha/test_unit'
 require 'tmpdir'
 require 'tempfile'
 require 'eventmachine'
@@ -26,7 +27,7 @@ class TestEmailDictClient < EventMachine::Connection
     unless script.empty?
       msg = script.shift
       puts msg if $DEBUG
-      send_data(msg+"\r\n") 
+      send_data(msg+"\r\n")
 
     end
   end
@@ -50,7 +51,14 @@ class TestEmailDictd < Test::Unit::TestCase
 
     Symbiosis::Email::DictHandler.prefix = @prefix
     Symbiosis::Email::DictHandler.syslog = @syslog
-    
+
+    #
+    # Stub the FQDN for testing, if HOSTNAME contains a valid hostname
+    #
+    if ENV["HOSTNAME"] and Symbiosis::Domain::NAME_REGEXP =~ ENV["HOSTNAME"]
+      Symbiosis::Host.stubs(:fqdn).returns(ENV["HOSTNAME"])
+    end
+
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
   end
@@ -174,12 +182,12 @@ class TestEmailDictd < Test::Unit::TestCase
     results = do_test_script(["L /passdb/idonotexist@foo.com"])
     assert_equal("N", results.first[0])
   end
-  
+
   def test_shell_user
     test_user = fetch_test_user
     do_skip "No test user" if test_user.nil?
 
-    hostname = ENV["HOSTNAME"] || Symbiosis::Host.fqdn
+    hostname = Symbiosis::Host.fqdn
     #
     # Create the domain
     #

@@ -1,4 +1,5 @@
 require 'test/unit'
+require 'mocha/test_unit'
 require 'time'
 require 'net/imap'
 require 'net/pop'
@@ -20,6 +21,13 @@ class TestDovecot < Test::Unit::TestCase
     @mailbox_crypt_password = Symbiosis::Utils.random_string
     @mailbox_crypt.password = @mailbox_crypt_password
 
+    #
+    # Stub the FQDN for testing, if HOSTNAME contains a valid hostname
+    #
+    if ENV["HOSTNAME"] and Symbiosis::Domain::NAME_REGEXP =~ ENV["HOSTNAME"]
+      Symbiosis::Host.stubs(:fqdn).returns(ENV["HOSTNAME"])
+    end
+
     Net::IMAP.debug = true if $DEBUG
   end
 
@@ -38,7 +46,7 @@ class TestDovecot < Test::Unit::TestCase
   end
 
   def fetch_hostname
-    ENV["HOSTNAME"] || Symbiosis::Host.fqdn
+    Symbiosis::Host.fqdn
   end
 
   def do_skip(msg)

@@ -1,6 +1,7 @@
 require 'symbiosis/email/poppass_handler'
 require 'socket'
 require 'test/unit'
+require 'mocha/test_unit'
 require 'tmpdir'
 require 'tempfile'
 require 'eventmachine'
@@ -43,6 +44,13 @@ class TestEmailPoppassd < Test::Unit::TestCase
     Symbiosis::Email::PoppassHandler.prefix = @prefix
     Symbiosis::Email::PoppassHandler.syslog = @syslog
     @sock = File.join(@prefix, File.basename($0)+"-#{$$}.sock")
+
+    #
+    # Stub the FQDN for testing, if HOSTNAME contains a valid hostname
+    #
+    if ENV["HOSTNAME"] and Symbiosis::Domain::NAME_REGEXP =~ ENV["HOSTNAME"]
+      Symbiosis::Host.stubs(:fqdn).returns(ENV["HOSTNAME"]) 
+    end
     
     domain = Symbiosis::Domain.new(nil, @prefix)
     domain.create
@@ -197,7 +205,7 @@ class TestEmailPoppassd < Test::Unit::TestCase
     test_user = fetch_test_user
     do_skip "No test user" if test_user.nil?
 
-    hostname = ENV["HOSTNAME"] || Symbiosis::Host.fqdn
+    hostname = Symbiosis::Host.fqdn
     #
     # Create the domain
     #

@@ -3,6 +3,7 @@ $: << "../.."
 exit 0 if Process.euid != 0
 
 require 'test/unit'
+require 'mocha/test_unit'
 require "tempfile"
 require 'yaml'
 require 'timeout'
@@ -74,14 +75,20 @@ class Exim4ConfigTest < Test::Unit::TestCase
     macro_snippet =~ /^VHOST_MAILBOX_DIR\s*=\s*(.*)$/
     @vhost_mailbox_dir = $1
 
-
     # And write
     File.open(macro_snippet_fn, "w+"){|fh| fh.puts(macro_snippet)}
 
-		# Set the primary hostname
-		File.open(File.join(@tempdir, "exim4", "symbiosis.d", "00-main", "11-primary-hostname"),"w+") do |fh|
+    #
+    # Stub the FQDN for testing, if HOSTNAME contains a valid hostname
+    #
+    if ENV["HOSTNAME"] and Symbiosis::Domain::NAME_REGEXP =~ ENV["HOSTNAME"]
+      Symbiosis::Host.stubs(:fqdn).returns(ENV["HOSTNAME"])
+    end
+
+    # Set the primary hostname
+    File.open(File.join(@tempdir, "exim4", "symbiosis.d", "00-main", "11-primary-hostname"),"w+") do |fh|
       fh.puts("primary_hostname = "+fetch_hostname)
-		end
+    end
     
     # Add in the spool directory 
     File.open(File.join(@tempdir, "exim4",  "symbiosis.d", "00-main", "11-spool-directory"), "w") do |fh|
@@ -336,8 +343,8 @@ class Exim4ConfigTest < Test::Unit::TestCase
     do_acl_setup()
 
     %w(normal_ip blacklisted_ip whitelisted_ip
-	whitelisted_sender1 whitelisted_sender2
-	blacklisted_sender1 blacklisted_sender2 blacklisted_sender3 blacklisted_sender4).each do |test|
+       whitelisted_sender1 whitelisted_sender2
+       blacklisted_sender1 blacklisted_sender2 blacklisted_sender3 blacklisted_sender4).each do |test|
       do_acl_script('exim4_acl_tests/'+test)
     end
   end
@@ -627,7 +634,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   end
 
   def fetch_hostname
-    ENV["HOSTNAME"] || Symbiosis::Host.fqdn
+    Symbiosis::Host.fqdn
   end
 
   def test_router_system_aliases
