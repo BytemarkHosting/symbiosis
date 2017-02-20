@@ -38,11 +38,7 @@ class TestDovecot < Test::Unit::TestCase
   end
 
   def fetch_hostname
-    if File.exist?('/proc/sys/kernel/hostname')
-      File.read('/proc/sys/kernel/hostname').chomp
-    else
-      "localhost"
-    end
+    ENV["HOSTNAME"] || Symbiosis::Host.fqdn
   end
 
   def do_skip(msg)
