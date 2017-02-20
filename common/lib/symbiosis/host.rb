@@ -27,6 +27,8 @@ module Symbiosis
     # like junk, "localhost" is returned.
     #
     def self.fqdn
+			return ENV['HOSTNAME'] if ENV['HOSTNAME']
+
       #
       # Start by working out our localhost name
       #
