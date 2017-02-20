@@ -77,6 +77,11 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
     # And write
     File.open(macro_snippet_fn, "w+"){|fh| fh.puts(macro_snippet)}
+
+		# Set the primary hostname
+		File.open(File.join(@tempdir, "exim4", "symbiosis.d", "00-main", "11-primary-hostname"),"w+") do |fh|
+      fh.puts("primary_hostname = "+fetch_hostname)
+		end
     
     # Add in the spool directory 
     File.open(File.join(@tempdir, "exim4",  "symbiosis.d", "00-main", "11-spool-directory"), "w") do |fh|
