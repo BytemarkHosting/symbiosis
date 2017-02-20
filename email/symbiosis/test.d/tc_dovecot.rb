@@ -193,7 +193,7 @@ EOF
   
   def do_setup_local_mailbox(test_user)
     hostname = fetch_hostname
-    mailbox = Symbiosis::Domains.find_mailbox(test_user.name + "@" + hostname)
+    mailbox = Symbiosis::Domains.find_mailbox(test_user.name + "@" + hostname, @prefix)
 
     #
     # AWOOGA.
