@@ -42,7 +42,7 @@ test:doc:
 test:email:
   variables:
     HOSTNAME: test.example.com
-    TEST_DEPS: exim4-daemon-heavy dovecot-common dovecot-core dovecot-sieve dovecot-managesieved dovecot-imapd dovecot-pop3d ruby-linux-netlink ruby-eventmachine ruby-cracklib cracklib-runtime
+    TEST_DEPS: exim4-daemon-heavy dovecot-common dovecot-core dovecot-sieve dovecot-managesieved dovecot-imapd dovecot-pop3d ruby-linux-netlink ruby-eventmachine ruby-cracklib cracklib-runtime ruby-mocha
   <<: *test
 
 test:firewall:
