@@ -33,7 +33,7 @@ module Symbiosis
       #
       # Sanity check name.
       #
-      return nil unless domain =~ Symbiosis::Domain::NAME_REGEXP
+      return nil unless Symbiosis::Domain.is_valid_name?(domain)
 
       #
       # Search all domains.  This returns a maximum of two results -- one with
@@ -101,7 +101,7 @@ module Symbiosis
         #
         # Sanity check name.
         #
-        next unless domain =~ Symbiosis::Domain::NAME_REGEXP
+        next unless Symbiosis::Domain.is_valid_name?(domain)
 
         possibles << domain
 

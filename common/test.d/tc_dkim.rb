@@ -92,7 +92,8 @@ EOF
       end
     end
 
-    hostname = "default" if hostname.empty?
+    # empty or localhost are not good names for selectors, so reset those to default
+    hostname = "default" if hostname.empty? or hostname == "localhost"
 
     # We should get the first part of the hostname back
     assert_equal(hostname.split(".").first, @domain.dkim_selector)
