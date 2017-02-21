@@ -627,7 +627,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   end
 
   def fetch_hostname
-    ENV["HOSTNAME"] || Symbiosis::Host.fqdn
+    Symbiosis::Host.fqdn
   end
 
   def test_router_system_aliases

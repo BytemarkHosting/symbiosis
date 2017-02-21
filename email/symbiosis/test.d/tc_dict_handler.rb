@@ -179,7 +179,7 @@ class TestEmailDictd < Test::Unit::TestCase
     test_user = fetch_test_user
     do_skip "No test user" if test_user.nil?
 
-    hostname = ENV["HOSTNAME"] || Symbiosis::Host.fqdn
+    hostname = Symbiosis::Host.fqdn
     #
     # Create the domain
     #

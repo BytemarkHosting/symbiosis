@@ -52,7 +52,7 @@ class TestEximLive < Test::Unit::TestCase
   end
 
   def fetch_hostname
-    ENV["HOSTNAME"] || Symbiosis::Host.fqdn
+    Symbiosis::Host.fqdn
   end
 
   def test_smtp_capabilities
