@@ -41,7 +41,6 @@ test:doc:
 
 test:email:
   variables:
-    HOSTNAME: test.example.com
     TEST_DEPS: exim4-daemon-heavy dovecot-common dovecot-core dovecot-sieve dovecot-managesieved dovecot-imapd dovecot-pop3d ruby-linux-netlink ruby-eventmachine ruby-cracklib cracklib-runtime ruby-mocha
   <<: *test
 
@@ -152,7 +151,6 @@ publish:
     - docker-socket
   variables:
     VERBOSE: --verbose
-    HOSTNAME: installing.example.com
   script:
     - rm -fv /usr/sbin/policy-rc.d
     - cd autotest
