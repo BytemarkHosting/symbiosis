@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
+
+PREFIX=$(dirname ${0})
 
 mkdir -p /var/spool/prosody
 cp $PREFIX/conf/dhparams /var/spool/prosody
