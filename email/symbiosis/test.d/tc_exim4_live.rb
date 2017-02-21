@@ -10,6 +10,9 @@ class TestEximLive < Test::Unit::TestCase
     @domain = Symbiosis::Domain.new()
     @domain.create
 
+    # Make sure the FQDN is created too.
+    Symbiosis::Domain.new(Symbiosis::Host.fqdn)
+
     @mailbox = @domain.create_mailbox("test")
     @mailbox.encrypt_password = false
     @mailbox_password = Symbiosis::Utils.random_string

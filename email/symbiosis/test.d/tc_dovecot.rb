@@ -12,6 +12,9 @@ class TestDovecot < Test::Unit::TestCase
     @domain = Symbiosis::Domain.new()
     @domain.create
 
+    # Make sure the local FQDN is created for tests
+    Symbiosis::Domain.new(Symbiosis::Host.fqdn).create
+
     @mailbox = @domain.create_mailbox("test")
     @mailbox.encrypt_password = false
     @mailbox_password = Symbiosis::Utils.random_string
@@ -201,7 +204,7 @@ EOF
   
   def do_setup_local_mailbox(test_user)
     hostname = fetch_hostname
-    mailbox = Symbiosis::Domains.find_mailbox(test_user.name + "@" + hostname, @prefix)
+    mailbox = Symbiosis::Domains.find_mailbox(test_user.name + "@" + hostname)
 
     #
     # AWOOGA.
