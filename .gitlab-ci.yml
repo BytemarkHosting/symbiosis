@@ -92,8 +92,12 @@ test:xmpp:
   stage: package
   script:
     - export PACKAGE=${CI_BUILD_NAME##package:}
-    - cd $PACKAGE
-    - sautobuild $PWD
+    - pushd $PACKAGE ; sautobuild $PWD ; popd
+    - mkdir -p pkg/
+    # These files are all optional
+    - 'mv -v ../*.{dsc,build,buildinfo,changes,tar.*} pkg/ 2>/dev/null || true'
+    # We always want a deb though.
+    - mv -v ../*.deb pkg/
   tags:
     - shell
   artifacts:
