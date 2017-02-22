@@ -93,7 +93,7 @@ test:xmpp:
   script:
     - export PACKAGE=${CI_BUILD_NAME##package:}
     - cd $PACKAGE
-    - sautobuild
+    - sautobuild $PWD
   tags:
     - shell
   artifacts:
