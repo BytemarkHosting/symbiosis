@@ -89,13 +89,13 @@ test:xmpp:
   <<: *test
 
 .package: &package
-  image: $CI_REGISTRY/docker-images/layers:jessie-deb
   stage: package
   script:
     - export PACKAGE=${CI_BUILD_NAME##package:}
-    - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
     - cd $PACKAGE
-    - package
+    - sautobuild
+  tags:
+    - shell
   artifacts:
     paths:
       - pkg/
