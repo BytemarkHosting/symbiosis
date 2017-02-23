@@ -70,6 +70,6 @@ fi
 
 #DEBHELPER#
 
-service pure-ftpd restart 
+invoke-rc.d pure-ftpd restart
 
 exit 0

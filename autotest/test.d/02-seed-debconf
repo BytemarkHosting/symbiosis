@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+PREFIX=$(dirname ${0})
+PRESEED_CONFIG="${PREFIX}/conf/debconf-preseed-jessie"
+
+if [ -f "${PRESEED_CONFIG}" ] ; then
+  echo "I: Preseeding debconf"
+  /usr/bin/debconf-set-selections < ${PRESEED_CONFIG}
+fi
+

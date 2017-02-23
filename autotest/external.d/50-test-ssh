@@ -1,0 +1,6 @@
+#!/bin/bash
+
+. $(dirname $0)/common
+
+echo -e "\nSSH-2.0-OpenSSH_6.0p1" | socat EXEC:"socat-scripter",fdin=3,fdout=4 TCP:$IP:22 
+

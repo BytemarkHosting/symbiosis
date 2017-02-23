@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+export LC_ALL="en_GB.UTF-8"
+
+#
+# Timeout commands after 15 minutes .. kill after 20 if the TERM isn't
+# respected.
+#
+/usr/bin/timeout -k 20m 15m /usr/bin/symbiosis-test

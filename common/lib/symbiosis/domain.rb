@@ -41,6 +41,14 @@ module Symbiosis
     end
 
     #
+    # Tests to see if a domain name is valid.  The FQDN is always valid, no
+    # matter what it is.
+    #
+    def self.is_valid_name?(name)
+      name =~ NAME_REGEXP or (Symbiosis::Host.fqdn == name)
+    end
+
+    #
     # Creates a new domain object.  If no name is set a random domain name is
     # generated, based on 10 characters in the imaginary <code>.test</code> TLD.
     #
@@ -63,7 +71,7 @@ module Symbiosis
       #
       # Make sure the name is a valid domain name.
       #
-      unless @name =~ NAME_REGEXP
+      unless self.class.is_valid_name?(@name)
         raise ArgumentError, "Bad name '#{@name.inspect}'"
       end
 

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#
+# This works for both lenny and squeeze+
+#
+for i in /etc/symbiosis/monit.d/disabled /tmp/dpkg.running ; do
+  mkdir -p $(dirname $i)
+  touch $i
+done
+

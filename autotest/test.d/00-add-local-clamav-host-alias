@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "I: Adding db.local.clamav.net alias to /etc/hosts"
+echo "212.110.161.69 db.local.clamav.net" >> /etc/hosts
+

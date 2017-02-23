@@ -186,7 +186,7 @@ class TestEmailDictd < Test::Unit::TestCase
     domain = Symbiosis::Domain.new(hostname, @prefix)
     domain.create
 
-    mailbox = Symbiosis::Domains.find_mailbox(test_user.name + "@" + hostname)
+    mailbox = Symbiosis::Domains.find_mailbox(test_user.name + "@" + hostname, @prefix)
     mailbox.password = "abc"
 
     # do the test twice, with and without the hostname
