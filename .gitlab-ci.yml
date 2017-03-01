@@ -13,7 +13,7 @@ stages:
   script:
     - adduser --home=/srv --shell=/bin/bash --no-create-home --disabled-login --gecos='Symbiosis Administrator,,,' admin
     - chown admin.admin /srv
-    - cp autotest/test.d/conf/maker-sources.list /etc/apt/sources.list.d/
+    - cp autotest/test.d/conf/autotest-sources.list /etc/apt/sources.list.d/
     - "[ -z \"$TEST_DEPS\" ] || (apt-get update ; apt-get install $TEST_DEPS)"
     - export PACKAGE=${CI_BUILD_NAME##test:}
     - cd $PACKAGE
@@ -155,7 +155,7 @@ publish:
     - rm -fv /usr/sbin/policy-rc.d
     - cd autotest
     - echo ${CI_BUILD_NAME##install:} > test.d/conf/action
-    - "echo deb http://repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/ ./ >> test.d/conf/maker-sources.list"
+    - "echo deb http://repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/ ./ >> test.d/conf/autotest-sources.list"
     - run-parts $VERBOSE --new-session --exit-on-error $PWD/test.d
 
 #
