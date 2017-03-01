@@ -283,7 +283,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     result = @client.registered?
     assert(result, "#registered? should return true once registered")
 
-    assert_raise(Acme::Client::Error::Malformed, "#register should return raise an error on second attempt") { @client.register }
+    assert_raise(Acme::Client::Error::Unauthorized, "#register should return raise an error on second attempt") { @client.register }
   end
 
   def test_verify
