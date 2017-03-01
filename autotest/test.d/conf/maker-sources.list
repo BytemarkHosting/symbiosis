@@ -11,4 +11,4 @@ deb     http://repo.bytemark.co.uk/open-source/ruby-acme-client/master/latest/je
 deb     http://repo.bytemark.co.uk/open-source/ruby-securecompare/master/latest/jessie ./
 deb     http://repo.bytemark.co.uk/open-source/ruby-json-jwt/master/latest/jessie ./
 deb     http://repo.bytemark.co.uk/open-source/ruby-bindata/master/latest/jessie ./
-deb     http://repo.bytemark.co.uk/open-source/ruby-ruby-url-safe-base64/master/latest/jessie ./
+deb     http://repo.bytemark.co.uk/open-source/ruby-url-safe-base64/master/latest/jessie ./
