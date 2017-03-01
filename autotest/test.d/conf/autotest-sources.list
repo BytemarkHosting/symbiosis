@@ -7,7 +7,7 @@ deb http://repo.bytemark.co.uk/open-source/squirrelmail-change-pass/master/lates
 #
 # Ruby letsencrypt stuff
 #
-deb     http://repo.bytemark.co.uk/open-source/ruby-acme-client/master/latest/jessie ./
+deb     http://repo.bytemark.co.uk/open-source/ruby-acme-client/master-jessie/latest/jessie ./
 deb     http://repo.bytemark.co.uk/open-source/ruby-securecompare/master/latest/jessie ./
 deb     http://repo.bytemark.co.uk/open-source/ruby-json-jwt/master/latest/jessie ./
 deb     http://repo.bytemark.co.uk/open-source/ruby-bindata/master/latest/jessie ./
