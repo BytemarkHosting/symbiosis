@@ -17,7 +17,6 @@ stages:
     - "[ -z \"$TEST_DEPS\" ] || (apt-get update ; apt-get install $TEST_DEPS)"
     - export PACKAGE=${CI_BUILD_NAME##test:}
     - cd $PACKAGE
-    - env
     - "[ ! -f Makefile ] || make test"
 
 test:backup:
