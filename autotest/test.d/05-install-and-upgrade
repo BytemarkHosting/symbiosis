@@ -17,7 +17,7 @@ fi
 
 if [ "upgrade" = "$ACTION" ] ; then
   echo "I: Installing current version of Symbiosis from repo.bytemark.co.uk"
-  $PREFIX/bin/apt-get-install $PREFIX/conf/current-jessie-sources.list $PREFIX/conf/jessie-packages
+  $PREFIX/bin/apt-get-install $PREFIX/conf/current-stretch-sources.list $PREFIX/conf/stretch-packages
     
   echo "I: Re-seed debconf"
   $PREFIX/02-seed-debconf
@@ -33,8 +33,8 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
     echo "I: Installing wheezy version of Symbiosis from repo.bytemark.co.uk"
     $PREFIX/bin/apt-get-install $PREFIX/conf/current-wheezy-sources.list $PREFIX/conf/wheezy-packages || true
 
-    echo "I: Replacing wheezy sources with jessie"
-    cp $PREFIX/conf/debian-jessie-sources.list /etc/apt/sources.list
+    echo "I: Replacing wheezy sources with stretch"
+    cp $PREFIX/conf/debian-stretch-sources.list /etc/apt/sources.list
 
     echo "I: Removing old wheezy symbiosis list"
     rm /etc/apt/sources.list.d/current-wheezy-sources.list
@@ -52,7 +52,7 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   fi
 
   #
-  # Now upgrade to jessie
+  # Now upgrade to stretch
   #
   echo "I: Performing dist-upgrade from wheezy"
 
@@ -68,11 +68,11 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   $PREFIX/02-seed-debconf
 
   echo "I: ensuring Symbiosis packages are installed"
-  $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list $PREFIX/conf/jessie-packages
+  $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list $PREFIX/conf/stretch-packages
 else 
 
 
-  echo "I: Installing latest version of Symbiosis from repo.bytemark.co.uk"
-  $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list $PREFIX/conf/jessie-packages
+  echo "I: Installing latest version of Symbiosis from maker2.bytemark.co.uk"
+  $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list $PREFIX/conf/stretch-packages
 fi
 

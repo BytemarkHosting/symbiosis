@@ -10,7 +10,9 @@ mysql-server-5.5	mysql-server/root_password_again	password	semiconscious malprac
 phpmyadmin	phpmyadmin/mysql/admin-pass	 password	semiconscious malpractice
 # Password of the database's administrative user:
 roundcube-core roundcube/mysql/admin-pass  password semiconscious malpractice
-# Just in case..
+# Just in case.. dbconfig-common seems to have two passwords for mysql..
 dbconfig-common dbconfig-common/mysql/admin-password password semiconscious malpractice
 dbconfig-common dbconfig-common/mysql/admin-pass password semiconscious malpractice
+# Also remember the password.
+dbconfig-common dbconfig-common/remember-admin-pass     boolean true
 

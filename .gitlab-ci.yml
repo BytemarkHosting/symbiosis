@@ -9,7 +9,7 @@ stages:
 
 .test: &test
   stage: test
-  image: $CI_REGISTRY/docker-images/layers:jessie-ruby
+  image: $CI_REGISTRY/docker-images/layers:stretch-ruby
   script:
     - adduser --home=/srv --shell=/bin/bash --no-create-home --disabled-login --gecos='Symbiosis Administrator,,,' admin
     - chown admin.admin /srv
@@ -88,7 +88,7 @@ test:xmpp:
   <<: *test
 
 .package: &package
-  image: $CI_REGISTRY/docker-images/layers:jessie-deb
+  image: $CI_REGISTRY/docker-images/layers:stretch-deb
   stage: package
   script:
     - export PACKAGE=${CI_BUILD_NAME##package:}
@@ -145,7 +145,7 @@ publish:
 
 .install: &install
   stage: install
-  image: $CI_REGISTRY/docker-images/base:jessie
+  image: $CI_REGISTRY/docker-images/base:stretch
   tags:
     - docker-socket
   variables:
@@ -162,7 +162,7 @@ publish:
 #
 install:dist-upgrade:
   <<: *install
-  image: $CI_REGISTRY/docker-images/base:wheezy
+  image: $CI_REGISTRY/docker-images/base:jessie
   allow_failure: true
 
 install:upgrade:
