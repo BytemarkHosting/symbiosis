@@ -4,11 +4,3 @@ deb http://repo.bytemark.co.uk/open-source/ruby-cracklib/master/latest/stretch/ 
 deb http://repo.bytemark.co.uk/open-source/bytemark-keys/master/latest/stretch/ ./
 deb http://repo.bytemark.co.uk/open-source/squirrelmail-change-pass/master/latest/stretch/ ./
 
-#
-# Ruby letsencrypt stuff
-#
-deb     http://repo.bytemark.co.uk/open-source/ruby-acme-client/master-stretch/latest/stretch ./
-deb     http://repo.bytemark.co.uk/open-source/ruby-securecompare/master/latest/stretch ./
-deb     http://repo.bytemark.co.uk/open-source/ruby-json-jwt/master/latest/stretch ./
-deb     http://repo.bytemark.co.uk/open-source/ruby-bindata/master/latest/stretch ./
-deb     http://repo.bytemark.co.uk/open-source/ruby-url-safe-base64/master/latest/stretch ./

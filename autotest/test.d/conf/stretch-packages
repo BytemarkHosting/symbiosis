@@ -26,5 +26,5 @@ openssh-server
 postgresql
 ruby-pg
 ruby-mysql
-ruby2.1
+ruby2.3
 squirrelmail-change-pass
