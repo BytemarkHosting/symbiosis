@@ -12,8 +12,8 @@ if [ -f $PREFIX/conf/action ] ; then
   ACTION=$(< ${PREFIX}/conf/action)
 fi
 
-# echo "Acquire::http::Proxy::maker2.bytemark.co.uk DIRECT;" > /etc/apt/apt.conf.d/95proxy
-# echo "Acquire::http::Proxy \"http://maker2.bytemark.co.uk:3142\";" >> /etc/apt/apt.conf.d/95proxy
+# echo "Acquire::http::Proxy::repo.bytemark.co.uk DIRECT;" > /etc/apt/apt.conf.d/95proxy
+# echo "Acquire::http::Proxy \"http://$GATEWAY:3142\";" >> /etc/apt/apt.conf.d/95proxy
 
 if [ "upgrade" = "$ACTION" ] ; then
   echo "I: Installing current version of Symbiosis from repo.bytemark.co.uk"
@@ -23,7 +23,7 @@ if [ "upgrade" = "$ACTION" ] ; then
   $PREFIX/02-seed-debconf
 
   echo "I: Performing dist-upgrade"
-  $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list
+  $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list
 
 elif [ "dist-upgrade" = "$ACTION" ] ; then
   #
@@ -59,20 +59,20 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   #
   # If the install has failed, try to start pure-authd and carry on
   #
-  if ! $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list ; then
+  if ! $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list ; then
     service pure-authd start
-    $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list 
+    $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list 
   fi
 
   echo "I: Re-seed debconf"
   $PREFIX/02-seed-debconf
 
   echo "I: ensuring Symbiosis packages are installed"
-  $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list $PREFIX/conf/jessie-packages
+  $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list $PREFIX/conf/jessie-packages
 else 
 
 
-  echo "I: Installing latest version of Symbiosis from maker2.bytemark.co.uk"
-  $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list $PREFIX/conf/jessie-packages
+  echo "I: Installing latest version of Symbiosis from repo.bytemark.co.uk"
+  $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list $PREFIX/conf/jessie-packages
 fi
 
