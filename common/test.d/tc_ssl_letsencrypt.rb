@@ -83,7 +83,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
   end
 
   def do_check_key(request)
-    protect = JSON.load(UrlSafeBase64.decode64(request["protected"]))
+    protect = JSON.load(Base64.urlsafe_decode64(request["protected"]))
     key = nil
     if protect.is_a?(Hash) and
       protect.has_key?("jwk") and
@@ -117,7 +117,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def do_post_new_reg(request)
     req     = JSON.load(request.body)
-    protect = JSON.load(UrlSafeBase64.decode64(req["protected"]))
+    protect = JSON.load(Base64.urlsafe_decode64(req["protected"]))
     key = nil
     if protect.is_a?(Hash) and
       protect.has_key?("jwk") and
@@ -151,7 +151,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     result = do_check_key(req)
     return result unless result == true
 
-    payload = JSON.load(UrlSafeBase64.decode64(req["payload"]))
+    payload = JSON.load(Base64.urlsafe_decode64(req["payload"]))
     sekrit  = Symbiosis::Utils.random_string(20).downcase
 
     @http01_challenge[sekrit] = {
@@ -176,8 +176,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     result = do_check_key(req)
     return result unless result == true
 
-    payload = JSON.load(UrlSafeBase64.decode64(req["payload"]))
     sekrit  = @authz_template.extract(request.uri)["sekrit"]
+    payload = JSON.load(Base64.urlsafe_decode64(req["payload"]))
 
     @http01_challenge[sekrit].merge!({
       "keyAuthorization" => payload["keyAuthorization"],
@@ -219,8 +219,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     result = do_check_key(req)
     return result unless result == true
 
-    payload = JSON.load(UrlSafeBase64.decode64(req["payload"]))
-    csr = OpenSSL::X509::Request.new(UrlSafeBase64.decode64(payload["csr"]))
+    payload = JSON.load(Base64.urlsafe_decode64(req["payload"]))
+    csr = OpenSSL::X509::Request.new(Base64.urlsafe_decode64(payload["csr"]))
 
     setup_root_ca
 
