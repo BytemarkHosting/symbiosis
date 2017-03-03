@@ -3,5 +3,5 @@
 # This is required for the httpd package to build, as it requires
 # symbiosis-common to perform tests.
 #
-deb http://repo.bytemark.co.uk/symbiosis/jessie ./
+deb http://repo.bytemark.co.uk/symbiosis/stretch ./
 

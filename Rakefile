@@ -9,7 +9,7 @@ DEBEMAIL = ENV["DEBEMAIL"] || "symbiosis@bytemark.co.uk"
 DEB_BUILD_ARCH = ENV["BUILD_ARCH"] || `dpkg-architecture -qDEB_BUILD_ARCH`.chomp
 DISTRO   = (ENV["DISTRO"]   || "debian").downcase
 RELEASE  = (ENV["RELEASE"]  || "stable").downcase
-CODENAME  = (ENV["CODENAME"]  || "jessie").downcase
+CODENAME  = (ENV["CODENAME"]  || "stretch").downcase
 REPONAME = (ENV["REPONAME"] || "symbiosis").downcase
 PARALLEL_BUILD = ENV.has_key?("PARALLEL_BUILD")
 

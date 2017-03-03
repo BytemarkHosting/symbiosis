@@ -13,7 +13,7 @@ cat <<EOF
         /___/
 
   For documentation please visit:
-       https://symbiosis.bytemark.co.uk/jessie/docs
+       https://symbiosis.bytemark.co.uk/stretch/docs
 
 EOF
 

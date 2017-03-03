@@ -1,10 +1,10 @@
-deb http://maker2.bytemark.co.uk/archives/netlinkrb/jessie/latest/ ./
-deb http://maker2.bytemark.co.uk/archives/prosody-modules/jessie/latest/ ./
-deb http://maker2.bytemark.co.uk/archives/ruby-cracklib/jessie/latest/ ./
-deb http://maker2.bytemark.co.uk/archives/bytemark-keys/jessie/latest/ ./
-deb http://maker2.bytemark.co.uk/archives/squirrelmail-change-pass/jessie/latest/ ./
+deb http://maker2.bytemark.co.uk/archives/netlinkrb/stretch/latest/ ./
+deb http://maker2.bytemark.co.uk/archives/prosody-modules/stretch/latest/ ./
+deb http://maker2.bytemark.co.uk/archives/ruby-cracklib/stretch/latest/ ./
+deb http://maker2.bytemark.co.uk/archives/bytemark-keys/stretch/latest/ ./
+deb http://maker2.bytemark.co.uk/archives/squirrelmail-change-pass/stretch/latest/ ./
 #
 # Ruby letsencrypt stuff
 #
-deb     http://repo.bytemark.co.uk/ruby-letsencrypt/jessie ./
+deb     http://repo.bytemark.co.uk/ruby-letsencrypt/stretch ./
 

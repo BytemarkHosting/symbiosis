@@ -17,7 +17,7 @@ fi
 
 if [ "upgrade" = "$ACTION" ] ; then
   echo "I: Installing current version of Symbiosis from repo.bytemark.co.uk"
-  $PREFIX/bin/apt-get-install $PREFIX/conf/current-jessie-sources.list $PREFIX/conf/jessie-packages
+  $PREFIX/bin/apt-get-install $PREFIX/conf/current-stretch-sources.list $PREFIX/conf/stretch-packages
     
   echo "I: Re-seed debconf"
   $PREFIX/02-seed-debconf
@@ -27,19 +27,19 @@ if [ "upgrade" = "$ACTION" ] ; then
 
 elif [ "dist-upgrade" = "$ACTION" ] ; then
   #
-  # If we're upgrading from squeeze:
+  # If we're upgrading from jessie:
   #
-  if grep -q wheezy /etc/apt/sources.list ; then
-    echo "I: Installing wheezy version of Symbiosis from repo.bytemark.co.uk"
-    $PREFIX/bin/apt-get-install $PREFIX/conf/current-wheezy-sources.list $PREFIX/conf/wheezy-packages || true
+  if grep -q jessie /etc/apt/sources.list ; then
+    echo "I: Installing jessie version of Symbiosis from repo.bytemark.co.uk"
+    $PREFIX/bin/apt-get-install $PREFIX/conf/current-jessie-sources.list $PREFIX/conf/jessie-packages || true
 
-    echo "I: Replacing wheezy sources with jessie"
-    cp $PREFIX/conf/debian-jessie-sources.list /etc/apt/sources.list
+    echo "I: Replacing jessie sources with stretch"
+    cp $PREFIX/conf/debian-stretch-sources.list /etc/apt/sources.list
 
-    echo "I: Removing old wheezy symbiosis list"
-    rm /etc/apt/sources.list.d/current-wheezy-sources.list
+    echo "I: Removing old jessie symbiosis list"
+    rm /etc/apt/sources.list.d/current-jessie-sources.list
 
-    #echo "I: clamav with squeeze is a bit ropey, so I'll clear out the freshclam stuff"
+    #echo "I: clamav with jessie is a bit ropey, so I'll clear out the freshclam stuff"
     #invoke-rc.d clamav-daemon stop
     #invoke-rc.d clamav-freshclam stop
     #rm $VERBOSE -f /var/lib/clamav/*.cv?
@@ -52,9 +52,9 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   fi
 
   #
-  # Now upgrade to jessie
+  # Now upgrade to stretch
   #
-  echo "I: Performing dist-upgrade from wheezy"
+  echo "I: Performing dist-upgrade from jessie"
 
   #
   # If the install has failed, try to start pure-authd and carry on
@@ -68,11 +68,11 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   $PREFIX/02-seed-debconf
 
   echo "I: ensuring Symbiosis packages are installed"
-  $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list $PREFIX/conf/jessie-packages
+  $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list $PREFIX/conf/stretch-packages
 else 
 
 
   echo "I: Installing latest version of Symbiosis from maker2.bytemark.co.uk"
-  $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list $PREFIX/conf/jessie-packages
+  $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list $PREFIX/conf/stretch-packages
 fi
 

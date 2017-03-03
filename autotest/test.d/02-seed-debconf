@@ -2,7 +2,7 @@
 
 
 PREFIX=$(dirname ${0})
-PRESEED_CONFIG="${PREFIX}/conf/debconf-preseed-jessie"
+PRESEED_CONFIG="${PREFIX}/conf/debconf-preseed-stretch"
 
 if [ -f "${PRESEED_CONFIG}" ] ; then
   echo "I: Preseeding debconf"
