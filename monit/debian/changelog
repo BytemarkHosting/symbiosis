@@ -1,7 +1,7 @@
 symbiosis-monit (2015:0618) stable; urgency=medium
 
   * Rename File#exists? to File#exist?
-  * Updated maintainers + Uploaders.
+  * Updated maintainers + Uploaders. 
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 11:02:42 +0100
 

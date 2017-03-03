@@ -33,7 +33,7 @@ module Symbiosis
       #
       # Sanity check name.
       #
-      return nil unless domain =~ Symbiosis::Domain::NAME_REGEXP
+      return nil unless Symbiosis::Domain.is_valid_name?(domain)
 
       #
       # Search all domains.  This returns a maximum of two results -- one with
@@ -85,6 +85,7 @@ module Symbiosis
     #
     def self.all(prefix = "/srv")
       results = Array.new
+      possibles = Array.new
 
       #
       #  For each domain.
@@ -100,7 +101,9 @@ module Symbiosis
         #
         # Sanity check name.
         #
-        next unless domain =~ Symbiosis::Domain::NAME_REGEXP
+        next unless Symbiosis::Domain.is_valid_name?(domain)
+
+        possibles << domain
 
         begin
           results << Domain.new(domain, this_prefix)
@@ -109,8 +112,19 @@ module Symbiosis
         end
       end
 
+      #
+      # Sometimes, significant memory pressure can cause Etc.getpwuid(@uid).name
+      # to fail.  This can cause problems, e.g. symbiosis-httpd-configure is
+      # then led to believe there aren't any domains and will delete all sites
+      # from sites-enabled.
+      #
+      if possibles.length > 0 and results.length == 0
+        raise RuntimeError "No domains detected, but there are entries in /srv. This detection failure could be due to memory pressure."
+      end
+
       results
     end
 
   end
+
 end

@@ -77,6 +77,11 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
     # And write
     File.open(macro_snippet_fn, "w+"){|fh| fh.puts(macro_snippet)}
+
+		# Set the primary hostname
+		File.open(File.join(@tempdir, "exim4", "symbiosis.d", "00-main", "11-primary-hostname"),"w+") do |fh|
+      fh.puts("primary_hostname = "+fetch_hostname)
+		end
     
     # Add in the spool directory 
     File.open(File.join(@tempdir, "exim4",  "symbiosis.d", "00-main", "11-spool-directory"), "w") do |fh|
@@ -330,7 +335,9 @@ class Exim4ConfigTest < Test::Unit::TestCase
     # setup the acl
     do_acl_setup()
 
-    %w(normal_ip blacklisted_ip whitelisted_ip).each do |test|
+    %w(normal_ip blacklisted_ip whitelisted_ip
+	whitelisted_sender1 whitelisted_sender2
+	blacklisted_sender1 blacklisted_sender2 blacklisted_sender3 blacklisted_sender4).each do |test|
       do_acl_script('exim4_acl_tests/'+test)
     end
   end
@@ -620,11 +627,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   end
 
   def fetch_hostname
-    if File.exist?('/proc/sys/kernel/hostname')
-      File.read('/proc/sys/kernel/hostname').chomp
-    else
-      "localhost"
-    end
+    Symbiosis::Host.fqdn
   end
 
   def test_router_system_aliases
@@ -743,11 +746,8 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_router_mail_for_local_root
     do_acl_setup
 
-    if File.exist?('/proc/sys/kernel/hostname')
-      this_hostname = File.read('/proc/sys/kernel/hostname').chomp
-    else
-      this_hostname = "localhost"
-    end
+    this_hostname = fetch_hostname
+
     # This should route just fine
     do_exim4_bt("root@"+this_hostname, "/var/mail/mail", "mail_for_root", "address_file")
 
@@ -760,11 +760,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_postmaster_for_any_domains
     do_acl_setup
 
-    if File.exist?('/proc/sys/kernel/hostname')
-      this_hostname = File.read('/proc/sys/kernel/hostname').chomp
-    else
-      this_hostname = "localhost"
-    end
+    this_hostname = fetch_hostname
 
     # This should route just fine
     do_exim4_bt("postmaster@"+this_hostname, "/var/mail/mail", "mail_for_root", "address_file")
@@ -800,9 +796,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_localhost_rewrite
     do_acl_setup
 
-    if File.exist?('/proc/sys/kernel/hostname')
-      this_hostname = File.read('/proc/sys/kernel/hostname').chomp
-    end
+    this_hostname = fetch_hostname
 
     if this_hostname == "localhost"
       do_skip "Cannot do localhost rewrite tests, since this host thinks it is called localhost."

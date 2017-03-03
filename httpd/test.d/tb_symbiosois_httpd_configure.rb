@@ -6,7 +6,6 @@ require 'tempfile'
 require 'symbiosis/domain'
 require 'symbiosis/domain/http'
 require 'symbiosis/host'
-require 'pp'
 
 class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
 
@@ -71,7 +70,7 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
 
     system("#{@script} --root-dir #{@root} --no-reload")
 
-    assert_equal($?,0,"#{@script} exited with a non-zero status")
+    assert_equal(0,$?.exitstatus,"#{@script} exited with a non-zero status")
 
     mass_hosting_files.each do |fn|
       assert(File.exist?(fn), "File #{fn} missing")
@@ -115,7 +114,7 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
   end
 
   def test_site_pruning
-    # 
+    #
     # This is a standard file in sites-available.  It should never be removed.
     #
     unmanaged_config = File.join(@apache2_dir,"sites-enabled","default")
@@ -158,8 +157,8 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
       assert(File.exist?(fn), "Missing config #{fn} which should not have been removed")
     end
 
-    assert(!File.exist?(domain_conf_fn), "File #{domain_conf_fn} missing when it should have been generated.")
-  
+    assert(!File.exist?(domain_conf_fn), "File #{domain_conf_fn} present when it should have been pruned.")
+
   end
 
   def test_bug_7593
@@ -184,11 +183,91 @@ class TestSymbiosisHttpdConfigure < Test::Unit::TestCase
 
     system("#{@script} --root-dir #{@root} --no-reload")
 
-    assert_equal($?,0,"#{@script} exited with a non-zero status")
+    assert_equal(0,$?.exitstatus,"#{@script} exited with a non-zero status")
 
     conf_files.each do |fn|
       assert(!File.exist?(fn), "File #{fn} present, when it shouldn't be.")
     end
+
+  end
+
+  def test_domains_on_command_line
+    domain = Symbiosis::Domain.new(nil, @prefix)
+    domain.create
+    name = domain.name
+    FileUtils.mkdir_p(domain.htdocs_dir)
+
+    domain2 = Symbiosis::Domain.new(nil, @prefix)
+    domain2.create
+    name2 = domain2.name
+    FileUtils.mkdir_p(domain2.htdocs_dir)
+
+    #
+    # These are the files we expect to be in place.
+    #
+    domain_conf_fn = File.join(@apache2_dir, "sites-enabled", domain.name+".conf")
+    domain2_conf_fn = File.join(@apache2_dir, "sites-enabled", domain2.name+".conf")
+    #
+    # Don't create a public/htdocs directory for this domain and
+    # disable mass hosting
+    #
+    FileUtils.touch("#{@root}/etc/symbiosis/apache.d/disabled.zz-mass-hosting")
+
+    system("#{@script} --root-dir #{@root} --no-reload #{domain.name}")
+
+    assert_equal(0,$?.exitstatus,"#{@script} exited with a non-zero status")
+
+    assert(File.exist?(domain_conf_fn), "File #{domain_conf_fn} is not present when it was on the cmd line.")
+    assert(!File.exist?(domain2_conf_fn), "File #{domain2_conf_fn} is present when it wasn't on the cmd line.")
+
+    system("#{@script} --root-dir #{@root} --no-reload #{domain2.name}")
+
+    assert(File.exist?(domain_conf_fn), "File #{domain_conf_fn} is not present when it was on the cmd line.")
+    assert(File.exist?(domain2_conf_fn), "File #{domain2_conf_fn} is present when it wasn't on the cmd line.")
+
+    system("#{@script} --root-dir #{@root} --no-reload #{domain2.name}")
+  end
+
+  def test_recreate_sites_enabled_links_if_missing
+    domain = Symbiosis::Domain.new(nil, @prefix)
+    domain.create
+    name = domain.name
+    FileUtils.mkdir_p(domain.htdocs_dir)
+    FileUtils.mkdir_p(domain.config_dir)
+    Symbiosis::Utils.set_param( "ip", "10.0.0.1", domain.config_dir)
+
+    #
+    # These are the files we expect to be in place.
+    #
+    domain_conf_fn = File.join(@apache2_dir, "sites-enabled", domain.name+".conf")
+    zz_mass_hosting_conf_fn = File.join(@apache2_dir, "sites-enabled", "zz-mass-hosting.conf")
+
+    system("#{@script} --root-dir #{@root} --no-reload")
+
+    assert_equal(0,$?.exitstatus,"#{@script} exited with a non-zero status")
+
+    assert(File.exist?(domain_conf_fn), "File #{domain_conf_fn} is not present.")
+    assert(File.exist?(zz_mass_hosting_conf_fn), "File #{zz_mass_hosting_conf_fn} is not present.")
+
+    File.unlink(domain_conf_fn)
+
+    system("#{@script} --root-dir #{@root} --no-reload")
+
+    assert(!File.exist?(domain_conf_fn), "File #{domain_conf_fn} has been recreated after it had been manually disabled.")
+
+    system("#{@script} --root-dir #{@root} --no-reload #{domain.name}")
+
+    assert(File.exist?(domain_conf_fn), "File #{domain_conf_fn} is missing when it had been specified on the cmd line.")
+
+    File.unlink(zz_mass_hosting_conf_fn)
+
+    system("#{@script} --root-dir #{@root} --no-reload")
+
+    assert(!File.exist?(zz_mass_hosting_conf_fn), "File #{zz_mass_hosting_conf_fn} has been recreated after it had been manually disabled.")
+
+    system("#{@script} --root-dir #{@root} --no-reload zz-mass-hosting")
+
+    assert(File.exist?(zz_mass_hosting_conf_fn), "File #{zz_mass_hosting_conf_fn} is not present.")
 
   end
 

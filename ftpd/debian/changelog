@@ -1,3 +1,16 @@
+symbiosis-ftpd (2015:1108) stable; urgency=medium
+
+  * Updated cipher lists.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 21 Nov 2016 13:51:58 +0000
+
+symbiosis-ftpd (2015:1107) stable; urgency=medium
+
+  * Changed login failure message to allow the next auth message in
+    certain circumstances.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 16 May 2016 12:04:46 +0100
+
 symbiosis-ftpd (2015:1106) stable; urgency=medium
 
   * Fixed systemd unit to create the socket directory before starting the

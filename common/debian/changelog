@@ -1,3 +1,86 @@
+symbiosis-common (2015:1220) stable; urgency=medium
+
+  * Allow underscores in hostnames.
+  * Clean up ACME challenge files after validation.
+  * Fixed symbiosis-ssl manpage.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 09 Aug 2016 17:34:57 +0100
+
+symbiosis-common (2015:1218) stable; urgency=medium
+
+  * The current certificate is now marked for replacement if it is deemed
+    invalid by OpenSSL.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 25 May 2016 15:45:59 +0100
+
+symbiosis-common (2015:1217) stable; urgency=medium
+
+  * Added --list and --select options for symbiosis-ssl
+  * Self-signed certs are no longer chosen for roll-over unless the SSL
+    provider is explcitly set to self-signed.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 May 2016 22:19:40 +0100
+
+symbiosis-common (2015:1216) stable; urgency=medium
+
+  * Raise an error if the getpwent memory bug hits (closes #12783).
+  * Added more output to symbiosis-ssl
+  * Renew certificates at 21 days instead of 10, averting emails from
+    LetsEncrypt.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 16 May 2016 12:13:26 +0100
+
+symbiosis-common (2015:1215) stable; urgency=medium
+
+  * Rejigged the conditions that trigger generation and rollover of
+    certificates.
+  * The next certificate name is now based on the contents of the ssl/sets/
+    directory rather than the sets that are available for use.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 22 Jan 2016 15:22:48 +0000
+
+symbiosis-common (2015:1214) stable; urgency=medium
+
+  * Retry (up to 5 times) if LetsEncrypt return a bad nonce error.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 21 Jan 2016 15:43:55 +0000
+
+symbiosis-common (2015:1213) stable; urgency=medium
+
+  * Don't give duff emails (with newlines) to letsencrypt.
+  * More output is given when the letsencrypt verification step fails.
+  * The first named domain will be used as the CN now.
+  * Added --force flag to re-request certificates.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 21 Jan 2016 12:03:30 +0000
+
+symbiosis-common (2015:1212) stable; urgency=medium
+
+  * Only poll the LetsEncrypt servers whilst the certificate request is still
+    pending, rather than waiting until it is verified.
+  * Fixed up --help opion to commands to output help.
+  * Fixed "!! Failed: Error creating new authz :: DNS name was empty" error.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 19 Jan 2016 11:40:35 +0000
+
+symbiosis-common (2015:1211) stable; urgency=medium
+
+  * Added ruby-test-unit as an explicit depends.
+  * Removed ruby-mocha, ruby-webmock and ruby-acme-client from build-deps, and
+    added them to the dependencies for the package itself for testing.
+  * Utils#get_param now returns nil if the file is missing/unreadable.
+  * Added Utils#get_param_from_dir_stack.
+  * Refactored SSL code to use "certificate sets", allowing SSL certificate
+    rollover.
+  * Added "letsencrypt" as an SSL provider.
+  * Added a "selfsigned" provider to mirror the letsencrypt class.
+  * Introduced new symbiosis-ssl command to handle all this. This gets run on
+    a weekly basis to do rollover.
+  * The DKIM selector code has been tidied to work if the hostname doesn't
+    match the selector regex.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 14 Jan 2016 16:47:43 +0000
+
 symbiosis-common (2015:1106) stable; urgency=medium
 
   * Added dependency on make.

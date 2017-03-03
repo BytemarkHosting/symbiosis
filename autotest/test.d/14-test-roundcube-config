@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#
+# We've established that a previous postinst script
+# for symbiosis-webmail-roundcube was removing people's
+# configurations, including ones which were customised.
+# The result was something that looked like this:
+#
+# lrwxrwxrwx   1 root root        27 Nov 11 18:02 config.inc.php -> config.inc.php.dpkg-symbiosis
+# -rw-r--r--   1 root root      1415 Nov 11 12:46 config.inc.php.dpkg-symbiosis
+# lrwxrwxrwx   1 root root        27 Mar 10  2014 config.inc.php.dpkg-symbiosis-orig -> config.inc.php.dpkg-symbiosis
+# 
+# This should look like this:
+#
+# lrwxrwxrwx   1 root root        27 Nov 11 18:02 config.inc.php -> config.inc.php.dpkg-symbiosis
+# -rw-r--r--   1 root root      1415 Nov 11 12:46 config.inc.php.dpkg-symbiosis
+# lrwxrwxrwx   1 root root        27 Mar 10  2014 config.inc.php.dpkg-symbiosis-orig                               
+#
+
+set -e 
+
+if [ -h /etc/roundcube/config.inc.php.dpkg-symbiosis-orig ]; then
+        echo "/etc/roundcube/config.inc.php.dpkg-symbiosis-orig is a symbolic link, when it should be a fail - FAILING"
+        exit 1
+else
+        echo "/etc/roundcube/config.inc.php.dpkg-symbiosis-orig is not a symbolic link"
+fi
+

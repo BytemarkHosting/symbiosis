@@ -1,4 +1,7 @@
 require 'symbiosis/domain'
+require 'symbiosis/ssl'
+require 'symbiosis/ssl/certificate_set'
+require 'symbiosis/ssl/selfsigned'
 require 'openssl'
 require 'erb'
 
@@ -11,7 +14,9 @@ module Symbiosis
     # matching key and certificate found using ssl_find_matching_certificate_and_key.
     #
     def ssl_enabled?
-      self.ssl_x509_certificate and self.ssl_key
+      return false if self.ssl_current_set.nil?
+
+      self.ssl_current_set.certificate and self.ssl_current_set.key
     end
 
     #
@@ -21,348 +26,509 @@ module Symbiosis
       get_param("ssl-only", self.config_dir)
     end
 
-    #
-    # Searches for the domain's SSL certificate using
-    # ssl_find_matching_certificate_and_key, and returns the certificate's filename, or
-    # nil if nothing could be found.
-    # 
     def ssl_x509_certificate_file
-      @ssl_x509_certificate_file ||= nil
-      
-      if @ssl_x509_certificate_file.nil?
-        @ssl_x509_certificate_file, @ssl_key_file = self.ssl_find_matching_certificate_and_key
-      end
-
-      @ssl_x509_certificate_file
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      self.ssl_current_set.certificate_file
     end
 
-    alias ssl_certificate_file ssl_x509_certificate_file
+    alias :ssl_certificate_file :ssl_x509_certificate_file
 
-    #
-    # Sets the domains SSL certificate filename.
-    #
     def ssl_x509_certificate_file=(f)
-      @ssl_x509_certificate_file = f
+      @ssl_current_set ||= Symbiosis::SSL::CertificateSet.new(self, self.config_dir)
+      self.ssl_current_set.certificate_file=f
     end
 
-    alias ssl_certificate_file= ssl_x509_certificate_file=
+    alias :ssl_certificate_file= :ssl_x509_certificate_file=
 
-    #
-    # Returns the X509 certificate object
-    #
     def ssl_x509_certificate
-      if !self.ssl_x509_certificate_file.nil?
-        OpenSSL::X509::Certificate.new(File.read(self.ssl_x509_certificate_file))
-      else
-        nil
-      end
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      self.ssl_current_set.certificate
     end
 
-    #
-    # Searches for the domain's SSL key using
-    # ssl_find_matching_certificate_and_key, and returns the key's filename, or
-    # nil if nothing could be found.
-    #
+    alias :ssl_certificate :ssl_x509_certificate
+
     def ssl_key_file
-      @ssl_key_file ||= nil
-
-      if @ssl_key_file.nil?
-        @ssl_x509_certificate_file, @ssl_key_file = self.ssl_find_matching_certificate_and_key
-      end
-
-      @ssl_key_file
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      self.ssl_current_set.key_file
     end
 
-    #
-    # Sets the domains's SSL key filename.
-    #
     def ssl_key_file=(f)
-      @ssl_key_file = f
+      @ssl_current_set ||= Symbiosis::SSL::CertificateSet.new(self, self.config_dir)
+      self.ssl_current_set.key_file=f
     end
 
-    #
-    # Returns the domains SSL key as an OpenSSL::PKey::RSA object, or nil if no
-    # key file could be found.
-    #
     def ssl_key
-      unless self.ssl_key_file.nil?
-        OpenSSL::PKey::RSA.new(File.read(self.ssl_key_file))
-      else
-        nil
-      end
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      self.ssl_current_set.key
     end
 
-    #
-    # Returns the certificate chain filename, if one exists, or one has been
-    # set, or nil if nothing could be found.
-    #
     def ssl_certificate_chain_file
-      if get_param("ssl.bundle", self.config_dir)
-        File.join( self.config_dir,"ssl.bundle" )
-      else
-        nil
-      end
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      self.ssl_current_set.certificate_chain_file
     end
 
-    alias ssl_bundle_file ssl_certificate_chain_file
+    alias :ssl_bundle_file :ssl_certificate_chain_file
 
-    #
-    # Add a path with extra SSL certs (for testing).
-    #
-    def ssl_add_ca_path(path)
-      @ssl_ca_paths ||= [] 
-
-      @ssl_ca_paths << path if File.directory?(path)
+    def ssl_add_ca_path(p)
+      @ssl_current_set ||= Symbiosis::SSL::CertificateSet.new(self, self.config_dir)
+      self.ssl_current_set.add_ca_path(p)
     end
 
-    #
-    # Sets up and returns a new OpenSSL::X509::Store.
-    #
-    # If any CA paths have been set using ssl_add_ca_path, then these are added to the store.
-    #
-    # If ssl_certificate_chain_file has been set, then this is added to the store.
-    #
-    # This is regenerated on every call.
-    #
     def ssl_certificate_store
-      @ssl_ca_paths ||= []
-
-      certificate_store = OpenSSL::X509::Store.new
-      certificate_store.set_default_paths
-
-      @ssl_ca_paths.each{|path| certificate_store.add_path(path)}
-      certificate_store.add_file(self.ssl_certificate_chain_file) unless self.ssl_certificate_chain_file.nil?
-      certificate_store
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      self.ssl_current_set.certificate_store
     end
 
-    #
-    # Return the available certificate/key files for a domain.  It will check
-    # files with the following extensions for both keys and certificates.
-    #  * combined
-    #  * key
-    #  * crt
-    #  * pem
-    #
-    # It will return an array of certificate and key filenames that could be
-    # read and parsed successfully by OpenSSL.  The array has to sub-arrays,
-    # the first being certificate filenames, the second key filenames, i.e.
-    # <code>[[certificates] , [keys]]</code>.  If a file contains both a
-    # certificate and key, it will appear in both arrays.
-    #
     def ssl_available_files
-      certificates = []
-      key_files = []
-
-      # 
-      # Try a number of permutations
-      #
-      %w(combined key crt cert pem).each do |ext|
-        #
-        # See if the file exists.
-        #
-        contents = get_param("ssl.#{ext}", self.config_dir)
-
-        #
-        # If it doesn't exist/is unreadble, return nil.
-        #
-        next if false == contents
- 
-        this_fn = File.join(self.config_dir, "ssl.#{ext}")
-
-        this_cert = nil
-        this_key = nil
-
-        #
-        # Check the certificate
-        #
-        begin
-          this_cert = OpenSSL::X509::Certificate.new(contents)
-        rescue OpenSSL::OpenSSLError
-          #
-          # This means the file did not contain a cert, or the cert it contains
-          # is unreadable.
-          #
-          this_cert = nil
-        end
-
-        #
-        # Check to see if the file contains a key.
-        #
-        begin
-          this_key = OpenSSL::PKey::RSA.new(contents)
-        rescue OpenSSL::OpenSSLError
-          #
-          # This means the file did not contain a key, or the key it contains
-          # is unreadable.
-          #
-          this_key = nil
-        end
-
-        # 
-        # Finally, if we have a key and certificate in one file, check they
-        # match, otherwise reject.
-        #
-        if this_key and this_cert and this_cert.check_private_key(this_key)
-          certificates << [this_fn, this_cert]
-          key_files << this_fn
-        elsif this_key and !this_cert
-          key_files << this_fn
-        elsif this_cert and !this_key
-          certificates << [this_fn, this_cert]
-        end
-      end
-
-      #
-      # Order certificates by time to expiry, penalising any that are
-      # before their start time or after their expiry time.
-      #
-      now = Time.now
-      certificate_files = certificates.sort_by { |fn, cert|
-        score = cert.not_after.to_i
-        score -= not_before.to_i if cert.not_before > now
-        score -= now.to_i if now > cert.not_after
-        -score
-      }.map { |fn, cert| fn }
-
-      [certificate_files, key_files]
+      return [] unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      self.ssl_current_set.available_files
     end
-    
-    #
-    # This returns an array of files for the domain that contain valid certificates.
-    #
+
     def ssl_available_certificate_files
-      self.ssl_available_files.first
+      return [] unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      self.ssl_current_set.available_certificate_files
     end
 
-    # 
-    # This returns an array of files for the domain that contain valid keys.
-    #
     def ssl_available_key_files
-      self.ssl_available_files.last
+      return [] unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      self.ssl_current_set.available_key_files
     end
 
-    #
-    # Tests each of the available key and certificate files, until a matching
-    # pair is found.  Returns an array of [certificate filename, key_filename],
-    # or nil if no match is found.
-    #
-    # The order in which keys and certficates are matched is determined by
-    # ssl_available_files.
-    #
     def ssl_find_matching_certificate_and_key
-      #
-      # Find the certificates and keys
-      #
-      certificate_files, key_files = self.ssl_available_files
+      return nil unless self.ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      self.ssl_current_set.find_matching_certificate_and_key
+    end
 
-      return nil if certificate_files.empty? or key_files.empty?
-
-      #
-      # Test each certificate...
-      certificate_files.each do |cert_fn|
-        cert = OpenSSL::X509::Certificate.new(File.read(cert_fn))
-        #
-        # ...with each key
-        key_files.each do |key_fn|
-          key = OpenSSL::PKey::RSA.new(File.read(key_fn))
-          #
-          # This tests the private key, and returns the current certificate and
-          # key if they verify.
-          return [cert_fn, key_fn] if cert.check_private_key(key)
-        end
-      end
-
-      #
-      # Return nil if no matching keys and certs are found
-      return nil
+    def ssl_verify(*args)
+      set = Symbiosis::SSL::CertificateSet.new(self, self.config_dir)
+      set.verify(*args)
     end
 
     #
-    # This method performs a variety of checks on an SSL certificate and key:
+    # Returns the SSL provider name.  If the `ssl-provider` is unset, the first
+    # available provider is chosen.  If the name is set to `false` then false
+    # is returned.  If no provider could be found, false is returned.  If the
+    # provider name is "bad", false is returned.
     #
-    # * Is the certificate valid for this domain name or any of its aliases
-    # * Has the certificate started yet?
-    # * Has the certificate expired?
-    # 
-    # If any of these checks fail, a warning is raised.
-    #
-    # * Does the key match the certificate?
-    # * If the certificate is not self-signed, does it need a bundle?
-    #
-    # If either of these last two checks fail, a
-    # OpenSSL::X509::CertificateError is raised.
-    #
-    def ssl_verify(certificate = self.ssl_x509_certificate, key = self.ssl_key, store = self.ssl_certificate_store, strict_checking=false)
+    def ssl_provider
+      provider = get_param("ssl-provider", self.config_dir)
 
-      #
-      # Firstly check that the certificate is valid for the domain or one of its aliases.
-      #
-      unless ([self.name] + self.aliases).any? { |domain_alias| OpenSSL::SSL.verify_certificate_identity(certificate, domain_alias) }
-        msg = "The certificate subject is not valid for this domain #{self.name}."
-        if strict_checking
-          raise OpenSSL::X509::CertificateError, msg
-        else
-          warn "\t#{msg}" if $VERBOSE
+      return false if false == provider
+
+      if provider.nil?
+        if defined? Symbiosis::SSL::LetsEncrypt and
+          Symbiosis::SSL::PROVIDERS.include?(Symbiosis::SSL::LetsEncrypt)
+          provider = "letsencrypt"
+        elsif Symbiosis::SSL::PROVIDERS.first.to_s =~ /.*::([^:]+)$/
+          provider = $1.downcase
         end
       end
 
-      # Check that the certificate is current
-      # 
-      #
-      if certificate.not_before > Time.now 
-        msg = "The certificate for #{self.name} is not valid yet."
-        if strict_checking
-          raise OpenSSL::X509::CertificateError, msg
-        else
-          warn "\t#{msg}" if $VERBOSE
-        end
+      return false unless provider.is_a?(String)
+
+      provider.gsub(/[^A-Za-z0-9_]/,"")
+    end
+
+    def ssl_provider=(provider)
+
+      unless provider =~ /^[a-z0-9_]+$/
+        warn "\tBad ssl-provider for #{self.name}" if $VERBOSE
+        return nil
       end
 
-      if certificate.not_after < Time.now 
-        msg = "The certificate for #{self.name} has expired."
-        if strict_checking
-          raise OpenSSL::X509::CertificateError, msg
-        else
-          warn "\t#{msg}" if $VERBOSE
-        end
+      set_param("ssl-provider", provider, self.config_dir)
+    end
+
+    #
+    # Returns the SSL provider class, or nil if `ssl-provider` is explicitly
+    # set to "false" for this domain.  If `ssl-provider` class is unset, the
+    # first available provider is used.  The `ssl-provider` doesn't map to a
+    # class name, then nil is returned.
+    #
+    def ssl_provider_class
+      provider_name = self.ssl_provider
+
+      return nil if false == provider_name
+
+      if provider_name.is_a?(String)
+        provider = Symbiosis::SSL::PROVIDERS.find{|k| k.to_s =~ /::#{provider_name}$/i}
       end
 
-      # Next check that the key matches the certificate.
-      #
-      #
-      unless certificate.check_private_key(key)
-        raise OpenSSL::X509::CertificateError, "The certificate's public key does not match the supplied private key for #{self.name}."
+      provider
+    end
+
+    #
+    # This fetches the certificate from using ssl_provider_class.  If
+    # ssl_provider_class does not return a suitable Class, nil is returned.
+    #
+    # Returns the an ssl_provider instance, having requested the certificate
+    # etc.
+    #
+    def ssl_fetch_new_certificate
+      ssl_provider_class = self.ssl_provider_class
+
+      unless ssl_provider_class.is_a?(Class) and
+        ssl_provider_class.instance_methods.include?(:verify_and_request_certificate!)
+        return nil
       end
-     
-      # 
-      # Now check the signature.
-      #
-      # First see if we can verify it using our own private key, i.e. the
-      # certificate is self-signed.
-      #
-      if certificate.verify(key)
-        puts "\tUsing a self-signed certificate for #{self.name}." if $VERBOSE
 
-      #
-      # Otherwise see if we can verify it using the certificate store,
-      # including any bundle that has been uploaded.
-      #
-      elsif store.is_a?(OpenSSL::X509::Store) and store.verify(certificate)
-        puts "\tUsing certificate signed by #{certificate.issuer.to_s} for #{self.name}" if $VERBOSE
+      ssl_provider = ssl_provider_class.new(self)
+      ssl_provider.register unless ssl_provider.registered?
 
-      #
-      # If we can't verify -- raise an error if strict_checking is enabled
-      #
+      req = ssl_provider.verify_and_request_certificate!
+
+      return nil unless req.is_a?(OpenSSL::X509::Request)
+
+      ssl_provider.certificate
+
+      return ssl_provider
+    end
+
+    #
+    # Returns an array of set names in the set directory.
+    #
+    def ssl_possible_set_names
+      Dir.glob(File.join(self.config_dir, 'ssl', 'sets', '*')).
+        sort_by{|i| i.to_s.split(/(\d+)/).map{|e| [e.to_i, e]}}.
+        collect{|d| File.basename(d)}
+    end
+
+
+    def ssl_next_set_name
+      last_set_name = self.ssl_possible_set_names.last
+
+      if last_set_name.nil?
+        "0"
       else
-        msg =  "Certificate signature does not verify for #{self.name} -- maybe a bundle is missing?"
-        if strict_checking
-          raise OpenSSL::X509::CertificateError, msg
-        else
-          warn "\t#{msg}" if $VERBOSE
+        last_set_name.succ
+      end
+    end
+
+    #
+    # We expect the certificate, key, and bundle in a pattern like
+    # /srv/example.com/config/ssl/set/.
+    #
+    def ssl_current_set
+      current_dir = File.join(self.config_dir, "ssl", "current")
+      stat = nil
+
+      begin
+        stat = File.lstat(current_dir)
+      rescue Errno::ENOENT
+        #
+        # Unless the current set is defined, and pointing to "legacy", set it
+        # it legacy.
+        #
+        unless defined? @ssl_current_set and
+          @ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet) and
+          @ssl_current_set.name == "legacy"
+
+          @ssl_current_set = self.ssl_legacy_set
+        end
+
+        return @ssl_current_set
+      end
+
+      while stat.symlink? do
+        parent_dir  = File.dirname(current_dir)
+        current_dir = File.expand_path(File.readlink(current_dir), parent_dir)
+        begin
+          stat = File.lstat(current_dir)
+        rescue Errno::ENOENT
+          break
         end
       end
 
-      true
+      #
+      # Expire our cached version if the path has changed
+      #
+      if defined? @ssl_current_set and
+          @ssl_current_set.is_a?(Symbiosis::SSL::CertificateSet) and
+          @ssl_current_set.directory == current_dir
+
+        return @ssl_current_set
+      end
+
+      this_set = self.ssl_available_sets.find{|s| s.directory == current_dir}
+
+      if this_set.nil?
+        begin
+          this_set = Symbiosis::SSL::CertificateSet.new(self, current_dir)
+          this_set = nil unless this_set.verify
+         rescue Errno::ENOENT, Errno::ENODIR
+          # do nothing
+          this_set = nil
+        rescue StandardError => err
+          this_set = nil
+          warn "\t#{err.to_s} -- ignoring SSL set in #{current_dir} for #{self.name}" if $VERBOSE
+        end
+      end
+
+      this_set = self.ssl_legacy_set if this_set.nil?
+
+      if this_set.is_a?(Symbiosis::SSL::CertificateSet)
+        if this_set.certificate.issuer == this_set.certificate.subject
+          puts "\tCurrent SSL set #{this_set.name}: self-signed for #{this_set.certificate.issuer}, expires #{this_set.certificate.not_after}" if $VERBOSE
+        else
+          puts "\tCurrent SSL set #{this_set.name}: signed by #{this_set.certificate.issuer}, expires #{this_set.certificate.not_after}" if $VERBOSE
+        end
+      end
+
+      @ssl_current_set = this_set
+    end
+
+    def ssl_legacy_set
+      this_set = Symbiosis::SSL::CertificateSet.new(self, self.config_dir)
+
+      this_set = nil unless this_set.verify
+
+      this_set
+    end
+
+    #
+    # Returns the directory
+    #
+    def ssl_available_sets
+      @ssl_available_sets ||= []
+
+      return @ssl_available_sets unless @ssl_available_sets.empty?
+
+      valid_codes = [0]
+
+      #
+      # Allow self-signed certificates if our provider class is SelfSigned
+      #
+      valid_codes << 18 if Symbiosis::SSL::SelfSigned == self.ssl_provider_class
+
+      #
+      # Use the list of possible set names and go through each one.
+      #
+      self.ssl_possible_set_names.each do |name|
+        cert_dir = File.join(self.config_dir, 'ssl', 'sets', name)
+
+        begin
+          this_set = Symbiosis::SSL::CertificateSet.new(self, cert_dir)
+        rescue Errno::ENOENT, Errno::ENOTDIR
+          next
+        end
+
+        #
+        # If this certificate verifies, add it to our list.
+        #
+        next unless valid_codes.include?(this_set.verify)
+
+        @ssl_available_sets << this_set
+      end
+
+      return @ssl_available_sets.sort!{|a,b| a.certificate.not_after <=> b.certificate.not_after}
+    end
+
+    #
+    # This method symlinks /srv/example.com/config/ssl/current to the latest
+    # set of certificates discovered by #ssl_available_sets. This returns true
+    # if a rollover was performed, or false otherwise.
+    #
+    def ssl_rollover(to_set = nil)
+      current = self.ssl_current_set
+
+      if to_set.is_a?(Symbiosis::SSL::CertificateSet)
+        latest = to_set
+      else
+        @ssl_available_sets = []
+        latest = self.ssl_available_sets.last
+      end
+
+      if latest.nil? or !File.directory?(latest.directory)
+        warn "\tNo valid sets of certificates found." if $VERBOSE
+        return false
+      end
+
+      current_dir = File.join(self.config_dir, "ssl", "current")
+
+      begin
+        stat = File.lstat(current_dir)
+      rescue Errno::ENOENT
+        stat = nil
+      end
+
+      unless stat.nil? or stat.symlink?
+        warn "\t#{current_dir} is not a symlink.  Unwilling to roll over." if $VERBOSE
+        return false
+      end
+
+      if !stat.nil? and current and current.name == latest.name
+        return false
+      end
+
+      #
+      # To create a symlink with the correct uid/gid when running as root, we
+      # need to set our effective UID/GID.
+      #
+      Process.egid = self.gid if Process.gid == 0
+      Process.euid = self.uid if Process.uid == 0
+
+      File.unlink(current_dir) unless stat.nil?
+      File.symlink(latest.directory, current_dir)
+
+      #
+      # Restore privileges
+      #
+      Process.euid = 0 if Process.uid == 0 and Process.euid != Process.uid
+      Process.egid = 0 if Process.gid == 0 and Process.egid != Process.gid
+
+      #
+      # Update our latest
+      #
+      @ssl_current_set = latest
+      puts "\tRolled over to SSL set #{latest.name}" if $VERBOSE
+
+      return true
+    ensure
+      #
+      # Make sure we restore privs.
+      #
+      Process.euid = 0 if Process.uid == 0 and Process.euid != Process.uid
+      Process.egid = 0 if Process.gid == 0 and Process.egid != Process.gid
+    end
+
+    #
+    # This method does
+    #   * validation
+    #   * generation
+    #   * rollover
+    #
+    def ssl_magic(threshold = 14, do_generate = nil, do_rollover = nil, now = Time.now)
+
+      puts "* Examining certificates for #{self.name}" if $VERBOSE
+
+      #
+      # Stage 0: verify and check expiriy
+      #
+      current_set = self.ssl_current_set
+      latest_set = self.ssl_available_sets.last
+
+      current_set_expires_in = ((current_set.certificate.not_after - now)/86400.0).round if current_set.is_a?(Symbiosis::SSL::CertificateSet)
+      latest_set_expires_in  = ((latest_set.certificate.not_after - now)/86400.0).round  if latest_set.is_a?(Symbiosis::SSL::CertificateSet)
+
+      #
+      # This is the set we'll eventually roll over to.
+      #
+      rollover_set = nil
+
+      if current_set.is_a?(Symbiosis::SSL::CertificateSet) and !self.ssl_available_sets.include?(current_set)
+        puts "\tThe current set is no longer valid for this domain." if $VERBOSE
+        current_set = current_set_expires_in = nil
+      end
+
+      if current_set.is_a?(Symbiosis::SSL::CertificateSet)
+        #
+        # If our current set is not due to expire, do nothing.
+        #
+        # Otherwise  we should generate a new certificate if there is no other
+        # set with an expiry date further into the future.
+        #
+        if current_set_expires_in > threshold
+          do_generate = false if do_generate.nil?
+
+        else
+          puts "\tThe current certificate expires in #{current_set_expires_in} days." if $VERBOSE
+          do_generate = (!latest_set_expires_in or latest_set_expires_in <= current_set_expires_in) if do_generate.nil?
+
+        end
+
+
+      elsif latest_set.is_a?(Symbiosis::SSL::CertificateSet)
+
+        #
+        # We roll over to our latest set, unless we generate a new set, in
+        # which case this variable is changed to that one.
+        #
+        rollover_set = latest_set
+
+        #
+        # If there is no current certificate set, but there is another set
+        # avaialable, and it is not due to expire soon, then don't generate,
+        # but do roll over.
+        #
+        # Otherwise generate a new certificate.
+        #
+        if latest_set_expires_in > threshold
+          do_generate = false if do_generate.nil?
+          do_rollover = true  if do_rollover.nil?
+
+        else
+          puts "\tThe latest available certificate expires in #{latest_set_expires_in} days." if $VERBOSE
+          do_generate = true if do_generate.nil?
+
+        end
+
+      else
+        puts "\tNo valid certificate sets found." if $VERBOSE
+        do_generate = true  if do_generate.nil?
+
+      end
+
+      #
+      # If we generate a new set, always roll over to it, unless told
+      # otherwise.
+      #
+      do_rollover = do_generate if do_rollover.nil?
+
+      #
+      # Stage 1: Generate
+      #
+
+      if do_generate
+        #
+        # If ssl-provision has been disabled, move on.
+        #
+        if false == self.ssl_provider
+          puts "\tNot fetching new certificate as the ssl-provider has been set to 'false'" if $VERBOSE
+
+        elsif !self.ssl_provider_class.is_a?(Class) or !(self.ssl_provider_class <= Symbiosis::SSL::CertificateSet)
+          puts "\tNot fetching new certificate as the ssl-provider #{ssl_provider.inspect} cannot be found." if $VERBOSE
+
+        else
+          #
+          #
+          puts "\tFetching a new certificate from #{self.ssl_provider_class.to_s.split("::").last}." if $VERBOSE
+
+          rollover_set = self.ssl_fetch_new_certificate
+          raise RuntimeError, "Failed to fetch certificate" if rollover_set.nil?
+
+          rollover_set.name = self.ssl_next_set_name
+
+          retries = 0
+          begin
+            rollover_set.write
+          rescue Errno::ENOTDIR, Errno::EEXIST => err
+            rollover_set.name = rollover_set.name.succ
+            rollover_set.directory = rollover_set.name
+            retries += 1
+
+            #
+            # Retry if we've failed once already.
+            #
+            retry if retries <= 1
+
+            raise RuntimeError, "Failed to write set (#{err.to_s})"
+          end
+
+          puts "\tSuccessfully fetched new certificate and created set #{rollover_set.name}" if $VERBOSE
+
+          @ssl_available_sets << rollover_set
+        end
+      end
+
+      #
+      # Stage 2: Roll over
+      #
+      if do_rollover and rollover_set.is_a?(Symbiosis::SSL::CertificateSet)
+        return self.ssl_rollover(rollover_set)
+      else
+        return false
+      end
+
     end
 
   end

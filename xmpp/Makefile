@@ -1,13 +1,10 @@
 
+all: man/symbiosis-xmpp-configure.man
 
-nop:
-	@echo "Valid targets are (alphabetically) :"
-	@echo " "
-	@echo " clean     - Remove bogus files."
-	@echo " docs      - Create manpages for scripts in sbin."
-	@echo " "
+docs: all
 
-docs: man/symbiosis-xmpp-configure.man
+test:
+	@echo "I: no tests defined for this package"
 
 man/%.man: ./sbin/%
 	[ -d man ] || mkdir man
@@ -16,4 +13,4 @@ man/%.man: ./sbin/%
 clean:
 	$(RM) -r man
 
-.PHONY: clean nop 
+.PHONY: clean nop test docs

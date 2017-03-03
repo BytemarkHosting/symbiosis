@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+. $(dirname $0)/common
+
+echo -e "\n* CAPABILITY\n* LOGOUT" | socat EXEC:"socat-scripter",fdin=3,fdout=4 TCP:$IP:143 
+
+#
+# Test for SSLv3 -- Dovecot has to be recompiled to work
+#
+# if ( echo -e "\n* CAPABILITY\n* LOGOUT" | socat EXEC:"socat-scripter",fdin=3,fdout=4 OPENSSL:$IP:993,verify=0,method=sslv3 ) ; then 
+#  false
+# fi
+
+

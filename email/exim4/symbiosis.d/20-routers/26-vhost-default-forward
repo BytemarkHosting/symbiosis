@@ -9,8 +9,9 @@ vhost_default_forward:
   user  = ${extract{uid}{${stat:VHOST_DIR/$domain}}}
   group = ${extract{gid}{${stat:VHOST_DIR/$domain}}}
   # Set the router/transport home directory
-  router_home_directory    = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part
-  transport_home_directory = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part
+  router_home_directory = ${if exists{VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part}{VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part}{VHOST_DIR/$domain}}
+
+  transport_home_directory = ${if exists{VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part}{VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part}{VHOST_DIR/$domain}}
   directory_transport = address_directory
   file_transport      = address_file
   pipe_transport      = address_pipe

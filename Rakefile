@@ -8,8 +8,8 @@ require 'pp'
 DEBEMAIL = ENV["DEBEMAIL"] || "symbiosis@bytemark.co.uk"
 DEB_BUILD_ARCH = ENV["BUILD_ARCH"] || `dpkg-architecture -qDEB_BUILD_ARCH`.chomp
 DISTRO   = (ENV["DISTRO"]   || "debian").downcase
-RELEASE  = (ENV["RELEASE"]  || "testing").downcase
-CODENAME  = (ENV["CODENAME"]  || "stretch").downcase
+RELEASE  = (ENV["RELEASE"]  || "stable").downcase
+CODENAME  = (ENV["CODENAME"]  || "jessie").downcase
 REPONAME = (ENV["REPONAME"] || "symbiosis").downcase
 PARALLEL_BUILD = ENV.has_key?("PARALLEL_BUILD")
 
@@ -461,7 +461,16 @@ namespace :pkg do
         # Now call sautobuild and debsign
         #
         if has_sautobuild?
-          sh "/usr/bin/sautobuild --no-repo --dist=#{DISTRO}_#{RELEASE} #{pkg[:dir]}"
+          extra_opts = []
+          if File.exists?("#{pkg[:source]}-sources.list")
+            extra_opts << "--sources-list=#{pkg[:source]}-sources.list"
+          end
+
+          if File.exists?("#{pkg[:source]}-sources.key")
+            extra_opts << "--apt-key=#{pkg[:source]}-sources.key"
+          end
+
+          sh "/usr/bin/sautobuild #{extra_opts.join(" ")} --no-repo --dist=#{DISTRO}_#{RELEASE} #{pkg[:dir]}"
         else
           sh "cd #{pkg[:dir]} && debuild -us -uc -sa"
         end

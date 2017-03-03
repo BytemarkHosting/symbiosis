@@ -254,7 +254,7 @@ blacklist.generate.each do |ip, ports|
   #
   # Check filename without .auto first.
   #
-  if Symbiosis::Utils.get_param(setting, blacklist_d) == false
+  if !Symbiosis::Utils.get_param(setting, blacklist_d)
     #
     # Automatically blacklist.
     #

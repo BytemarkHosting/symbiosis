@@ -1,0 +1,15 @@
+#
+# Squeeze
+#
+deb     http://mirror.bytemark.co.uk/debian/     jessie main contrib non-free
+
+#
+# Security updates
+#
+deb     http://security.debian.org/ jessie/updates  main contrib non-free
+
+#
+# Backports
+#
+deb     http://mirror.bytemark.co.uk/debian/     jessie-backports main contrib non-free
+

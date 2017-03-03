@@ -215,7 +215,7 @@ module Symbiosis
         #
         # If no real_quota_definition was found, set it to an empty string.
         #
-        real_quota_definition = "" if false == real_quota_definition
+        real_quota_definition = "" unless real_quota_definition.is_a?(String)
 
         real_quota_definition.split(",").each do |qpart|
           case qpart

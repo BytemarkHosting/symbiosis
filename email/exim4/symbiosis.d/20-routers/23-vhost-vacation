@@ -16,6 +16,9 @@ vhost_vacation:
   # This line is used to match normal bulk mail senders &c.
   senders = "!^server@.*:^daemon@.*:^root@.*:^listserv@.*:^majordomo@.*:\
              !^.*-request@.*:!^owner-[^@]+@.*:!^mailer-daemon@.*"
+  # Set the home directory for any routers/transports.
+  router_home_directory    = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part
+  transport_home_directory = VHOST_DIR/$domain/VHOST_MAILBOX_DIR/$local_part
   user  = ${extract{uid}{${stat:VHOST_DIR/$domain}}}
   group = ${extract{gid}{${stat:VHOST_DIR/$domain}}}
   transport = vhost_vacation

@@ -11,10 +11,18 @@ docs: man/symbiosis-httpd-configure.man  man/symbiosis-httpd-logger.man man/symb
 
 test:
 	$(MAKE) -C vhost-alias test
+	[ -z "`which ruby2.1`" ] ||  ruby2.1 -I ../common/lib -I lib/  test.d/t*.rb
 
-man/%.man: ./sbin/%
+.PHONY: test clean all docs
+ 
+man/%.txt: ./sbin/%
 	[ -d man ] || mkdir man
-	RUBYLIB=./lib:../common/lib $<  --manual | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
+	RUBYLIB=./lib:../common/lib $<  --manual > $@
+	test -s $@
+
+man/%.man: man/%.txt
+	sed -e 's/^=\+$$//' $< | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
+	test -s $@
 
 clean:
 	cd vhost-alias && make clean

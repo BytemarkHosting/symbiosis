@@ -1,7 +1,7 @@
 symbiosis-api-doc (2015:0618) stable; urgency=medium
 
   * Updated maintainers + uploaders.
-  * Updated debian standards 
+  * Updated debian standards. 
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 10:44:22 +0100
 

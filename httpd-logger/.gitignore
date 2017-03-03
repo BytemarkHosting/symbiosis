@@ -1,0 +1,5 @@
+debian/files
+debian/tmp
+debian/symbiosis-httpd-logger
+debian/debhelper-build-stamp
+obj-x86_64-linux-gnu/

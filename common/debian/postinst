@@ -65,7 +65,7 @@ fi
 #
 #  If there are no existing directories beneath /srv/ create a default.
 #
-if [ -n "$HOSTNAME" -a "$(find /srv -maxdepth 1 -mindepth 1 -type d | wc -l)" = "0" ] ; then
+if [ ! -e "/srv/$HOSTNAME" ] ; then
   #
   # Create the standard directories
   #
@@ -76,18 +76,57 @@ if [ -n "$HOSTNAME" -a "$(find /srv -maxdepth 1 -mindepth 1 -type d | wc -l)" = 
   chown -R admin:admin /srv/$HOSTNAME
 fi
 
-if [ -e /etc/ssl/ssl.crt ] && [ -e /etc/ssl/ssl.key ] ; then
+#
+# We'd like to generate a certificate for the hostname.  Naturally this will go in /srv/$HOSTNAME
+#
+if [ -d "/srv/$HOSTNAME/config" ] ; then
   #
-  # Make sure the certificate is at least as recent as the key, to avoid
-  # overwriting it.
+  # Generate certificates for this host
   #
-  touch -r /etc/ssl/ssl.key /etc/ssl/ssl.crt
+  if ! ( symbiosis-ssl --verbose $HOSTNAME ) ; then
+    echo "W: SSL certificate generation failed. Retrying with a self-signed certificate..."
+    echo selfsigned > /srv/$HOSTNAME/config/ssl-provider
+    symbiosis-ssl --verbose $HOSTNAME || true
+  fi
 fi
 
 #
-# Generate SSL certificates.
+# Not interested in linking from /etc/$HOSTNAME/config/ssl.*
 #
-cd /etc/ssl && make check || true
+ssl_current_dir="/srv/$HOSTNAME/config/ssl/current"
+
+#
+# If there are no cerificates in /etc/ssl, symlink those from this directory.
+# This is race-tastic.
+#
+if [ ! -e "/etc/ssl/ssl.key" ] &&
+    [ ! -e "/etc/ssl/ssl.crt" ] &&
+    [ ! -e "/etc/ssl/ssl.combined" ] &&
+    ( symbiosis-ssl --no-generate --no-rollover $HOSTNAME ) &&
+    [ -e "$ssl_current_dir/ssl.key" ] && 
+    [ -e "$ssl_current_dir/ssl.crt" ] && 
+    [ -e "$ssl_current_dir/ssl.combined" ] ; then
+
+  echo "I: Symlinking SSL certificate and key from $ssl_current_dir to /etc/ssl"
+  ln -s "$ssl_current_dir"/ssl.{key,crt,combined} /etc/ssl/
+
+  #
+  # Move existing bundle out of the way.
+  #
+  if [ -e /etc/ssl/ssl.bundle ] ; then
+    echo "W: Moving old SSL bundle to /etc/ssl/ssl.bundle.$$"
+    mv /etc/ssl/ssl.bundle /etc/ssl/ssl.bundle.$$        # ugh
+  fi
+
+  #
+  # Link any new bundle in again.
+  #
+  if [ -e "$ssl_current_dir/ssl.bundle" ] ; then
+    echo "I: Symlinking SSL bundle from $ssl_current_dir to /etc/ssl"
+    ln -s "$ssl_current_dir/ssl.bundle" /etc/ssl/ssl.bundle
+  fi
+
+fi
 
 #DEBHELPER#
 

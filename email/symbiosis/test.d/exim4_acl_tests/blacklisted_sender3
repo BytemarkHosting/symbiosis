@@ -1,0 +1,17 @@
+# This file tests a mail from a blacklisted sub-domain 
+192.168.0.1
+220
+EHLO remote.domain
+250
+MAIL FROM:<evil@any.blacklisted.domain>
+250 
+# Always accept mail to the postmaster
+RCPT TO:<postmaster@local.domain>
+250
+# We don't want to accept mail from this IP
+RCPT TO:<local.user@local.domain>
+550 Your email address or domain is locally blacklisted.
+RSET
+250
+QUIT
+221

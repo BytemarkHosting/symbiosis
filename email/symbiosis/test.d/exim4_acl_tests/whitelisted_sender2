@@ -1,0 +1,18 @@
+# This file tests we accept mail from specifically whitelisted senders 
+192.168.0.1
+220
+EHLO remote.domain
+250
+# This email should be allowed through
+MAIL FROM:<notevil@any.blacklisted.domain>
+250 
+# Always accept mail to the postmaster
+RCPT TO:<postmaster@local.domain>
+250
+# We don't want to accept mail from this IP
+RCPT TO:<local.user@local.domain>
+250
+RSET
+250
+QUIT
+221

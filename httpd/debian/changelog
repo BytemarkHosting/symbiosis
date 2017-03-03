@@ -1,3 +1,49 @@
+symbiosis-httpd (2015:1112) stable; urgency=medium
+
+  * Udated HTTP cipher lists.
+  * Fix HSTS config to make HSTS work by default
+  * Supply sync parameter when opening default apache log file.
+  * Split manpage generation into two stages.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 21 Nov 2016 13:49:38 +0000
+
+symbiosis-httpd (2015:1111) stable; urgency=low
+
+  * Fixed a bug in the SSL Apache template, to make sure HTTP redirections go
+    to the domain in the Host: header, if specified.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 09 Aug 2016 12:37:02 +0100
+
+symbiosis-httpd (2015:1110) stable; urgency=medium
+
+  * Fixed output in symbiosis-httpd-configure to correctly report pre-enabled
+    sites correctly.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 24 May 2016 10:25:37 +0100
+
+symbiosis-httpd (2015:1109) stable; urgency=medium
+
+  * Updated symbiosis-httpd-configure to allow single domains to be managed
+    from the command line.  This permits domains or configs to be re-enabled
+    manually.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 16 May 2016 12:10:55 +0100
+
+symbiosis-httpd (2015:1108) stable; urgency=medium
+
+  * When ssl-only is set, the SSL template should redirect to the HTTP Host
+    given in the request, instead of assuming that the request should go to
+    the "bare" domain.  Closes #12383.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 05 Feb 2016 12:55:02 +0000
+
+symbiosis-httpd (2015:1107) stable; urgency=medium
+
+  * Updated zz-mass-hosting templates to have a wildcard alias in order to
+    work when sharing the IP with other name-based virtual hosts.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 17 Dec 2015 16:23:13 +0000
+
 symbiosis-httpd (2015:1106) stable; urgency=medium
 
   * Added no-effort SNI support for domains running on the primary IP address,

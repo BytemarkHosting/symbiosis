@@ -69,7 +69,7 @@ if ( !array_key_exists('force_https', $config) ) {
 
 }
 
-if ( !array_key_exists(['login_lc'], $config) ) {
+if ( !array_key_exists('login_lc', $config) ) {
   /*
    * Forces conversion of logins to lower case.
    */ 

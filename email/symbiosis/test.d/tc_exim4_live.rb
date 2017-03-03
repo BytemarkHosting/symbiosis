@@ -10,6 +10,9 @@ class TestEximLive < Test::Unit::TestCase
     @domain = Symbiosis::Domain.new()
     @domain.create
 
+    # Make sure the FQDN is created too.
+    Symbiosis::Domain.new(Symbiosis::Host.fqdn)
+
     @mailbox = @domain.create_mailbox("test")
     @mailbox.encrypt_password = false
     @mailbox_password = Symbiosis::Utils.random_string
@@ -21,7 +24,6 @@ class TestEximLive < Test::Unit::TestCase
 
     @ssl_ctx = OpenSSL::SSL::SSLContext.new("TLSv1_client")
     @ssl_ctx.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
   end
 
   def teardown
@@ -50,11 +52,7 @@ class TestEximLive < Test::Unit::TestCase
   end
 
   def fetch_hostname
-    if File.exist?('/proc/sys/kernel/hostname')
-      File.read('/proc/sys/kernel/hostname').chomp
-    else
-      "localhost"
-    end
+    Symbiosis::Host.fqdn
   end
 
   def test_smtp_capabilities

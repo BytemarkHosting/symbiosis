@@ -4,7 +4,7 @@ symbiosis-phpmyadmin (2015:0618) stable; urgency=medium
   * Tidied apache config for jessie
   * Fixed variable shadowing in tests.
   * Make sure no proxy is used in tests.
-  * Updated maintainer + uploaders. 
+  * Updated maintainer + uploaders.  
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 11:09:24 +0100
 

@@ -9,7 +9,7 @@ XS-Ruby-Versions: all
 
 Package: symbiosis-firewall
 Architecture: any
-Depends: iptables, ruby, symbiosis-common (>= 2014:0113), libruby, ruby-sqlite3, incron, ${shlibs:Depends}, ${misc:Depends}
+Depends: iptables, ruby, symbiosis-common (>= 2015:1210), libruby, ruby-sqlite3, incron, ${shlibs:Depends}, ${misc:Depends}
 Replaces: bytemark-vhost-firewall, symbiosis-test, symbiosis-monit (<< 2011:1206)
 Breaks: symbiosis-monit (<< 2011:1206)
 Provides: bytemark-vhost-firewall

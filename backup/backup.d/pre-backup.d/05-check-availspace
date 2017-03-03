@@ -3,65 +3,82 @@
 #Relies upon libfilesys-df-perl
 
 use strict;
-my $has_filesysdf  = eval "use Filesys::Df; 1;";
+my $has_filesysdf = eval "use Filesys::Df; 1;";
 use Switch;
 
 my $rv = 1;
 
 print "=> Checking there is enough free space for a backup...\n\n";
 
-unless ($has_filesysdf)
-{
-        print "!! Perl module Filesys::Df is not installed, exiting and so not completing backup\n\n";
-        $rv = 1;
+unless ($has_filesysdf) {
+    print "!! Perl module Filesys::Df is not installed, exiting and so not completing backup\n\n";
+    exit 0;
 }
-else
+
+#
+# If an argument is given, then this is the backup2l config to test.
+#
+my $conf = shift @ARGV;
+$conf = "/etc/backup2l.conf" unless ($conf);
+
+my $dir;
+
+open my $fh, '<', $conf or die "!! Unable to open file $conf: $!\n\n";
+
+while (<$fh>) {
+    next unless ( $_ =~ /^BACKUP_DIR=["']?([^"']+)["']?\s*$/ );
+
+    $dir = $1;
+    last;
+}
+
+close $fh;
+
+my $ref          = df($dir);
+my $divis        = 0;
+my $gb_available = $ref->{bavail} / 1e6;
+
+printf "*  Free space on %s: %8.1f GB\n", $dir, $gb_available;
+
+my $est_output = `backup2l --estimate --conf $conf 2> /dev/null`;
+
+unless ( ${^CHILD_ERROR_NATIVE} == 0 ) {
+    print "!! backup2l estimate failed: command exitied with status $?";
+    exit 0;
+}
+
+unless ( $est_output =~
+    /\/ (?<int>[0-9]*\.?[0-9]+)(?<suff>[ KMGT]B) \(uncompressed\)$/m )
 {
-        open my $fh, '<', '/etc/backup2l.conf' or die "Unable to open file: $!\n";
-        my %hash = map { split /=|\s+/; } <$fh>;
-        close $fh;
-        while (my ($key, $val) = each %hash)
-        {
-                if($key eq "BACKUP_DIR")
-                {
-                        $val =~ s/"//g;
+    print "!! Failed to parse backup2l output\n\n";
+    exit 0;
+}
 
-                        my $ref = df($val);
-                        my $divis = 0;
-                        my $gb_available =  $ref->{bavail} / 1e6;
+if ( $+{int} eq "0" && $+{suff} eq " B" ) {
+    print "!! The backup estimate is 0 bytes which cannot be correct.\n\n";
+    exit 0;
+}
 
-                        printf "*  Free space on %s: %8.1f GB\n", $val, $gb_available;
+switch ( $+{suff} ) {
+    case " B" { $divis = 1e-9; }
+    case "KB" { $divis = 1e-6; }
+    case "MB" { $divis = 1e-3; }
+    case "GB" { $divis = 1; }
+    case "TB" { $divis = 1e3; }
+    else      { $divis = 1; }
+}
 
-                        my $est_output = `backup2l --estimate --conf /etc/symbiosis/backup.d/backup2l.conf 2> /dev/null`;
-                        $est_output =~ /^\s*[0-9].*\/ ([0-9A-Z.]+) \(uncompressed\)$/m;
-                        my $estimate = $1;
-                        $estimate =~ /(?<int>[-+]?[0-9]*\.?[0-9]+)(?<suff>[A-Z]+)/;
+my $value_in_gb = $+{int} * $divis;
 
-                        switch($+{suff})
-                        {
-                                case "B"        {  $divis = 1e-9; }
-                                case "KB"       {  $divis = 1e-6; }
-                                case "MB"       {  $divis = 1e-3; }
-                                case "GB"       {  $divis = 1; }
-                                case "TB"       {  $divis = 1e3; }
-                                else            {  $divis = 1;}
-                        }
-                        my $value_in_gb = $+{int} * $divis;
+printf "*  Estimated backup size:                %8.1f GB\n\n", $value_in_gb;
 
-                        printf "*  Estimated backup size:                %8.1f GB\n\n", $value_in_gb;
-
-                        if($gb_available < $value_in_gb)
-                        {
-                                printf "!! There is not enough space to take a backup.  Aborting!\n\n";
-                                $rv = 1;
-                        }
-                        else
-                        {
-                                printf "=> There is enough space to take a backup.\n\n";
-                                $rv = 0;
-                        }
-                }
-        }
+if ( $gb_available < $value_in_gb ) {
+    printf "!! There is not enough space to take a backup.  Aborting!\n\n";
+    $rv = 1;
+}
+else {
+    printf "=> There is enough space to take a backup.\n\n";
+    $rv = 0;
 }
 
 exit $rv;

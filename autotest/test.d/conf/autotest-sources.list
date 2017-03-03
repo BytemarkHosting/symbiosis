@@ -1,0 +1,7 @@
+deb http://repo.bytemark.co.uk/open-source/netlinkrb/master/latest/stretch/ ./
+deb http://repo.bytemark.co.uk/open-source/prosody-modules/master/latest/stretch/ ./
+deb http://repo.bytemark.co.uk/open-source/ruby-cracklib/master/latest/stretch/ ./
+deb http://repo.bytemark.co.uk/open-source/bytemark-keys/master/latest/stretch/ ./
+deb http://repo.bytemark.co.uk/open-source/squirrelmail-change-pass/master/latest/stretch/ ./
+deb http://repo.bytemark.co.uk/open-source/ruby-acme-client/master/latest/stretch/ ./
+

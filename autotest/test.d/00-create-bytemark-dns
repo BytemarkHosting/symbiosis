@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Creating /root/BytemarkDNS"
+
+mkdir -p /root/BytemarkDNS

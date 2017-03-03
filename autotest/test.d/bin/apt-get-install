@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+
+set -e
+set -x
+
+#
+#  The sources list we update from.
+#
+SOURCES="$1"
+PACKAGES="$2"
+ACTION=install
+
+#
+#  The options to use by default.
+#
+OPTIONS="-o APT::Get::AllowUnauthenticated=true -o DPkg::Options::=--force-confdef -o DPkg::Options::=--force-confnew"
+
+#
+# Copy sources in place.
+#
+if [ -n "$SOURCES" ] ; then
+  mkdir -p $VERBOSE /etc/apt/sources.list.d
+  cp $VERBOSE $SOURCES /etc/apt/sources.list.d/
+  OPTIONS=${OPTIONS/confnew/confold}
+fi
+
+if [ -z "$PACKAGES" ] ; then
+  ACTION=dist-upgrade
+elif [ ! -f "$PACKAGES" ] ; then
+  echo "E: package list $PACKAGES missing"
+  exit 1
+fi
+
+#
+#  Sanity check that we're on a Debian/Ubuntu host.
+#
+if [ ! -x /usr/bin/apt-get ] ; then
+    echo "/usr/bin/apt-get missing or non-executable."
+    exit 1
+fi
+
+#
+#  Minimise debconf front-end
+#
+DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND
+
+
+#
+#  Update our sources list first.
+#
+apt-get $OPTIONS update 
+
+#
+#  Now simulate a dist-upgrade so that we can see if we need to do anything
+#
+echo /usr/bin/apt-get $OPTIONS $ACTION --yes --force-yes
+if [ "$ACTION" = "install" ] ; then
+  /usr/bin/apt-get $OPTIONS install --yes --force-yes $(< $PACKAGES)
+else
+  /usr/bin/apt-get $OPTIONS $ACTION --yes --force-yes
+fi
+

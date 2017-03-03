@@ -1,6 +1,6 @@
 symbiosis-mysql (2015:1009) stable; urgency=medium
 
-  * Fixed up innodb file per table config setting.
+  * Fixed up innodb file per table config setting. 
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Oct 2015 17:21:28 +0100
 

@@ -1,3 +1,51 @@
+symbiosis-email (2015:1215) stable; urgency=medium
+
+  * Allow underscores in DKIM selectors.
+  * Allow wildcard whitelisting/blacklistng.
+  * Added further black/whitelist tests for bad domains. 
+  * Fixed a bug where blacklsted hostnames were not getting checked.
+  * Updated cipher lists.
+  * Fix typo ensuring tagged spam does get moved to Spam folder.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 22 Nov 2016 12:16:24 +0000
+
+symbiosis-email (2015:1214) stable; urgency=low
+
+  * Bug fix in the Exim4 vhost-default-forward router. Should check if these
+    home directories exist before setting them.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 09 Aug 2016 12:39:11 +0100
+
+symbiosis-email (2015:1213) stable; urgency=medium
+
+  * Fixed incompatibility with updated exim4 (#12673).
+
+ -- James Carter <jcarter@bytemark.co.uk>  Thu, 17 Mar 2016 13:37:26 +0000
+
+symbiosis-email (2015:1212) stable; urgency=medium
+
+  * Fixed symbiosis-email-encrypt-passwords not to have $VERBOSE flag set
+    permanently.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 03 Feb 2016 13:40:49 +0000
+
+symbiosis-email (2015:1211) stable; urgency=medium
+
+  * Removed useless test files from /etc/symbiosis/test.d/exim4_acl_tests.
+  * Home direcotory now set for the vhost_vacation router in Exim.
+  * Updated usage of get_param to match new spec in symbiosis-common.
+  * Exim was using the whole hostname instead of the first component in as the
+    DKIM selector, which differed from how symbiosis-dns was doing things.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 14 Jan 2016 16:46:05 +0000
+
+symbiosis-email (2015:1118) stable; urgency=medium
+
+  * Updated the interface expansion in the remote_smtp transports to work.  It
+    turns out $value gets reset outside the ${extract } expansion.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 18 Nov 2015 14:30:10 +0000
+
 symbiosis-email (2015:1104) stable; urgency=medium
 
   * Changed SSL certificate and key paths in Exim4 and Dovecot to use

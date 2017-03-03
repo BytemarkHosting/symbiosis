@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+. $(dirname $0)/common
+
+curl -s -I -H "Host: $HOSTNAME" http://$IP/bytemark/
+curl -s -k -I -H "Host: $HOSTNAME" https://$IP/bytemark/
+
+#
+# Test for SSLv3
+#
+if ( curl -3 -s -k -I -H "Host: $HOSTNAME" https://$IP/bytemark/ ) ; then
+  false
+fi
+
+

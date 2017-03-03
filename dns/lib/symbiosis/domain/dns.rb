@@ -25,8 +25,10 @@ module Symbiosis
       spf = "v=spf1 +a +mx ?all" if spf === true
 
       if spf.is_a?(String)
-       # Encode just the first line 
-       tinydns_encode(spf.split($/).first)
+        # We encode just the first line, and remove any whitespace from the ends.
+        line = spf.split($/).first.strip
+
+        tinydns_encode(line)
       else
         nil
       end
@@ -75,39 +77,22 @@ module Symbiosis
     def dmarc_record
       raw_dmarc = get_param("dmarc", self.config_dir)
 
-      unless raw_dmarc
-        return nil
-      end
+      return nil unless raw_dmarc
 
-      if raw_dmarc.is_a?(String) and raw_dmarc =~ /^v=DMARC\d;(\w+=[^;]+;)+/
-        # Take this as a raw record
-        return raw_dmarc.split($/).first
-      end
+      return 'v=DMARC1; p=quarantine; sp=none' if true == raw_dmarc
 
-      has_antispam = get_param("antispam", self.config_dir)
-
-      dmarc_hash = {
-        "v" => "DMARC1",
-        "p" => "quarantine",
-        "adkim" => (self.has_dkim? ? "s" : nil),
-        "aspf" => (self.has_spf? ? "s" : nil),
-        "sp" => "none",
-        "pct" => (has_antispam ? "100"  : nil)
-      }.reject{|k,v| v.nil?}
-
-      # 
-      # raw_dmarc = raw_dmarc.to_s.split($/)
       #
-      # raw_dmarc.each do |line|
-      #   if /\b([A-Za-z0-9]+)\s*=\s*(\w+);?/
-      #       dmarc_hash[$1.downcase] = $2
-      #   end
-      # end
+      # Make sure we're not matching against things other than strings.
+      #
+      return nil unless raw_dmarc.is_a?(String)
 
-      dmarc = ["v="+dmarc_hash.delete("v")]
-      dmarc += dmarc_hash.sort.collect{|k,v| "#{k}=#{v}"}
+      if raw_dmarc =~ /^(v=DMARC\d(;\s+\S+=[^;]+)+)/
+        # Take this as a raw record
+        return tinydns_encode($1)
+      end
 
-      return tinydns_encode(dmarc.join(";"))
+      puts "\tThe DMARC record looks wrong: #{raw_dmarc.inspect}" if $VERBOSE
+      return nil
     end
 
     private
@@ -123,7 +108,7 @@ module Symbiosis
 
     #
     # Decodes a given string from a format suitable for consupmtion by TinyDNS
-    # 
+    #
     def tinydns_decode(s)
       s.gsub(/(?:\\([0-7]{3,3})|.)/){|r| $1 ? [$1.oct].pack("c*") : r}
     end
@@ -132,4 +117,3 @@ module Symbiosis
   end
 
 end
-

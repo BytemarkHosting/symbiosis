@@ -11,6 +11,9 @@ class TestDovecot < Test::Unit::TestCase
     @domain = Symbiosis::Domain.new()
     @domain.create
 
+    # Make sure the local FQDN is created for tests
+    Symbiosis::Domain.new(Symbiosis::Host.fqdn).create
+
     @mailbox = @domain.create_mailbox("test")
     @mailbox.encrypt_password = false
     @mailbox_password = Symbiosis::Utils.random_string
@@ -38,11 +41,7 @@ class TestDovecot < Test::Unit::TestCase
   end
 
   def fetch_hostname
-    if File.exist?('/proc/sys/kernel/hostname')
-      File.read('/proc/sys/kernel/hostname').chomp
-    else
-      "localhost"
-    end
+    Symbiosis::Host.fqdn
   end
 
   def do_skip(msg)

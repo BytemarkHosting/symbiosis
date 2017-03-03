@@ -1,6 +1,19 @@
+symbiosis-dns (2015:1011) stable; urgency=medium
+
+  * Avoid generating invalid SPF records by stripping any potential
+   newline characters prior to generating them.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 21 Jan 2016 10:04:49 +0000
+
+symbiosis-dns (2015:1010) stable; urgency=medium
+
+  * Fixed up DMARC record generation to produce valid records.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 14 Jan 2016 16:44:59 +0000
+
 symbiosis-dns (2015:1009) stable; urgency=medium
 
-  * symbiosis-dns-generate, avoid corrupting DNS data when out of disc space. 
+  * symbiosis-dns-generate, avoid corrupting DNS data when out of disc space.
   * Fixed "filtering" percent on DMARC record to reflect antispam flag.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 12 Oct 2015 16:25:13 +0100
@@ -18,7 +31,7 @@ symbiosis-dns (2015:0618) stable; urgency=medium
   * Custom TTLs can now be set using a value in config/ttl
   * Added DMARC support via config/dmarc
   * Deprecated bytemark_antispam flag
-  * Fix the SPF record so it doesn't include CR/LF. 
+  * Fix the SPF record so it doesn't include CR/LF.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 17 Jun 2015 10:38:10 +0100
 

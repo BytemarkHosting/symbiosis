@@ -19,7 +19,7 @@ module Symbiosis
     #
     # This is a regular expression that matches valid domain names.
     #
-    NAME_REGEXP = /^[a-z0-9-]+\.([a-z0-9-]+\.?)+$/i
+    NAME_REGEXP = /^[_a-z0-9-]+\.([_a-z0-9-]+\.?)+$/i
 
     #
     # This regular expression matches crypted passwords, putting the word
@@ -38,6 +38,14 @@ module Symbiosis
       prefix, name = File.split(directory)
 
       self.new(name, prefix)
+    end
+
+    #
+    # Tests to see if a domain name is valid.  The FQDN is always valid, no
+    # matter what it is.
+    #
+    def self.is_valid_name?(name)
+      name =~ NAME_REGEXP or (Symbiosis::Host.fqdn == name)
     end
 
     #
@@ -63,7 +71,7 @@ module Symbiosis
       #
       # Make sure the name is a valid domain name.
       #
-      unless @name =~ NAME_REGEXP
+      unless self.class.is_valid_name?(@name)
         raise ArgumentError, "Bad name '#{@name.inspect}'"
       end
 

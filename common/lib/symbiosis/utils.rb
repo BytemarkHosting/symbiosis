@@ -16,7 +16,7 @@ module Symbiosis
     # This method will show the manual to the caller.
     #
     def show_manual( filename )
-      show_help_or_usage( filename, false )
+      show_help_or_manual( filename, false )
     end
 
     #
@@ -25,15 +25,16 @@ module Symbiosis
     #
     # This method will show brief usage-information to the caller.
     #
-    def show_usage( filename )
-      show_help_or_usage( filename, true )
+    def show_help( filename )
+      show_help_or_manual( filename, true )
     end
 
+    alias :show_usage :show_help
 
     #
     #  Show either the manual, or the brief usage text.
     #
-    def show_help_or_usage( filename, help )
+    def show_help_or_manual( filename, help )
 
       #
       # Open the file, stripping the shebang line
@@ -173,10 +174,10 @@ module Symbiosis
     #
     # Allow arbitrary parameters in parent_dir to be retrieved.
     #
-    # * false is returned if the file does not exist, or is not readable
-    # * true is returned if the file exists, but is of zero length
+    # * nil is returned if the file does not exist, or is not readable
+    # * true is returned if the file exists, but is of zero length, or if the file contains the word "yes" or "true"
+    # * false is returned if the file contains the word "false" or "no"
     # * otherwise the files contents are returned as a string.
-    #
     #
     def get_param(setting, parent_dir, opts = {})
       fn = File.join(parent_dir, setting)
@@ -184,7 +185,7 @@ module Symbiosis
       #
       # Return false unless we can read the file
       #
-      return false unless File.exist?(fn) and File.readable?(fn)
+      return nil unless File.exist?(fn) and File.readable?(fn)
 
       #
       # Read the file.
@@ -192,14 +193,35 @@ module Symbiosis
       contents = safe_open(fn, File::RDONLY, opts){|fh| fh.read}.to_s
       
       #
-      # Return true if the file was empty
+      # Return true if the file was empty, or the contents are "true" or "yes"
       #
-      return true if contents.empty?
+      return true if contents.empty? or contents =~ /\A\s*(true|yes)\s*\Z/i
+
+      #
+      # Return false if the file is set to "false" or "no"
+      #
+      return false if contents =~ /\A\s*(false|no)\s*\Z/i
 
       #
       # Otherwise return the contents
       #
       return contents
+    end
+
+    #
+    # This returns the first setting of a parameter in a stack of directories.
+    #
+    # Returns the first non-
+    #
+    def get_param_with_dir_stack(setting, dir_stack, opts = {})
+      var = nil
+
+      [dir_stack].flatten.each do |dir|
+        var = get_param(setting, dir, opts)
+        break unless var.nil?
+      end
+
+      var
     end
 
     #
@@ -483,7 +505,7 @@ module Symbiosis
       raise Errno::ENOLCK, "Unable to release lock -- #{err.to_s}"
     end
 
-    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock, :show_usage, :show_manual, :show_help_or_usage
+    module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock, :show_help, :show_usage, :show_manual, :show_help_or_manual
 
   end
 

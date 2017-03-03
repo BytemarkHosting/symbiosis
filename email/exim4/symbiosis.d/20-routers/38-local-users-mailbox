@@ -7,7 +7,7 @@ local_users_mailbox:
   local_parts = ! root : ! admin
   local_part_suffix = +*
   local_part_suffix_optional
-  data  = ${home}/Maildir/${if eq{$h_X-Spam-Status:}{Spam}{.Spam/}{}}
+  data  = ${home}/Maildir/${if eqi{$h_X-Spam-Status:}{spam}{.Spam/}{}}
   # Set permissions for any actions we might take
   user  = ${local_user_uid}
   group = ${local_user_gid}

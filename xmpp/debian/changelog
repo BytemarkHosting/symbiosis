@@ -1,3 +1,24 @@
+symbiosis-xmpp (2015:1024) stable; urgency=medium
+
+  * Updated cipher lists.
+  * Fixed template name in comment in template.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 21 Nov 2016 13:50:51 +0000
+
+symbiosis-xmpp (2015:1023) stable; urgency=medium
+
+  * XMPP configuration generated a line consisting of just a semi-colon when
+    no SSL certificates were available for a domain.  This has been fixed
+    (closes #12473).
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 03 Feb 2016 13:38:13 +0000
+
+symbiosis-xmpp (2015:1022) stable; urgency=medium
+
+  * Updated to work with new version of symbiosis-common.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 14 Jan 2016 16:44:04 +0000
+
 symbiosis-xmpp (2015:1021) stable; urgency=medium
 
   * Fixed bugs in configuration (missing semicolons).

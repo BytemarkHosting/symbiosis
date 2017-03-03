@@ -1,7 +1,7 @@
 symbiosis-cron (2015:1103) stable; urgency=medium
 
   * Now follows cron specs accurately when both month day and weekday fields
-    are specifically set, combining them with "or" rather than "and".
+    are specifically set, combining them with "or" rather than "and". 
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 03 Nov 2015 12:53:11 +0000
 
