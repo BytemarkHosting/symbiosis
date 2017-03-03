@@ -55,6 +55,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def teardown
     WebMock.allow_net_connect!
+    WebMock.reset!
     unless $DEBUG
       @domain.destroy  if @domain.is_a?( Symbiosis::Domain)
       FileUtils.rm_rf(@prefix) if @prefix and File.directory?(@prefix)
