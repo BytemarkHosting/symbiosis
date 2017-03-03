@@ -7,9 +7,3 @@ deb     http://mirror.bytemark.co.uk/debian/     strech main contrib non-free
 # Security updates
 #
 deb     http://security.debian.org/ strech/updates  main contrib non-free
-
-#
-# Backports
-#
-deb     http://mirror.bytemark.co.uk/debian/     strech-backports main contrib non-free
-

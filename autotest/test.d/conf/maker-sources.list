@@ -6,5 +6,5 @@ deb http://maker2.bytemark.co.uk/archives/squirrelmail-change-pass/stretch/lates
 #
 # Ruby letsencrypt stuff
 #
-deb     http://repo.bytemark.co.uk/open-source/ruby-letsencrypt/latest/stretch ./
+deb     http://repo.bytemark.co.uk/open-source/ruby-acme-client/latest/stretch ./
 
