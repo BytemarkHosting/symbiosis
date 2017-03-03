@@ -14,10 +14,13 @@ docs: man/symbiosis-encrypt-password.man  man/is-bytemark-ip.man  man/symbiosis-
 clean:
 	$(RM) -r man
 
-test: test2.1
+test: test2.1 test2.3
 
 test2.1:
 	[ -z "`which ruby2.1`" ] ||  ruby2.1 -I lib ./bin/symbiosis-test  test.d/	
+
+test2.3:
+	[ -z "`which ruby2.3`" ] ||  ruby2.3 -I lib ./bin/symbiosis-test  test.d/	
 
 .PHONY: test clean all docs
 
