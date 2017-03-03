@@ -34,6 +34,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     @endpoint = "https://imaginary.test.endpoint:443"
     @http01_challenge =  {} # This is where we store our challenges
     @authz_template = Addressable::Template.new "#{@endpoint}/acme/authz/{sekrit}/0"
+    @authz_get_template = Addressable::Template.new "#{@endpoint}/acme/authz/{sekrit}"
 
 
     #
@@ -44,6 +45,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     stub_request(:post, "#{@endpoint}/acme/new-authz").to_return{|r| do_post_new_authz(r)}
     stub_request(:post, @authz_template).to_return{|r| do_post_authz(r)}
     stub_request(:get,  @authz_template).to_return{|r| do_get_authz(r)}
+    stub_request(:get,  @authz_get_template).to_return{|r| do_get_authz_defs(r)}
     stub_request(:post, "#{@endpoint}/acme/new-cert").to_return{|r| do_post_new_cert(r)}
     stub_request(:get,  "#{@endpoint}/bundle").to_return{|r| do_get_bundle(r)}
 
@@ -185,6 +187,26 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       "status" => "pending" })
 
     {:status => 200, :body => JSON.dump(@http01_challenge[sekrit]),  :headers => {"Content-Type" => "application/json"}}
+  end
+
+  def do_get_authz_defs(request)
+    sekrit = @authz_get_template.extract(request.uri)["sekrit"]
+
+    body = {
+      "status" => "valid",
+      "validated" => Time.now,
+      "expires" =>  (Date.today + 90),
+      "challenges" => [
+        {
+          "type" => "http-01",
+          "url" => "#{@endpoint}/authz/#{sekrit}/0",
+          "token" => "alabaster"
+        }
+      ]
+
+    }
+
+    {:status => 200, :body => JSON.dump(sekrit),  :headers => {"Content-Type" => "application/json"}}
   end
 
   def do_get_authz(request)
