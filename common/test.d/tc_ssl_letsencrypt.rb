@@ -205,6 +205,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       "challenges" => [
         {
           "type" => "http-01",
+          "status" => "valid",
           "uri" => "#{@endpoint}/authz/#{sekrit}/0",
           "token" => "alabaster"
         }
@@ -230,6 +231,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       "challenges" => [
         {
           "type" => "http-01",
+          "status" => "pending",
           "uri" => "#{@endpoint}/authz/#{sekrit}/0",
           "token" => "alabaster"
         }
@@ -255,6 +257,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       "challenges" => [
         {
           "type" => "http-01",
+          "status" => "invalid",
           "uri" => "#{@endpoint}/authz/#{sekrit}/0",
           "token" => "alabaster"
         }
