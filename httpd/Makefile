@@ -12,6 +12,7 @@ docs: man/symbiosis-httpd-configure.man  man/symbiosis-httpd-logger.man man/symb
 test:
 	$(MAKE) -C vhost-alias test
 	[ -z "`which ruby2.1`" ] ||  ruby2.1 -I ../common/lib -I lib/  test.d/t*.rb
+	[ -z "`which ruby2.3`" ] ||  ruby2.3 -I ../common/lib -I lib/  test.d/t*.rb
 
 .PHONY: test clean all docs
  
