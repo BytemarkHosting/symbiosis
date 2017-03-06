@@ -390,8 +390,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       to_return{|r| do_get_authz_pending(r)}.
       to_return{|r| do_get_authz(r)}
     stub_request(:get,  @authz_challenges_template).
-      to_return{|r| do_get_authz_challenges_pending(r)}
-      to_return{|r| do_get_authz_challenges_pending(r)}
+      to_return{|r| do_get_authz_challenges_pending(r)}.
+      to_return{|r| do_get_authz_challenges_pending(r)}.
       to_return{|r| do_get_authz_challenges(r)}
 
     req = nil
@@ -429,8 +429,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       to_return{|r| do_get_authz_pending(r)}.
       to_return{|r| do_get_authz_invalid(r)}
     stub_request(:get,  @authz_challenges_template).
-      to_return{|r| do_get_authz_challenges_pending(r)}
-      to_return{|r| do_get_authz_challenges_pending(r)}
+      to_return{|r| do_get_authz_challenges_pending(r)}.
+      to_return{|r| do_get_authz_challenges_pending(r)}.
       to_return{|r| do_get_authz_challenges_invalid(r)}
     assert_nil(@client.request)
 
@@ -447,7 +447,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       to_return{|r| do_get_authz_invalid(r)}.
       to_return{|r| do_get_authz(r)}
     stub_request(:get,  @authz_challenges_template).
-      to_return{|r| do_get_authz_challenges_invalid(r)}
+      to_return{|r| do_get_authz_challenges_invalid(r)}.
       to_return{|r| do_get_authz_challenges(r)}
 
     req = @client.request
