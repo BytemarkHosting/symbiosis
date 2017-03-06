@@ -29,6 +29,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
     @state = "pending"
+    @token = ""
 
     @registered_keys = []
 
@@ -59,6 +60,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
   def teardown
     WebMock.allow_net_connect!
     WebMock.reset!
+    @token = ""
     unless $DEBUG
       @domain.destroy  if @domain.is_a?( Symbiosis::Domain)
       FileUtils.rm_rf(@prefix) if @prefix and File.directory?(@prefix)
@@ -157,11 +159,12 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
     payload = JSON.load(Base64.urlsafe_decode64(req["payload"]))
     sekrit  = Symbiosis::Utils.random_string(20).downcase
+    @token = Symbiosis::Utils.random_string(20)
 
     @http01_challenge[sekrit] = {
       "type" => "http-01",
       "uri" => "#{@endpoint}/acme/authz/#{sekrit}/0",
-      "token" => Symbiosis::Utils.random_string(20)
+      "token" => @token
     }
 
     response_payload = {
@@ -207,7 +210,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
           "type" => "http-01",
           "status" => "valid",
           "uri" => "#{@endpoint}/authz/#{sekrit}/0",
-          "token" => "alabaster"
+          "token" => @token || Symbiosis::Utils.random_string(20)
         }
       ]
 
@@ -233,7 +236,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
           "type" => "http-01",
           "status" => "pending",
           "uri" => "#{@endpoint}/authz/#{sekrit}/0",
-          "token" => "alabaster"
+          "token" => @token || Symbiosis::Utils.random_string(20)
         }
       ]
 
@@ -259,7 +262,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
           "type" => "http-01",
           "status" => "invalid",
           "uri" => "#{@endpoint}/authz/#{sekrit}/0",
-          "token" => "alabaster"
+          "token" => @token || Symbiosis::Utils.random_string(20)
         }
       ]
 
@@ -478,6 +481,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
     stub_request(:get,  @authz_template).
       to_return{|r| do_get_authz_invalid(r)}
+    stub_request(:get,  @authz_challenges_template).
+      to_return{|r| do_get_authz_challenges_invalid(r)}
 
     assert_raises(RuntimeError, "No error raised when an invalid request is generated"){ @domain.ssl_magic }
   end
