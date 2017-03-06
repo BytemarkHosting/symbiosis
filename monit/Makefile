@@ -24,7 +24,7 @@ test2.1:
 
 test2.3:
 	cd test.d
-	[ -z "`which ruby2.3`" ] ||  (cd test.d && ruby2.1 -I . ts_monit.rb)
+	[ -z "`which ruby2.3`" ] ||  (cd test.d && ruby2.3 -I . ts_monit.rb)
 
 clean:
 	$(RM) man/symbiosis-monit.man
