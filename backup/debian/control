@@ -10,7 +10,6 @@ XS-Ruby-Versions: all
 Package: symbiosis-backup
 Architecture: all
 Depends: backup2l, ruby, symbiosis-common (>= 2014:0113), make, libfilesys-df-perl,libswitch-perl, ${misc:Depends}
-Recommends: ruby-mysql, ruby-pg
 Description: Automatically backup your files
  This package configures backup2l to backup your data.
  .
