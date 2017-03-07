@@ -4,4 +4,4 @@ apache.d                  etc/symbiosis/
 monit.d                   etc/symbiosis/
 bytemark/*                usr/share/symbiosis/static/
 apache2                   etc/
-php7                      etc/
+php                       etc/
