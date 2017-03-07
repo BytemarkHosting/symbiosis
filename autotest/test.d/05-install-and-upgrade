@@ -68,11 +68,11 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   $PREFIX/02-seed-debconf
 
   echo "I: ensuring Symbiosis packages are installed"
-  $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list $PREFIX/conf/stretch-packages
+  $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list $PREFIX/conf/stretch-packages
 else 
 
 
-  echo "I: Installing latest version of Symbiosis from maker2.bytemark.co.uk"
-  $PREFIX/bin/apt-get-install $PREFIX/conf/maker-sources.list $PREFIX/conf/stretch-packages
+  echo "I: Installing latest version of Symbiosis from repo.bytemark.co.uk"
+  $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list $PREFIX/conf/stretch-packages
 fi
 

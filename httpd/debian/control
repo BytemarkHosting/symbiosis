@@ -3,14 +3,14 @@ Section: web
 Priority: optional
 Maintainer: James Carter <jcarter@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), apache2-dev, libcap-dev, php5-common, txt2man, gem2deb, ruby
+Build-Depends: debhelper (>= 7.0.0), apache2-dev, libcap-dev, php7.0-common, txt2man, gem2deb, ruby
 Standards-Version: 3.9.6
 XS-Ruby-Versions: all
 
 Package: symbiosis-httpd
 Architecture: all
-Depends: libapache2-mod-php5, webalizer, libapache2-mod-vhost-bytemark (>= 2015:0101), ${misc:Depends}, symbiosis-common (>= 2015:0101), ruby | ruby-interpreter, ruby-eventmachine
-Recommends: php5-mysql | php5-mysqli |  php5-mysqlnd, php5-curl, php5-imagick, php5-mcrypt, php5-mhash, php5-xmlrpc, php5-gd, geoip-database
+Depends: libapache2-mod-php7.0, webalizer, libapache2-mod-vhost-bytemark (>= 2015:0101), ${misc:Depends}, symbiosis-common (>= 2015:0101), ruby | ruby-interpreter, ruby-eventmachine
+Recommends: php7.0-mysql | php7.0-mysqli |  php7.0-mysqlnd, php7.0-curl, php7.0-imagick, php7.0-mcrypt, php7.0-mhash, php7.0-xmlrpc, php7.0-gd, geoip-database
 Description: Tools to manage Apache virtual hosting in Symbiosis
  This package contains tools to manage the virtual hosting of websites
  with Apache2.

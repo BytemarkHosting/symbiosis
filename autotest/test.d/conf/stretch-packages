@@ -24,7 +24,5 @@ symbiosis-xmpp
 libapache2-mod-vhost-bytemark
 openssh-server
 postgresql
-ruby-pg
-ruby-mysql
 ruby2.3
 squirrelmail-change-pass
