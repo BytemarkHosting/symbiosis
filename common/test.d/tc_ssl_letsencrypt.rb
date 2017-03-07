@@ -28,12 +28,15 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     @prefix.freeze
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
+    @state = "pending"
+    @token = ""
 
     @registered_keys = []
 
     @endpoint = "https://imaginary.test.endpoint:443"
     @http01_challenge =  {} # This is where we store our challenges
     @authz_template = Addressable::Template.new "#{@endpoint}/acme/authz/{sekrit}/0"
+    @authz_challenges_template = Addressable::Template.new "#{@endpoint}/acme/authz/{sekrit}"
 
 
     #
@@ -44,6 +47,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     stub_request(:post, "#{@endpoint}/acme/new-authz").to_return{|r| do_post_new_authz(r)}
     stub_request(:post, @authz_template).to_return{|r| do_post_authz(r)}
     stub_request(:get,  @authz_template).to_return{|r| do_get_authz(r)}
+    stub_request(:get,  @authz_challenges_template).to_return{|r| do_get_authz_challenges(r)}
     stub_request(:post, "#{@endpoint}/acme/new-cert").to_return{|r| do_post_new_cert(r)}
     stub_request(:get,  "#{@endpoint}/bundle").to_return{|r| do_get_bundle(r)}
 
@@ -55,6 +59,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def teardown
     WebMock.allow_net_connect!
+    WebMock.reset!
+    @token = ""
     unless $DEBUG
       @domain.destroy  if @domain.is_a?( Symbiosis::Domain)
       FileUtils.rm_rf(@prefix) if @prefix and File.directory?(@prefix)
@@ -83,7 +89,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
   end
 
   def do_check_key(request)
-    protect = JSON.load(UrlSafeBase64.decode64(request["protected"]))
+    protect = JSON.load(Base64.urlsafe_decode64(request["protected"]))
     key = nil
     if protect.is_a?(Hash) and
       protect.has_key?("jwk") and
@@ -117,7 +123,7 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
   def do_post_new_reg(request)
     req     = JSON.load(request.body)
-    protect = JSON.load(UrlSafeBase64.decode64(req["protected"]))
+    protect = JSON.load(Base64.urlsafe_decode64(req["protected"]))
     key = nil
     if protect.is_a?(Hash) and
       protect.has_key?("jwk") and
@@ -151,13 +157,14 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     result = do_check_key(req)
     return result unless result == true
 
-    payload = JSON.load(UrlSafeBase64.decode64(req["payload"]))
+    payload = JSON.load(Base64.urlsafe_decode64(req["payload"]))
     sekrit  = Symbiosis::Utils.random_string(20).downcase
+    @token = Symbiosis::Utils.random_string(20)
 
     @http01_challenge[sekrit] = {
       "type" => "http-01",
       "uri" => "#{@endpoint}/acme/authz/#{sekrit}/0",
-      "token" => Symbiosis::Utils.random_string(20)
+      "token" => @token
     }
 
     response_payload = {
@@ -176,8 +183,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     result = do_check_key(req)
     return result unless result == true
 
-    payload = JSON.load(UrlSafeBase64.decode64(req["payload"]))
     sekrit  = @authz_template.extract(request.uri)["sekrit"]
+    payload = JSON.load(Base64.urlsafe_decode64(req["payload"]))
 
     @http01_challenge[sekrit].merge!({
       "keyAuthorization" => payload["keyAuthorization"],
@@ -186,13 +193,91 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     {:status => 200, :body => JSON.dump(@http01_challenge[sekrit]),  :headers => {"Content-Type" => "application/json"}}
   end
 
+  def do_get_authz_challenges(request)
+    sekrit = @authz_challenges_template.extract(request.uri)["sekrit"]
+
+    body = {
+      "status" => "valid",
+      "validated" => Time.now,
+      "expires" =>  (Date.today + 90).rfc3339,
+      "identifier" => {
+        "type": "dns",
+        "value": @domain.name
+      },
+
+      "challenges" => [
+        {
+          "type" => "http-01",
+          "status" => "valid",
+          "uri" => "#{@endpoint}/authz/#{sekrit}/0",
+          "token" => @token || Symbiosis::Utils.random_string(20)
+        }
+      ]
+
+    }
+
+    {:status => 200, :body => JSON.dump(body), :headers => {"Content-Type" => "application/json"}}
+  end
+
+  def do_get_authz_challenges_pending(request)
+    sekrit = @authz_challenges_template.extract(request.uri)["sekrit"]
+
+    body = {
+      "status" => "pending",
+      "validated" => Time.now,
+      "expires" =>  (Date.today + 90).rfc3339,
+      "identifier" => {
+        "type": "dns",
+        "value": @domain.name
+      },
+
+      "challenges" => [
+        {
+          "type" => "http-01",
+          "status" => "pending",
+          "uri" => "#{@endpoint}/authz/#{sekrit}/0",
+          "token" => @token || Symbiosis::Utils.random_string(20)
+        }
+      ]
+
+    }
+
+    {:status => 200, :body => JSON.dump(body), :headers => {"Content-Type" => "application/json"}}
+  end
+
+  def do_get_authz_challenges_invalid(request)
+    sekrit = @authz_challenges_template.extract(request.uri)["sekrit"]
+
+    body = {
+      "status" => "invalid",
+      "validated" => Time.now,
+      "expires" =>  (Date.today + 90).rfc3339,
+      "identifier" => {
+        "type": "dns",
+        "value": @domain.name
+      },
+
+      "challenges" => [
+        {
+          "type" => "http-01",
+          "status" => "invalid",
+          "uri" => "#{@endpoint}/authz/#{sekrit}/0",
+          "token" => @token || Symbiosis::Utils.random_string(20)
+        }
+      ]
+
+    }
+
+    {:status => 200, :body => JSON.dump(body), :headers => {"Content-Type" => "application/json"}}
+  end
+
   def do_get_authz(request)
     sekrit = @authz_template.extract(request.uri)["sekrit"]
 
     @http01_challenge[sekrit].merge!({
       "status" => "valid",
       "validated" => Time.now,
-      "expires" =>  (Date.today + 90) })
+      "expires" =>  (Date.today + 90).rfc3339})
 
     {:status => 200, :body => JSON.dump(@http01_challenge[sekrit]),  :headers => {"Content-Type" => "application/json"}}
   end
@@ -219,8 +304,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     result = do_check_key(req)
     return result unless result == true
 
-    payload = JSON.load(UrlSafeBase64.decode64(req["payload"]))
-    csr = OpenSSL::X509::Request.new(UrlSafeBase64.decode64(payload["csr"]))
+    payload = JSON.load(Base64.urlsafe_decode64(req["payload"]))
+    csr = OpenSSL::X509::Request.new(Base64.urlsafe_decode64(payload["csr"]))
 
     setup_root_ca
 
@@ -307,6 +392,10 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       to_return{|r| do_get_authz_pending(r)}.
       to_return{|r| do_get_authz_pending(r)}.
       to_return{|r| do_get_authz(r)}
+    stub_request(:get,  @authz_challenges_template).
+      to_return{|r| do_get_authz_challenges_pending(r)}.
+      to_return{|r| do_get_authz_challenges_pending(r)}.
+      to_return{|r| do_get_authz_challenges(r)}
 
     req = nil
     req = @client.request
@@ -342,6 +431,10 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
       to_return{|r| do_get_authz_pending(r)}.
       to_return{|r| do_get_authz_pending(r)}.
       to_return{|r| do_get_authz_invalid(r)}
+    stub_request(:get,  @authz_challenges_template).
+      to_return{|r| do_get_authz_challenges_pending(r)}.
+      to_return{|r| do_get_authz_challenges_pending(r)}.
+      to_return{|r| do_get_authz_challenges_invalid(r)}
     assert_nil(@client.request)
 
     @client.instance_variable_set(:@names, [])
@@ -356,6 +449,9 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
     stub_request(:get,  @authz_template).
       to_return{|r| do_get_authz_invalid(r)}.
       to_return{|r| do_get_authz(r)}
+    stub_request(:get,  @authz_challenges_template).
+      to_return{|r| do_get_authz_challenges_invalid(r)}.
+      to_return{|r| do_get_authz_challenges(r)}
 
     req = @client.request
 
@@ -385,6 +481,8 @@ class SSLLetsEncryptTest < Test::Unit::TestCase
 
     stub_request(:get,  @authz_template).
       to_return{|r| do_get_authz_invalid(r)}
+    stub_request(:get,  @authz_challenges_template).
+      to_return{|r| do_get_authz_challenges_invalid(r)}
 
     assert_raises(RuntimeError, "No error raised when an invalid request is generated"){ @domain.ssl_magic }
   end

@@ -1,0 +1,9 @@
+Dockerfile
+.dockerignore
+.git
+*.build
+*.xz
+*.changes
+*.dsc
+*.deb
+*.gz
