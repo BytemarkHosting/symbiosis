@@ -94,7 +94,6 @@ test:xmpp:
     - export PACKAGE=${CI_BUILD_NAME##package:}
     - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
     - cd $PACKAGE
-    - apt-get update
     - package
   artifacts:
     paths:
