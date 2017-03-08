@@ -18,7 +18,6 @@ symbiosis-pam
 symbiosis-phpmyadmin
 symbiosis-updater
 symbiosis-webmail
-symbiosis-webmail-squirrelmail
 symbiosis-webmail-roundcube
 symbiosis-xmpp
 libapache2-mod-vhost-bytemark
@@ -26,4 +25,3 @@ openssh-server
 postgresql
 ruby-pg
 ruby2.3
-squirrelmail-change-pass

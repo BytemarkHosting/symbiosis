@@ -9,22 +9,11 @@ Bugs: https://projects.bytemark.co.uk/projects/symbiosis/issues
 
 Package: symbiosis-webmail
 Architecture: all
-Depends: symbiosis-webmail-squirrelmail | symbiosis-webmail-roundcube, ${misc:Depends}
+Depends: symbiosis-webmail-roundcube, ${misc:Depends}
 Recommends: symbiosis-email
 Description: Provide webmail access to a Symbiosis system
  This package will enable a global webmail system for all domains hosted
  using the Bytemark Symbiosis system.
-
-Package: symbiosis-webmail-squirrelmail
-Architecture: all
-Depends: squirrelmail, ${misc:Depends}
-Recommends: symbiosis-webmail, avelsieve, squirrelmail-change-pass
-Description: Provide webmail access to Symbiosis using Squirrelmail
- This package will enable a global webmail system for all domains hosted
- using the Bytemark system.
- .
- This is a metapackage that implements webmail using the Squirrelmail system.
-
 
 Package: symbiosis-webmail-roundcube
 Architecture: all
