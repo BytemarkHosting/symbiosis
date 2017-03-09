@@ -6,7 +6,7 @@ ssl_cipher_list = ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDH
 #
 # Ban ancient protocols too.
 #
-ssl_protocols = !SSLv2 !SSLv3
+ssl_protocols = !SSLv3
 
 #
 # Prefer our ciphers
