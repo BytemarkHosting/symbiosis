@@ -9,7 +9,7 @@ XS-Ruby-Versions: all
 
 Package: symbiosis-dns
 Architecture: all
-Depends: rsync, wget, unzip, ruby-interpreter, symbiosis-common (>= 2014:0113), ${misc:Depends}
+Depends: rsync, wget, unzip, ruby, symbiosis-common (>= 2014:0113), ${misc:Depends}
 Replaces: symbiosis-tinydns
 Conflicts: symbiosis-tinydns
 Provides: symbiosis-tinydns

@@ -9,7 +9,7 @@ XS-Ruby-Versions: all
 
 Package: symbiosis-httpd
 Architecture: all
-Depends: libapache2-mod-php7.0, webalizer, libapache2-mod-vhost-bytemark (>= 2015:0101), ${misc:Depends}, symbiosis-common (>= 2015:0101), ruby | ruby-interpreter, ruby-eventmachine
+Depends: apache2, libapache2-mod-php7.0, webalizer, libapache2-mod-vhost-bytemark (>= 2015:0101), ${misc:Depends}, symbiosis-common (>= 2015:0101), ruby | ruby-interpreter, ruby-eventmachine
 Recommends: php7.0-mysql | php7.0-mysqli |  php7.0-mysqlnd, php7.0-curl, php7.0-imagick, php7.0-mcrypt, php7.0-mhash, php7.0-xmlrpc, php7.0-gd, geoip-database
 Description: Tools to manage Apache virtual hosting in Symbiosis
  This package contains tools to manage the virtual hosting of websites
