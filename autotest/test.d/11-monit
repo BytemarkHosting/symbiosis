@@ -50,6 +50,11 @@ for i in $(seq 1 300) ; do
   sleep 1
 done
 
+echo "Setting monit to use verbose template"
+rm /usr/share/symbiosis/monit/default.txt.erb
+ln -s verbose.txt.erb /usr/share/symbiosis/monit/default.txt.erb
+
+
 #
 # Have a couple of goes running monit 
 #
