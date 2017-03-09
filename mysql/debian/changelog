@@ -1,3 +1,10 @@
+symbiosis-mysql (2017:0309) stable; urgency=medium
+
+  * Depends on virtual-mysql-server instead of mysql-server, per recent debian
+    guidelines - https://wiki.debian.org/Teams/MySQL/virtual-mysql-server
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 09 Oct 2015 17:21:28 +0100
+
 symbiosis-mysql (2015:1009) stable; urgency=medium
 
   * Fixed up innodb file per table config setting. 
