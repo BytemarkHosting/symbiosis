@@ -148,7 +148,8 @@ publish:
 .install: &install
   stage: install
   image: $CI_REGISTRY/docker-images/base:stretch
-  allow_failure: true
+  except:
+  - /stretch/
   tags:
     - docker-socket
   variables:
