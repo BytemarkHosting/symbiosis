@@ -67,9 +67,11 @@
                 RewriteRule ^/(.*)$  /srv/%1/public/htdocs/$1
 
                 <IfDefine PHPMYADMIN_FORCE_SSL>
-                        
                         RewriteCond "%{HTTPS}" "off"
-                        RewriteRule "^/phpmyadmin.*" "https://%{HTTP_HOST}%{REQUEST_URI}%{QUERY_STRING}"
+                        RewriteCond "%{HTTP_HOST}" =""
+                        RewriteRule ^/?phpmyadmin.* https://<%= domain %>%{REQUEST_URI}%{QUERY_STRING}" [R=301,L]
+                        RewriteCond "%{HTTPS}" "off"
+                        RewriteRule "^/?phpmyadmin.*" "https://%{HTTP_HOST}%{REQUEST_URI}%{QUERY_STRING}" [R=301,L]
                 </IfDefine>
         </IfModule>
 

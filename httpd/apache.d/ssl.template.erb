@@ -141,8 +141,12 @@
         <IfModule rewrite_module>
                 <IfDefine PHPMYADMIN_FORCE_SSL>
                         RewriteEngine On
+
                         RewriteCond "%{HTTPS}" "off"
-                        RewriteRule "^/phpmyadmin.*" "https://%{HTTP_HOST}%{REQUEST_URI}%{QUERY_STRING}"
+                        RewriteCond "%{HTTP_HOST}" =""
+                        RewriteRule ^/?phpmyadmin.* https://<%= domain %>%{REQUEST_URI}%{QUERY_STRING}" [R=301,L]
+                        RewriteCond "%{HTTPS}" "off"
+                        RewriteRule "^/?phpmyadmin.*" "https://%{HTTP_HOST}%{REQUEST_URI}%{QUERY_STRING}" [R=301,L]
                 </IfDefine>
         </IfModule>
         #
