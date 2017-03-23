@@ -143,9 +143,12 @@ publish:
   script:
     - publish
 
+# fails on stretch for the time being - see issue #57 for updates
 .install: &install
   stage: install
   image: $CI_REGISTRY/docker-images/base:stretch
+  except:
+  - /stretch/
   tags:
     - docker-socket
   variables:

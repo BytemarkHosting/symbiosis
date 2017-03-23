@@ -4,12 +4,6 @@
  **************************************************/
 
 /*
- * This flag mandates the use of SSL, causing http requests to be redirected to
- * https.
- */
-$cfg['ForceSSL'] = true;
-
-/*
  * This iterates through each of the servers configured, at makes aure that the
  * auth is done over HTTP, and that debian-sys-maint is denied from logging in.
  */
