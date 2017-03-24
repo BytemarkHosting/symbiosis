@@ -124,3 +124,11 @@ if ( array_search("password", $config['plugins']) === false ) {
 }
 
 
+if ( !array_key_exists('create_default_folders', $config) ) {
+
+  /*
+   * Make sure Inbox, Drafts, Sent and Trash all exist
+   */
+  $config['create_default_folders'] = true;
+
+}

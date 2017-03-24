@@ -1,0 +1,23 @@
+namespace inbox {
+# Config file for Roundcube defaults compatibility in Dovecot
+# "auto = create"    - create the mailbox when needed
+# "auto = subscribe" - create and subscribe to the mailbox by default
+
+  inbox = yes
+    mailbox Trash {
+      auto = subscribe # autocreate and autosubscribe the Trash mailbox
+      special_use = \Trash
+    }
+  mailbox Drafts {
+    auto = subscribe # autocreate and autosubscribe the Drafts mailbox
+    special_use = \Drafts
+  }
+  mailbox Sent {
+    auto = subscribe # autocreate and autosubscribe the Sent mailbox
+    special_use = \Sent
+  }
+  mailbox Spam {
+    auto = create # autocreate Spam, but don't autosubscribe
+    special_use = \Junk
+  }
+}
