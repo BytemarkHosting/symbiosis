@@ -1,0 +1,45 @@
+#!/bin/bash -eu
+
+tmpfile=""
+
+#
+# Clean up after ourselves.
+#
+do_cleanup() {
+  trap - EXIT
+
+  if [ -n "$tmpfile" -a -f "$tmpfile" ] ; then
+    rm $tmpfile
+  fi
+}
+
+trap do_cleanup EXIT
+
+if [ -z "$1" ]; then
+  echo "usage: symbiosis-generate-dhparams <path to config dir> [user]"
+fi
+
+#
+# This script regenerates Diffie-Helman parameters and chowns to the specified
+#
+dir=$1
+
+mkdir -m 750 -p $dir
+[ ! -z "$2" ] && chown $2.$2 $dir
+
+length=2048
+tmpfile=$(tempfile -m 0600 -d $dir -p .dh)
+
+if [ ! -f "$tmpfile" ] ; then
+  exit 1
+fi
+
+
+if [ "$*" != "--verbose" ] && [ "$*" != "-v" ]; then
+  openssl dhparam -out $tmpfile 2048 > /dev/null 2>&1
+else
+  openssl dhparam -out $tmpfile 2048
+fi
+
+
+mv $tmpfile $dir/dhparams

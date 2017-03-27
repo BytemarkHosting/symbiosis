@@ -1,45 +1,9 @@
 #!/bin/bash -eu
 
-tmpfile=""
+symbiosis-generate-dhparams /var/spool/exim4
 
-#
-# Clean up after ourselves.
-#
-do_cleanup() {
-  trap - EXIT
-
-  if [ -n "$tmpfile" -a -f "$tmpfile" ] ; then
-    rm $tmpfile
-  fi
-}
-
-trap do_cleanup EXIT
-
-#
-# This script regenerates Exim Diffie-Helman parameters.
-#
 for i in /var/spool/exim4/gnutls-params-[0-9]* ; do
-
-  #
-  # If no files match the pattern, then i gets set to the pattern.  In that
-  # case, assume we're generating a 2048 bit sequence.
-  #
-  if [ '/var/spool/exim4/gnutls-params-[0-9]*' = "$i" ] ; then
-    i=/var/spool/exim4/gnutls-params-2048
-  fi
-
-  length=${i##/var/spool/exim4/gnutls-params-}
-  tmpfile=$(tempfile -m 0600 -d /var/spool/exim4/ -p .dh)
-
-
-  if [ ! -f "$tmpfile" ] ; then
-    continue
-  fi
-
-  chown Debian-exim.Debian-exim $tmpfile
-
-  certtool --generate-dh-params --bits $length > $tmpfile 2> /dev/null
-
-  mv $tmpfile $i
+  rm -f "$i"
 done
 
+mv /var/spool/exim4/dhparams /var/spool/exim4/gnutls-params-2048
