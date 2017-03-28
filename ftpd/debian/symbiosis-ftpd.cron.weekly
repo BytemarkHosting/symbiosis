@@ -1,0 +1,3 @@
+#!/bin/bash
+
+symbiosis-generate-dhparams /var/lib/symbiosis/ftpd
