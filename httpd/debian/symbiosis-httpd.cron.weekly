@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# regenerate dhparams for httpd
+symbiosis-generate-dhparams /var/lib/symbiosis/httpd

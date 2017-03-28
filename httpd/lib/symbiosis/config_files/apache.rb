@@ -247,10 +247,6 @@ module Symbiosis
           # Add a bundle, if needed.
           #
           ans << "SSLCertificateChainFile #{@domain.ssl_bundle_file}" if @domain.ssl_bundle_file
-          # 
-          # Add a dhparams
-          #
-          ans << "SSLOpenSSLConfCmd DHParameters #{@domain.ssl_dhparams_file}"
         elsif File.exist?("/etc/ssl/ssl.crt")
           #
           # TODO: this makes absolutely no checks for the certificate validity
@@ -262,7 +258,6 @@ module Symbiosis
           #
           ans << "SSLCertificateKeyFile /etc/ssl/ssl.key" if File.exist?("/etc/ssl/ssl.key")
           ans << "SSLCertificateChainFile /etc/ssl/ssl.bundle" if File.exist?("/etc/ssl/ssl.bundle")
-          ans << "SSLOpenSSLConfCmd DHParameters /etc/ssl/dhparams"
         end
 
         ans.join("\n        ")
