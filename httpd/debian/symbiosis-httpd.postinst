@@ -61,6 +61,8 @@ if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
   done
 fi
 
+symbiosis-generate-dhparams /var/lib/symbiosis/httpd
+
 #
 # Reconfigure apache.
 #

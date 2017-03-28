@@ -67,6 +67,8 @@ if [ -e /etc/ssl/private/pure-ftpd.pem ] ; then
   fi
 fi
 
+symbiosis-generate-dhparams /var/lib/symbiosis/ftpd
+
 
 #DEBHELPER#
 
