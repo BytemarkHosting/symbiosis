@@ -3,4 +3,4 @@
 # root.
 ssl_cert =< /etc/ssl/ssl.combined
 ssl_key  =< /etc/ssl/ssl.combined
-
+ssl_dh   =< /etc/ssl/private/dovecot-dhparams.pem

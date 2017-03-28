@@ -1,3 +1,8 @@
-#!/bin/bash
+#!/bin/bash -eu
 
-symbiosis-generate-dhparams /var/lib/symbiosis/ftpd
+verbose=""
+if [ "$*" = "--verbose" ] || [ "$*" = "-v" ]; then
+  verbose="-v "
+fi
+
+symbiosis-generate-dhparams $verbose/etc/ssl/private/pure-ftpd-dhparams.pem 

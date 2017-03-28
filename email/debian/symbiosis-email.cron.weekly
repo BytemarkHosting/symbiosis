@@ -1,9 +1,12 @@
 #!/bin/bash -eu
 
-symbiosis-generate-dhparams /var/spool/exim4
+verbose=""
+if [ "$*" = "--verbose" ] || [ "$*" = "-v" ]; then
+  verbose="-v "
+fi
 
+symbiosis-generate-dhparams $verbose/etc/ssl/private/dovecot-dhparams.pem
 for i in /var/spool/exim4/gnutls-params-[0-9]* ; do
   rm -f "$i"
 done
-
-mv /var/spool/exim4/dhparams /var/spool/exim4/gnutls-params-2048
+cp /etc/ssl/private/dovecot-dhparams.pem /var/spool/exim4/gnutls-params-2048 Debian-exim

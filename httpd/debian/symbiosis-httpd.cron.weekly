@@ -1,4 +1,8 @@
-#!/bin/bash
+#!/bin/bash -eu
 
-# regenerate dhparams for httpd
-symbiosis-generate-dhparams /var/lib/symbiosis/httpd
+verbose=""
+if [ "$*" = "--verbose" ] || [ "$*" = "-v" ]; then
+  verbose="-v "
+fi
+
+symbiosis-generate-dhparams $verbose/etc/ssl/private/apache2-dhparams.pem

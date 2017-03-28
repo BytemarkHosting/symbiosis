@@ -1,3 +1,8 @@
 #!/bin/bash -eu
 
-symbiosis-generate-dhparams /var/spool/prosody prosody
+verbose=""
+if [ "$*" = "--verbose" ] || [ "$*" = "-v" ]; then
+  verbose="-v "
+fi
+
+symbiosis-generate-dhparams $verbose/var/spool/prosody/dhparams prosody
