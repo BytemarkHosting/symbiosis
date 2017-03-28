@@ -5,8 +5,8 @@ if [ "$*" = "--verbose" ] || [ "$*" = "-v" ]; then
   verbose="-v "
 fi
 
-symbiosis-generate-dhparams $verbose/etc/ssl/private/dovecot-dhparams.pem
 for i in /var/spool/exim4/gnutls-params-[0-9]* ; do
   rm -f "$i"
 done
-cp /etc/ssl/private/dovecot-dhparams.pem /var/spool/exim4/gnutls-params-2048 Debian-exim
+symbiosis-generate-dhparams $verbose/var/spool/exim4/gnutls-params-2048 Debian-exim
+

@@ -12,3 +12,8 @@ ssl_protocols = !SSLv3
 # Prefer our ciphers
 #
 ssl_prefer_server_ciphers = yes
+
+# 
+# Regenerates every week
+#
+ssl_dh_parameters_length = 2048
