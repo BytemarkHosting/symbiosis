@@ -58,5 +58,5 @@ fi
 
 mv "$tmpfile" "$fileName"
 
-[ $# -lt 2 ] && exit 0
+[[ $# < 2 ]] && exit 0
 chown $2.$2 "$fileName"
