@@ -15,7 +15,7 @@ if [ "$1" != "configure" ]; then
 fi
 
 
-if [ ! -f /etc/ssl/private/dovecot-dhparams.pem ] ; then
+if [ ! -f /etc/ssl/private/exim4-dhparams.pem ] ; then
   #
   # generate dhparams if they don't exist already
   #

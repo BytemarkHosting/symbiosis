@@ -39,7 +39,6 @@ fileName="$1"
 dir=$(dirname "$fileName")
 
 mkdir -m 750 -p "$dir"
-[ $# -ge 2 ] && chown $2.$2 "$dir"
 
 length=2048
 tmpfile=$(tempfile -m 0600 -d "$dir" -p .dh)
@@ -58,3 +57,4 @@ fi
 
 
 mv "$tmpfile" "$fileName"
+[ $# -ge 2 ] && chown $2.$2 "$fileName"
