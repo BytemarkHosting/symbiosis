@@ -131,22 +131,22 @@
                 RewriteEngine On
 
                 #
-                # Use our server name if HTTP_HOST is empty. 
+                # Use our server nane if HTTP_HOST is empty. 
                 #
-                RewriteCond "<%='%'%>{HTTP_HOST}" =""
+                RewriteCond "%{HTTP_HOST}" =""
                 RewriteRule ^/?(.*) https://<%= domain %>/$1 [R=301,L]
-                RewriteRule ^/?(.*) https://<%='%'%>{HTTP_HOST}/$1 [R=301,L]
+                RewriteRule ^/?(.*) https://%{HTTP_HOST}/$1 [R=301,L]
         </IfModule>
 % else
         <IfModule rewrite_module>
                 <IfDefine PHPMYADMIN_FORCE_SSL>
                         RewriteEngine On
 
-                        RewriteCond "<%='%'%>{HTTPS}" "off"
-                        RewriteCond "<%='%'%>{HTTP_HOST}" =""
-                        RewriteRule ^/?phpmyadmin.* https://<%= domain %><%='%'%>{REQUEST_URI}<%='%'%>{QUERY_STRING}" [R=301,L]
                         RewriteCond "%{HTTPS}" "off"
-                        RewriteRule "^/?phpmyadmin.*" "https://<%='%'%>{HTTP_HOST}<%='%'%>{REQUEST_URI}<%='%'%>{QUERY_STRING}" [R=301,L]
+                        RewriteCond "%{HTTP_HOST}" =""
+                        RewriteRule ^/?phpmyadmin.* https://<%= domain %>/%{REQUEST_URI}%{QUERY_STRING}" [R=301,L]
+                        RewriteCond "%{HTTPS}" "off"
+                        RewriteRule "^/?phpmyadmin.*" "https://%{HTTP_HOST}%{REQUEST_URI}%{QUERY_STRING}" [R=301,L]
                 </IfDefine>
         </IfModule>
         #
