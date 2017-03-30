@@ -63,15 +63,15 @@
                 #  Aliases for testing sites prior to DNS migration.
                 #
                 RewriteEngine On
-                RewriteCond <%='%'%>{HTTP_HOST} ^(.*)\.testing\.(.*)$
+                RewriteCond %{HTTP_HOST} ^(.*)\.testing\.(.*)$
                 RewriteRule ^/(.*)$  /srv/%1/public/htdocs/$1
 
                 <IfDefine PHPMYADMIN_FORCE_SSL>
-                        RewriteCond "<%='%'%>{HTTPS}" "off"
-                        RewriteCond "<%='%'%>{HTTP_HOST}" =""
-                        RewriteRule ^/?phpmyadmin.* https://<%= domain %><%='%'%>{REQUEST_URI}<%='%'%>{QUERY_STRING}" [R=301,L]
-                        RewriteCond "<%='%'%>{HTTPS}" "off"
-                        RewriteRule "^/?phpmyadmin.*" "https://%{HTTP_HOST}<%='%'%>{REQUEST_URI}<%='%'%>{QUERY_STRING}" [R=301,L]
+                        RewriteCond "%{HTTPS}" "off"
+                        RewriteCond "%{HTTP_HOST}" =""
+                        RewriteRule "^/?(phpmyadmin.*)$" "https://<%= domain %>/$1" [R=301,L]
+                        RewriteCond "%{HTTPS}" "off"
+                        RewriteRule "^/?(phpmyadmin.*)$" "https://%{HTTP_HOST}/$1" [R=301,L]
                 </IfDefine>
         </IfModule>
 
