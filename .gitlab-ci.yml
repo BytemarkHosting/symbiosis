@@ -154,10 +154,6 @@ publish:
   script:
     - echo $install_or_upgrade | tee test.d/conf/action
     - touch external.d/VERBOSE
-    - if [ "$install_or_upgrade" = "dist-upgrade" ] ; then
-    -   chroot=${chroot/stretch/jessie}
-    - fi
-
     - /usr/bin/sautotest -v -c $chroot -e $PWD/external.d/ test.d/
 
 #
@@ -165,15 +161,20 @@ publish:
 #
 install:dist-upgrade:
   <<: *install
-  install_or_upgrade: dist-upgrade
+  variables:
+    install_or_upgrade: dist-upgrade
+    chroot: jessie-amd64
+
 
 install:upgrade:
   <<: *install
-  install_or_upgrade: upgrade
+  variables:
+    install_or_upgrade: upgrade
 
 install:fresh-install:
   <<: *install
-  install_or_upgrade: install
+  variables:
+    install_or_upgrade: install
   stage: fresh-install
 
 
