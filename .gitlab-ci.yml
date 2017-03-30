@@ -146,34 +146,34 @@ publish:
 # fails on stretch for the time being - see issue #57 for updates
 .install: &install
   stage: install
-  image: $CI_REGISTRY/docker-images/base:stretch
-  except:
-  - /stretch/
   tags:
-    - docker-socket
+    - shell
   variables:
     VERBOSE: --verbose
+    chroot: stretch-amd64
   script:
-    - rm -fv /usr/sbin/policy-rc.d
-    - cd autotest
-    - echo ${CI_BUILD_NAME##install:} > test.d/conf/action
-    - "echo deb http://repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/ ./ >> test.d/conf/autotest-sources.list"
-    - run-parts $VERBOSE --new-session --exit-on-error $PWD/test.d
+    - echo $install_or_upgrade | tee test.d/conf/action
+    - touch external.d/VERBOSE
+    - if [ "$install_or_upgrade" = "dist-upgrade" ] ; then
+    -   chroot=${chroot/stretch/jessie}
+    - fi
+
+    - /usr/bin/sautotest -v -c $chroot -e $PWD/external.d/ test.d/
 
 #
 # These next two do not work in gitlab-ci, yet.
 #
 install:dist-upgrade:
   <<: *install
-  image: $CI_REGISTRY/docker-images/base:jessie
-  allow_failure: true
+  install_or_upgrade: dist-upgrade
 
 install:upgrade:
   <<: *install
-  allow_failure: true
+  install_or_upgrade: upgrade
 
 install:fresh-install:
   <<: *install
+  install_or_upgrade: install
   stage: fresh-install
 
 
