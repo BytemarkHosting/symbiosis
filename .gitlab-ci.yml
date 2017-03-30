@@ -154,8 +154,7 @@ publish:
   script:
     - echo $install_or_upgrade | tee autotest/test.d/conf/action
     - touch autotest/external.d/VERBOSE
-    - echo /usr/bin/sautotest -v -c $chroot -e $PWD/autotest/external.d/ test.d/
-    - /usr/bin/sautotest -v -c $chroot -e $PWD/autotest/external.d/ test.d/
+    - /usr/bin/sautotest -v -c $chroot -e $PWD/autotest/external.d/ autotest/test.d/
 
 #
 # These next two do not work in gitlab-ci, yet.
