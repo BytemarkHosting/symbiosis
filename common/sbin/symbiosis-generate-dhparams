@@ -44,6 +44,7 @@ length=2048
 tmpfile=$(tempfile -m 0600 -d "$dir" -p .dh)
 
 if [ ! -f "$tmpfile" ] ; then
+  echo "temporary file '$tmpfile' doesn't exist, stopping."
   exit 1
 fi
 
@@ -59,4 +60,4 @@ fi
 mv "$tmpfile" "$fileName"
 
 [[ $# < 2 ]] && exit 0
-chown $2.$2 "$fileName"
+chown "$2.$2" "$fileName"
