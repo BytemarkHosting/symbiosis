@@ -1,4 +1,3 @@
 usr/sbin/
 etc/default
 etc/pure-ftpd/auth
-var/lib/symbiosis/ftpd
