@@ -163,6 +163,7 @@ publish:
 install:dist-upgrade:
   <<: *install
   variables:
+    VERBOSE: --verbose
     install_or_upgrade: dist-upgrade
     chroot: jessie-amd64
 
@@ -170,12 +171,16 @@ install:dist-upgrade:
 install:upgrade:
   <<: *install
   variables:
+    VERBOSE: --verbose
     install_or_upgrade: upgrade
+    chroot: stretch-amd64
 
 install:fresh-install:
   <<: *install
   variables:
+    VERBOSE: --verbose
     install_or_upgrade: install
+    chroot: stretch-amd64
   stage: fresh-install
 
 
