@@ -153,7 +153,7 @@ publish:
     chroot: stretch-amd64
   script:
     - echo $install_or_upgrade | tee autotest/test.d/conf/action
-    - touch external.d/VERBOSE
+    - touch autotest/external.d/VERBOSE
     - /usr/bin/sautotest -v -c $chroot -e $PWD/external.d/ test.d/
 
 #
