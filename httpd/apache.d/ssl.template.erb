@@ -144,9 +144,9 @@
 
                         RewriteCond "%{HTTPS}" "off"
                         RewriteCond "%{HTTP_HOST}" =""
-                        RewriteRule ^/?phpmyadmin.* https://<%= domain %>%{REQUEST_URI}%{QUERY_STRING}" [R=301,L]
+                        RewriteRule "^/?(phpmyadmin.*)$" "https://<%= domain %>/$1" [R=301,L]
                         RewriteCond "%{HTTPS}" "off"
-                        RewriteRule "^/?phpmyadmin.*" "https://%{HTTP_HOST}%{REQUEST_URI}%{QUERY_STRING}" [R=301,L]
+                        RewriteRule "^/?(phpmyadmin.*)$" "https://%{HTTP_HOST}/$1" [R=301,L]
                 </IfDefine>
         </IfModule>
         #

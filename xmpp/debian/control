@@ -9,7 +9,7 @@ XS-Ruby-Versions: all
 
 Package: symbiosis-xmpp
 Architecture: all
-Depends: symbiosis-common (>= 2014:0113), symbiosis-email, prosody, prosody-mod-auth-dovecot, lua-sec, ruby | ruby-interpreter, ${misc:Depends}
+Depends: symbiosis-common (>= 2017:0328), symbiosis-email, prosody, prosody-mod-auth-dovecot, lua-sec, ruby | ruby-interpreter, ${misc:Depends}
 Recommends: symbiosis-monit
 Description: Add XMPP (Jabber) support to Symbiosis
  This package installs prosody and configures users based on existing

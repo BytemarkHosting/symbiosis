@@ -14,6 +14,14 @@ if [ "$1" != "configure" ]; then
         exit 0
 fi
 
+
+if [ ! -f /etc/ssl/private/exim4-dhparams.pem ] ; then
+  #
+  # generate dhparams if they don't exist already
+  #
+  /etc/cron.weekly/symbiosis-email --verbose
+fi
+
 #
 # Configure supplementary groups for clamav and freshclam
 #

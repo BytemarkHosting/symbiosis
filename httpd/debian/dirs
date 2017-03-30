@@ -2,3 +2,4 @@ usr/lib/apache2/modules
 etc/apache2/mods-available/
 etc/apache2/mod-ifier.d/
 usr/share/bug/libapache2-mod-vhost-bytemark/
+var/lib/symbiosis/httpd

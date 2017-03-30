@@ -64,7 +64,7 @@ class TestPhpMyAdmin < Test::Unit::TestCase
       request  = Net::HTTP::Get.new("/phpmyadmin/")
       response = connection.request(request)
 
-      assert_equal(302, response.code.to_i, "No redirect when fetching /phpmyadmin/" )
+      assert_includes([301,302], response.code.to_i, "No redirect when fetching /phpmyadmin/" )
       assert_match(/^https:/, response['location'], "Redirect to non-https site when when fetching /phpmyadmin/")
     end
   end

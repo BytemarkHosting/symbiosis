@@ -3,4 +3,3 @@
 # root.
 ssl_cert =< /etc/ssl/ssl.combined
 ssl_key  =< /etc/ssl/ssl.combined
-

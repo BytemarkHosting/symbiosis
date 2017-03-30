@@ -17,6 +17,12 @@ if [ "$1" != "configure" ]; then
   exit 0
 fi
 
+if [ ! -f /etc/ssl/private/apache2-dhparams.pem ] ; then
+  #
+  # generate dhparams if they don't exist already
+  #
+  /etc/cron.weekly/symbiosis-httpd --verbose
+fi
 #
 # OK icky bit for wheezy->jessie upgrade
 #
@@ -60,6 +66,7 @@ if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
     apache2_invoke enmod $mod
   done
 fi
+
 
 #
 # Reconfigure apache.

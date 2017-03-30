@@ -1,3 +1,9 @@
+symbiosis-common (2017:0328) stable; urgency=medium
+
+  * Add symbiosis-generate-dhparams, which is used by other packages.
+
+ -- Telyn Roat <telyn@bytemark.co.uk>  Tue, 28 Mar 2017 13:25:34 +0100
+
 symbiosis-common (2015:1220) stable; urgency=medium
 
   * Allow underscores in hostnames.

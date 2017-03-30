@@ -5,5 +5,4 @@ if [ "$*" = "--verbose" ] || [ "$*" = "-v" ]; then
   verbose="-v "
 fi
 
-symbiosis-generate-dhparams $verbose/etc/ssl/private/exim4-dhparams.pem Debian-exim
-
+symbiosis-generate-dhparams $verbose/etc/ssl/private/pure-ftpd-dhparams.pem 
