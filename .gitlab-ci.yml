@@ -146,6 +146,7 @@ publish:
   stage: install
   tags:
     - shell
+    - sautotest
   script:
     - echo $install_or_upgrade | tee autotest/test.d/conf/action
     - schroot -l
