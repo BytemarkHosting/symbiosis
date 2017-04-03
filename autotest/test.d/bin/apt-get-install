@@ -55,10 +55,10 @@ apt-get $OPTIONS update
 #
 #  Now simulate a dist-upgrade so that we can see if we need to do anything
 #
-echo /usr/bin/apt-get $OPTIONS $ACTION --yes --force-yes
+echo /usr/bin/apt-get $OPTIONS $ACTION --yes
 if [ "$ACTION" = "install" ] ; then
-  /usr/bin/apt-get $OPTIONS install --yes --force-yes $(< $PACKAGES)
+  /usr/bin/apt-get $OPTIONS install --yes $(< $PACKAGES)
 else
-  /usr/bin/apt-get $OPTIONS $ACTION --yes --force-yes
+  /usr/bin/apt-get $OPTIONS $ACTION --yes
 fi
 
