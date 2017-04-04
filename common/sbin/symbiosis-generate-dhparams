@@ -50,9 +50,9 @@ fi
 [ -n "$verbose" ] && echo "Generating $fileName..."
 
 if [ -z "$verbose" ] ; then
-  openssl dhparam -out "$tmpfile" 2048 > /dev/null 2>&1
+  certtool --generate-dh-params --sec-param medium -outfile "$tmpfile" > /dev/null 2>&1
 else
-  openssl dhparam -out "$tmpfile" 2048
+  certtool --generate-dh-params --sec-param medium -outfile "$tmpfile"
 fi
 
 

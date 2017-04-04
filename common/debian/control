@@ -10,7 +10,7 @@ XS-Ruby-Versions: all
 Package: symbiosis-common
 Architecture: all
 XB-Ruby-Versions: ${ruby:Versions}
-Depends: ruby | ruby-interpreter, ruby-acme-client (>= 0.3.5), ruby-linux-netlink, ruby-cracklib, ruby-erubis, ruby-mocha, ruby-webmock, ruby-test-unit, openssl, sudo, adduser, cracklib-runtime, ssl-cert, ${misc:Depends}
+Depends: ruby | ruby-interpreter, ruby-acme-client (>= 0.3.5), ruby-linux-netlink, ruby-cracklib, ruby-erubis, ruby-mocha, ruby-webmock, ruby-test-unit, gnutls-bin, openssl, sudo, adduser, cracklib-runtime, ssl-cert, ${misc:Depends}
 Replaces: symbiosis-firewall (<< 2011:1214), symbiosis-range, symbiosis-test, bytemark-vhost-range, bytemark-vhost-test, symbiosis-crack
 Breaks: symbiosis-firewall (<< 2011:1214), symbiosis-email (<< 2012:0215)
 Conflicts: symbiosis-range, symbiosis-test, symbiosis-crack, bytemark-vhost-range, bytemark-vhost-test, symbiosis-email (<< 2012:0215)
