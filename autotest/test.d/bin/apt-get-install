@@ -14,7 +14,7 @@ ACTION=install
 #
 #  The options to use by default.
 #
-OPTIONS="-o APT::Get::AllowUnauthenticated=true -o DPkg::Options::=--force-confdef -o DPkg::Options::=--force-confnew"
+OPTIONS="-o APT::Get::AllowUnauthenticated=true -o DPkg::Options::=--force-confdef -o DPkg::Options::=--force-confnew --quiet"
 
 #
 # Copy sources in place.
