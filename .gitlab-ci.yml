@@ -153,9 +153,8 @@ publish:
     - sautotest
   script:
     - echo $install_or_upgrade | tee autotest/test.d/conf/action
-    - schroot -l
-    - schroot --info --chroot $chroot
     - touch autotest/external.d/VERBOSE
+    - echo "deb http://repo.bytemark.co.uk/open-source/symbiosis/$CI_BUILD_REF_NAME/latest/ ./" >> autotest/test.d/conf/autotest-sources.list
     - "echo chosen chroot: $chroot"
     - /usr/bin/sautotest -v -c "$chroot" -e $PWD/autotest/external.d/ autotest/test.d/
 
