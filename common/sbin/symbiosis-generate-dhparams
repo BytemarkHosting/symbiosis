@@ -50,9 +50,9 @@ fi
 [ -n "$verbose" ] && echo "Generating $fileName..."
 
 if [ -z "$verbose" ] ; then
-  certtool --generate-dh-params --sec-param medium -outfile "$tmpfile" > /dev/null 2>&1
+  certtool --generate-dh-params --sec-param medium --outfile "$tmpfile" > /dev/null 2>&1
 else
-  certtool --generate-dh-params --sec-param medium -outfile "$tmpfile"
+  certtool --generate-dh-params --sec-param medium --outfile "$tmpfile"
 fi
 
 
