@@ -1,4 +1,4 @@
-#!env ruby
+#!/usr/bin/ruby
 #
 # NAME
 #   symbiosis-email-configure-antivirus - Start/stop antivirus daemon if needed
@@ -22,7 +22,10 @@
 #
 # Telyn <telyn@bytemark.co.uk>
 #
-require 'getoptlog'
+require 'getoptlong'
+require 'symbiosis/domains'
+require 'symbiosis/utils'
+require 'fileutils'
 
 help = verbose = false
 opts = GetoptLong.new(
@@ -41,8 +44,8 @@ opts.each do |opt, arg|
 end
 
 enable_av = false
-Domains.each do |domain|
-  if domain.get_param("antivirus", domain.config_dir)
+Symbiosis::Domains.each do |domain|
+  if Symbiosis::Utils.get_param("antivirus", domain.config_dir)
     puts "#{domain.name} has antivirus config file" if $VERBOSE
     enable_av = true
   end
@@ -56,9 +59,9 @@ mask_path = '/etc/systemd/system/clamav-daemon.service'
 
 if enable_av
   # unmask clamav-daemon
-  if File.exists? mask_path
+  if File.exist?(mask_path)
     puts "Unmasking clamav-daemon.service" if $VERBOSE
-    File::Delete '/dev/null' mask_path
+    File.delete '/dev/null', mask_path
     system('systemctl daemon-reload')
   else
     puts "clamav-daemon.service already unmasked" if $VERBOSE
@@ -68,14 +71,15 @@ if enable_av
 
   # if av should be on, and isn't, start it
   unless system("/etc/init.d/clamav-daemon status")
-    system("/etc/init.d/clamav-daemon start")
+    puts "starting clamav-daemon..."
+    puts system("/etc/init.d/clamav-daemon start") ? "ok" : "fail"
   end
 else
   # mask systemd
-  if File.exists? '/etc/systemd'
-    unless File.exists? mask_path
+  if File.exist? '/etc/systemd'
+    unless File.exist?(mask_path) then
       puts "masking #{mask_path}" if $VERBOSE
-      File::Utils.ln_s '/dev/null' mask_path
+      FileUtils.ln_s '/dev/null', mask_path
       system('systemctl daemon-reload')
     end
   end
@@ -83,7 +87,10 @@ else
   system("update-rc.d clamav-daemon enable 3 4 5")
   # if av shouldn't be on and is, stop it.
   if system("/etc/init.d/clamav-daemon status")
-    system("/etc/init.d/clamav-daemon stop")
+    puts "stopping clamav-daemon..."
+    puts system("/etc/init.d/clamav-daemon stop") ? "ok" : "fail"
+  else
+    puts "couldn't get clamav status"
   end
 
 end
