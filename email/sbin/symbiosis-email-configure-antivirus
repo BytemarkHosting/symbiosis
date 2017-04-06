@@ -1,0 +1,91 @@
+#!env ruby
+#
+# NAME
+#   symbiosis-email-configure-antivirus - Start/stop antivirus daemon if needed
+#
+# SYNOPSIS
+#  symbiosis-email-configure-antivirus [ -h | --help ] [ -v | --verbose ]
+#  
+# OPTIONS
+#  -h, --help              Show a help message, and exit.
+# 
+#  -v, --verbose           Show verbose errors.
+#
+# USAGE
+#
+# This script checks to see if any Symbiosis domains have the 'antivirus'
+# config file. If any do and clamav-daemon is not running, it is started.
+# If none have the antivirus config file and clamav-daemon is running, it is
+# stopped.
+#
+# AUTHOR
+#
+# Telyn <telyn@bytemark.co.uk>
+#
+require 'getoptlog'
+
+help = verbose = false
+opts = GetoptLong.new(
+  [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+  [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+)
+
+$VERBOSE=false
+opts.each do |opt, arg|
+  case opt
+  when '--help'
+    help = true
+  when '--verbose'
+    $VERBOSE = true
+  end
+end
+
+enable_av = false
+Domains.each do |domain|
+  if domain.get_param("antivirus", domain.config_dir)
+    puts "#{domain.name} has antivirus config file" if $VERBOSE
+    enable_av = true
+  end
+end
+
+endis = enable_av ? 'en' : 'dis'
+
+puts "going to #{endis}able clamav-daemon" if $VERBOSE
+
+mask_path = '/etc/systemd/system/clamav-daemon.service'
+
+if enable_av
+  # unmask clamav-daemon
+  if File.exists? mask_path
+    puts "Unmasking clamav-daemon.service" if $VERBOSE
+    File::Delete '/dev/null' mask_path
+    system('systemctl daemon-reload')
+  else
+    puts "clamav-daemon.service already unmasked" if $VERBOSE
+  end
+  # update rc.d
+  system("update-rc.d clamav-daemon disable 2 3 4 5")
+
+  # if av should be on, and isn't, start it
+  unless system("/etc/init.d/clamav-daemon status")
+    system("/etc/init.d/clamav-daemon start")
+  end
+else
+  # mask systemd
+  if File.exists? '/etc/systemd'
+    unless File.exists? mask_path
+      puts "masking #{mask_path}" if $VERBOSE
+      File::Utils.ln_s '/dev/null' mask_path
+      system('systemctl daemon-reload')
+    end
+  end
+  # update rc.d
+  system("update-rc.d clamav-daemon enable 3 4 5")
+  # if av shouldn't be on and is, stop it.
+  if system("/etc/init.d/clamav-daemon status")
+    system("/etc/init.d/clamav-daemon stop")
+  end
+
+end
+
+# vi: set softtabstop=0 expandtab shiftwidth=4 smarttab
