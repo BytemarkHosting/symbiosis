@@ -46,24 +46,26 @@ opts.each do |opt, arg|
 end
 
 enable_av = false
+puts "Looking for domains with config/antivirus set" if $VERBOSE
 Symbiosis::Domains.each do |domain|
+  nt = "."
   if get_param("antivirus", domain.config_dir)
-    puts "#{domain.name} has antivirus config file" if $VERBOSE
     enable_av = true
+  else
+    nt = "n't"
   end
+  puts "  #{domain.name} does#{nt}" if $VERBOSE
 end
 
 endis = enable_av ? 'en' : 'dis'
 
-puts "going to #{endis}able clamav-daemon" if $VERBOSE
-
-mask_path = '/etc/systemd/system/clamav-daemon.service'
+puts "\r\nGoing to #{endis}able clamav-daemon" if $VERBOSE
 
 if enable_av
   unmask_service "clamav-daemon"
   # if av should be on, and isn't, start it
   unless service_running? "clamav-daemon"
-    puts start_service("clamav-daemon") ? "ok" : "fail"
+    start_service("clamav-daemon")
   end
 else
   mask_service "clamav-daemon"

@@ -507,32 +507,36 @@ module Symbiosis
 
     def guess_init_system
       if File.exist?('/run/systemd/system')
-        puts "systemd detected" if $VERBOSE
+        puts "  (systemd detected)" if $VERBOSE
         return :systemd
       elsif system("which initctl > /dev/null 2>&1")
         if `initctl version` =~ /upstart/
-          puts "upstart detected" if $VERBOSE
+          puts "  (upstart detected)" if $VERBOSE
           return :upstart
         else
-          puts "initctl shim detected" if $VERBOSE
+          puts "  (initctl shim detected)" if $VERBOSE
           return :upstart # if there's an upstart shim we might still be able to use it
         end
       else
-        puts "nothing detected - assuming init scripts will work" if $VERBOSE
+        puts " (nothing detected, defaulting to sysvinit)" if $VERBOSE
         return :sysv
       end
 
     end
 
     def service_running?(service)
-      case guess_init_system
+      puts "Finding out if #{service} is running..." if $VERBOSE
+      
+      running = case guess_init_system
       when :systemd
-        system("systemctl status #{service}")
+        system("systemctl status #{service} >/dev/null 2>&1")
       when :upstart
-        system("initctl start #{serice}")
+        system("initctl start #{serice} >/dev/null 2>&1")
       when :sysv
-        system("/etc/init.d/#{service} start")
+        system("/etc/init.d/#{service} start >/dev/null 2>&1")
       end
+      puts running ? "  it is" : "  it's not" if $VERBOSE
+      running
     end
 
     # prevent a service from running on boot
@@ -542,14 +546,22 @@ module Symbiosis
       case guess_init_system
       when :systemd
         puts "Masking #{service}.service" if $VERBOSE
-        FileUtils.ln_s '/dev/null', "/etc/systemd/system/#{service}.service"
+	unless File.exist? "/etc/systemd/system/#{service}.service"
+		FileUtils.ln_s '/dev/null', "/etc/systemd/system/#{service}.service"
+	else
+		if "/dev/null" == File.readlink("/etc/systemd/system/#{service}.service")
+			puts "  already masked - nothing to do" if $VERBOSE
+		else
+			puts "There's already a file at /etc/systemd/system/#{service}.service - bailing out of masking.\r\nThis may because the system administrator has made their own alterations. Should make a directory called #{service}.service.d instead, or disable this script from running in /etc/cron.d/symbiosis-email"
+		end
+	end
         puts "Reloading systemd" if $VERBOSE
         system("systemctl daemon-reload")
       when :upstart
         puts "Doing nothing because I don't know how to mask an upstart service" if $VERBOSE
         # ???
       when :sysv
-        puts "disabling #{service} on all runlevels" if $VERBOSE
+        puts "Disabling #{service} on all runlevels" if $VERBOSE
         system("update-rc.d #{service} disable 2 3 4 5")
       end
     end
@@ -560,8 +572,12 @@ module Symbiosis
     def unmask_service(service)
       case guess_init_system
       when :systemd
-        puts "Unmasking #{service}.service"
-        File.delete "/etc/systemd/system/#{service}.service"
+        puts "Unmasking #{service}.service" if $VERBOSE
+	if File.exist? "/etc/systemd/system/#{service}.service"
+	  File.delete "/etc/systemd/system/#{service}.service"
+	else
+	  puts "  already unmasked" if $VERBOSE
+	end
         puts "Reloading systemd" if $VERBOSE
         system("systemctl daemon-reload")
       when :upstart
@@ -584,6 +600,7 @@ module Symbiosis
         system("/etc/init.d/#{service} start")
       end
       puts ( success ? "ok" : "fail" ) if $VERBOSE
+      success
     end
 
     def stop_service(service)
