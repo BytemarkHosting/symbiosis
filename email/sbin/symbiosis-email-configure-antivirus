@@ -27,6 +27,8 @@ require 'symbiosis/domains'
 require 'symbiosis/utils'
 require 'fileutils'
 
+include Symbiosis::Utils
+
 help = verbose = false
 opts = GetoptLong.new(
   [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
@@ -45,7 +47,7 @@ end
 
 enable_av = false
 Symbiosis::Domains.each do |domain|
-  if Symbiosis::Utils.get_param("antivirus", domain.config_dir)
+  if get_param("antivirus", domain.config_dir)
     puts "#{domain.name} has antivirus config file" if $VERBOSE
     enable_av = true
   end
@@ -58,41 +60,17 @@ puts "going to #{endis}able clamav-daemon" if $VERBOSE
 mask_path = '/etc/systemd/system/clamav-daemon.service'
 
 if enable_av
-  # unmask clamav-daemon
-  if File.exist?(mask_path)
-    puts "Unmasking clamav-daemon.service" if $VERBOSE
-    File.delete '/dev/null', mask_path
-    system('systemctl daemon-reload')
-  else
-    puts "clamav-daemon.service already unmasked" if $VERBOSE
-  end
-  # update rc.d
-  system("update-rc.d clamav-daemon disable 2 3 4 5")
-
+  unmask_service "clamav-daemon"
   # if av should be on, and isn't, start it
-  unless system("/etc/init.d/clamav-daemon status")
-    puts "starting clamav-daemon..."
-    puts system("/etc/init.d/clamav-daemon start") ? "ok" : "fail"
+  unless service_running? "clamav-daemon"
+    puts start_service("clamav-daemon") ? "ok" : "fail"
   end
 else
-  # mask systemd
-  if File.exist? '/etc/systemd'
-    unless File.exist?(mask_path) then
-      puts "masking #{mask_path}" if $VERBOSE
-      FileUtils.ln_s '/dev/null', mask_path
-      system('systemctl daemon-reload')
-    end
+  mask_service "clamav-daemon"
+  # if av should be on, and isn't, start it
+  if service_running? "clamav-daemon"
+    stop_service "clamav-daemon"
   end
-  # update rc.d
-  system("update-rc.d clamav-daemon enable 3 4 5")
-  # if av shouldn't be on and is, stop it.
-  if system("/etc/init.d/clamav-daemon status")
-    puts "stopping clamav-daemon..."
-    puts system("/etc/init.d/clamav-daemon stop") ? "ok" : "fail"
-  else
-    puts "couldn't get clamav status"
-  end
-
 end
 
 # vi: set softtabstop=0 expandtab shiftwidth=4 smarttab
