@@ -531,9 +531,9 @@ module Symbiosis
       when :systemd
         system("systemctl status #{service} >/dev/null 2>&1")
       when :upstart
-        system("initctl start #{serice} >/dev/null 2>&1")
+        system("initctl status #{serice} >/dev/null 2>&1")
       when :sysv
-        system("/etc/init.d/#{service} start >/dev/null 2>&1")
+        system("/etc/init.d/#{service} status >/dev/null 2>&1")
       end
       puts running ? "  it is" : "  it's not" if $VERBOSE
       running
@@ -546,15 +546,7 @@ module Symbiosis
       case guess_init_system
       when :systemd
         puts "Masking #{service}.service" if $VERBOSE
-	unless File.exist? "/etc/systemd/system/#{service}.service"
-		FileUtils.ln_s '/dev/null', "/etc/systemd/system/#{service}.service"
-	else
-		if "/dev/null" == File.readlink("/etc/systemd/system/#{service}.service")
-			puts "  already masked - nothing to do" if $VERBOSE
-		else
-			puts "There's already a file at /etc/systemd/system/#{service}.service - bailing out of masking.\r\nThis may because the system administrator has made their own alterations. Should make a directory called #{service}.service.d instead, or disable this script from running in /etc/cron.d/symbiosis-email"
-		end
-	end
+        system("systemctl mask #{service}.service")
         puts "Reloading systemd" if $VERBOSE
         system("systemctl daemon-reload")
       when :upstart
@@ -562,7 +554,7 @@ module Symbiosis
         # ???
       when :sysv
         puts "Disabling #{service} on all runlevels" if $VERBOSE
-        system("update-rc.d #{service} disable 2 3 4 5")
+        system("update-rc.d #{service} disable")
       end
     end
 
@@ -573,18 +565,14 @@ module Symbiosis
       case guess_init_system
       when :systemd
         puts "Unmasking #{service}.service" if $VERBOSE
-	if File.exist? "/etc/systemd/system/#{service}.service"
-	  File.delete "/etc/systemd/system/#{service}.service"
-	else
-	  puts "  already unmasked" if $VERBOSE
-	end
+        system("systemctl unmask #{service}.service")
         puts "Reloading systemd" if $VERBOSE
         system("systemctl daemon-reload")
       when :upstart
         # ???
       when :sysv
         puts "enabling #{service} on runlevels 3 & 5" if $VERBOSE
-        system("update-rc.d #{service} enable 3 4 5")
+        system("update-rc.d #{service} defaults")
       end
 
     end
