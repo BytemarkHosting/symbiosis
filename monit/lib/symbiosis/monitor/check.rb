@@ -114,7 +114,7 @@ module Symbiosis
 
       def initialize(description)
         @service = Service.from_description(description)
-	@connections = description[:connections]
+        @connections = description[:connections]
         @name = description[:name] || description[:unit_name]
       end
 
@@ -152,7 +152,7 @@ module Symbiosis
         return SystemExit::EX_OK if should_be_enabled? == service_enabled?
 
         if should_be_enabled?
-          return SystemExit::EX_UNAVAILABLE if @service.enable 
+          return SystemExit::EX_UNAVAILABLE if @service.enable
         else
           return SystemExit::EX_UNAVAILABLE if @service.disable
         end
@@ -178,12 +178,10 @@ module Symbiosis
 
       # This tests a TCP connection and the responses it receives.  It takes
       # a single argument of a Symbiosis::Monitor::TCPConnection object
-      def do_tcpconnection_check(connection)
-        raise ArgumentError unless connection.is_a?(Symbiosis::Monitor::TCPConnection)
-
+      def do_connection_check(connection)
         puts "Testing connection to #{connection.host}:#{connection.port}"
         connection.do_check
-        do_tcpresponse_check(connection.responses)
+        do_response_check(connection.responses)
         puts 'Connection test OK'
         SystemExit::EX_OK
       rescue Errno::ETIMEDOUT, Errno::ECONNREFUSED, Errno::EPROTO, IOError,
@@ -214,27 +212,31 @@ module Symbiosis
         @service.start
       end
 
+      def do_connections_check
+        unless @connections.nil?
+          results = @connections.map do |connection|
+            r = do_tcpconnection_check(connection)
+            restart if SystemExit::EX_TEMPFAIL == r
+            r
+          end
+
+          fails = results.reject { |r| r == SystemExit::EX_OK }
+          return fails.first unless fails.empty?
+        end
+        SystemExit::EX_OK
+      end
+
       def do_check
         return SystemExit::EX_UNAVAILABLE unless ensure_service_enabled
 
         return SystemExit::EX_TEMPFAIL unless ensure_service_running
 
-	unless @connections.nil?
-		results = @connections.map do |connection|
-			r = do_tcpconnection_check(connection)
-			restart if SystemExit::EX_TEMPFAIL == r
-		end
-
-		fails = results.reject { |r| r == SystemExit::EX_OK }
-		unless fails.empty?
-			return fails.first
-		end
-	end
-	SystemExit::EX_OK
+        do_connections_checks
+        SystemExit::EX_OK
       end
 
       # override this method to inspect and validate responses
-      def do_tcpresponse_check
+      def do_response_check
         true
       end
 
