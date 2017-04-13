@@ -58,7 +58,7 @@ module Symbiosis
       end
 
       def enabled?
-        %w[enabled linked static].contains unit_file_state
+        %w[enabled linked static].include? unit_file_state
       end
 
       def self.systemd?
