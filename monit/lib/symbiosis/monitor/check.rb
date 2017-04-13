@@ -114,6 +114,7 @@ module Symbiosis
 
       def initialize(description)
         @service = Service.from_description(description)
+	@connections = description[:connections]
         @name = description[:name] || description[:unit_name]
       end
 
@@ -148,7 +149,7 @@ module Symbiosis
       end
 
       def ensure_service_enabled
-        return SystemExit::EX_SUCCESS if should_be_enabled? == service_enabled?
+        return SystemExit::EX_OK if should_be_enabled? == service_enabled?
 
         if should_be_enabled?
           return SystemExit::EX_UNAVAILABLE if @service.enable 
@@ -158,7 +159,7 @@ module Symbiosis
         SystemExit::EX_OK
       end
 
-      def do_process_check
+      def ensure_service_running
         return SystemExit::EX_OK if should_be_running? == running?
 
         if should_be_running?
@@ -203,7 +204,7 @@ module Symbiosis
         return if should_ignore?
 
         puts "Attempting to stop #{@name}"
-        @serice.stop
+        @service.stop
       end
 
       def start
@@ -218,12 +219,18 @@ module Symbiosis
 
         return SystemExit::EX_TEMPFAIL unless ensure_service_running
 
-        @connections.each do |connection|
-          r = do_tcpconnection_check(connection)
-          restart if SystemExit::EX_TEMPFAIL == r
-        end
+	unless @connections.nil?
+		results = @connections.map do |connection|
+			r = do_tcpconnection_check(connection)
+			restart if SystemExit::EX_TEMPFAIL == r
+		end
 
-        r
+		fails = results.reject { |r| r == SystemExit::EX_OK }
+		unless fails.empty?
+			return fails.first
+		end
+	end
+	SystemExit::EX_OK
       end
 
       # override this method to inspect and validate responses
