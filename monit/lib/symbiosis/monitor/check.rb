@@ -176,9 +176,9 @@ module Symbiosis
         SystemExit::EX_SOFTWARE
       end
 
-      # This tests a TCP connection and the responses it receives.  It takes
+      # This tests a TCP connection and the responses it receives. It takes
       # a single argument of a Symbiosis::Monitor::TCPConnection object
-      def do_connection_check(connection)
+      def check_connection(connection)
         puts "Testing connection to #{connection.host}:#{connection.port}"
         connection.do_check
         do_response_check(connection.responses)
@@ -212,15 +212,14 @@ module Symbiosis
         @service.start
       end
 
-      def do_connections_check
+      def check_connections
         unless @connections.nil?
           results = @connections.map do |connection|
-            r = do_tcpconnection_check(connection)
-            restart if SystemExit::EX_TEMPFAIL == r
-            r
+            check_connection(connection)
           end
 
           fails = results.reject { |r| r == SystemExit::EX_OK }
+          restart if fails.first == SystemExit::EX_TEMPFAIL
           return fails.first unless fails.empty?
         end
         SystemExit::EX_OK
@@ -231,8 +230,7 @@ module Symbiosis
 
         return SystemExit::EX_TEMPFAIL unless ensure_service_running
 
-        do_connections_checks
-        SystemExit::EX_OK
+        check_connections
       end
 
       # override this method to inspect and validate responses

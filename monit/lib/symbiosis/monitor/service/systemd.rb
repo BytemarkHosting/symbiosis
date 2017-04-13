@@ -19,12 +19,12 @@ module Symbiosis
       #
       # It is not recommended to make use of the latter two options.
       DEFAULT_MODE = 'replace'.freeze
-      attr_accessor :name
+      attr_reader :name
 
       # needs to be initialised with a :unit_name param, or will error
       def initialize(description)
-        name = description[:unit_name]
-        @unit = DBus::Systemd::Unit.new(name + '.service')
+        @name = description[:unit_name]
+        @unit = DBus::Systemd::Unit.new(unit_file)
       end
 
       def running?
@@ -44,15 +44,15 @@ module Symbiosis
       def disable
         # 1st false means 'mask persistently', 2nd means 'don't replace
         # symlinks to other units'
-        DBus::Systemd::Manager.MaskUnitFiles name, false, false
+        manager.MaskUnitFiles [unit_file], false
         daemon_reload
         !enabled?
       end
 
       def enable
-        DBus::Systemd::Manager.EnableUnitFiles name, false, false
-        # 1st false means 'mask persistently', 2nd means 'don't force'
-        DBus::Systemd::Manager.UnmaskUnitFiles name, false, false
+        # 1st false means 'enable persistently', 2nd means 'don't force'
+        manager.EnableUnitFiles [unit_file], false, false
+        manager.UnmaskUnitFiles [unit_file], false
         daemon_reload
         enabled?
       end
@@ -62,13 +62,21 @@ module Symbiosis
       end
 
       def self.systemd?
-        DBus::Systemd::Manager.new.ListUnits
+        manager.ListUnits
         return true
       rescue NoMethodError
         return false
       end
 
       private
+
+      def manager
+        self.class.manager
+      end
+
+      def self.manager
+        @@manager ||= DBus::Systemd::Manager.new
+      end
 
       def active_state
         states = @unit.Get(DBus::Systemd::Unit::INTERFACE, 'ActiveState')
@@ -97,8 +105,12 @@ module Symbiosis
         end
       end
 
+      def unit_file
+	"#{name}.service"
+      end
+
       def daemon_reload
-        Dbus::Systemd::Manager.Reload
+        manager.Reload
       end
     end
   end
