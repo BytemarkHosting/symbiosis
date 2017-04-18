@@ -234,7 +234,7 @@ module Symbiosis
       end
 
       # override this method to inspect and validate responses
-      def do_response_check(connection)
+      def do_response_check(_connection)
         true
       end
 
