@@ -2,66 +2,26 @@
 
 require 'symbiosis/monitor/check'
 
+# ensure pureftpd is running and can be connected to
 class PureFtpdCheck < Symbiosis::Monitor::Check
-
   def initialize
-    super
-    @process.pidfile = "/var/run/pure-ftpd/pure-ftpd.pid"
-    @process.initscript = "/etc/init.d/pure-ftpd"
-    @name = "pure-ftpd"
-  end
-
-#  def stop
-#    super
-#
-#    #
-#    # Stupid pure-ftpd is sometimes a bit rubbish at creating a PID file...
-#    #
-#    `pgrep -x #{@name}`.split($/).each do |pid|
-#      #
-#      # Sanity check the process.
-#      #
-#      next unless pid =~ /^\d+$/
-#      pid = pid.to_i
-#
-#      #
-#      # Avoid suicide.
-#      #
-#      next if Process.pid == pid
-#
-#      # 
-#      # die die die
-#      #
-#      puts "#{@name} isn't dead.  Attempting to kill its pid #{pid}."
-#      Process.kill(15,pid)
-#    end
-#  end
-#
-  def do_check
-    return SystemExit::EX_CONFIG unless initscript_ok?
-
-    r = do_process_check
-    self.restart if SystemExit::EX_TEMPFAIL == r
-    return r unless 0 == r
-
-    tcpconnection = Symbiosis::Monitor::TCPConnection.new(
-      "localhost",
-      "ftp", 
-      [/^\d+ /,"NOOP\r\n",/^\d+ /,"QUIT\r\n",/^\d /])
-
-    r = do_tcpconnection_check(tcpconnection)
-
-    self.restart if SystemExit::EX_TEMPFAIL == r
-
-    return r
+    super pid_file: '/var/run/pure-ftpd/pure-ftpd.pid',
+          init_script: '/etc/init.d/pure-ftpd',
+          unit_name: 'pure-ftpd'
   end
 
   def do_response_check(responses)
-    bad = responses.find{|l| l !~ /^2\d+[ -]/}
-    raise "Unexpected response '#{bad}'" unless bad.nil? 
+    bad = responses.find { |l| l !~ /^2\d+[ -]/ }
+    raise "Unexpected response '#{bad}'" unless bad.nil?
   end
-
 end
 
-exit PureFtpdCheck.new.do_check if $0 == __FILE__
+connections = [
+  Symbiosis::Monitor::TCPConnection.new(
+    'localhost',
+    'ftp',
+    [/^\d+ /, "NOOP\r\n", /^\d+ /, "QUIT\r\n", /^\d /]
+  )
+]
 
+exit PureFtpdCheck.new(connections).do_check if $PROGRAM_NAME == __FILE__

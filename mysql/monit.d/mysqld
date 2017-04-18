@@ -2,46 +2,49 @@
 
 require 'symbiosis/monitor/check'
 
+# ensure service is running and responds to pings
 class MysqldCheck < Symbiosis::Monitor::Check
-
   def initialize
-    super
-    @process.pidfile = "/var/run/mysqld/mysqld.pid"
-    @process.initscript = "/etc/init.d/mysql"
-    @name = "mysqld"
+    super pid_file: '/var/run/mysqld/mysqld.pid',
+          init_script: '/etc/init.d/mysql',
+          unit_name: 'mysqld'
   end
 
-  def do_check
-    return SystemExit::EX_CONFIG unless File.executable?("/usr/bin/mysqladmin")
-    return SystemExit::EX_CONFIG unless initscript_ok?
-
-    r = do_process_check
-    self.restart if SystemExit::EX_TEMPFAIL == r
-    return r unless 0 == r
-
-    debian_conf = "/etc/mysql/debian.cnf"
-    if not File.readable?(debian_conf)
+  def config_readable?
+    debian_conf = '/etc/mysql/debian.cnf'
+    unless File.readable?(debian_conf)
       puts "Unable to test connection, as #{debian_conf} is not readable"
       return SystemExit::EX_NOPERM
     end
-    begin
-      puts "Testing connection with a ping"
-      cmd = "/usr/bin/mysqladmin --defaults-extra-file=#{debian_conf} -u debian-sys-maint ping 2>&1"
-      Kernel.system(cmd)
-      if $?.success?
-        puts "Connection tested OK."
-        return SystemExit::EX_OK
-      else
-        puts "Connection test failed."
-        self.restart
-        return SystemExit::EX_TEMPFAIL
-      end
-    rescue => err
-      puts "Connection test failed permanently."
-      return SystemExit::EX_UNAVAILABLE
+  end
+
+  def ping_check
+    puts 'Testing connection with a ping'
+    cmd = "/usr/bin/mysqladmin --defaults-extra-file=#{debian_conf} -u debian-sys-maint ping 2>&1"
+    Kernel.system(cmd)
+    if $CHILD_STATUS.success?
+      puts 'Connection tested OK.'
+      return SystemExit::EX_OK
+    else
+      puts 'Connection test failed.'
+      restart
+      return SystemExit::EX_TEMPFAIL
     end
   end
 
+  def do_check
+    r = super
+    return r unless SystemExit::EX_OK == r
+    return SystemExit::EX_CONFIG unless File.executable?('/usr/bin/mysqladmin')
+
+    r = config_readable?
+    return r unless SystemExit::EX_OK == r
+
+    ping_check
+  rescue => err
+    puts "Connection test errored - #{err}"
+    return SystemExit::EX_UNAVAILABLE
+  end
 end
 
-exit MysqldCheck.new.do_check if $0 == __FILE__
+exit MysqldCheck.new.do_check if $PROGRAM_NAME == __FILE__
