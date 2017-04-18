@@ -5,10 +5,9 @@ require 'symbiosis/monitor/check'
 class SpamdCheck < Symbiosis::Monitor::Check
 
   def initialize
-    super
-    @process.pidfile = "/var/run/spamassassin.pid"
-    @process.initscript = "/etc/init.d/spamassassin"
-    @name = "/usr/sbin/spamd"
+    super pid_file: '/var/run/spamassassin.pid',
+          init_script: '/etc/init.d/spamassassin',
+          unit_name: 'spamassassin'
   end
 
   def should_be_running

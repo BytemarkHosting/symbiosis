@@ -5,10 +5,9 @@ require 'symbiosis/monitor/check'
 class DovecotCheck < Symbiosis::Monitor::Check
 
   def initialize
-    super
-    @process.pidfile = "/var/run/dovecot/master.pid"
-    @process.initscript = "/etc/init.d/dovecot"
-    @name = "dovecot"
+    super pid_file: '/var/run/dovecot/master.pid',
+          initscript: '/etc/init.d/dovecot',
+          unit_name: 'dovecot'
   end
 
   def protocols

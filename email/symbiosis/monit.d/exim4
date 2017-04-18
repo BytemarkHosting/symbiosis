@@ -5,10 +5,9 @@ require 'symbiosis/monitor/check'
 class Exim4Check < Symbiosis::Monitor::Check
 
   def initialize
-    super
-    @process.pidfile = "/var/run/exim4/exim.pid"
-    @process.initscript = "/etc/init.d/exim4"
-    @name = "exim4"
+    super pid_file: '/var/run/exim4/exim.pid',
+          init_script: '/etc/init.d/exim4',
+          unit_name: 'exim4'
   end
 
   def do_check
