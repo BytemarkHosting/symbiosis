@@ -5,5 +5,3 @@ module Symbiosis
 
   end
 end
-
-# vim: softtabstop=0 expandtab shiftwidth=2 smarttab:
