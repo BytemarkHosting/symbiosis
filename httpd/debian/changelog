@@ -1,3 +1,9 @@
+symbiosis-httpd (2015:1113) stable; urgency=medium
+
+  * Removed symbiosis-common as a build-dep.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 19 Apr 2017 10:35:41 +0100
+
 symbiosis-httpd (2015:1112) stable; urgency=medium
 
   * Udated HTTP cipher lists.
