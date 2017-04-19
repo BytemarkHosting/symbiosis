@@ -4,10 +4,11 @@ require 'symbiosis/monitor/check'
 
 # ensure pureftpd is running and can be connected to
 class PureFtpdCheck < Symbiosis::Monitor::Check
-  def initialize
+  def initialize(connections)
     super pid_file: '/var/run/pure-ftpd/pure-ftpd.pid',
           init_script: '/etc/init.d/pure-ftpd',
-          unit_name: 'pure-ftpd'
+          unit_name: 'pure-ftpd',
+	  connections: connections
   end
 
   def do_response_check(responses)

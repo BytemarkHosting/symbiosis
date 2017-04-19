@@ -1,9 +1,11 @@
 #!/usr/bin/ruby
 
 require 'symbiosis/monitor/check'
+require 'English'
 
 # ensure service is running and responds to pings
 class MysqldCheck < Symbiosis::Monitor::Check
+	DEBIAN_CONFIG_PATH = '/etc/mysql/debian.cnf'.freeze
   def initialize
     super pid_file: '/var/run/mysqld/mysqld.pid',
           init_script: '/etc/init.d/mysql',
@@ -11,16 +13,16 @@ class MysqldCheck < Symbiosis::Monitor::Check
   end
 
   def config_readable?
-    debian_conf = '/etc/mysql/debian.cnf'
-    unless File.readable?(debian_conf)
-      puts "Unable to test connection, as #{debian_conf} is not readable"
+    unless File.readable?(DEBIAN_CONFIG_PATH)
+      puts "Unable to test connection, as #{DEBIAN_CONFIG_PATH} is not readable"
       return SystemExit::EX_NOPERM
     end
+    SystemExit::EX_OK
   end
 
   def ping_check
     puts 'Testing connection with a ping'
-    cmd = "/usr/bin/mysqladmin --defaults-extra-file=#{debian_conf} -u debian-sys-maint ping 2>&1"
+    cmd = "/usr/bin/mysqladmin --defaults-extra-file=#{DEBIAN_CONFIG_PATH} ping 2>&1"
     Kernel.system(cmd)
     if $CHILD_STATUS.success?
       puts 'Connection tested OK.'
@@ -34,13 +36,14 @@ class MysqldCheck < Symbiosis::Monitor::Check
 
   def do_check
     r = super
+    puts "Trying to ping mysql"
     return r unless SystemExit::EX_OK == r
     return SystemExit::EX_CONFIG unless File.executable?('/usr/bin/mysqladmin')
 
     r = config_readable?
     return r unless SystemExit::EX_OK == r
 
-    ping_check
+    return ping_check
   rescue => err
     puts "Connection test errored - #{err}"
     return SystemExit::EX_UNAVAILABLE

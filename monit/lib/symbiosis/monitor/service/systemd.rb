@@ -24,7 +24,10 @@ module Symbiosis
       # needs to be initialised with a :unit_name param, or will error
       def initialize(description)
         @name = description[:unit_name]
-        @unit = DBus::Systemd::Unit.new(unit_file)
+      end
+
+      def unit
+        @unit ||= DBus::Systemd::Unit.new(unit_file)
       end
 
       def running?
@@ -32,12 +35,12 @@ module Symbiosis
       end
 
       def start(mode = DEFAULT_MODE)
-        @unit.Start mode
+        unit.Start mode
         running?
       end
 
       def stop(mode = DEFAULT_MODE)
-        @unit.Stop mode
+        unit.Stop mode
         !running?
       end
 
@@ -46,19 +49,25 @@ module Symbiosis
         # symlinks to other units'
         manager.MaskUnitFiles [unit_file], false
         daemon_reload
+        sleep 1
         !enabled?
       end
 
       def enable
         # 1st false means 'enable persistently', 2nd means 'don't force'
-        manager.EnableUnitFiles [unit_file], false, false
         manager.UnmaskUnitFiles [unit_file], false
         daemon_reload
+        sleep 1
+        return true if enabled?
+
+        manager.EnableUnitFiles [unit_file], false, false
+        daemon_reload
+        sleep 1
         enabled?
       end
 
       def enabled?
-        %w[enabled linked static].include? unit_file_state
+        'loaded' == load_state && %w[enabled linked static generated].include?(unit_file_state)
       end
 
       def self.systemd?
@@ -68,18 +77,18 @@ module Symbiosis
         return false
       end
 
+      def self.manager
+        @manager ||= DBus::Systemd::Manager.new
+      end
+
       private
 
       def manager
         self.class.manager
       end
 
-      def self.manager
-        @@manager ||= DBus::Systemd::Manager.new
-      end
-
       def active_state
-        states = @unit.Get(DBus::Systemd::Unit::INTERFACE, 'ActiveState')
+        states = unit.Get(DBus::Systemd::Unit::INTERFACE, 'ActiveState')
         if states.count.zero?
           'unknown'
         else
@@ -88,7 +97,7 @@ module Symbiosis
       end
 
       def load_state
-        states = @unit.Get(DBus::Systemd::Unit::INTERFACE, 'LoadState')
+        states = unit.Get(DBus::Systemd::Unit::INTERFACE, 'LoadState')
         if states.count.zero?
           'unknown'
         else
@@ -97,7 +106,7 @@ module Symbiosis
       end
 
       def unit_file_state
-        states = @unit.Get(DBus::Systemd::Unit::INTERFACE, 'UnitFileState')
+        states = manager.GetUnitFileState(unit_file)
         if states.count.zero?
           'unknown'
         else
@@ -106,7 +115,7 @@ module Symbiosis
       end
 
       def unit_file
-	"#{name}.service"
+        "#{@name}.service"
       end
 
       def daemon_reload
