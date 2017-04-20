@@ -1,3 +1,10 @@
+symbiosis-httpd-logger (0.3) stable; urgency=medium
+
+  * Mask out non-permissions bits from file mode inherited from directory
+    (thanks to @banburybill).
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 19 Apr 2017 10:43:19 +0100
+
 symbiosis-httpd-logger (0.2) stable; urgency=medium
 
   * Non-maintainer upload.

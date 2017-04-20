@@ -1,3 +1,12 @@
+symbiosis-email (2015:1216) stable; urgency=medium
+
+  * Removed further references to $HOSTNAME in tests.
+  * Added ruby-cracklib as an install dependency.
+  * Start services in tests with invoke-rc.d instead of service.
+  * Tidy how the hostname is set during testing.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 19 Apr 2017 10:39:29 +0100
+
 symbiosis-email (2015:1215) stable; urgency=medium
 
   * Allow underscores in DKIM selectors.
