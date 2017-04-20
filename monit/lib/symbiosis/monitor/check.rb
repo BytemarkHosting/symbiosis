@@ -163,9 +163,9 @@ module Symbiosis
         return SystemExit::EX_OK if should_be_running? == running?
 
         if should_be_running?
-          return SystemExit::EX_TEMPFAIL unless @service.start
+          return SystemExit::EX_TEMPFAIL unless start
         else
-          return SystemExit::EX_TEMPFAIL unless @service.stop
+          return SystemExit::EX_TEMPFAIL unless stop
           SystemExit::EX_OK
         end
       rescue Errno::EACCES, Errno::EPERM => err

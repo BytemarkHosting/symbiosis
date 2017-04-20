@@ -26,10 +26,6 @@ module Symbiosis
         @name = description[:unit_name]
       end
 
-      def unit
-        @unit ||= DBus::Systemd::Unit.new(unit_file)
-      end
-
       def running?
         active_state == 'active' || active_state == 'activating'
       end
@@ -85,6 +81,10 @@ module Symbiosis
 
       def manager
         self.class.manager
+      end
+
+      def unit
+        @unit ||= DBus::Systemd::Unit.new(unit_file)
       end
 
       def active_state
