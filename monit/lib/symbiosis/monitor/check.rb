@@ -145,6 +145,7 @@ module Symbiosis
       end
 
       def service_enabled?
+        puts 'Checking service is enabled'
         @service.enabled?
       end
 

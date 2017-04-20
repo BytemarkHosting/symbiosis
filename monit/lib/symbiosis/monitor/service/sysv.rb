@@ -4,8 +4,8 @@ module Symbiosis
     # for inspecting and altering a process started by an init script under
     # sysvinit and compatible inits
     class SysvService
-	    # default runlevels to use in the abscence of info
-	    START_RUNLEVELS = ['3','4','5'].freeze
+      # default runlevels to use in the abscence of info
+      START_RUNLEVELS = %w[3 4 5].freeze
       # description requires a :pid_file and an :init_script, both of which are
       # full path. The pid file must be made when the service is started.
       # if :process_name is provided, running? will make sure the process it
@@ -25,56 +25,54 @@ module Symbiosis
       end
 
       def running?
-       name == @expected_name
+        name == @expected_name
       rescue Errno::ESRCH, Errno::ENOENT
         false
       end
 
       def enabled?
-	      !rc_scripts.grep(/rc[#{START_RUNLEVELS.join}]\.d\/S/).empty?
+        !rc_scripts.grep(%r{rc[#{START_RUNLEVELS.join}]\.d/S}).empty?
       end
 
       def enable
-	      puts "enabling #{initscript_name}"
-	      # updated-rc.d defaults does nothing and returns 0 if scripts already exist
-	      system("update-rc.d defaults #{initscript_name}") if rc_scripts.empty?
-	      unless 0 == $CHILD_STATUS
-		      puts 'update-rc.d failed - giving up on enabling'
-		      return true
-	      end
-	      return false if enabled?
-	      # if we're still here, rc scripts already existed but
-	      # set all our runlevels to kill so let's fix that
-	      rename_rc_scripts /^K/, 'S'
+        puts "enabling #{initscript_name}"
+        # updated-rc.d defaults does nothing and returns 0 if scripts already exist
+        system("update-rc.d defaults #{initscript_name}") if rc_scripts.empty?
+        unless $CHILD_STATUS.zero?
+          puts 'update-rc.d failed - giving up on enabling'
+          return true
+        end
+        return false if enabled?
+        # if we're still here, rc scripts already existed but
+        # set all our runlevels to kill so let's fix that
+        rename_rc_scripts(/^K/, 'S')
       end
 
       def disable
-	      puts "disabling #{initscript_name}"
-	      rename_rc_scripts /^S/, 'K'
+        puts "disabling #{initscript_name}"
+        rename_rc_scripts(/^S/, 'K')
       end
 
       private
 
-      def rename_rc_scripts(pattern, replacement, runlevels=START_RUNLEVELS)
-	      rc_scripts.each do |old_path|
-		      dir = File.dirname(old_path)
-		      if old_path =~ /^\/etc\/rc[#{runlevels.join}]\.d\/K.+$/
-			      new_name = File.basename(old_path).sub pattern, replacement
-			      new_path = File.join(dir, new_name)
-			      puts "renaming #{old_path} to #{new_path}"
-			      File.rename old_path, new_path
-			else 
-				puts "#{old_path} didn't match regex"
-		      end
-	      end
+      def rename_rc_scripts(pattern, replacement, runlevels = START_RUNLEVELS)
+        rc_scripts.each do |old_path|
+          dir = File.dirname(old_path)
+          next unless old_path =~ %r{^/etc/rc[#{runlevels.join}]\.d/K.+$}
+
+          new_name = File.basename(old_path).sub pattern, replacement
+          new_path = File.join(dir, new_name)
+          puts "renaming #{old_path} to #{new_path}"
+          File.rename old_path, new_path
+        end
       end
 
       def initscript_name
-	      File.basename @initscript
+        File.basename @initscript
       end
 
       def rc_scripts
-	      Dir.glob("/etc/rc?.d/???#{initscript_name}")
+        Dir.glob("/etc/rc?.d/???#{initscript_name}")
       end
 
       def pid
@@ -127,8 +125,8 @@ module Symbiosis
       def do_initscript(action)
         return unless ::Process.uid.zero?
         check_initscript
-	Kernel.system("service #{File.basename @initscript} #{action} 2>&1")
-	$CHILD_STATUS
+        Kernel.system("service #{File.basename @initscript} #{action} 2>&1")
+        $CHILD_STATUS
       end
     end
   end
