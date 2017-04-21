@@ -3,13 +3,10 @@ stages:
   - package
   - publish
   - fresh-install
-  - install
 
 .test: &test
   stage: test
   image: $CI_REGISTRY/docker-images/layers:stretch-ruby
-  tags:
-    - docker
   script:
     - adduser --home=/srv --shell=/bin/bash --no-create-home --disabled-login --gecos='Symbiosis Administrator,,,' admin
     - chown admin.admin /srv
@@ -98,8 +95,6 @@ test:xmpp:
   artifacts:
     paths:
       - pkg/
-  tags:
-    - docker
 
 package:common:
   <<: *package
@@ -161,20 +156,20 @@ publish:
 #
 # These next two do not work in gitlab-ci, yet.
 #
-install:dist-upgrade:
-  <<: *install
-  variables:
-    VERBOSE: --verbose
-    install_or_upgrade: dist-upgrade
-    chroot: chroot:jessie-amd64
-
-
-install:upgrade:
-  <<: *install
-  variables:
-    VERBOSE: --verbose
-    install_or_upgrade: upgrade
-    chroot: chroot:stretch-amd64
+#install:dist-upgrade:
+#  <<: *install
+#  variables:
+#    VERBOSE: --verbose
+#    install_or_upgrade: dist-upgrade
+#    chroot: chroot:jessie-amd64
+#
+#
+#install:upgrade:
+#  <<: *install
+#  variables:
+#    VERBOSE: --verbose
+#    install_or_upgrade: upgrade
+#    chroot: chroot:stretch-amd64
 
 install:fresh-install:
   <<: *install
