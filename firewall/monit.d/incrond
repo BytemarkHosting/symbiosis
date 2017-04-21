@@ -7,7 +7,8 @@ class IncrondCheck < Symbiosis::Monitor::Check
   def initialize
     super pid_file: '/var/run/incrond.pid',
           init_script: '/etc/init.d/incron',
-          unit_name: 'incron'
+          unit_name: 'incron',
+          process_name: 'incrond'
   end
 end
 
