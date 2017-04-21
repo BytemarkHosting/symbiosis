@@ -87,7 +87,7 @@ module Symbiosis
       def unit
         @unit ||= DBus::Systemd::Unit.new(unit_file)
       rescue DBus::Error => err
-        raise err unless err.error_name == NO_SUCH_UNIT_ERROR
+        raise err unless err.name == NO_SUCH_UNIT_ERROR
         # if the unit cannot be found, maybe it's a linked unit
         # - linked units don't seem to get loaded on boot (unless
         # the linked name is wanted by another unit or a target)
