@@ -5,9 +5,10 @@ require 'symbiosis/monitor/check'
 # Ensure spamassassin is running and responds to pings
 class SpamdCheck < Symbiosis::Monitor::Check
   def initialize(connections)
-    super pid_file: '/var/run/spamassassin.pid',
+    super pid_file: '/var/run/spamd.pid',
           init_script: '/etc/init.d/spamassassin',
           unit_name: 'spamassassin',
+          process_name: '/usr/sbin/spamd',
           connections: connections
   end
 

@@ -8,6 +8,7 @@ class SshdCheck < Symbiosis::Monitor::Check
     super pid_file: '/var/run/sshd.pid',
           init_script: '/etc/init.d/ssh',
           unit_name: 'ssh',
+          process_name: 'sshd',
           connections: connections
   end
 
