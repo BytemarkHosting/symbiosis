@@ -19,88 +19,33 @@ module Symbiosis
     #  # Inherit the Check class.
     #  #
     #  class SshdCheck < Symbiosis::Monitor::Check
-    #
-    #   #
-    #   # Return the port as needed
-    #   #
-    #   attr_reader :port
-    #
-    #   #
-    #   # Set up some defailt locations
-    #   # -- the pidfile, initscript, process name and TCP port.
-    #   #
     #   def initialize
-    #   super
-    #   @process.pidfile = "/var/run/sshd.pid"
-    #   @process.initscript = "/etc/init.d/ssh"
-    #   @name = "sshd"
-    #   @port = 22
+    #   super pid_file: '/var/run/sshd.pid' # pid file to check under sysvinit
+    #         # init script to call under sysvinit
+    #         init_script: '/etc/init.d/ssh'
     #
-    #   # # See if the port can be gleaned from the SSH config.
-    #   #
-    #   if ( File.exist?( "/etc/sshd/sshd_config" ) )
+    #         # process name under sysvinit.
+    #         # see `grep Name /proc/<pid>/status` for the process name
+    #         process_name: 'sshd',
     #
-    #     File("file").readlines.each |l|
-    #     @port = $1.to_i if l =~ /^Port\s+(\d+)/
-    #   end
-    #   end
+    #         # unit name under systemd
+    #         unit_name: 'ssh',
     #
-    #   #
-    #   # Run the check -- this overrides the default do_check class in
-    #   # Symbiosis::Monitor::Check
-    #   #
-    #   def do_check
-    #   #
-    #   # Check our initscript, and return a config error if it is wrong.
-    #   #
-    #   return SystemExit::EX_CONFIG unless initscript_ok?
-    #
-    #   #
-    #   # Do the process check
-    #   #
-    #   r = do_process_check
-    #
-    #   #
-    #   # Restart if the process check returns a temporary error.
-    #   #
-    #   self.restart if SystemExit::EX_TEMPFAIL == r
-    #
-    #   #
-    #   # Return if the process check wasn't successful.
-    #   #
-    #   return r unless r.successful?
-    #
-    #   #
-    #   # Set up a TCP connection test.
-    #   #
-    #   tcpconnection = Symbiosis::Monitor::TCPConnection.new(
-    #     "localhost", @port, [nil,"SSH-2.0-OpenSSH-4.3p2\n"]
-    #   )
-    #
-    #   #
-    #   # Run the TCP connection check,
-    #   #
-    #   r = do_tcpconnection_check(tcpconnection)
-    #
-    #   #
-    #   # Try to restart if the check returned a temporary failure.
-    #   #
-    #   self.restart if SystemExit::EX_TEMPFAIL == r
-    #
-    #   #
-    #   # Finally return the result from the TCP check.
-    #   #
-    #   return r
-    #   end
+    #         # a set of connections (currently
+    #         # Symbiosis::Monitor::TCPConnection is the only kind)
+    #         # to check. If nil or empty, won't check any connections
+    #         connections: [Symbiosis::Monitor::TCPConnection.new(
+    #           # host , port, messages to send on connect
+    #           'localhost', 22, [nil, 'SSH-2.0-OpenSSH-5.5p1\n']
+    #         )]
     #
     #   #
     #   # This method is used in the TCP connection test to check the TCP
     #   # responses.
     #   #
     #   def do_response_check(responses)
-    #   raise "Unexpected response '#{responses.first}'" unless responses.first =~ /^SSH/
+    #     raise "Unexpected response '#{responses.first}'" unless responses.first =~ /^SSH/
     #   end
-    #
     #  end
     #
     #  #
