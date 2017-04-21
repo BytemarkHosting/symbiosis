@@ -19,6 +19,7 @@ module Symbiosis
       #
       # It is not recommended to make use of the latter two options.
       DEFAULT_MODE = 'replace'.freeze
+      NO_SUCH_UNIT_ERROR = 'org.freedesktop.systemd1.NoSuchUnit'.freeze
       attr_reader :name
 
       # needs to be initialised with a :unit_name param, or will error
@@ -85,6 +86,14 @@ module Symbiosis
 
       def unit
         @unit ||= DBus::Systemd::Unit.new(unit_file)
+      rescue DBus::Error => err
+        if err.error_name == NO_SUCH_UNIT_ERROR
+          # if the unit cannot be found, maybe it's a linked unit
+          # - linked units don't seem to get loaded on boot (unless
+          # the linked name is wanted by another unit or a target)
+          manager.LoadUnit(unit_file)
+          @unit ||= DBus::Systemd::Unit.new(unit_file)
+        end
       end
 
       def active_state
