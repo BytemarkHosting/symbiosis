@@ -7,7 +7,8 @@ class ProsodyCheck < Symbiosis::Monitor::Check
   def initialize
     super pid_file: '/var/run/prosody/prosody.pid',
           init_script: '/etc/init.d/prosody',
-          unit_name: 'prosody'
+          unit_name: 'prosody',
+          process_name: 'lua5.1'
   end
 
   def should_be_running
