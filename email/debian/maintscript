@@ -6,8 +6,3 @@ rm_conffile /etc/symbiosis/monit.d/clamav-freshclam 2014:1231
 rm_conffile /etc/symbiosis/test.d/exim4_acl_tests/testy 2010:0101
 rm_conffile /etc/symbiosis/test.d/exim4_acl_tests/test2 2010:0101
 rm_conffile /etc/symbiosis/test.d/exim4_acl_tests/test3 2010:0101
-rm_conffile /etc/symbiosis/monit.d/spamassassin 2016:0101
-rm_conffile /etc/symbiosis/monit.d/exim4 2016:0101
-rm_conffile /etc/symbiosis/monit.d/dovecot 2016:0101
-rm_conffile /etc/symbiosis/monit.d/clamav-freshclam 2016:0101
-rm_conffile /etc/symbiosis/monit.d/clamav-daemon 2016:0101
