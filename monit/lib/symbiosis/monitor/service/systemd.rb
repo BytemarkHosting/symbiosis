@@ -64,7 +64,7 @@ module Symbiosis
       end
 
       def enabled?
-        'loaded' == load_state && %w[enabled linked static generated].include?(unit_file_state)
+        %w[enabled linked static generated].include?(unit_file_state) && 'loaded' == load_state
       end
 
       def self.systemd?
