@@ -7,6 +7,12 @@ symbiosis-ftpd (2017:0424) stable; urgency=medium
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:17:55 +0100
 
+symbiosis-ftpd (2015:1109) stable; urgency=medium
+
+  * Use invoke-rc.d to restart services in postinst.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 19 Apr 2017 10:37:22 +0100
+
 symbiosis-ftpd (2015:1108) stable; urgency=medium
 
   * Updated cipher lists.

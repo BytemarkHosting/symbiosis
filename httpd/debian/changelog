@@ -2,10 +2,15 @@ symbiosis-httpd (2017:0424) stable; urgency=medium
 
   * Add snippet to force phpmyadmin to use https.
   * Use generated Diffie-Helman parameters.
-  * Removed build-dep on symbiosis-common.
   * Rewrote monit script to use systemd.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 14:41:06 +0100
+
+symbiosis-httpd (2015:1113) stable; urgency=medium
+
+  * Removed symbiosis-common as a build-dep.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 19 Apr 2017 10:35:41 +0100
 
 symbiosis-httpd (2015:1112) stable; urgency=medium
 

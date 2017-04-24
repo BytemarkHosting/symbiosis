@@ -4,6 +4,13 @@ symbiosis-backup (2017:0424) stable; urgency=medium
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:24:55 +0100
 
+symbiosis-backup (2015:1030) stable; urgency=medium
+
+  * Updated makefile; added no-op test target and fixed clean to actually
+    clean.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 19 Apr 2017 10:42:15 +0100
+
 symbiosis-backup (2015:1029) stable; urgency=medium
 
   * Updated the available space checker to parse the backup2l.conf more
