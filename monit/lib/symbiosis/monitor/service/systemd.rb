@@ -44,19 +44,19 @@ module Symbiosis
       def disable
         # 1st false means 'mask persistently', 2nd means 'don't replace
         # symlinks to other units'
-        manager.MaskUnitFiles [unit_file], false
+        manager.MaskUnitFiles [unit_file], false, false
         daemon_reload
         sleep 1
         !enabled?
       end
 
       def enable
-        # 1st false means 'enable persistently', 2nd means 'don't force'
         manager.UnmaskUnitFiles [unit_file], false
         daemon_reload
         sleep 1
         return true if enabled?
 
+        # 1st false means 'enable persistently', 2nd means 'don't force'
         manager.EnableUnitFiles [unit_file], false, false
         daemon_reload
         sleep 1
