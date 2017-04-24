@@ -1,11 +1,8 @@
-
-
 stages:
   - test
   - package
   - publish
   - fresh-install
-  - install
 
 .test: &test
   stage: test
@@ -146,34 +143,40 @@ publish:
 # fails on stretch for the time being - see issue #57 for updates
 .install: &install
   stage: install
-  image: $CI_REGISTRY/docker-images/base:stretch
-  except:
-  - /stretch/
   tags:
-    - docker-socket
-  variables:
-    VERBOSE: --verbose
+    - shell
+    - sautotest
   script:
-    - rm -fv /usr/sbin/policy-rc.d
-    - cd autotest
-    - echo ${CI_BUILD_NAME##install:} > test.d/conf/action
-    - "echo deb http://repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/ ./ >> test.d/conf/autotest-sources.list"
-    - run-parts $VERBOSE --new-session --exit-on-error $PWD/test.d
+    - echo $install_or_upgrade | tee autotest/test.d/conf/action
+    - touch autotest/external.d/VERBOSE
+    - echo "deb http://repo.bytemark.co.uk/open-source/symbiosis/$CI_BUILD_REF_NAME/latest/ ./" >> autotest/test.d/conf/autotest-sources.list
+    - "echo chosen chroot: $chroot"
+    - /usr/bin/sautotest -v -c "$chroot" -e $PWD/autotest/external.d/ autotest/test.d/
 
 #
 # These next two do not work in gitlab-ci, yet.
 #
-install:dist-upgrade:
-  <<: *install
-  image: $CI_REGISTRY/docker-images/base:jessie
-  allow_failure: true
-
-install:upgrade:
-  <<: *install
-  allow_failure: true
+#install:dist-upgrade:
+#  <<: *install
+#  variables:
+#    VERBOSE: --verbose
+#    install_or_upgrade: dist-upgrade
+#    chroot: chroot:jessie-amd64
+#
+#
+#install:upgrade:
+#  <<: *install
+#  variables:
+#    VERBOSE: --verbose
+#    install_or_upgrade: upgrade
+#    chroot: chroot:stretch-amd64
 
 install:fresh-install:
   <<: *install
+  variables:
+    VERBOSE: --verbose
+    install_or_upgrade: install
+    chroot: chroot:stretch-amd64
   stage: fresh-install
 
 
