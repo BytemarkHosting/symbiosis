@@ -1,3 +1,11 @@
+symbiosis-xmpp (2017:0424) stable; urgency=medium
+
+  * Updated DH params generation to use central script.
+  * Updated monit task to use systemd rather than sysvinit.
+  * Updated copyright.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:03:14 +0100
+
 symbiosis-xmpp (2015:1024) stable; urgency=medium
 
   * Updated cipher lists.
