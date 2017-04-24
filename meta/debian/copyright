@@ -5,6 +5,16 @@ Source: https://github.com/BytemarkHosting/symbiosis
 Files: *
 Copyright: 2008-2017, Bytemark Ltd
 License: GPL-2+
+
+Files: debian/bytemark-symbiosis.init update-motd.d/00-bytemark-symbiosis
+Copyright: 2008-2017, Bytemark Ltd
+           1991, Carl Pilcher
+Comment: Tentacles in ASCII art by Carl Pilcher, from
+         http://web.archive.org/web/19961222022156/http://www.afn.org/~afn39695/pilcher.htm
+License: GPL-2+
+
+
+License: GPL-2+
  This program is free software; you can redistribute it
  and/or modify it under the terms of the GNU General Public
  License as published by the Free Software Foundation; either
@@ -25,11 +35,3 @@ License: GPL-2+
  On Debian systems, the full text of the GNU General Public
  License version 2 can be found in the file
  `/usr/share/common-licenses/GPL-2'.
-
-Files: debian/bytemark-symbiosis.init update-motd.d/00-bytemark-symbiosis
-Copyright: 2008-2017, Bytemark Ltd
-           1991, Carl Pilcher
-Comment: Tentacles in ASCII art by Carl Pilcher, from
-         http://web.archive.org/web/19961222022156/http://www.afn.org/~afn39695/pilcher.htm
-License: GPL-2+
-
