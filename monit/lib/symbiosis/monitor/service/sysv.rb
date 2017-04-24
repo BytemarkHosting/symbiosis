@@ -58,7 +58,7 @@ module Symbiosis
       def rename_rc_scripts(pattern, replacement, runlevels = START_RUNLEVELS)
         rc_scripts.each do |old_path|
           dir = File.dirname(old_path)
-          next unless old_path =~ %r{^/etc/rc[#{runlevels.join}]\.d/K.+$}
+          next unless old_path =~ %r{/etc/rc[#{runlevels.join}]\.d/[SK]}
 
           new_name = File.basename(old_path).sub pattern, replacement
           new_path = File.join(dir, new_name)
