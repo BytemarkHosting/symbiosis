@@ -4,5 +4,5 @@
 #
 
 %:
-	dh --with apache2 $@ 
+	dh $@ --with apache2
 

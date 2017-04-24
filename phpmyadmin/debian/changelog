@@ -1,3 +1,13 @@
+symbiosis-phpmyadmin (2017:0424) stable; urgency=medium
+
+  * Use apache2 debhelper scripts to install config snippet.
+  * Remove HTTPS force redirect from phpmyadmin config as this is no longer
+    supported.
+  * Updated copyright, compat.
+  * Adjusted argument ordering in debian/rules
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:35:22 +0100
+
 symbiosis-phpmyadmin (2015:0618) stable; urgency=medium
 
   * Renamed File#exists? to File#exist?

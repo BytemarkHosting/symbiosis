@@ -1,7 +1,8 @@
 bytemark-symbiosis (2015:0825) stable; urgency=medium
 
   * Now depends on bytemark-keys as an alternative to symbiosis-keys.
-  * General dynamic MOTD reformatting. 
+  * General dynamic MOTD reformatting.
+  * Updated copyright.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 25 Aug 2015 14:18:30 +0100
 

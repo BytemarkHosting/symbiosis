@@ -12,6 +12,8 @@ Depends: bytemark-keys (>= 2015:0303) |  symbiosis-key (>= 2012:0813),
   symbiosis-updater (>= 2014:0113),
   lsb-base (>= 3.0-6),
   libpam-modules,
+  ruby,
+  python,
   python-apt,
   ${misc:Depends}
 Recommends: symbiosis-backup (>= 2014:0113),

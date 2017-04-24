@@ -1,3 +1,9 @@
+symbiosis-cron (2017:0424) stable; urgency=medium
+
+  * Updated copyright, compat. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:45:21 +0100
+
 symbiosis-cron (2015:1103) stable; urgency=medium
 
   * Now follows cron specs accurately when both month day and weekday fields
