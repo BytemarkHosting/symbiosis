@@ -1,3 +1,13 @@
+symbiosis-email (2017:0424) stable; urgency=medium
+
+  * Use central dhparam generation script to generate dhparams.
+  * Add dependency on ruby-cracklib.
+  * Auto-create standard mailboxes (Trash, Drafts, Sent, Spam) on first login.
+  * Rewrite monit tasks to use new systemd integrations.
+  * Redesign tests to detect the hostname better.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:20:08 +0100
+
 symbiosis-email (2015:1215) stable; urgency=medium
 
   * Allow underscores in DKIM selectors.
