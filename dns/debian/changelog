@@ -1,3 +1,9 @@
+symbiosis-dns (2017:0424) stable; urgency=medium
+
+  * Updated copyright, compat file.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:10:43 +0100
+
 symbiosis-dns (2015:1011) stable; urgency=medium
 
   * Avoid generating invalid SPF records by stripping any potential
