@@ -1,3 +1,10 @@
+symbiosis-webmail (2017:0424) stable; urgency=medium
+
+  * Automatically create default folders on login to roundcube.
+  * Updated copyright, compat files.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:33:41 +0100
+
 symbiosis-webmail (2015:1023) stable; urgency=medium
 
   * Remove symbiosis-webmail-squirrelmail because it is not packaged in
