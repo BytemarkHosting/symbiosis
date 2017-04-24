@@ -37,11 +37,13 @@ module Symbiosis
       def enable
         puts "enabling #{initscript_name}"
         # updated-rc.d defaults does nothing and returns 0 if scripts already exist
-        system("update-rc.d defaults #{initscript_name}") if rc_scripts.empty?
-        unless $CHILD_STATUS.zero?
-          puts 'update-rc.d failed - giving up on enabling'
-          return true
-        end
+	if rc_scripts.empty?
+		system("update-rc.d defaults #{initscript_name}")
+		unless $CHILD_STATUS.zero?
+			puts 'update-rc.d failed - giving up on enabling'
+			return true
+		end
+	end
         return false if enabled?
         # if we're still here, rc scripts already existed but
         # set all our runlevels to kill so let's fix that
