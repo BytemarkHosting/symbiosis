@@ -1,3 +1,9 @@
+symbiosis-httpd-logger (0.3.1) stable; urgency=medium
+
+  * Updated copyright and dh compatibility.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:39:11 +0100
+
 symbiosis-httpd-logger (0.3) stable; urgency=medium
 
   * Mask out non-permissions bits from file mode inherited from directory
