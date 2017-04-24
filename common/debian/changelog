@@ -1,3 +1,9 @@
+symbiosis-common (2017:0424) stable; urgency=medium
+
+  * Updated copyright to new machine-readable format.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:47:58 +0100
+
 symbiosis-common (2017:0328) stable; urgency=medium
 
   * Add symbiosis-generate-dhparams, which is used by other packages.
