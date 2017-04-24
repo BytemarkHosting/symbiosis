@@ -11,7 +11,7 @@ class ProsodyCheck < Symbiosis::Monitor::Check
           process_name: 'lua5.1'
   end
 
-  def should_be_running
+  def should_be_running?
     !Dir.glob('/srv/*/config/xmpp').empty?
   end
 end

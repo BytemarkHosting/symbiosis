@@ -12,7 +12,7 @@ class SpamdCheck < Symbiosis::Monitor::Check
           connections: connections
   end
 
-  def should_be_running
+  def should_be_running?
     !Dir.glob('/srv/*/config/antispam').empty?
   end
 

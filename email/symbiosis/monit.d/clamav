@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+require 'symbiosis/monitor/check'
+
+# Ensure clamav-daemon is running and responds to pings
+class ClamavCheck < Symbiosis::Monitor::Check
+  def initialize
+    super pid_file: '/run/clamav/clamd.pid',
+          init_script: '/etc/init.d/clamav-daemon',
+          unit_name: 'clamav-daemon',
+          process_name: 'clamd'
+  end
+
+  def should_be_running?
+    !Dir.glob('/srv/*/config/antivirus').empty?
+  end
+end
+
+exit ClamavCheck.new.do_check if $PROGRAM_NAME == __FILE__
