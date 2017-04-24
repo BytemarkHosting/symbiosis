@@ -1,3 +1,12 @@
+symbiosis-ftpd (2017:0424) stable; urgency=medium
+
+  * Updated dhparam generation script to use central service to regenerate
+    parameters.
+  * Updated monit script to use systemd.
+  * Updated copyright and compat files.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:17:55 +0100
+
 symbiosis-ftpd (2015:1108) stable; urgency=medium
 
   * Updated cipher lists.
