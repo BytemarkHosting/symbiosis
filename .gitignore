@@ -13,6 +13,7 @@ configure-stamp
 */debian/*.substvars
 */debian/files
 */debian/*.debhelper
+*/debian/debhelper-build-stamp
 */debian/check_file_copies/*
 */debian/transform_file_copies/*
 */man/*.man
@@ -22,8 +23,10 @@ configure-stamp
 *.dsc
 *.tar.gz
 *.tar.*
+*.buildinfo
 repo/*
-
+.*.sw?
+.sw?
 #
 #  Per-Package
 #
