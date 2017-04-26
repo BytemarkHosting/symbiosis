@@ -176,6 +176,8 @@ module Symbiosis
 
         return SystemExit::EX_TEMPFAIL unless ensure_service_running
 
+        return SystemExit::EX_OK unless should_be_running?
+
         check_connections
       end
 
