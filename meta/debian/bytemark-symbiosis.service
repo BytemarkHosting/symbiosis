@@ -22,3 +22,6 @@ ExecStart=/etc/init.d/bytemark-symbiosis start
 ExecStop=/etc/init.d/bytemark-symbiosis stop
 ExecReload=/etc/init.d/bytemark-symbiosis reload
 StandardOutput=tty
+
+[Install]
+WantedBy=multi-user.target
