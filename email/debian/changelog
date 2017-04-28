@@ -1,4 +1,4 @@
-symbiosis-email (2017:0428) stable; urgency=medium
+symbiosis-email (2015:1217) stable; urgency=medium
 
   * If pipe-delivery fails attempt to keep the failed message in the queue.
 
