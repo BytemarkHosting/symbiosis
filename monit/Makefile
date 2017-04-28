@@ -6,7 +6,8 @@ doc/index.html: lib
 
 man/symbiosis-monit.man: sbin/symbiosis-monit
 	[ -d man ] || mkdir man
-	RUBYLIB=./lib ./sbin/symbiosis-monit  --manual | txt2man -s 1 -t symbiosis-monit | sed -e 's/\\\\fB/\\fB/' > man/symbiosis-monit.man
+	RUBYLIB=./lib ./sbin/symbiosis-monit  --manual | txt2man -s 1 -t symbiosis-monit | sed -e 's/\\\\fB/\\fB/' > $@ 
+	test -s $@
 
 man: man/symbiosis-monit.man
 
