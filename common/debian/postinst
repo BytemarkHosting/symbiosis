@@ -54,12 +54,19 @@ fi
 #
 # Find the hostname, if not set already.
 #
-if [ -z "$HOSTNAME" ] ; then
+if ! ( echo "$HOSTNAME" | grep -q '^[_a-z0-9-]\+\.\([_a-z0-9-]\+\.\?\)\+$' ) ; then
   if [ -f /etc/hostname ] ; then
     HOSTNAME=$(< /etc/hostname)
   else
     HOSTNAME=$(hostname --fqdn)
   fi
+fi
+
+#
+# If the hostname is still invalid, add ".localdomain" to the end
+#
+if ! ( echo "$HOSTNAME" | grep -q '^[_a-z0-9-]\+\.\([_a-z0-9-]\+\.\?\)\+$' ) ; then
+	HOSTNAME="${HOSTNAME}.localdomain"
 fi
 
 #
