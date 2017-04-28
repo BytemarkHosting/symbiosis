@@ -3,7 +3,7 @@ Section: web
 Priority: extra
 Maintainer: James Carter <jcarter@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), dh_systemd
+Build-Depends: debhelper (>= 7.0.0), dh-systemd
 Standards-Version: 3.9.6
 
 Package: bytemark-symbiosis
