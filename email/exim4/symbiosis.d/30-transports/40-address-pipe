@@ -9,5 +9,5 @@
 address_pipe:
   debug_print = "T: address_directory for $local_part@$domain"
   driver = pipe
-  return_output
+  return_fail_output
 
