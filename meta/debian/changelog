@@ -1,3 +1,10 @@
+bytemark-symbiosis (2017:0424) stable; urgency=medium
+
+  * Added tentacles to Bytemark Symbiosis logo in honour of Debian Stretch.
+  * Updated copyright file.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 16:18:57 +0100
+
 bytemark-symbiosis (2015:0825) stable; urgency=medium
 
   * Now depends on bytemark-keys as an alternative to symbiosis-keys.
