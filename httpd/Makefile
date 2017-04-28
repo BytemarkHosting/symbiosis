@@ -1,5 +1,5 @@
 
-RUBYLIB := "$(PWD)/lib:$(PWD)/ext:$(PWD)/../common/lib"
+RUBYLIB := "$(PWD)/lib:$(PWD)/../common/lib"
 
 nop:
 	@echo "Valid targets are (alphabetically) :"
@@ -18,7 +18,7 @@ test:
  
 man/%.txt: ./sbin/%
 	[ -d man ] || mkdir man
-	RUBYLIB=$(RUBYLIB) $<  --manual > $@
+	RUBYLIB=$(RUBYLIB) $< --manual > $@
 	test -s $@
 
 man/%.man: man/%.txt
