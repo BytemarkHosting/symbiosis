@@ -24,6 +24,7 @@ clean:
 manpages/%.man: ./sbin/%
 	[ -d ./manpages ] || mkdir ./manpages
 	RUBYLIB=$(RUBYLIB) $<  --manual | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
+	test -s $@
 
 manpages: ./manpages/symbiosis-firewall-whitelist.man ./manpages/symbiosis-firewall.man ./manpages/symbiosis-firewall-blacklist.man
 
