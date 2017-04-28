@@ -1,3 +1,9 @@
+symbiosis-monit (2015:0619) stable; urgency=medium
+
+  * Updated Makefile to reflect proper test targets.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 19 Apr 2017 10:35:16 +0100
+
 symbiosis-monit (2015:0618) stable; urgency=medium
 
   * Rename File#exists? to File#exist?
