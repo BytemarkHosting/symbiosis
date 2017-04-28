@@ -6,14 +6,18 @@ doc/index.html: lib
 
 man/symbiosis-monit.man: sbin/symbiosis-monit
 	[ -d man ] || mkdir man
-	RUBYLIB=./lib ./sbin/symbiosis-monit  --manual | txt2man -s 1 -t symbiosis-monit | sed -e 's/\\\\fB/\\fB/' > $@
+	RUBYLIB=./lib ./sbin/symbiosis-monit  --manual | txt2man -s 1 -t symbiosis-monit | sed -e 's/\\\\fB/\\fB/' > $@ 
 	test -s $@
 
 man: man/symbiosis-monit.man
 
 docs: man/symbiosis-monit.man doc/index.html
 
-test: test2.1
+test: test1.9.1 test2.1
+
+test1.9.1:
+	cd test.d
+	[ -z "`which ruby1.9.1`" ] || (cd test.d && ruby1.9.1 -I . ts_monit.rb)
 
 test2.1:
 	cd test.d
