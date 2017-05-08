@@ -1,6 +1,6 @@
 sbin/*             usr/sbin/
 default/*          etc/default/
-monit.d/*          etc/symbiosis/monit.d/
+monit.d/*          usr/share/symbiosis/monit/checks/
 test.d/*           etc/symbiosis/test.d/
 patterns.d/*       etc/symbiosis/firewall/patterns.d/
 lib/*              usr/lib/ruby/vendor_ruby/

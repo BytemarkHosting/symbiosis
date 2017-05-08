@@ -42,4 +42,21 @@ for i in prosody dovecot; do
 done
 
 #DEBHELPER#
+
+#
+# Add symlinks for the monit script
+# 
+monit_dir="/etc/symbiosis/monit.d"
+mkdir -p "$monit_dir"
+
+for i in prosody; do
+  monit_script = "/usr/share/symbiosis/monit/checks/$i"
+  link_target = "$monit_dir/$i"
+
+  if [ -x "$monit_script" ] && [ ! -e "$link_target" ]; then
+    echo "I: Adding symlink for Symbiosis Monit script for $i"
+    ln -s "$monit_script" "$link_target" || true
+  fi
+done
+
 exit 0

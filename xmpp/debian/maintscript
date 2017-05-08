@@ -1,0 +1,1 @@
+rm_conffile /etc/symbiosis/monit.d/prosody 2017:0424

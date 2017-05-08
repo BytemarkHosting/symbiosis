@@ -1,2 +1,2 @@
-monit.d              etc/symbiosis
+monit.d/*            usr/share/symbiosis/monit/checks/
 mysql                etc
