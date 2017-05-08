@@ -1,0 +1,6 @@
+[Unit]
+Description=Symbiosis monitoring
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/symbiosis-monit
