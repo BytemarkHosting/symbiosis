@@ -26,8 +26,8 @@ monit_dir="/etc/symbiosis/monit.d"
 mkdir -p "$monit_dir"
 
 for i in incrond; do
-  monit_script = "/usr/share/symbiosis/monit/checks/$i"
-  link_target = "$monit_dir/$i"
+  monit_script="/usr/share/symbiosis/monit/checks/$i"
+  link_target="$monit_dir/$i"
 
   if [ -x "$monit_script" ] && [ ! -e "$link_target" ]; then
     echo "I: Adding symlink for Symbiosis Monit script for $i"
