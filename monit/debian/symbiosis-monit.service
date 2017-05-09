@@ -1,6 +1,6 @@
 [Unit]
-Description=Symbiosis monitoring
+Description=Symbiosis monitor
 
 [Service]
-Type=oneshot
-ExecStart=/usr/sbin/symbiosis-monit
+Type=simple
+ExecStart=/usr/sbin/symbiosis-monit -t email /etc/symbiosis/monit.d
