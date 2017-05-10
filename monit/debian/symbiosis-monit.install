@@ -1,5 +1,5 @@
 sbin/symbiosis-monit          usr/sbin/
-monit.d/*                     etc/symbiosis/monit.d/
+monit.d/*                     usr/share/symbiosis/monit/checks/
 templates/*                   usr/share/symbiosis/monit/
 lib/*                         usr/lib/ruby/vendor_ruby/
 test.d/*                      etc/symbiosis/test.d/

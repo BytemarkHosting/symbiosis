@@ -1,0 +1,2 @@
+rm_conffile /etc/symbiosis/monit.d/cron 2017:0424
+rm_conffile /etc/symbiosis/monit.d/sshd 2017:0424
