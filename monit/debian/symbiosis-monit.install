@@ -1,6 +1,6 @@
-sbin/symbiosis-monit          usr/sbin/
+sbin/*                        usr/sbin/
 monit.d/*                     etc/symbiosis/monit.d/
 templates/*                   usr/share/symbiosis/monit/
 lib/*                         usr/lib/ruby/vendor_ruby/
 test.d/*                      etc/symbiosis/test.d/
-debian/symbiosis-monit.timer  lib/systemd/system/
+system/*                      lib/systemd/
