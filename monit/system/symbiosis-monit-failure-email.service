@@ -3,4 +3,4 @@ Description=Notify by email about symbiosis-monit failure
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/symbiosis-monit-failure-email
+ExecStart=/usr/sbin/symbiosis-monit-failure-email
