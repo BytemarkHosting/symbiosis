@@ -1,3 +1,10 @@
+symbiosis-ftpd (2017:0510) stable; urgency=medium
+
+  * Store monit configuration in /usr/share instead of /etc. Use symlinks to
+    allow users to enable/disable but discourage editing
+
+ -- Telyn <telyn@bytemark.co.uk>  Wed, 10 May 2017 13:42:15 +0100
+
 symbiosis-ftpd (2017:0424) stable; urgency=medium
 
   * Updated dhparam generation script to use central service to regenerate
