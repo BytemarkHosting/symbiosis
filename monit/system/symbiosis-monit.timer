@@ -1,0 +1,9 @@
+[Unit]
+Description=Regularly execute symbiosis-monit.service
+
+[Timer]
+# run every 2 minutes
+OnCalendar=*:0/2
+
+[Install]
+WantedBy=timers.target

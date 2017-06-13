@@ -3,7 +3,7 @@ Section: web
 Priority: extra
 Maintainer: James Carter <jcarter@bytemark.co.uk>
 Uploaders: Patrick J Cherry <patrick@bytemark.co.uk>, Steve Kemp <steve@bytemark.co.uk>
-Build-Depends: debhelper (>= 7.0.0), txt2man, gem2deb, ruby
+Build-Depends: debhelper (>= 7.0.0), txt2man, gem2deb, ruby, dh-systemd
 Standards-Version: 3.9.6
 XS-Ruby-Versions: all
 

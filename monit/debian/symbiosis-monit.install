@@ -1,6 +1,6 @@
-sbin/symbiosis-monit          usr/sbin/
+sbin/*                        usr/sbin/
 monit.d/*                     usr/share/symbiosis/monit/checks/
 templates/*                   usr/share/symbiosis/monit/
 lib/*                         usr/lib/ruby/vendor_ruby/
 test.d/*                      etc/symbiosis/test.d/
-
+system/*                      lib/systemd/system/
