@@ -1,3 +1,2 @@
 rm_conffile /etc/symbiosis/monit.d/pure-authd 2014:1231
-
-
+rm_conffile /etc/symbiosis/monit.d/pure-ftpd 2017:0424
