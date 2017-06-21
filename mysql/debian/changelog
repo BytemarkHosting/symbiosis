@@ -1,4 +1,4 @@
-symbiosis-mysql (2017:0309) stable; urgency=medium
+symbiosis-mysql (2015:1010) stable; urgency=medium
 
   * Depends on virtual-mysql-server instead of mysql-server, per recent debian
     guidelines - https://wiki.debian.org/Teams/MySQL/virtual-mysql-server
