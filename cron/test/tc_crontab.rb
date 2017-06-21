@@ -16,9 +16,8 @@ class TestCrontab < Test::Unit::TestCase
 
   def test_documentation_example
 
-    assert_nothing_raised do
-      # Note this crontab has no newline at the end.  Specially for Mr Howells.
-      @crontab = Symbiosis::Crontab.new " 
+    # Note this crontab has no newline at the end.  Specially for Mr Howells.
+    @crontab = Symbiosis::Crontab.new "
 #
 # Send any output to Bob
 #
@@ -42,12 +41,10 @@ MAILTO=bob@my-brilliant-site.com
 #
 # run every minute
 #
-* * * * * php --some-argument-or-other cronjob.php
-"
-    end
+* * * * * php --some-argument-or-other cronjob.php"
 
     assert_equal("bob@my-brilliant-site.com",@crontab.environment["MAILTO"])
-    
+
     # Test first entry -- run at 18:40 every day
     #
     record = @crontab.records[0]
@@ -77,7 +74,7 @@ MAILTO=bob@my-brilliant-site.com
     assert_equal((1..12).to_a, record.mon)
     assert_equal((0..6).to_a, record.wday)
     assert_equal("/usr/local/bin/monthly-job.sh", record.command)
-    
+
     # Next entry -- Run every minute
     #
     record = @crontab.records[3]
@@ -135,10 +132,10 @@ class TestCrontabRecord < Test::Unit::TestCase
     assert_equal((1..12).to_a, crontab_record.mon)
     assert_equal((1..5).to_a, crontab_record.wday)
     assert_equal("mail -s \"It's 10pm\" joe%Joe,%%Where are your kids?%", crontab_record.command)
-    
+
   end
 
-  def test_manpage_eg4 
+  def test_manpage_eg4
 #       23 0-23/2 * * * echo "run 23 minutes after midn, 2am, 4am ..., everyday"
     crontab_record = nil
     assert_nothing_raised {
@@ -177,7 +174,7 @@ class TestCrontabRecord < Test::Unit::TestCase
     assert_equal((0..6).to_a, crontab_record.wday)
     assert_equal("do my stuff", crontab_record.command)
   end
-  
+
   def test_daily_midnight
     crontab_record = nil
     %w(daily midnight).each do |d|
@@ -204,7 +201,7 @@ class TestCrontabRecord < Test::Unit::TestCase
     assert_equal("do my stuff", crontab_record.command)
   end
 
-  
+
   def test_monthly
     crontab_record = Symbiosis::CrontabRecord.parse("@monthly do my stuff")
     assert_equal([0], crontab_record.min)
@@ -261,7 +258,7 @@ class TestCrontabRecord < Test::Unit::TestCase
     # test long names
     crontab_record = Symbiosis::CrontabRecord.parse("* * * january,february,march,april,may,june,july,august,september,october,november,december * do my bidding")
     assert_equal((1..12).to_a, crontab_record.mon)
-   
+
     # make sure that the regexp starts from the beginning of a word.
     crontab_record = Symbiosis::CrontabRecord.parse("* * * janjan,marfeb * do my bidding")
     assert_equal([1,3], crontab_record.mon)
@@ -273,13 +270,13 @@ class TestCrontabRecord < Test::Unit::TestCase
 
   def test_silly_combinations
 
-    #    October 2011      
-    # Su Mo Tu We Th Fr Sa  
-    #                    1  
-    #  2  3  4  5  6  7  8  
-    #  9 10 11 12 13 14 15  
-    # 16 17 18 19 20 21 22  
-    # 23 24 25 26 27 28 29  
+    #    October 2011
+    # Su Mo Tu We Th Fr Sa
+    #                    1
+    #  2  3  4  5  6  7  8
+    #  9 10 11 12 13 14 15
+    # 16 17 18 19 20 21 22
+    # 23 24 25 26 27 28 29
     # 30 31
     #
     today = Time.new(2011,9,30,0,0,0)
@@ -294,7 +291,7 @@ class TestCrontabRecord < Test::Unit::TestCase
     x = crontab_record.next_due(today)
     assert_equal_date( Time.new(2011,10,2,10,10,0), x )
 
-    x = crontab_record.next_due(x + 120) 
+    x = crontab_record.next_due(x + 120)
     assert_equal_date( Time.new(2011,10,9,10,10,0), x )
 
     x = crontab_record.next_due(x + 120)
@@ -322,6 +319,29 @@ class TestCrontabRecord < Test::Unit::TestCase
     assert_equal_date(Time.new(2014,1,17,7,30,0), crontab_record.next_due(now))
   end
 
+	#
+	# This tests an error whereby the next_due method would skip past the next
+	# date, because in the loop that iterates through dates, it wasn't reseting
+	# the time to the top of the hour/day/month.
+	#
+	def test_correct_wrapping
+		crontab_record = Symbiosis::CrontabRecord.parse("20 0-23 * * * echo hi")
+    now = Time.new(2017,6,2,1,40,0)
+    assert_equal_date(Time.new(2017,6,2,2,20,0), crontab_record.next_due(now))
+
+		crontab_record = Symbiosis::CrontabRecord.parse("20 0-23 1-5 * * echo hi")
+    now = Time.new(2017,6,6,1,40,0)
+    assert_equal_date(Time.new(2017,7,1,0,20,0), crontab_record.next_due(now))
+
+    crontab_record = Symbiosis::CrontabRecord.parse("20 0-23 * * 1-5 echo hi")
+    now = Time.new(2017,6,10,1,40,0)
+    assert_equal_date(Time.new(2017,6,12,0,20,0), crontab_record.next_due(now))
+
+		crontab_record = Symbiosis::CrontabRecord.parse("20 0-23 * 1-5 * echo hi")
+    now = Time.new(2017,6,6,1,40,0)
+    assert_equal_date(Time.new(2018,1,1,0,20,0), crontab_record.next_due(now))
+	end
+
   #
   # This checks the date, to the nearest minute.
   #
@@ -330,7 +350,7 @@ class TestCrontabRecord < Test::Unit::TestCase
     assert_kind_of(Time, actual)
     %w(year mon day hour min).each do |m|
       assert_equal(expected.__send__(m), actual.__send__(m), "#{m} should be #{expected.__send__(m)} in #{actual.to_s}")
-    end 
+    end
   end
 
   def test_return_sensible_error
