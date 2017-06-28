@@ -91,8 +91,8 @@ test:xmpp:
   stage: package
   script:
     - export PACKAGE=${CI_BUILD_NAME##package:}
-    - cp symbiosis.list $PACKAGE/
-    - pushd $PACKAGE ; sautobuild --distribution jessie --sources-list symbiosis.list --apt-key ../symbiosis.key $PWD ; popd
+    - cp -v symbiosis.list $PACKAGE/
+    - pushd $PACKAGE ; ls -lah ; sautobuild --distribution jessie --sources-list symbiosis.list --apt-key ../symbiosis.key $PWD ; popd
     - mkdir -p pkg/
     # These files are all optional
     - 'mv -v *.{dsc,build,buildinfo,changes,tar.*} pkg/ 2>/dev/null || true'
