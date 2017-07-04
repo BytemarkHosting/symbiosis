@@ -155,6 +155,8 @@ publish:
       else
         machinectl clone ${OLD_DEBIAN_RELEASE}-amd64 $MACHINE
       fi
+    - machinectl start $MACHINE
+    - sleep 10
     - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
   script:
     - systemd-run $RUN_ARGS -E "ACTION=$ACTION" -E "DEBIAN_RELEASE=$DEBIAN_RELEASE" -E "OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE" -E "BRANCH_NAME=$CI_BUILD_REF_SLUG" /bin/run-parts --exit-on-error /root/test.d/
@@ -163,7 +165,7 @@ publish:
     - run-parts --exit-on-error test/external-test.d
   after_script:
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
-    - machinectl stop $MACHINE || true
+    - machinectl poweroff $MACHINE || true
     - machinectl remove $MACHINE
   variables: &installvars
     DEBIAN_RELEASE: stretch
