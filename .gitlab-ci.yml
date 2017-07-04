@@ -150,9 +150,9 @@ publish:
     - RUN_ARGS="--wait --quiet --pty --machine $MACHINE"
     - |
       if [ "$ACTION" = "install" ]; then
-        machinectl clone $DEBIAN_RELEASE-amd64 $MACHINE
+        machinectl clone ${DEBIAN_RELEASE}-amd64 $MACHINE
       else
-        machinectl clone $OLD_DEBIAN_RELEASE-amd64 $MACHINE
+        machinectl clone ${OLD_DEBIAN_RELEASE}-amd64 $MACHINE
       fi
     - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
   script:
