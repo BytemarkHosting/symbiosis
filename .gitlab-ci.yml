@@ -163,8 +163,8 @@ publish:
   after_script:
     - machinectl remove $MACHINE
   variables: &installvars
-    - DEBIAN_RELEASE: stretch
-    - OLD_DEBIAN_RELEASE: jessie
+    DEBIAN_RELEASE: stretch
+    OLD_DEBIAN_RELEASE: jessie
 
 install:dist-upgrade:
   <<: *install
