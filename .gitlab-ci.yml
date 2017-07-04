@@ -148,7 +148,7 @@ publish:
   before_script:
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
     - RUN_ARGS=--wait --quiet --pty --machine $MACHINE
-    -|
+    - |
       if [ "$ACTION" == "install" ]; then
         machinectl clone $DEBIAN_RELEASE-amd64 $MACHINE
       else
