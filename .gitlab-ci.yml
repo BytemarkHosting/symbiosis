@@ -162,24 +162,25 @@ publish:
     - run-parts --exit-on-error test/external-test.d
   after_script:
     - machinectl remove $MACHINE
-  variables:
+  variables: &installvars
     - DEBIAN_RELEASE: stretch
     - OLD_DEBIAN_RELEASE: jessie
 
 install:dist-upgrade:
   <<: *install
   variables:
+    <<: *installvars
     ACTION: dist-upgrade
 
 install:upgrade:
   <<: *install
   variables:
+    <<: *installvars
     ACTION: upgrade
 
 install:fresh-install:
   <<: *install
   variables:
-    ACTION: install
-  stage: install
+    <<: *installvars
 
 
