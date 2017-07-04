@@ -2,7 +2,7 @@ stages:
   - test
   - package
   - publish
-  - fresh-install
+  - install
 
 .test: &test
   stage: test
@@ -144,39 +144,42 @@ publish:
 .install: &install
   stage: install
   tags:
-    - shell
-    - sautotest
+    - systemd-containers
+  before_script:
+    - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
+    - RUN_ARGS=--wait --quiet --pty --machine $MACHINE
+    -|
+      if [ "$ACTION" == "install" ]; then
+        machinectl clone $DEBIAN_RELEASE-amd64 $MACHINE
+      else
+        machinectl clone $OLD_DEBIAN_RELEASE-amd64 $MACHINE
+      fi
+    - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
   script:
-    - echo $install_or_upgrade | tee autotest/test.d/conf/action
-    - touch autotest/external.d/VERBOSE
-    - echo "deb http://repo.bytemark.co.uk/open-source/symbiosis/$CI_BUILD_REF_NAME/latest/ ./" >> autotest/test.d/conf/autotest-sources.list
-    - "echo chosen chroot: $chroot"
-    - /usr/bin/sautotest -v -c "$chroot" -e $PWD/autotest/external.d/ autotest/test.d/
+    - systemd-run $RUN_ARGS -E "ACTION=$ACTION" -E "DEBIAN_RELEASE=$DEBIAN_RELEASE" -E "OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE" -E "BRANCH_NAME=$CI_BUILD_REF_SLUG" /bin/run-parts --exit-on-error /root/test.d/
+    - export IP=$(systemd-run $RUN_ARGS /bin/bash -c "ip addr show host0 | grep -Po 'inet \K[\d.]+'" | tr -d '\r')
+    - export IP6=$(systemd-run $RUN_ARGS /bin/bash -c "ip addr show host0 | grep -Po 'inet6 \K[\da-f:]+'" | tr -d '\r')
+    - run-parts --exit-on-error test/external-test.d
+  after_script:
+    - machinectl remove $MACHINE
+  variables:
+    - DEBIAN_RELEASE: stretch
+    - OLD_DEBIAN_RELEASE: jessie
 
-#
-# These next two do not work in gitlab-ci, yet.
-#
-#install:dist-upgrade:
-#  <<: *install
-#  variables:
-#    VERBOSE: --verbose
-#    install_or_upgrade: dist-upgrade
-#    chroot: chroot:jessie-amd64
-#
-#
-#install:upgrade:
-#  <<: *install
-#  variables:
-#    VERBOSE: --verbose
-#    install_or_upgrade: upgrade
-#    chroot: chroot:stretch-amd64
+install:dist-upgrade:
+  <<: *install
+  variables:
+    ACTION: dist-upgrade
+
+install:upgrade:
+  <<: *install
+  variables:
+    ACTION: upgrade
 
 install:fresh-install:
   <<: *install
   variables:
-    VERBOSE: --verbose
-    install_or_upgrade: install
-    chroot: chroot:stretch-amd64
-  stage: fresh-install
+    ACTION: install
+  stage: install
 
 

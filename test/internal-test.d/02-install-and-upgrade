@@ -1,0 +1,70 @@
+#!/bin/bash
+#
+
+set -e
+
+PREFIX=$(dirname ${0})
+
+dpkg --clear-avail
+
+if [ -f $PREFIX/conf/action ] ; then
+  ACTION=$(< ${PREFIX}/conf/action)
+fi
+
+CONF=$PREFIX/conf-$DEBIAN_RELEASE
+OLD_CONF=$PREFIX/conf-$OLD_DEBIAN_RELEASE
+
+DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND
+
+APT_OPTS="-o DPkg::Options::=--force-confdef -o DPkg::Options::=--force-confnew --quiet"
+APT_LIST=/etc/apt/sources.list.d/symbiosis.list
+# description of actions:
+# install - fresh install latest from a stretch base
+# upgrade - upgrade to latest from a symbiosis-stretch base
+# dist-upgrade - upgrade to latest from symbiosis-jessie
+
+if [ "upgrade" = "$ACTION" ] ; then
+  echo "I: seed debconf"
+  debconf-set-selections < "$CONF/debconf-preseed"
+
+  echo "I: Install current symbiosis.bytemark.co.uk release"
+  echo "deb http://symbiosis.bytemark.co.uk/$DEBIAN_RELEASE/ ./" > $APT_LIST
+  apt-get $APT_OPTS update
+  apt-get $APT_OPTS install --install-recommends bytemark-symbiosis
+
+  echo "I: Re-seed debconf"
+  debconf-set-selections < "$CONF/debconf-preseed"
+
+  echo "I: Add new version's sources"
+  cp $CONF/sources.list $APT_LIST
+  echo "deb http://repo.bytemark.co.uk/open-source/symbiosis/$BRANCH_NAME/latest/ ./" >> $APT_LIST
+  apt-get $APT_OPTS upgrade
+
+elif [ "dist-upgrade" = "$ACTION" ] ; then
+  echo "I: seed debconf with $OLD_DEBIAN_RELEASE config"
+  debconf-set-selections < "$OLD_CONF/debconf-preseed"
+
+  echo "I: Install $OLD_DEBIAN_RELEASE version of Symbiosis from symbiosis.bytemark.co.uk"
+  echo "deb http://symbiosis.bytemark.co.uk/$OLD_DEBIAN_RELEASE/ ./" > $APT_LIST
+  apt-get $APT_OPTS update
+  apt-get $APT_OPTS install --install-recommends bytemark-symbiosis
+
+  echo "I: Re-seed debconf"
+  debconf-set-selections < "$CONF/debconf-preseed"
+
+  echo "I: Add new version's sources"
+  cp $CONF/sources.list $APT_LIST
+  echo "deb http://repo.bytemark.co.uk/open-source/symbiosis/$BRANCH_NAME/latest/ ./" >> $APT_LIST
+
+  echo "I: Perform dist-upgrade"
+  apt-get $APT_OPTS update
+  apt-get $APT_OPTS dist-upgrade
+else 
+  echo "I: Install latest version of Symbiosis from repo.bytemark.co.uk"
+  cp $OLD_CONF/sources.list $APT_LIST
+  echo "deb http://repo.bytemark.co.uk/open-source/symbiosis/$BRANCH_NAME/latest/ ./" >> $APT_LIST
+  apt-get $APT_OPTS update
+  apt-get $APT_OPTS install --install-recommends bytemark-symbiosis
+fi
+
