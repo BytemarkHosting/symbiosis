@@ -146,14 +146,13 @@ publish:
   tags:
     - systemd-containers
   before_script:
+    - set -x
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
     - RUN_ARGS="--wait --quiet --pty --machine $MACHINE"
     - |
       if [ "$ACTION" = "install" ]; then
-        echo machinectl clone ${DEBIAN_RELEASE}-amd64 $MACHINE
         machinectl clone ${DEBIAN_RELEASE}-amd64 $MACHINE
       else
-        echo machinectl clone ${OLD_DEBIAN_RELEASE}-amd64 $MACHINE
         machinectl clone ${OLD_DEBIAN_RELEASE}-amd64 $MACHINE
       fi
     - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
@@ -163,6 +162,8 @@ publish:
     - export IP6=$(systemd-run $RUN_ARGS /bin/bash -c "ip addr show host0 | grep -Po 'inet6 \K[\da-f:]+'" | tr -d '\r')
     - run-parts --exit-on-error test/external-test.d
   after_script:
+    - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
+    - machinectl stop $MACHINE || true
     - machinectl remove $MACHINE
   variables: &installvars
     DEBIAN_RELEASE: stretch
