@@ -173,7 +173,7 @@ publish:
     - chmod +x run-test
     - machinectl copy-to $MACHINE run-test /run-test
     - export IP=$(get-machine-ip $MACHINE)
-    - ssh root@$IP /run-test
+    - ssh -o StrictHostKeyChecking=false root@$IP /run-test
     - run-parts --exit-on-error test/external-test.d
   after_script:
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
