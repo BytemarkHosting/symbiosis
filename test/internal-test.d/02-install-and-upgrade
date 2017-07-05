@@ -17,7 +17,7 @@ OLD_CONF=$PREFIX/conf-$OLD_DEBIAN_RELEASE
 DEBIAN_FRONTEND=noninteractive
 export DEBIAN_FRONTEND
 
-APT_OPTS="-o DPkg::Options::=--force-confdef -o DPkg::Options::=--force-confnew --quiet"
+APT_OPTS="-y -o DPkg::Options::=--force-confdef -o DPkg::Options::=--force-confnew --quiet"
 APT_LIST=/etc/apt/sources.list.d/symbiosis.list
 # description of actions:
 # install - fresh install latest from a stretch base
