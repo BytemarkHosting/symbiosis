@@ -62,7 +62,7 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   apt-get $APT_OPTS dist-upgrade
 else 
   echo "I: Install latest version of Symbiosis from repo.bytemark.co.uk"
-  cp $OLD_CONF/sources.list $APT_LIST
+  cp $CONF/sources.list $APT_LIST
   echo "deb http://repo.bytemark.co.uk/open-source/symbiosis/$BRANCH_NAME/latest/ ./" >> $APT_LIST
   apt-get $APT_OPTS update
   apt-get $APT_OPTS install --install-recommends bytemark-symbiosis
