@@ -155,7 +155,11 @@ publish:
         machinectl clone ${DEBIAN_RELEASE} $MACHINE
       fi
     - machinectl start $MACHINE
-    - sleep 20
+    - |
+      while [ "$IP" = "" ]; then
+          export IP=$(get-machine-ip $MACHINE)
+          sleep 3
+      fi
     - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
   script:
     - | 
@@ -173,7 +177,6 @@ publish:
     - sed -e 's/32;/34;/g' -i run-test 
     - chmod +x run-test
     - machinectl copy-to $MACHINE run-test /run-test
-    - while $IP export IP=$(get-machine-ip $MACHINE)
     - ssh -o StrictHostKeyChecking=false root@$IP /run-test
     - run-parts --exit-on-error test/external-test.d
   after_script:
