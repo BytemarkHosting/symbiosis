@@ -160,20 +160,19 @@ publish:
     - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
   script:
     - | 
-      cat > /var/lib/machines/$MACHINE/run-test <<TEST
+      cat > /var/lib/machines/$MACHINE/run-test <<TESTSCRIPT
       #!/bin/bash
       
-      set -x
-
       ACTION=$ACTION
       DEBIAN_RELEASE=$DEBIAN_RELEASE
       OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE
       BRANCH_NAME=$CI_BUILD_REF_SLUG
       
       /bin/run-parts --exit-on-error /root/test.d/
-    - chmod +x /var/lib/machines/$MACHINE/run-test
+      TESTSCRIPT
     - export IP=$(get-machine-ip $MACHINE)
-    - ssh root@IP /run-test
+    - ssh root@$IP chmod +x /run-test
+    - ssh root@$IP /run-test
     - run-parts --exit-on-error test/external-test.d
   after_script:
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
