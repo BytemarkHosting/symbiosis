@@ -170,6 +170,7 @@ publish:
       
       /bin/run-parts --exit-on-error /root/test.d/
       TESTSCRIPT
+    - sed -e 's/32;/34;/g' -i run-test 
     - cat run-test
     - chmod +x run-test
     - machinectl copy-to $MACHINE run-test /run-test
