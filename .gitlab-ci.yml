@@ -149,13 +149,13 @@ publish:
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
     - RUN_ARGS="--wait --quiet --pty --machine $MACHINE"
     - |
-      if [ "$ACTION" = "install" ]; then
-        machinectl clone ${DEBIAN_RELEASE} $MACHINE
-      else
+      if [ "$ACTION" = "dist-upgrade" ]; then
         machinectl clone ${OLD_DEBIAN_RELEASE} $MACHINE
+      else
+        machinectl clone ${DEBIAN_RELEASE} $MACHINE
       fi
     - machinectl start $MACHINE
-    - sleep 10
+    - sleep 20
     - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
   script:
     - | 
@@ -171,32 +171,19 @@ publish:
       /bin/run-parts --exit-on-error /root/test.d/
       END_OF_INTERNAL_TEST
     - sed -e 's/32;/34;/g' -i run-test 
-    - cat run-test
     - chmod +x run-test
     - machinectl copy-to $MACHINE run-test /run-test
-    - export IP=$(get-machine-ip $MACHINE)
+    - while $IP export IP=$(get-machine-ip $MACHINE)
     - ssh -o StrictHostKeyChecking=false root@$IP /run-test
     - run-parts --exit-on-error test/external-test.d
   after_script:
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
-    - machinectl poweroff $MACHINE || true
+    - machinectl stop $MACHINE || true
     - sleep 10
     - machinectl remove $MACHINE
   variables: &installvars
     DEBIAN_RELEASE: stretch
     OLD_DEBIAN_RELEASE: jessie
-
-install:dist-upgrade:
-  <<: *install
-  variables:
-    <<: *installvars
-    ACTION: dist-upgrade
-
-install:upgrade:
-  <<: *install
-  variables:
-    <<: *installvars
-    ACTION: upgrade
 
 install:fresh-install:
   <<: *install
@@ -204,4 +191,15 @@ install:fresh-install:
     <<: *installvars
     ACTION: install
 
+install:upgrade:
+  <<: *install
+  variables:
+    <<: *installvars
+    ACTION: upgrade
+
+install:dist-upgrade:
+  <<: *install
+  variables:
+    <<: *installvars
+    ACTION: dist-upgrade
 
