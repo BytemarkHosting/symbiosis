@@ -159,9 +159,20 @@ publish:
     - sleep 10
     - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
   script:
-    - systemd-run $RUN_ARGS -E "ACTION=$ACTION" -E "DEBIAN_RELEASE=$DEBIAN_RELEASE" -E "OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE" -E "BRANCH_NAME=$CI_BUILD_REF_SLUG" /bin/run-parts --exit-on-error /root/test.d/
-    - export IP=$(systemd-run $RUN_ARGS /bin/bash -c "ip addr show host0 | grep -Po 'inet \K[\d.]+'" | tr -d '\r')
-    - export IP6=$(systemd-run $RUN_ARGS /bin/bash -c "ip addr show host0 | grep -Po 'inet6 \K[\da-f:]+'" | tr -d '\r')
+    - | 
+      cat > /var/lib/machines/$MACHINE/run-test <<TEST
+      #!/bin/bash
+      
+      set -x
+
+      ACTION=$ACTION
+      DEBIAN_RELEASE=$DEBIAN_RELEASE
+      OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE
+      BRANCH_NAME=$CI_BUILD_REF_SLUG
+      
+      /bin/run-parts --exit-on-error /root/test.d/
+    - export IP=$(get-machine-ip $MACHINE)
+    - ssh root@IP /run-test
     - run-parts --exit-on-error test/external-test.d
   after_script:
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
