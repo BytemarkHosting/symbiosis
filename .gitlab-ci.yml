@@ -151,9 +151,9 @@ publish:
     - RUN_ARGS="--wait --quiet --pty --machine $MACHINE"
     - |
       if [ "$ACTION" = "install" ]; then
-        machinectl clone ${DEBIAN_RELEASE}-amd64 $MACHINE
+        machinectl clone ${DEBIAN_RELEASE} $MACHINE
       else
-        machinectl clone ${OLD_DEBIAN_RELEASE}-amd64 $MACHINE
+        machinectl clone ${OLD_DEBIAN_RELEASE} $MACHINE
       fi
     - machinectl start $MACHINE
     - sleep 10
@@ -171,12 +171,14 @@ publish:
       BRANCH_NAME=$CI_BUILD_REF_SLUG
       
       /bin/run-parts --exit-on-error /root/test.d/
+    - chmod +x /var/lib/machines/$MACHINE/run-test
     - export IP=$(get-machine-ip $MACHINE)
     - ssh root@IP /run-test
     - run-parts --exit-on-error test/external-test.d
   after_script:
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
     - machinectl poweroff $MACHINE || true
+    - sleep 10
     - machinectl remove $MACHINE
   variables: &installvars
     DEBIAN_RELEASE: stretch
