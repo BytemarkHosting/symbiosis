@@ -170,6 +170,7 @@ publish:
       
       /bin/run-parts --exit-on-error /root/test.d/
       TESTSCRIPT
+    - cat run-test
     - chmod +x run-test
     - machinectl copy-to $MACHINE run-test /run-test
     - export IP=$(get-machine-ip $MACHINE)
