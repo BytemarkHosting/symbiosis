@@ -181,8 +181,11 @@ publish:
     - run-parts --exit-on-error test/external-test.d
   after_script:
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
-    - machinectl stop $MACHINE || true
-    - sleep 10
+    - |
+      while machinectl status $MACHINE > /dev/null; do
+          machinectl stop $MACHINE || true
+          sleep 1
+      done
     - machinectl remove $MACHINE
   variables: &installvars
     DEBIAN_RELEASE: stretch
