@@ -177,7 +177,7 @@ publish:
     - sed -e 's/32;/34;/g' -i run-test 
     - chmod +x run-test
     - machinectl copy-to $MACHINE run-test /run-test
-    - ssh -o StrictHostKeyChecking=false root@$IP /run-test
+    - ssh -o StrictHostKeyChecking=false -o UserKnownHostsFile=/dev/null root@$IP /run-test
     - run-parts --exit-on-error test/external-test.d
   after_script:
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
