@@ -146,7 +146,6 @@ publish:
   tags:
     - systemd-containers
   before_script:
-    - set -x
     - MACHINE=symbiosis-$DEBIAN_RELEASE-$ACTION-$CI_BUILD_ID
     - RUN_ARGS="--wait --quiet --pty --machine $MACHINE"
     - |
