@@ -162,11 +162,12 @@ publish:
     - | 
       cat > run-test <<TESTSCRIPT
       #!/bin/bash
+      set -x
       
-      ACTION=$ACTION
-      DEBIAN_RELEASE=$DEBIAN_RELEASE
-      OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE
-      BRANCH_NAME=$CI_BUILD_REF_SLUG
+      export ACTION=$ACTION
+      export DEBIAN_RELEASE=$DEBIAN_RELEASE
+      export OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE
+      export BRANCH_NAME=$CI_BUILD_REF_SLUG
       
       /bin/run-parts --exit-on-error /root/test.d/
       TESTSCRIPT
