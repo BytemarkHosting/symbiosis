@@ -161,7 +161,7 @@ publish:
     - | 
       cat > run-test <<TESTSCRIPT
       #!/bin/bash
-      set -x
+      set -ex
       
       export ACTION=$ACTION
       export DEBIAN_RELEASE=$DEBIAN_RELEASE
