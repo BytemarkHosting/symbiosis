@@ -156,10 +156,10 @@ publish:
       fi
     - machinectl start $MACHINE
     - |
-      while [ "$IP" = "" ]; then
+      while [ "$IP" = "" ]; do
           export IP=$(get-machine-ip $MACHINE)
           sleep 3
-      fi
+      done
     - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
   script:
     - | 
