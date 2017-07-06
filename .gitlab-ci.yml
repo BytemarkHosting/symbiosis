@@ -187,6 +187,7 @@ publish:
           sleep 1
       done
     - machinectl remove $MACHINE
+  dependencies: []
   variables: &installvars
     DEBIAN_RELEASE: stretch
     OLD_DEBIAN_RELEASE: jessie
