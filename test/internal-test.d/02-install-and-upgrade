@@ -50,7 +50,7 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   apt-get $APT_OPTS update
   apt-get $APT_OPTS install --install-recommends bytemark-symbiosis
 
-  echo "I: Re-seed debconf"
+  echo "I: Re-seed debconf with $DEBIAN_RELEASE config"
   debconf-set-selections < "$CONF/debconf-preseed"
 
   echo "I: Add new version's sources"
