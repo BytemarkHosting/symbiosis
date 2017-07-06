@@ -7,7 +7,7 @@ for service in systemd-udevd dbus; do
 mkdir /etc/systemd/system/$service.service.d
 cat > /etc/systemd/system/$service.service.d/disable-oomscoreadjust.conf <<DISABLEOOMSCORE
 [Service]
-OOMScoreAdjust=
+OOMScoreAdjust=0
 DISABLEOOMSCORE
 
 done
