@@ -56,7 +56,7 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   echo "I: Add new version's sources"
   cp $CONF/sources.list $APT_LIST
   echo "deb http://repo.bytemark.co.uk/open-source/symbiosis/$BRANCH_NAME/latest/ ./" >> $APT_LIST
-  sed -e "s/$OLD_DEBIAN_RELEASE/$NEW_DEBIAN_RELEASE/g" -i /etc/apt/sources.list
+  sed -e "s/$OLD_DEBIAN_RELEASE/$DEBIAN_RELEASE/g" -i /etc/apt/sources.list
 
   echo "I: Perform dist-upgrade"
   apt-get $APT_OPTS update
