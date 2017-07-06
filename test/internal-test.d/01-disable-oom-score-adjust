@@ -9,3 +9,5 @@ cat > /etc/systemd/system/$service.service.d/disable-oomscoreadjust.conf <<DISAB
 [Service]
 OOMScoreAdjust=
 DISABLEOOMSCORE
+
+done
