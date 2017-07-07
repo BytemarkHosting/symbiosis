@@ -1,0 +1,41 @@
+#!/usr/bin/ruby
+
+require 'symbiosis/monitor/check'
+
+class FreshclamCheck < Symbiosis::Monitor::Check
+
+  def initialize
+    super
+    @process.pidfile = "/var/run/clamav/freshclam.pid"
+    @process.initscript = "/etc/init.d/clamav-freshclam"
+    @name = "freshclam"
+  end
+
+  def do_check
+    #
+    # Check the initscript.  If it is missing, make sure that the process is
+    # actually suppose to be running, before raising an error.
+    #
+    unless initscript_ok?
+      if should_be_running
+        return SystemExit::EX_CONFIG
+      else
+        puts "Daemon state probably OK -- initscript is missing and #{@name} supposed to be running."
+        return 0
+      end
+    end
+
+    r = do_process_check
+    if SystemExit::EX_TEMPFAIL == r 
+      should_be_running ? self.start : self.stop
+    end
+    return r
+  end
+
+  def should_be_running
+    (0 < Dir.glob('/srv/*/config/antivirus').length)
+  end
+end
+
+exit FreshclamCheck.new.do_check if $0 == __FILE__
+
