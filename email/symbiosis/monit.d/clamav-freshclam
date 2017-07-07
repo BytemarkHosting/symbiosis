@@ -11,6 +11,21 @@ class FreshclamCheck < Symbiosis::Monitor::Check
     @name = "freshclam"
   end
 
+  #
+  # This is a monkey-patch for clamav under Jessie, which runs under systemd by
+  # default, and doesn't write a pidfile.  Starting / stopping works via the
+  # systemd/sysvinit compatibility layer.
+  #
+  def running
+   `systemctl status clamav-freshclam.service`
+	 if $? and $?.success?
+      puts "Found clamav-freshclam running via systemctl"
+      return true
+    end
+
+    super
+  end
+
   def do_check
     #
     # Check the initscript.  If it is missing, make sure that the process is
@@ -26,7 +41,7 @@ class FreshclamCheck < Symbiosis::Monitor::Check
     end
 
     r = do_process_check
-    if SystemExit::EX_TEMPFAIL == r 
+    if SystemExit::EX_TEMPFAIL == r
       should_be_running ? self.start : self.stop
     end
     return r
