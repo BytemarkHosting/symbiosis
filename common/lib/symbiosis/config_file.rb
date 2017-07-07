@@ -137,7 +137,7 @@ module Symbiosis
 
       fn = ( File.exists?(self.filename) ? self.filename : '/dev/null' )
 
-      Diffy::Diff.new(fn, tempfile.path, :source: 'files', :include_diff_info: true).to_s(format)
+      Diffy::Diff.new(fn, tempfile.path, source: 'files', include_diff_info: true).to_s(format)
     end
 
     #
