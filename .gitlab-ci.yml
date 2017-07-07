@@ -147,6 +147,7 @@ publish:
     - systemd-containers
   before_script:
     - MACHINE=$CI_BUILD_ID-symbiosis-$DEBIAN_RELEASE-$ACTION
+    - HOSTNAME=$MACHINE.localdomain
     - RUN_ARGS="--wait --quiet --pty --machine $MACHINE"
     - |
       if [ "$ACTION" = "dist-upgrade" ]; then
@@ -171,11 +172,11 @@ publish:
       export DEBIAN_RELEASE=$DEBIAN_RELEASE
       export OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE
       export BRANCH_NAME=$CI_BUILD_REF_SLUG
-      export HOSTNAME=$MACHINE
+      export HOSTNAME=$HOSTNAMR
 
-      echo "$MACHINE" | tee /etc/hostname
-      echo "$IP $MACHINE" | tee -a /etc/hosts
-      hostname $MACHINE
+      echo "$HOSTNAME" | tee /etc/hostname
+      echo "$IP $HOSTNAME" | tee -a /etc/hosts
+      hostname $HOSTNAME
 
       /bin/run-parts --exit-on-error /root/test.d/
       END_OF_INTERNAL_TEST
