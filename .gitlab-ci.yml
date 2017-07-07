@@ -173,6 +173,9 @@ publish:
       export OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE
       export BRANCH_NAME=$CI_BUILD_REF_SLUG
 
+      echo "$MACHINE" | tee /etc/hostname
+      echo "$IP $MACHINE" | tee -a /etc/hosts
+
       /bin/run-parts --exit-on-error /root/test.d/
       END_OF_INTERNAL_TEST
     - sed -e 's/32;/34;/g' -i run-test 
