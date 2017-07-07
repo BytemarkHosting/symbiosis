@@ -161,7 +161,6 @@ publish:
           sleep 3
       done
     - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
-    - echo "$MACHINE" > hostname
   script:
     - | 
       cat > run-test <<END_OF_INTERNAL_TEST
@@ -175,6 +174,7 @@ publish:
 
       echo "$MACHINE" | tee /etc/hostname
       echo "$IP $MACHINE" | tee -a /etc/hosts
+      hostname -b
 
       /bin/run-parts --exit-on-error /root/test.d/
       END_OF_INTERNAL_TEST
