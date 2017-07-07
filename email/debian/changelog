@@ -1,3 +1,9 @@
+symbiosis-email (2015:1218) UNRELEASED; urgency=medium
+
+  * Fix path to binary in /etc/cron.d/symbiosis-email. Closes #72. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 07 Jul 2017 16:39:59 +0100
+
 symbiosis-email (2015:1217) stable; urgency=medium
 
   * If pipe-delivery fails attempt to keep the failed message in the queue.
