@@ -2,5 +2,5 @@ deb http://repo.bytemark.co.uk/open-source/netlinkrb/master/latest/jessie/ ./
 deb http://repo.bytemark.co.uk/open-source/prosody-modules/master/latest/jessie/ ./
 deb http://repo.bytemark.co.uk/open-source/ruby-cracklib/master/latest/jessie/ ./
 deb http://repo.bytemark.co.uk/open-source/bytemark-keys/master/latest/jessie/ ./
-deb http://repo.bytemark.co.uk/open-source/ruby-acme-client/master/latest/jessie/ ./
+deb http://repo.bytemark.co.uk/open-source/ruby-acme-client/master/6716/jessie/ ./
 deb http://repo.bytemark.co.uk/open-source/ruby-dbus-systemd/master/latest/jessie/ ./
