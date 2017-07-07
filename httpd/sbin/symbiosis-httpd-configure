@@ -455,7 +455,7 @@ configurations.each do |config|
       # the next domain.
       #
       if diff_only
-        puts config.diff.to_s(:color)
+        puts config.diff(:color)
         puts "\tW: Apache has rejected this configuration change" unless config.ok?
         next
       end
