@@ -162,17 +162,6 @@ publish:
       done
     - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
     - echo "$MACHINE" > hostname
-    - machinectl copy-to $MACHINE hostname /etc/hostname 
-    - |
-      while machinectl status $MACHINE > /dev/null; do
-          machinectl stop $MACHINE || true
-          sleep 1
-      done
-    - |
-      while [ "$IP" = "" ]; do
-          export IP=$(get-machine-ip $MACHINE)
-          sleep 3
-      done
   script:
     - | 
       cat > run-test <<END_OF_INTERNAL_TEST
@@ -184,8 +173,6 @@ publish:
       export OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE
       export BRANCH_NAME=$CI_BUILD_REF_SLUG
 
-      echo "127.0.0.1 $HOSTNAME" > /etc/
-      
       /bin/run-parts --exit-on-error /root/test.d/
       END_OF_INTERNAL_TEST
     - sed -e 's/32;/34;/g' -i run-test 
