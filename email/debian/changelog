@@ -1,3 +1,9 @@
+symbiosis-email (2015:1218) oldstable; urgency=medium
+
+  * Ensure manpages are built
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 06 Jul 2017 16:10:48 +0100
+
 symbiosis-email (2015:1217) stable; urgency=medium
 
   * If pipe-delivery fails attempt to keep the failed message in the queue.

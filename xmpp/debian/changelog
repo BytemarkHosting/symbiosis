@@ -1,3 +1,9 @@
+symbiosis-xmpp (2015:1026) oldstable; urgency=medium
+
+  * Ensure manpages are built.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 06 Jul 2017 16:09:15 +0100
+
 symbiosis-xmpp (2015:1025) stable; urgency=medium
 
   * Add lua-sec as an explicit dependency for TLS support.
