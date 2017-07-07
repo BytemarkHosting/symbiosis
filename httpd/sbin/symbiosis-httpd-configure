@@ -33,6 +33,9 @@
 #                                     non-SSL sites. Defaults to
 #                                     /etc/symbiosis/apache.d/zz-mass-hosting.template.erb
 #
+# --diff-only, -d   Show the differences in the new configuration, without
+#                   making any changes.
+#
 # --force, -f       Force the re-creation of all sites.
 #
 # --no-reload, -n   Do not reload Apache even if changes have taken place.
@@ -120,12 +123,14 @@ mass_non_ssl_template = nil
 mass_ssl_template     = nil
 apache2_dir      = nil
 no_reload       = false
+diff_only       = false
 
 opts = GetoptLong.new(
          [ '--help',             '-h', GetoptLong::NO_ARGUMENT ],
          [ '--manual',           '-m', GetoptLong::NO_ARGUMENT ],
          [ '--verbose',          '-v', GetoptLong::NO_ARGUMENT ],
          [ '--force',            '-f', GetoptLong::NO_ARGUMENT ],
+         [ '--diff-only',        '-d', GetoptLong::NO_ARGUMENT ],
          [ '--no-reload',        '-n', GetoptLong::NO_ARGUMENT],
          [ '--no-restart',       '-N', GetoptLong::NO_ARGUMENT],
          [ '--ssl-template',     '-s', GetoptLong::REQUIRED_ARGUMENT ],
@@ -156,6 +161,8 @@ begin
       # This is a legacy option.
     when '--no-restart'
       no_reload = true
+    when '--diff-only'
+      diff_only = true
     when '--help'
       help = true
     when '--manual'
@@ -442,6 +449,17 @@ configurations.each do |config|
     # This gets apache2 to check the configuration using a temporary file.
     #
     if recreate
+
+      #
+      # If we're only showing the diff, then check the config, and continue to
+      # the next domain.
+      #
+      if diff_only
+        puts config.diff.to_s(:color)
+        puts "\tW: Apache has rejected this configuration change" unless config.ok?
+        next
+      end
+
       if config.ok?
 
         verbose "\tWriting configuration"

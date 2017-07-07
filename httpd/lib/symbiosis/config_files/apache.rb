@@ -2,6 +2,7 @@ require 'symbiosis/config_file'
 require 'symbiosis/domain/http'
 require 'symbiosis/host'
 require 'tempfile'
+require 'diffy'
 
 module Symbiosis
   module ConfigFiles
@@ -36,6 +37,19 @@ module Symbiosis
         end
       end
 
+      def diff
+        config = self.generate_config(self.template)
+
+        tempfile = Tempfile.new(File.basename(self.filename))
+        tempfile.puts(config)
+        tempfile.close(false)
+
+        fn = ( File.exists?(self.filename) ? self.filename : '/dev/null' )
+
+        Diffy::Diff.new(fn, tempfile.path, :source => 'files', :include_diff_info => true)
+      ensure
+        tmpfile.unlink
+      end
 
       #
       # This checks a site has its config file linked into the sites-enabled
@@ -275,7 +289,7 @@ module Symbiosis
           false
         end
       end
-    
+
       #
       # This returns the FQDN
       #
