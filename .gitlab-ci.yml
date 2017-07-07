@@ -171,10 +171,11 @@ publish:
       export DEBIAN_RELEASE=$DEBIAN_RELEASE
       export OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE
       export BRANCH_NAME=$CI_BUILD_REF_SLUG
+      export HOSTNAME=$MACHINE
 
       echo "$MACHINE" | tee /etc/hostname
       echo "$IP $MACHINE" | tee -a /etc/hosts
-      hostname -b
+      hostname $MACHINE
 
       /bin/run-parts --exit-on-error /root/test.d/
       END_OF_INTERNAL_TEST
