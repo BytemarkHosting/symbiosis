@@ -129,7 +129,7 @@ module Symbiosis
     # different configuraion template can be specified in the second option.
     #
     def diff(format = nil, templ = self.template)
-      config = generate_config(tmpl)
+      config = generate_config(templ)
 
       tempfile = Tempfile.new(File.basename(filename))
       tempfile.puts(config)
