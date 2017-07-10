@@ -6,8 +6,8 @@
 # Modifications were made by Patrick J Cherry <patrick@bytemark.co.uk> for the
 # Bytemark Symbiosis system
 #
-# HISTORY 
-# 
+# HISTORY
+#
 #  2010-06-17: Reworked for Symbiosis <patrick@bytemark.co.uk>
 #  2001-01-04: (BUG) camma and slash were misinterpreted <gotoken#notwork.org>
 #  2000-12-31: replaced Array#filter with collect! <zn#mbf.nifty.com>
@@ -20,7 +20,7 @@
 # COPYRIGHT
 #
 # This code is released under the same terms as Ruby itself.  See LICENCE for
-# more details.  
+# more details.
 #
 # (c) 2000-1 Kentaro Goto
 # (c) 2010-2012 Bytemark Computer Consulting Ltd
@@ -55,10 +55,10 @@ module Symbiosis
 
   #
   # A class representing a Crontab.
-  # 
+  #
   class Crontab
-    
-    # 
+
+    #
     # The array of crontab records
     #
     attr_reader :records
@@ -68,7 +68,7 @@ module Symbiosis
     # read
     #
     attr_reader :filename
-    
+
     #
     # The original string input to parse.
     #
@@ -81,7 +81,7 @@ module Symbiosis
 
     #
     # This takes an argument of a crontab in a string, or a filename.  If a
-    # filename is given, it will be read.  Otherwise the string will be parsed. 
+    # filename is given, it will be read.  Otherwise the string will be parsed.
     #
     def initialize(string_or_filename = "")
       # Must be a string!
@@ -91,7 +91,7 @@ module Symbiosis
       @environment = {}
       if File.exist?(string_or_filename)
         @filename = string_or_filename
-        @crontab = File.open(string_or_filename){|fh| fh.read} 
+        @crontab = File.open(string_or_filename){|fh| fh.read}
       else
         @filename = "string input"
         @crontab = string_or_filename
@@ -102,7 +102,7 @@ module Symbiosis
       parse(@crontab)
     end
 
-    # 
+    #
     # An iterator for each record.
     #
     def each(&block)
@@ -148,7 +148,7 @@ module Symbiosis
         old_env[k] = (ENV[k].nil? ? nil : ENV[k])
         ENV[k] = v
       end
-      output = [] 
+      output = []
 
       @records.select{|record| record.ready?}.each do |record|
         this_output = record.run
@@ -162,7 +162,7 @@ module Symbiosis
       # restore environment
       old_env.each do |k,v|
         if v.nil?
-          ENV.delete(k) 
+          ENV.delete(k)
         else
           ENV[k] = v
         end
@@ -185,7 +185,7 @@ module Symbiosis
           IO.popen(@mail_command,"w+") do |pipe|
             pipe.write mail.join("\n")
             pipe.close
-          end 
+          end
         else
           puts mail.join("\n")
         end
@@ -208,7 +208,7 @@ module Symbiosis
         line.chomp!
 
         # Skip if line begins with a hash or is all spaces or empty.
-        next if line =~ /\A([\s#].*|\s*)\Z/ 
+        next if line =~ /\A([\s#].*|\s*)\Z/
 
         # Skip unsupported lines
         if line =~ /^\s*@reboot/
@@ -271,13 +271,13 @@ module Symbiosis
         SHORTCUTS.collect{|shortcut, snippet| str.sub!(/\A\s*@#{shortcut}/, snippet)}
 
         min, hour, mday, mon, wday = str.split(/\s+/).first(5)
-       
+
         # This regexp makes sure we start at a word boundary (\b), and can take
-        # names longer than the ones specified. 
+        # names longer than the ones specified.
         wday = wday.downcase.gsub(/\b(#{WDAY.join("|")})[a-z]*/){
           WDAY.index($1)
         }
- 
+
         # Same as above, but have to add one, as months start at 1 not 0.
         mon = mon.downcase.gsub(/\b(#{MON.join("|")})[a-z]*/){
           MON.index($1)+1
@@ -294,7 +294,7 @@ module Symbiosis
     #
     # Create a new CrontabRecord, setting the minute, hour, month-day, month,
     # week-day and command.  Raises a CrontabFormatError if any of the
-    # arguments fail to parse. 
+    # arguments fail to parse.
     #
     def initialize(min, hour, mday, mon, wday, command)
       @min  = parse_field(min,  0, 59)
@@ -326,8 +326,8 @@ module Symbiosis
     #
     # Returns true if the record should be run at time set by now.
     #
-    def ready?(now = Time.now) 
-      now = now.to_time 
+    def ready?(now = Time.now)
+      now = now.to_time
       if @lazy_mday_wday_match
         min.include?  now.min  and
         hour.include? now.hour and
@@ -351,8 +351,8 @@ module Symbiosis
     def next_due(now = Time.now)
       time      = now.to_time
       orig_time = time
-
       while !ready?(time)
+
         # find the next minute that matches
         unless min.include?(time.min)
           ind = (min + [time.min]).sort.index(time.min)
@@ -361,9 +361,9 @@ module Symbiosis
             # Roll on time to the beginning of the next hour
             #
             time += 3600
-            time = Time.local(time.year, time.mon, time.day, time.hour, time.min) 
+            time = Time.local(time.year, time.mon, time.day, time.hour)
           else
-            time = Time.local(time.year, time.mon, time.day, time.hour, min[ind]) 
+            time = Time.local(time.year, time.mon, time.day, time.hour, min[ind])
           end
         end
 
@@ -376,10 +376,10 @@ module Symbiosis
             dtime = time.to_date + 1
             time = Time.local(dtime.year, dtime.mon, dtime.day)
           else
-            time = Time.local(time.year, time.mon, time.day, hour[ind], time.min, 0) 
+            time = Time.local(time.year, time.mon, time.day, hour[ind], time.min)
           end
-        end  
-        
+        end
+
         time_a = time_b = nil
 
         # find the next month or week day that matches
@@ -388,10 +388,10 @@ module Symbiosis
 
           if mday.length == ind
             dtime = time.to_date >> 1
-            time_a = Time.local(dtime.year, dtime.mon, dtime.mday) 
+            time_a = Time.local(dtime.year, dtime.mon)
           else
             begin
-              time_a = Time.local(time.year, time.mon, mday[ind], time.hour, time.min) 
+              time_a = Time.local(time.year, time.mon, mday[ind], time.hour, time.min)
             rescue ArgumentError
               dtime = time.to_date >> 1
               time_a = Time.local(dtime.year, dtime.mon)
@@ -409,7 +409,7 @@ module Symbiosis
             dtime = time.to_date + (7 - time.wday + wday.first)
             time_b = Time.local(dtime.year, dtime.mon, dtime.mday)
           else
-            dtime = time.to_date + (wday.first - time.wday) 
+            dtime = time.to_date + (wday.first - time.wday)
             time_b = Time.local(dtime.year, dtime.mon, dtime.mday, time.hour, time.min)
           end
 
@@ -425,7 +425,7 @@ module Symbiosis
           ind = (mon + [time.mon]).sort.index(time.mon)
 
           if mon.length == ind
-            # Roll on time to the beginning of the next year 
+            # Roll on time to the beginning of the next year
             time = Time.local(time.year + 1)
           else
             begin
@@ -436,14 +436,13 @@ module Symbiosis
             end
           end
         end
-        
+
         # Break if we get 30 years into the future!
         if time.year - orig_time.year > 30
           time = nil
           break
         end
       end
-
       time
     end
 
@@ -461,7 +460,7 @@ module Symbiosis
       end
       ret
     end
-    
+
     private
 
     def parse_field(str, first, last)
@@ -469,7 +468,7 @@ module Symbiosis
         every, f, l = nil
 
         #
-        # Split the field, assuming it looks like "0-9/4". 
+        # Split the field, assuming it looks like "0-9/4".
         #
         if entry.strip =~ /(\*|\d+)(?:\-(\d+))?(?:\/(\d+))?/
           f,l,every = [$1, $2, $3]
@@ -496,7 +495,7 @@ module Symbiosis
             # Make sure we've got an integer now
             raise CrontabFormatError.new "Bad field #{n.inspect} in #{str}" unless n.is_a?(Integer)
 
-            # make sure everything is within ranges 
+            # make sure everything is within ranges
             raise CrontabFormatError.new "out of range (#{n} for #{first}..#{last})" unless (first..last).include?(n)
 
             n
