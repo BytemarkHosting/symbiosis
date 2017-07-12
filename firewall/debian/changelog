@@ -1,3 +1,9 @@
+symbiosis-firewall (2015:1024) stable; urgency=medium
+
+  * Ensure manpages are generated as part of the build task.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 06 Jul 2017 16:07:35 +0100
+
 symbiosis-firewall (2015:1023) stable; urgency=medium
 
   * Updated code to work with the new version of symbiosis-common. 

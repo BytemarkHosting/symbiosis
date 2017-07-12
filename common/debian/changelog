@@ -1,3 +1,9 @@
+symbiosis-common (2015:1222) oldstable; urgency=medium
+
+  * Ensure manpages are built.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 06 Jul 2017 16:09:40 +0100
+
 symbiosis-common (2015:1221) stable; urgency=medium
 
   * Rationalise testing of valid domain names into a method. 
