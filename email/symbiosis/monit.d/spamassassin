@@ -16,8 +16,8 @@ class SpamdCheck < Symbiosis::Monitor::Check
   end
 
   #
-  # Ignore the test if 
-  #   * dpkg if running 
+  # Ignore the test if
+  #   * dpkg if running
   #   * the initscript is missing and spamassassin should not be running.
   #
   def should_ignore?
@@ -34,23 +34,23 @@ class SpamdCheck < Symbiosis::Monitor::Check
       if should_be_running
         return SystemExit::EX_CONFIG
       else
-        puts "Daemon state probably OK -- initscript is missing and #{@name} supposed to be running."
+        puts "Daemon state probably OK -- initscript is missing and #{@name} is not supposed to be running."
         return 0
       end
     end
 
-    r = do_process_check 
-    if SystemExit::EX_TEMPFAIL == r 
+    r = do_process_check
+    if SystemExit::EX_TEMPFAIL == r
       should_be_running ? self.start : self.stop
     end
 
     return 0 unless should_be_running
 
-    tcpconnection = Symbiosis::Monitor::TCPConnection.new( 
+    tcpconnection = Symbiosis::Monitor::TCPConnection.new(
       "localhost", "spamd", ["PING SPAMC/1.3\r\n",nil]
     )
     r = do_tcpconnection_check(tcpconnection)
-    self.restart if SystemExit::EX_TEMPFAIL == r 
+    self.restart if SystemExit::EX_TEMPFAIL == r
     return r
   end
 

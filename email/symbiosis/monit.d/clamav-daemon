@@ -35,7 +35,7 @@ class ClamdCheck < Symbiosis::Monitor::Check
       if should_be_running
         return SystemExit::EX_CONFIG
       else
-        puts "Daemon state probably OK -- initscript is missing and #{@name} supposed to be running."
+        puts "Daemon state probably OK -- initscript is missing and #{@name} is not supposed to be running."
         return 0
       end
     end
