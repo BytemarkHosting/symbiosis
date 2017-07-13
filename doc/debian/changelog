@@ -1,3 +1,9 @@
+symbiosis-api-doc (2015:0619) oldstable; urgency=medium
+
+  * Added Makefile, updated build-deps.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 06 Jul 2017 16:11:57 +0100
+
 symbiosis-api-doc (2015:0618) stable; urgency=medium
 
   * Updated maintainers + uploaders.

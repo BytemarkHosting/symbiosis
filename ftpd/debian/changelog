@@ -1,3 +1,9 @@
+symbiosis-ftpd (2015:1110) oldstable; urgency=medium
+
+  * Ensure manpages are built
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 06 Jul 2017 16:10:28 +0100
+
 symbiosis-ftpd (2015:1109) stable; urgency=medium
 
   * Use invoke-rc.d to restart services in postinst.

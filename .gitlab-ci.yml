@@ -88,13 +88,18 @@ test:xmpp:
   <<: *test
 
 .package: &package
-  image: $CI_REGISTRY/docker-images/layers:jessie-deb
   stage: package
   script:
     - export PACKAGE=${CI_BUILD_NAME##package:}
-    - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
-    - cd $PACKAGE
-    - package
+    - cp -v symbiosis.list $PACKAGE/
+    - pushd $PACKAGE ; sautobuild --distribution jessie --sources-list symbiosis.list --apt-key ../symbiosis.key $PWD ; popd
+    - mkdir -p pkg/
+    # These files are all optional
+    - 'mv -v *.{dsc,build,buildinfo,changes,tar.*} pkg/ 2>/dev/null || true'
+    # We always want a deb though.
+    - mv -v *.deb pkg/
+  tags:
+    - shell
   artifacts:
     paths:
       - pkg/
@@ -147,30 +152,35 @@ publish:
   stage: install
   image: $CI_REGISTRY/docker-images/base:jessie
   tags:
-    - docker-socket
-  variables:
-    VERBOSE: --verbose
+    - shell
+    - sautotest
   script:
-    - rm -fv /usr/sbin/policy-rc.d
-    - cd autotest
-    - echo ${CI_BUILD_NAME##install:} > test.d/conf/action
-    - "echo deb http://repo.bytemark.co.uk/symbiosis/$CI_BUILD_REF_SLUG/$CI_PIPELINE_ID/ ./ >> test.d/conf/autotest-sources.list"
-    - run-parts $VERBOSE --new-session --exit-on-error $PWD/test.d
+    - echo $install_or_upgrade | tee autotest/test.d/conf/action
+    - echo "deb http://repo.bytemark.co.uk/open-source/symbiosis/$CI_BUILD_REF_NAME/latest/ ./" >> autotest/test.d/conf/autotest-sources.list
+    - "echo chosen chroot: $chroot"
+    - /usr/bin/sautotest -c "$chroot" autotest/test.d/
 
 #
 # These next two do not work in gitlab-ci, yet.
 #
 install:dist-upgrade:
   <<: *install
-  image: $CI_REGISTRY/docker-images/base:wheezy
   allow_failure: true
+  variables:
+     install_or_upgrade: install
+     chroot: chroot:wheezy-amd64
 
 install:upgrade:
   <<: *install
   allow_failure: true
+  variables:
+     install_or_upgrade: upgrade
+     chroot: chroot:jessie-amd64
 
 install:fresh-install:
   <<: *install
-  stage: fresh-install
+  variables:
+     install_or_upgrade: install
+     chroot: chroot:jessie-amd64
 
 

@@ -2,6 +2,8 @@ symbiosis-email (2015:1218) stable; urgency=medium
 
   * Re-instate clamav tests that stop it if no domains are using anti-virus
     scanning.  Closes #49.
+  * Fix path to binary in /etc/cron.d/symbiosis-email. Closes #72. 
+  * Ensure manpages are built
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 07 Jul 2017 10:16:59 +0100
 

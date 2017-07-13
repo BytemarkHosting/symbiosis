@@ -27,4 +27,8 @@ postgresql
 ruby-pg
 ruby-mysql
 ruby2.1
+roundcube/jessie-backports
+roundcube-core/jessie-backports
+roundcube-mysql/jessie-backports
+roundcube-plugins/jessie-backports
 squirrelmail-change-pass
