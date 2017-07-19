@@ -43,7 +43,7 @@ printf "*  Free space on %s: %8.1f GB\n", $dir, $gb_available;
 my $est_output = `backup2l --estimate --conf $conf 2> /dev/null`;
 
 unless ( ${^CHILD_ERROR_NATIVE} == 0 ) {
-    print "!! backup2l estimate failed: command exitied with status $?";
+    print "!! backup2l estimate failed: command exited with status $?";
     exit 0;
 }
 
