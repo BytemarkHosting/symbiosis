@@ -11,18 +11,9 @@ for i in {client,server} ; do
 done
 
 #
-#  Rebuild dovecot
+# Restart all deamons
 #
-if [ -e /etc/dovecot/Makefile ] ; then
-    cd /etc/dovecot && make
-fi
-
-#
-#  Restart all deamons
-#
-for i in prosody dovecot; do
-  invoke-rc.d $i restart || true
-done
+invoke-rc.d $i prosody || true
 
 #DEBHELPER#
 exit 0
