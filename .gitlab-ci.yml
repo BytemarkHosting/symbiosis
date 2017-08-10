@@ -20,8 +20,8 @@ stages:
     - "[ ! -f Makefile ] || make test"
 
 codeclimate:
-  stage: test,
-  tags: [ docker-socket ],
+  stage: test
+  tags: [ docker-socket ]
   image: $CI_REGISTRY/docker-images/layers:stretch-codeclimate-codeclimate-init
   script:
     - codeclimate init
