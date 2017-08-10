@@ -19,6 +19,17 @@ stages:
     - cd $PACKAGE
     - "[ ! -f Makefile ] || make test"
 
+codeclimate:
+  stage: test,
+  tags: [ docker-socket ],
+  image: $CI_REGISTRY/docker-images/layers:stretch-codeclimate-codeclimate-init
+  script:
+    - codeclimate init
+    - codeclimate engines:enable rubocop
+    - codeclimate analyze -f json > codeclimate.json
+  artifacts:
+    paths: [ codeclimate.json ]
+
 test:backup:
   <<: *test
 
