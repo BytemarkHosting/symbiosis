@@ -11,7 +11,7 @@ for i in {client,server} ; do
 done
 
 #
-# Restart all deamons
+# Restart all daemons
 #
 invoke-rc.d $i prosody || true
 
