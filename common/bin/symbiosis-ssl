@@ -177,6 +177,8 @@ end
 
 now = Time.now
 
+domains_altered = []
+
 domains.sort_by(&:name).each do |domain|
   if do_list || rollover_to
     puts "Certificate sets for #{domain}:"
@@ -218,12 +220,15 @@ domains.sort_by(&:name).each do |domain|
   end
 
   begin
-    domain.ssl_magic(threshold, do_generate, do_rollover, now)
+    rollover_performed = domain.ssl_magic(threshold, do_generate, do_rollover, now)
+    domains_altered.push domain.name if rollover_performed
   rescue StandardError => err
     puts "\t!! Failed: #{err.to_s.gsub($RS, '')}" if $VERBOSE
     puts err.backtrace.join("\n") if $DEBUG
     exit_code = 1
   end
 end
+
+Symbiosis::SSL.call_hooks domains_altered
 
 exit exit_code
