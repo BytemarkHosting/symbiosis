@@ -21,7 +21,7 @@ test:backup:
 
 test:common:
   variables:
-    TEST_DEPS: ruby ruby-acme-client ruby-linux-netlink ruby-cracklib ruby-erubis ruby-mocha ruby-webmock ruby-test-unit openssl cracklib-runtime
+    TEST_DEPS: ruby ruby-acme-client ruby-linux-netlink ruby-cracklib ruby-erubis ruby-mocha ruby-webmock ruby-test-unit openssl cracklib-runtime ruby-diffy
   <<: *test
 
 test:cron:
