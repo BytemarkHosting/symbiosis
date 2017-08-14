@@ -1,3 +1,5 @@
+require 'symbiosis'
+
 module Symbiosis
   class SSL
     PROVIDERS ||= []
@@ -5,7 +7,9 @@ module Symbiosis
     def self.call_hooks(domains_with_updates)
       return if domains_with_updates.empty?
 
-      Dir.glob('/etc/symbiosis/ssl-hooks.d/*').each do |script|
+      hooks_path = Symbiosis.path_to('/etc/symbiosis/ssl-hooks.d/*')
+
+      Dir.glob(hooks_path).each do |script|
         next unless File.executable?(script)
         IO.popen([script, 'live-update'], 'r+') do |io|
           io.puts domains_with_updates.join("\n")

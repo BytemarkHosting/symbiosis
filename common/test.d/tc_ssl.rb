@@ -2,6 +2,7 @@ $:.unshift  "../lib/" if File.directory?("../lib")
 
 require 'test/unit'
 require 'tmpdir'
+require 'symbiosis'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/ssl/selfsigned'
 require 'mocha/test_unit'
@@ -26,12 +27,21 @@ class SSLTest < Test::Unit::TestCase
     #
     Process.egid = 1000 if Process.gid == 0
     Process.euid = 1000 if Process.uid == 0
+    @root = Dir.mktmpdir('root')
 
     @prefix = Dir.mktmpdir("srv")
 
     @prefix.freeze
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
+
+    @verbose = (($VERBOSE or $DEBUG) ? " --verbose " : "")
+
+    testd = File.dirname(__FILE__)
+
+    @script = File.expand_path(File.join(testd,"..","bin","symbiosis-ssl"))
+    @script = '/usr/sbin/symbiosis-ssl' unless File.exist?(@script)
+    @script += @verbose
   end
 
   def teardown
@@ -928,4 +938,42 @@ class SSLTest < Test::Unit::TestCase
 
   end
 
+  def test_ssl_hooks
+    #
+    # This requires the Self-signed provider to be in place
+    #
+
+    ssl_domain = @domain
+    ssl_domain.ssl_provider = 'selfsigned'
+
+    ssl_dir  = File.join(ssl_domain.config_dir, 'ssl')
+    sets_dir = File.join(ssl_dir, 'sets')
+
+    Symbiosis::Utils.mkdir_p(sets_dir)
+
+    regular_domain = Symbiosis::Domain.new(nil, @prefix)
+    regular_domain.create
+
+    args_path = Symbiosis.path_to('hook.args')
+    out_path = Symbiosis.path_to('hook.output')
+
+    File.delete(args_path, 'w') if File.exist?(args_path)
+    File.delete(out_path, 'w') if File.exist?(out_path)
+
+
+    hook = <<HOOK
+#!/bin/bash
+
+echo "$1" > #{args_path}
+cat > #{out_path}
+HOOK
+
+    system("#{@script} --root-dir=#{@root} --prefix=#{@prefix}")
+
+    args = IO.read args_path
+    out = IO.read args_path
+
+    assert_equal 'live-update'
+    assert_equal ssl_domain.name, out
+  end
 end
