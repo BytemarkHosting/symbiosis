@@ -29,7 +29,7 @@ test:cron:
 
 test:dns:
   variables:
-    TEST_DEPS: ruby-linux-netlink ruby-erubis
+    TEST_DEPS: ruby-linux-netlink ruby-erubis ruby-diffy
   <<: *test
 
 test:doc:
@@ -53,7 +53,7 @@ test:ftpd:
 test:httpd:
   variables:
     RUBYOPT: -v
-    TEST_DEPS: ruby-linux-netlink ruby-erubis apache2
+    TEST_DEPS: ruby-linux-netlink ruby-erubis apache2 ruby-diffy
   <<: *test
 
 test:httpd-logger:
@@ -66,7 +66,7 @@ test:meta:
 
 test:monit:
   variables:
-    TEST_DEPS: ruby-sqlite3 ruby-log4r
+    TEST_DEPS: ruby-sqlite3 ruby-log4r ruby-dbus-systemd
   <<: *test
 
 test:mysql:
