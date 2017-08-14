@@ -27,10 +27,13 @@ class SSLTest < Test::Unit::TestCase
     #
     Process.egid = 1000 if Process.gid == 0
     Process.euid = 1000 if Process.uid == 0
-    @root = Dir.mktmpdir('root')
+    @etc = Dir.mktmpdir('etc')
 
     @prefix = Dir.mktmpdir("srv")
+    Symbiosis.etc = File.realpath @etc
+    Symbiosis.prefix = File.realpath @prefix
 
+    @etc.freeze
     @prefix.freeze
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
@@ -60,6 +63,8 @@ class SSLTest < Test::Unit::TestCase
       @domain.destroy  if @domain.is_a?( Symbiosis::Domain)
       FileUtils.rm_rf(@prefix) if File.directory?(@prefix)
     end
+
+    FileUtils.rm_rf(@etc) if File.directory?(@etc)
 
     Process.euid = 0 if Process.uid == 0
     Process.egid = 0 if Process.gid == 0
@@ -954,12 +959,8 @@ class SSLTest < Test::Unit::TestCase
     regular_domain = Symbiosis::Domain.new(nil, @prefix)
     regular_domain.create
 
-    args_path = Symbiosis.path_to('hook.args')
-    out_path = Symbiosis.path_to('hook.output')
-
-    File.delete(args_path, 'w') if File.exist?(args_path)
-    File.delete(out_path, 'w') if File.exist?(out_path)
-
+    args_path = Symbiosis.path_in_etc('hook.args')
+    out_path = Symbiosis.path_in_etc('hook.output')
 
     hook = <<HOOK
 #!/bin/bash
@@ -968,12 +969,16 @@ echo "$1" > #{args_path}
 cat > #{out_path}
 HOOK
 
-    system("#{@script} --root-dir=#{@root} --prefix=#{@prefix}")
+    FileUtils.mkdir_p Symbiosis.path_in_etc('symbiosis/ssl-hooks.d')
 
+    IO.write Symbiosis.path_in_etc('symbiosis/ssl-hooks.d/hook'), hook, mode: 'w', perm: 0755
+
+    system("#{@script} --etc-dir=#{@etc} --prefix=#{@prefix}")
+    
     args = IO.read args_path
-    out = IO.read args_path
+    out = IO.read out_path
 
-    assert_equal 'live-update'
-    assert_equal ssl_domain.name, out
+    assert_equal "live-update\n", args
+    assert_equal "#{ssl_domain.name}\n", out
   end
 end

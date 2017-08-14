@@ -2,27 +2,30 @@
 # This module contains all the classes that are needed for Bytemark Symbiosis.
 #
 module Symbiosis
-  def root
-    @@root || '/'
+  @@etc = '/etc'
+  @@prefix='/srv' 
+
+  def self.etc
+    @@etc
   end
 
-  def root=(new_root)
-    @@root = new_root
+  def self.etc=(new_etc)
+    @@etc = new_etc
   end
 
-  def prefix
-    @@prefix || '/srv'
+  def self.prefix
+    @@prefix
   end
 
-  def prefix=(new_prefix)
+  def self.prefix=(new_prefix)
     @@prefix = new_prefix
   end
 
-  def path_to(path)
-    File.join(root, path)
+  def self.path_in_etc(path)
+    File.join(etc, path)
   end
 
-  def path_in_prefix_to(path)
-    File.join(root, prefix, path)
+  def self.path_in_prefix(path)
+    File.join(prefix, path)
   end
 end
