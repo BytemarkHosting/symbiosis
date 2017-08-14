@@ -505,6 +505,106 @@ module Symbiosis
       raise Errno::ENOLCK, "Unable to release lock -- #{err.to_s}"
     end
 
+    def guess_init_system
+      if File.exist?('/run/systemd/system')
+        puts "  (systemd detected)" if $VERBOSE
+        return :systemd
+      elsif system("which initctl > /dev/null 2>&1")
+        if `initctl version` =~ /upstart/
+          puts "  (upstart detected)" if $VERBOSE
+          return :upstart
+        else
+          puts "  (initctl shim detected)" if $VERBOSE
+          return :upstart # if there's an upstart shim we might still be able to use it
+        end
+      else
+        puts " (nothing detected, defaulting to sysvinit)" if $VERBOSE
+        return :sysv
+      end
+
+    end
+
+    def service_running?(service)
+      puts "Finding out if #{service} is running..." if $VERBOSE
+      
+      running = case guess_init_system
+      when :systemd
+        system("systemctl status #{service} >/dev/null 2>&1")
+      when :upstart
+        system("initctl status #{serice} >/dev/null 2>&1")
+      when :sysv
+        system("/etc/init.d/#{service} status >/dev/null 2>&1")
+      end
+      puts running ? "  it is" : "  it's not" if $VERBOSE
+      running
+    end
+
+    # prevent a service from running on boot
+    # by masking in systemd & running update-rc.d
+    # and whatever the equivalent is in upstart
+    def mask_service(service)
+      case guess_init_system
+      when :systemd
+        puts "Masking #{service}.service" if $VERBOSE
+        system("systemctl mask #{service}.service")
+        puts "Reloading systemd" if $VERBOSE
+        system("systemctl daemon-reload")
+      when :upstart
+        puts "Doing nothing because I don't know how to mask an upstart service" if $VERBOSE
+        # ???
+      when :sysv
+        puts "Disabling #{service} on all runlevels" if $VERBOSE
+        system("update-rc.d #{service} disable")
+      end
+    end
+
+    # allow a service to start on boot
+    # by unmasking in systemd & running update-rc.d
+    # and whatever the equivalent is in upstart
+    def unmask_service(service)
+      case guess_init_system
+      when :systemd
+        puts "Unmasking #{service}.service" if $VERBOSE
+        system("systemctl unmask #{service}.service")
+        puts "Reloading systemd" if $VERBOSE
+        system("systemctl daemon-reload")
+      when :upstart
+        # ???
+      when :sysv
+        puts "enabling #{service} on runlevels 3 & 5" if $VERBOSE
+        system("update-rc.d #{service} defaults")
+      end
+
+    end
+
+    def start_service(service)
+      puts "starting #{service}..." if $VERBOSE
+      success = case guess_init_system
+      when :systemd
+        system("systemctl start #{service}")
+      when :upstart
+        system("initctl start #{serice}")
+      when :sysv
+        system("/etc/init.d/#{service} start")
+      end
+      puts ( success ? "ok" : "fail" ) if $VERBOSE
+      success
+    end
+
+    def stop_service(service)
+      puts "stopping #{service}..." if $VERBOSE
+      success = case guess_init_system
+      when :systemd
+        system("systemctl stop #{service}")
+      when :upstart
+        system("initctl stop #{serice}")
+      when :sysv
+        system("/etc/init.d/#{service} stop")
+      end
+      puts ( success ? "ok" : "fail" ) if $VERBOSE
+    end
+
+
     module_function :mkdir_p, :set_param, :get_param, :random_string, :safe_open, :parse_quota, :lock, :unlock, :show_help, :show_usage, :show_manual, :show_help_or_manual
 
   end

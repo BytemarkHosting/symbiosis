@@ -1,0 +1,78 @@
+#!/usr/bin/ruby
+#
+# NAME
+#   symbiosis-email-configure-antivirus - Start/stop antivirus daemon if needed
+#
+# SYNOPSIS
+#  symbiosis-email-configure-antivirus [ -h | --help ] [ -v | --verbose ]
+#  
+# OPTIONS
+#  -h, --help              Show a help message, and exit.
+# 
+#  -v, --verbose           Show verbose errors.
+#
+# USAGE
+#
+# This script checks to see if any Symbiosis domains have the 'antivirus'
+# config file. If any do and clamav-daemon is not running, it is started.
+# If none have the antivirus config file and clamav-daemon is running, it is
+# stopped.
+#
+# AUTHOR
+#
+# Telyn <telyn@bytemark.co.uk>
+#
+require 'getoptlong'
+require 'symbiosis/domains'
+require 'symbiosis/utils'
+require 'fileutils'
+
+include Symbiosis::Utils
+
+help = verbose = false
+opts = GetoptLong.new(
+  [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+  [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+)
+
+$VERBOSE=false
+opts.each do |opt, arg|
+  case opt
+  when '--help'
+    help = true
+  when '--verbose'
+    $VERBOSE = true
+  end
+end
+
+enable_av = false
+puts "Looking for domains with config/antivirus set" if $VERBOSE
+Symbiosis::Domains.each do |domain|
+  nt = "."
+  if get_param("antivirus", domain.config_dir)
+    enable_av = true
+  else
+    nt = "n't"
+  end
+  puts "  #{domain.name} does#{nt}" if $VERBOSE
+end
+
+endis = enable_av ? 'en' : 'dis'
+
+puts "\r\nGoing to #{endis}able clamav-daemon" if $VERBOSE
+
+if enable_av
+  unmask_service "clamav-daemon"
+  # if av should be on, and isn't, start it
+  unless service_running? "clamav-daemon"
+    start_service("clamav-daemon")
+  end
+else
+  mask_service "clamav-daemon"
+  # if av should be on, and isn't, start it
+  if service_running? "clamav-daemon"
+    stop_service "clamav-daemon"
+  end
+end
+
+# vi: set softtabstop=0 expandtab shiftwidth=4 smarttab

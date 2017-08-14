@@ -1,3 +1,11 @@
+symbiosis-common (2017:0425) stable; urgency=medium
+
+  * Add start/stop/mask/unmask_service methods to Symbiosis::Utils,
+    which abstract away the difference between init systems for the
+    purpose of starting, stopping, enabling and disabling services.
+
+ -- Telyn Roat <telyn@bytemark.co.uk>  Tue, 28 Mar 2017 13:25:34 +0100
+
 symbiosis-common (2017:0424) stable; urgency=medium
 
   * Updated copyright to new machine-readable format.
