@@ -9,6 +9,7 @@ test:
 man/%.man: ./sbin/%
 	[ -d man ] || mkdir man
 	RUBYLIB=./lib:../common/lib $<  --manual | sed -e 's/^=\+$$//' | txt2man -s 1 -t $(notdir $<) | sed -e 's/\\\\fB/\\fB/' > $@
+	test -s $@
 
 clean:
 	$(RM) -r man

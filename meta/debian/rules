@@ -4,4 +4,4 @@
 #
 
 %:
-	dh $@ 
+	dh $@ --with systemd

@@ -136,12 +136,26 @@ if [ -e /etc/dovecot/Makefile ] ; then
     cd /etc/dovecot && make dovecot.conf
 fi
 
+monit_dir="/etc/symbiosis/monit.d"
+mkdir -p "$monit_dir"
+
 #
 #  Restart all deamons
 #
 for i in exim4 dovecot spamassassin clamav-daemon symbiosis-email-dict-proxy symbiosis-email-poppassd; do
     # spamassassin + clamav-daemon might not be installed.  Wrap the invokation.
     service $i restart || true
+
+    #
+    # Add symlinks for our symbiosis monit scripts (one per service, possibly)
+    #
+    monit_script="/usr/share/symbiosis/monit/checks/$i"
+    link_target="$monit_dir/$i"
+
+    if [ -x "$monit_script" ] && [ ! -e "$link_target" ] ; then
+      echo "I: Adding symlink for Symbiosis Monit script for $i"
+      ln -s "$monit_script" "$link_target" || true
+    fi
 done
 
 #DEBHELPER#

@@ -183,7 +183,7 @@ module Symbiosis
       fn = File.join(parent_dir, setting)
 
       #
-      # Return false unless we can read the file
+      # Return nil unless we can read the file
       #
       return nil unless File.exist?(fn) and File.readable?(fn)
 
@@ -198,12 +198,12 @@ module Symbiosis
       return true if contents.empty? or contents =~ /\A\s*(true|yes)\s*\Z/i
 
       #
-      # Return false if the file is set to "false" or "no"
+      # Return false if the contents are set to "false" or "no"
       #
       return false if contents =~ /\A\s*(false|no)\s*\Z/i
 
       #
-      # Otherwise return the contents
+      # Otherwise return the contents, literally.
       #
       return contents
     end
@@ -211,7 +211,7 @@ module Symbiosis
     #
     # This returns the first setting of a parameter in a stack of directories.
     #
-    # Returns the first non-
+    # Returns the first non-nil entry, following the same rules as `get_param`.
     #
     def get_param_with_dir_stack(setting, dir_stack, opts = {})
       var = nil

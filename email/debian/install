@@ -1,4 +1,6 @@
 exim4/                     etc/
 dovecot/                   etc/
 sbin/                      usr/
-symbiosis/                 etc/
+symbiosis/firewall         etc/symbiosis
+symbiosis/test.d           etc/symbiosis
+symbiosis/monit.d/*        usr/share/symbiosis/monit/checks/

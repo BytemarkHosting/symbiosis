@@ -21,4 +21,4 @@ Description: Symbiosis firewall generator
  .
  The firewall also allows the user to restrict the abilities of the
  www-data user  which will ensure that any PHP, or website, compromises
- do not propogate.
+ do not propagate.

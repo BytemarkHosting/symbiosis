@@ -57,66 +57,67 @@
 #  Modules we require
 #
 
+require 'English'
 require 'getoptlong'
 
 opts = GetoptLong.new(
-    [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
-    [ '--manual', '-m', GetoptLong::NO_ARGUMENT ],
-    [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
-    [ '--debug', '-d', GetoptLong::NO_ARGUMENT ],
-    [ '--force', '-f', GetoptLong::NO_ARGUMENT ],
-    [ '--list', '-l', GetoptLong::NO_ARGUMENT ],
-    [ '--threshold', '-t', GetoptLong::REQUIRED_ARGUMENT ],
-    [ '--no-generate', '-G', GetoptLong::NO_ARGUMENT ],
-    [ '--no-rollover', '-R', GetoptLong::NO_ARGUMENT ],
-    [ '--select', '-s', GetoptLong::REQUIRED_ARGUMENT ],
-    [ '--prefix', '-p', GetoptLong::REQUIRED_ARGUMENT ]
+  ['--help', '-h', GetoptLong::NO_ARGUMENT],
+  ['--manual', '-m', GetoptLong::NO_ARGUMENT],
+  ['--verbose', '-v', GetoptLong::NO_ARGUMENT],
+  ['--debug', '-d', GetoptLong::NO_ARGUMENT],
+  ['--force', '-f', GetoptLong::NO_ARGUMENT],
+  ['--list', '-l', GetoptLong::NO_ARGUMENT],
+  ['--threshold', '-t', GetoptLong::REQUIRED_ARGUMENT],
+  ['--no-generate', '-G', GetoptLong::NO_ARGUMENT],
+  ['--no-rollover', '-R', GetoptLong::NO_ARGUMENT],
+  ['--select', '-s', GetoptLong::REQUIRED_ARGUMENT],
+  ['--prefix', '-p', GetoptLong::REQUIRED_ARGUMENT]
 )
 
 manual = help = false
 $VERBOSE = false
 $DEBUG = false
-prefix = "/srv"
+prefix = '/srv'
 do_list = do_generate = do_rollover = nil
 rollover_to = nil
 threshold = 21
 
 opts.each do |opt,arg|
   case opt
-    when '--no-generate'
-      do_generate = false
-    when '--no-rollover'
-      do_rollover = false
-    when '--select'
-      rollover_to = arg.to_s
-    when '--force'
-      do_generate = do_rollover = true
-      $VERBOSE = true
-    when '--threshold'
-      begin
-        threshold = Integer(arg)
-      rescue ArgumentError
-        warn "** Could not parse #{arg.inspect} as an integer for --threshold"
-      end
-    when '--help'
-      help = true
-    when '--manual'
-      manual = true
-    when '--prefix'
-      prefix = arg
-    when '--list'
-      do_list = true
-    when '--verbose'
-      $VERBOSE = true
-    when '--debug'
-      $DEBUG = true
+  when '--no-generate'
+    do_generate = false
+  when '--no-rollover'
+    do_rollover = false
+  when '--select'
+    rollover_to = arg.to_s
+  when '--force'
+    do_generate = do_rollover = true
+    $VERBOSE = true
+  when '--threshold'
+    begin
+      threshold = Integer(arg)
+    rescue ArgumentError
+      warn "** Could not parse #{arg.inspect} as an integer for --threshold"
+    end
+  when '--help'
+    help = true
+  when '--manual'
+    manual = true
+  when '--prefix'
+    prefix = arg
+  when '--list'
+    do_list = true
+  when '--verbose'
+    $VERBOSE = true
+  when '--debug'
+    $DEBUG = true
   end
 end
 
 #
 # Output help as required.
 #
-if help or manual
+if help || manual
   require 'symbiosis/utils'
   Symbiosis::Utils.show_help(__FILE__) if help
   Symbiosis::Utils.show_manual(__FILE__) if manual
@@ -124,7 +125,7 @@ if help or manual
 end
 
 #
-# The required spawn a massive stack of warnings in verbose mode.  So let's
+# The requires spawn a massive stack of warnings in verbose mode.  So let's
 # hide them.
 #
 v = $VERBOSE
@@ -141,7 +142,6 @@ require 'symbiosis/ssl/selfsigned'
 #
 $VERBOSE = v
 
-
 domains = []
 
 ARGV.each do |arg|
@@ -155,21 +155,18 @@ ARGV.each do |arg|
   domains << domain
 end
 
-if rollover_to and ARGV.length != 1
-  warn "** Exactly one domain must be specfied when rolling over to a specific set."
+if rollover_to && ARGV.length != 1
+  warn '** Exactly one domain must be specfied when rolling over to a specific set.'
   exit 1
 end
 
-if ARGV.empty?
-  domains = Symbiosis::Domains.all(prefix)
-end
+domains = Symbiosis::Domains.all(prefix) if ARGV.empty?
 
 exit_code = 0
 
-%w(INT TERM).each do |sig|
+%w[INT TERM].each do |sig|
   trap(sig) do
-
-    if 0 == Process.uid
+    if Process.uid.zero?
       Process.euid = 0
       Process.egid = 0
     end
@@ -180,9 +177,8 @@ end
 
 now = Time.now
 
-domains.sort{|a,b| a.name <=> b.name}.each do |domain|
-
-  if do_list or rollover_to
+domains.sort_by(&:name).each do |domain|
+  if do_list || rollover_to
     puts "Certificate sets for #{domain}:"
 
     if domain.ssl_available_sets.empty?
@@ -201,11 +197,9 @@ domains.sort{|a,b| a.name <=> b.name}.each do |domain|
     current = domain.ssl_current_set
     puts "\tCurrent SSL set: #{current.name}\n" unless $VERBOSE
 
-    if rollover_to.nil?
-      next
-    end
+    next if rollover_to.nil?
 
-    to_set  = domain.ssl_available_sets.find{|s| s.name.to_s == rollover_to}
+    to_set = domain.ssl_available_sets.find { |s| s.name.to_s == rollover_to }
 
     if to_set.nil?
       puts "\tThere is no set '#{rollover_to}' available for this domain."
@@ -226,12 +220,10 @@ domains.sort{|a,b| a.name <=> b.name}.each do |domain|
   begin
     domain.ssl_magic(threshold, do_generate, do_rollover, now)
   rescue StandardError => err
-    puts "\t!! Failed: #{err.to_s.gsub($/,'')}" if $VERBOSE
+    puts "\t!! Failed: #{err.to_s.gsub($RS, '')}" if $VERBOSE
     puts err.backtrace.join("\n") if $DEBUG
     exit_code = 1
   end
-
 end
 
 exit exit_code
-

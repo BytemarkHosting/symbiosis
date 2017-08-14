@@ -1,8 +1,38 @@
+symbiosis-email (2017:0510) stable; urgency=medium
+
+  * Store monit configuration in /usr/share instead of /etc. Use symlinks to
+    allow users to enable/disable but discourage editing
+
+ -- Telyn <telyn@bytemark.co.uk>  Wed, 10 May 2017 13:42:15 +0100
+
+symbiosis-email (2017:0424) stable; urgency=medium
+
+  * Use central dhparam generation script to generate dhparams.
+  * Auto-create standard mailboxes (Trash, Drafts, Sent, Spam) on first login.
+  * Rewrite monit tasks to use new systemd integrations.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:20:08 +0100
+
+symbiosis-email (2015:1217) stable; urgency=medium
+
+  * If pipe-delivery fails attempt to keep the failed message in the queue.
+
+ -- Steve Kemp <steve@bytemark.co.uk>  Fri, 28 Apr 2017 10:12:14 +0100
+
+symbiosis-email (2015:1216) stable; urgency=medium
+
+  * Removed further references to $HOSTNAME in tests.
+  * Added ruby-cracklib as an install dependency.
+  * Start services in tests with invoke-rc.d instead of service.
+  * Tidy how the hostname is set during testing.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 19 Apr 2017 10:39:29 +0100
+
 symbiosis-email (2015:1215) stable; urgency=medium
 
   * Allow underscores in DKIM selectors.
   * Allow wildcard whitelisting/blacklistng.
-  * Added further black/whitelist tests for bad domains. 
+  * Added further black/whitelist tests for bad domains.
   * Fixed a bug where blacklsted hostnames were not getting checked.
   * Updated cipher lists.
   * Fix typo ensuring tagged spam does get moved to Spam folder.
@@ -83,7 +113,7 @@ symbiosis-email (2015:1021) stable; urgency=medium
 
 symbiosis-email (2015:1009) stable; urgency=medium
 
-  * Comment out PidFile settings in clamav/freshclam config to aid upgrades. 
+  * Comment out PidFile settings in clamav/freshclam config to aid upgrades.
   * Removed clamav monitoring as this is now run under systemd.
   * Corrected spamassassin pid and process name for monitoring.
   * Move d-push support into own meta-package, so as not to pull in unwanted
@@ -102,7 +132,7 @@ symbiosis-email (2015:0825) stable; urgency=medium
   * Updated OpenSSL ciphers in Dovecot.
   * Added cronjob to regenerate DH params for exim weekly.
   * Added manpage for symbiosis-email-dict-proxy.
-  * Removed symbiosis-email-check-password as it is no longer used. 
+  * Removed symbiosis-email-check-password as it is no longer used.
   * This package now cleans up after itself more effectively on remove/purge.
   * Added supplementary groups to clamav
   * Fixed up vhost_no_local_mail router to work with messages received

@@ -1,3 +1,16 @@
+symbiosis-firewall (2017:0510) stable; urgency=medium
+
+  * Store monit configuration in /usr/share instead of /etc. Use symlinks to
+    allow users to enable/disable but discourage editing
+
+ -- Telyn <telyn@bytemark.co.uk>  Wed, 10 May 2017 13:42:15 +0100
+
+symbiosis-firewall (2017:0424) stable; urgency=medium
+
+  * Updated monit scripts to work with systemd.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 14:40:11 +0100
+
 symbiosis-firewall (2015:1023) stable; urgency=medium
 
   * Updated code to work with the new version of symbiosis-common. 

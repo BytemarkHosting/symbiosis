@@ -1,4 +1,4 @@
-symbiosis-common (2017:0407) stable; urgency=medium
+symbiosis-common (2017:0425) stable; urgency=medium
 
   * Add start/stop/mask/unmask_service methods to Symbiosis::Utils,
     which abstract away the difference between init systems for the
@@ -6,11 +6,24 @@ symbiosis-common (2017:0407) stable; urgency=medium
 
  -- Telyn Roat <telyn@bytemark.co.uk>  Tue, 28 Mar 2017 13:25:34 +0100
 
+symbiosis-common (2017:0424) stable; urgency=medium
+
+  * Updated copyright to new machine-readable format.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:47:58 +0100
+
 symbiosis-common (2017:0328) stable; urgency=medium
 
   * Add symbiosis-generate-dhparams, which is used by other packages.
 
  -- Telyn Roat <telyn@bytemark.co.uk>  Tue, 28 Mar 2017 13:25:34 +0100
+
+symbiosis-common (2015:1221) stable; urgency=medium
+
+  * Rationalise testing of valid domain names into a method. 
+  * Update letsencrypt tests to work with 0.3.5 of ruby-acme-client.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 19 Apr 2017 10:44:32 +0100
 
 symbiosis-common (2015:1220) stable; urgency=medium
 

@@ -2,26 +2,14 @@
 #
 require 'symbiosis/monitor/check'
 
+# ensure that Incrond is running
 class IncrondCheck < Symbiosis::Monitor::Check
-
   def initialize
-    super
-    @process.pidfile = "/var/run/incrond.pid"
-    @process.initscript = "/etc/init.d/incron"
-    @name = "incrond"
+    super pid_file: '/var/run/incrond.pid',
+          init_script: '/etc/init.d/incron',
+          unit_name: 'incron',
+          process_name: 'incrond'
   end
-
-  def do_check
-    return SystemExit::EX_CONFIG unless initscript_ok?
-
-    r = do_process_check
-    self.start if SystemExit::EX_TEMPFAIL == r 
-
-    return r
-  end
-
 end
 
-exit IncrondCheck.new.do_check if $0 == __FILE__
-
- 
+exit IncrondCheck.new.do_check if $PROGRAM_NAME == __FILE__
