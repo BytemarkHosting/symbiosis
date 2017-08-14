@@ -13,7 +13,7 @@ man: man/symbiosis-monit.man
 
 docs: man/symbiosis-monit.man doc/index.html
 
-test: test1.9.1 test2.1
+test: test1.9.1 test2.1 test2.3
 
 test1.9.1:
 	cd test.d
@@ -22,6 +22,10 @@ test1.9.1:
 test2.1:
 	cd test.d
 	[ -z "`which ruby2.1`" ] ||  (cd test.d && ruby2.1 -I . ts_monit.rb)
+
+test2.3:
+	cd test.d
+	[ -z "`which ruby2.3`" ] ||  (cd test.d && ruby2.3 -I . ts_monit.rb)
 
 clean:
 	$(RM) man/symbiosis-monit.man
