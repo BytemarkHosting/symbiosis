@@ -22,10 +22,8 @@ stages:
 codeclimate:
   stage: test
   tags: [ docker-socket ]
-  image: $CI_REGISTRY/docker-images/layers:stretch-codeclimate-codeclimate-init
+  image: $CI_REGISTRY/docker-images/layers:stretch-codeclimate
   script:
-    - codeclimate init
-    - codeclimate engines:enable rubocop
     - codeclimate analyze -f json > codeclimate.json
   artifacts:
     paths: [ codeclimate.json ]
