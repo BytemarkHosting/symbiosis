@@ -237,6 +237,6 @@ domains.sort_by(&:name).each do |domain|
   end
 end
 
-Symbiosis::SSL.call_hooks domains_altered
+Symbiosis::SSL.call_hooks domains_altered, 'live-update'
 
 exit exit_code
