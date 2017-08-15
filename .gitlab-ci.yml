@@ -2,7 +2,7 @@ stages:
   - test
   - package
   - publish
-  - fresh-install
+  - install
 
 .test: &test
   stage: test
@@ -10,7 +10,7 @@ stages:
   script:
     - adduser --home=/srv --shell=/bin/bash --no-create-home --disabled-login --gecos='Symbiosis Administrator,,,' admin
     - chown admin.admin /srv
-    - cp autotest/test.d/conf/autotest-sources.list /etc/apt/sources.list.d/
+    - cp test/internal-test.d/conf-stretch/sources.list /etc/apt/sources.list.d/
     - "[ -z \"$TEST_DEPS\" ] || (apt-get update ; apt-get install $TEST_DEPS)"
     - export PACKAGE=${CI_BUILD_NAME##test:}
     - cd $PACKAGE
@@ -144,39 +144,75 @@ publish:
 .install: &install
   stage: install
   tags:
-    - shell
-    - sautotest
+    - systemd-containers
+  before_script:
+    - MACHINE=$CI_BUILD_ID-symbiosis-$DEBIAN_RELEASE-$ACTION
+    - HOSTNAME=$MACHINE.localdomain
+    - RUN_ARGS="--wait --quiet --pty --machine $MACHINE"
+    - |
+      if [ "$ACTION" = "dist-upgrade" ]; then
+        machinectl clone ${OLD_DEBIAN_RELEASE} $MACHINE
+      else
+        machinectl clone ${DEBIAN_RELEASE} $MACHINE
+      fi
+    - machinectl start $MACHINE
+    - |
+      while [ "$IP" = "" ]; do
+          export IP=$(get-machine-ip $MACHINE)
+          sleep 3
+      done
+    - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
   script:
-    - echo $install_or_upgrade | tee autotest/test.d/conf/action
-    - touch autotest/external.d/VERBOSE
-    - echo "deb http://repo.bytemark.co.uk/open-source/symbiosis/$CI_BUILD_REF_NAME/latest/ ./" >> autotest/test.d/conf/autotest-sources.list
-    - "echo chosen chroot: $chroot"
-    - /usr/bin/sautotest -v -c "$chroot" -e $PWD/autotest/external.d/ autotest/test.d/
+    - | 
+      cat > run-test <<END_OF_INTERNAL_TEST
+      #!/bin/bash
+      set -e
+      
+      export ACTION=$ACTION
+      export DEBIAN_RELEASE=$DEBIAN_RELEASE
+      export OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE
+      export BRANCH_NAME=$CI_BUILD_REF_SLUG
+      export HOSTNAME=$HOSTNAMR
 
-#
-# These next two do not work in gitlab-ci, yet.
-#
-#install:dist-upgrade:
-#  <<: *install
-#  variables:
-#    VERBOSE: --verbose
-#    install_or_upgrade: dist-upgrade
-#    chroot: chroot:jessie-amd64
-#
-#
-#install:upgrade:
-#  <<: *install
-#  variables:
-#    VERBOSE: --verbose
-#    install_or_upgrade: upgrade
-#    chroot: chroot:stretch-amd64
+      echo "$HOSTNAME" | tee /etc/hostname
+      echo "$IP $HOSTNAME" | tee -a /etc/hosts
+      hostname $HOSTNAME
+
+      /bin/run-parts --exit-on-error /root/test.d/
+      END_OF_INTERNAL_TEST
+    - sed -e 's/32;/34;/g' -i run-test 
+    - chmod +x run-test
+    - machinectl copy-to $MACHINE run-test /run-test
+    - ssh -o StrictHostKeyChecking=false -o UserKnownHostsFile=/dev/null root@$IP /run-test
+    - run-parts --verbose --exit-on-error test/external-test.d
+  after_script:
+    - MACHINE=$CI_BUILD_ID-symbiosis-$DEBIAN_RELEASE-$ACTION
+    - |
+      while machinectl status $MACHINE > /dev/null; do
+          machinectl stop $MACHINE || true
+          sleep 1
+      done
+    - machinectl remove $MACHINE
+  dependencies: []
+  variables: &installvars
+    DEBIAN_RELEASE: stretch
+    OLD_DEBIAN_RELEASE: jessie
 
 install:fresh-install:
   <<: *install
   variables:
-    VERBOSE: --verbose
-    install_or_upgrade: install
-    chroot: chroot:stretch-amd64
-  stage: fresh-install
+    <<: *installvars
+    ACTION: install
 
+install:upgrade:
+  <<: *install
+  variables:
+    <<: *installvars
+    ACTION: upgrade
+
+install:dist-upgrade:
+  <<: *install
+  variables:
+    <<: *installvars
+    ACTION: dist-upgrade
 

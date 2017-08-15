@@ -1,0 +1,118 @@
+#!/bin/bash
+# 
+#
+
+#
+# This script runs through and executes each program to test its basic functionality.
+#
+set -exv
+
+#=============================================================================================================
+# symbiosis-common
+#
+#
+# Check password encryption 
+#
+pw="correct horse battery staple"
+ans=$(symbiosis-encrypt-password "$pw")
+ruby -e "ans='$ans'.sub(/^\{CRYPT\}/,'') ; exit '$pw'.crypt(ans) == ans"
+
+#
+# Set the mailbox password using our newly encrypted password
+#
+echo "$ans" > /srv/$(hostname)/mailboxes/root/password
+chown admin.admin /srv/$(hostname)/mailboxes/root/password
+
+#
+# Set the FTP password
+#
+echo "$ans" > /srv/$(hostname)/config/ftp-password
+chown admin.admin /srv/$(hostname)/config/ftp-password
+
+#
+# This just returns the IP address
+#
+symbiosis-ip --verbose
+symbiosis-configure-ips --verbose
+
+#
+# We expect this will exit 1 when running on a non-Bytemark IP.  So lets check
+# the output.
+#
+ans=$(is-bytemark-ip || true)
+[ "$ans" = "0" -o "$ans" = "1" ]
+
+#
+# Check backup space finding.
+#
+ans=$(which-backup-space 89.16.174.65)
+[ "$ans" = "example.backup.bytemark.co.uk" ]
+
+#
+# Password weakness tester
+#
+symbiosis-password-test --verbose
+
+#=============================================================================================================
+# symbiosis-cron
+#
+
+#
+# Run all crontabs
+#
+symbiosis-all-crontabs --verbose
+
+
+#
+# Test our crontab runner
+#
+echo "@daily echo foo" > /tmp/crontab
+symbiosis-crontab --test /tmp/crontab
+
+
+#=============================================================================================================
+# symbiosis-dns
+#
+
+#
+# Disable the DNS uploader.
+#
+echo "exit 0" > /root/BytemarkDNS/upload
+
+# Now test it
+symbiosis-dns-generate --verbose
+
+#=============================================================================================================
+# symbiosis-firewall
+#
+
+#
+# Now check the firewall scripts
+#
+symbiosis-firewall --verbose
+symbiosis-firewall-blacklist --verbose
+symbiosis-firewall-whitelist --verbose 
+
+#=============================================================================================================
+# symbiosis-ftpd
+#
+
+#
+# Check the FTP password
+#
+AUTHD_ACCOUNT="$(hostname)" AUTHD_PASSWORD="$pw" AUTHD_REMOTE_IP="1.2.3.4" symbiosis-ftpd-check-password
+
+#=============================================================================================================
+# symbiosis-httpd
+#
+# symbiosis-httpd-logger
+symbiosis-httpd-configure --verbose
+symbiosis-httpd-generate-stats --verbose 
+symbiosis-httpd-rotate-logs --verbose 
+
+
+#
+#=============================================================================================================
+# symbiosis-xmpp
+# 
+symbiosis-xmpp-configure --verbose

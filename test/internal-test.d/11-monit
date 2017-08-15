@@ -1,0 +1,54 @@
+#!/bin/bash
+
+rm -f /etc/cron.d/symbiosis-monit
+#
+# This works for both lenny and squeeze+
+#
+for i in /etc/symbiosis/monit.d/disabled /tmp/dpkg.running ; do
+  rm $i
+done
+
+do_monit() {
+  #
+  # Make sure clamav + spamassassin stay running
+  #
+  mkdir -p /srv/$(hostname)/config/
+
+  touch /srv/$(hostname)/config/anti{spam,virus}
+
+  /usr/sbin/symbiosis-monit --force --verbose
+}
+
+
+if [ "x${http_proxy}" != "x" ] ; then
+
+  echo "Adding HTTP proxy config to freshclam"
+  proxy_with_port=${http_proxy#http://}
+  proxy_with_port=${proxy_with_port%/}
+  echo "HTTPProxyServer ${proxy_with_port%:*}" >> /etc/clamav/freshclam.conf
+  echo "HTTPProxyPort ${proxy_with_port#*:}" >> /etc/clamav/freshclam.conf
+fi
+
+echo -n "I: Adding db.local.clamav.net alias to /etc/hosts"
+echo "212.110.161.69 db.local.clamav.net" >> /etc/hosts
+invoke-rc.d clamav-freshclam restart
+
+echo -n "I: Waiting for clamav to download databases."
+for i in $(seq 1 300) ; do
+
+  if [ -f "/var/lib/clamav/main.cvd" -a -f "/var/lib/clamav/daily.cvd" ] ; then
+     echo "done."
+     invoke-rc.d clamav-daemon restart
+     break
+  fi
+
+  echo -n "."
+  sleep 1
+done
+
+#
+# Have a couple of goes running monit 
+#
+trap do_monit ERR
+
+do_monit
