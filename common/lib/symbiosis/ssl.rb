@@ -1,6 +1,7 @@
 require 'symbiosis'
 
 module Symbiosis
+  # SSL knows about which SSL providers exist and provides SSL helper functions
   class SSL
     PROVIDERS ||= []
 
@@ -11,6 +12,7 @@ module Symbiosis
 
       Dir.glob(hooks_path).each do |script|
         next unless File.executable?(script)
+        next if File.basename(script) =~ /\..*$/
         IO.popen([script, 'live-update'], 'r+') do |io|
           io.puts domains_with_updates.join("\n")
           io.close_write # Close the pipe now we've written stuff.
