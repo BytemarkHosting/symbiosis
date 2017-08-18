@@ -98,6 +98,8 @@ test:xmpp:
   image: $CI_REGISTRY/docker-images/layers:stretch-deb
   stage: package
   script:
+    - cp symbiosis.list /etc/apt/sources.list.d/
+    - apt-get update
     - export PACKAGE=${CI_BUILD_NAME##package:}
     - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
     - cd $PACKAGE

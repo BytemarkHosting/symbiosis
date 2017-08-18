@@ -1,4 +1,5 @@
-/usr/share/symbiosis/monit/checks/exim4                   /etc/symbiosis/monit.d/
-/usr/share/symbiosis/monit/checks/dovecot                 /etc/symbiosis/monit.d/
-/usr/share/symbiosis/monit/checks/clamav-daemon           /etc/symbiosis/monit.d/
-/usr/share/symbiosis/monit/checks/clamav-freshclam        /etc/symbiosis/monit.d/
+/usr/sbin/symbiosis-email-encrypt-passwords               /etc/cron.daily/symbiosis-email-encrypt-passwords
+/usr/share/symbiosis/monit/checks/exim4                   /etc/symbiosis/monit.d/exim4
+/usr/share/symbiosis/monit/checks/dovecot                 /etc/symbiosis/monit.d/dovecot
+/usr/share/symbiosis/monit/checks/clamav-daemon           /etc/symbiosis/monit.d/clamav-dovecot
+/usr/share/symbiosis/monit/checks/clamav-freshclam        /etc/symbiosis/monit.d/clamav-freshclam
