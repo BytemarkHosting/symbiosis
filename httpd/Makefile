@@ -1,5 +1,5 @@
 
-RUBYLIB := "$(PWD)/lib:$(PWD)/../common/lib"
+RUBYLIB := "${PWD}/lib:${PWD}/../common/lib"
 
 nop:
 	@echo "Valid targets are (alphabetically) :"
@@ -12,13 +12,13 @@ docs: man/symbiosis-httpd-configure.man  man/symbiosis-httpd-logger.man man/symb
 
 test:
 	$(MAKE) -C vhost-alias test
-	RUBYLIB=$(RUBYLIB) ruby test.d/t*.rb
+	RUBYLIB=${RUBYLIB} ruby test.d/t*.rb
 
 .PHONY: test clean all docs
  
 man/%.txt: ./sbin/%
 	[ -d man ] || mkdir man
-	RUBYLIB=$(RUBYLIB) $< --manual > $@
+	RUBYLIB=${RUBYLIB} $< --manual > $@
 	test -s $@
 
 man/%.man: man/%.txt
