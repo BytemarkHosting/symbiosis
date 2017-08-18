@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+
+set -e
+
+PREFIX=$(dirname ${0})
+
+apt-key add $PREFIX/conf-$DEBIAN_RELEASE/apt-key

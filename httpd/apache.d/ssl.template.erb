@@ -31,6 +31,24 @@
         #
         <%= server_aliases %>
 
+        #
+        # This is the directory people are redirected to if their site is
+        # empty.
+        #
+        Alias /bytemark/ "/usr/share/symbiosis/static/"
+        <Directory "/usr/share/symbiosis/static/">
+                DirectoryIndex index.html
+                AllowOverride All
+                Require all granted
+        </Directory>
+
+        #
+        # And this makes that redirection happen.
+        #
+        <LocationMatch "^/+$">
+                Options -Indexes
+                ErrorDocument 403 /bytemark/
+        </LocationMatch>
 
         <IfModule ssl_module>
                 SSLEngine On
@@ -122,6 +140,25 @@
         # And server alias in place
         #
         <%= server_aliases %>
+
+        #
+        # This is the directory people are redirected to if their site is
+        # empty.
+        #
+        Alias /bytemark/ "/usr/share/symbiosis/static/"
+        <Directory "/usr/share/symbiosis/static/">
+                DirectoryIndex index.html
+                AllowOverride All
+                Require all granted
+        </Directory>
+
+        #
+        # And this makes that redirection happen.
+        #
+        <LocationMatch "^/+$">
+                Options -Indexes
+                ErrorDocument 403 /bytemark/
+        </LocationMatch>
 
 % if mandatory_ssl?
         <IfModule rewrite_module>

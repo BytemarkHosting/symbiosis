@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# OOMScoreAdjust cannot be used in jessie containers without installing a backported systemd & dbus.
+# by setting it to blank we should be able to disable it.
+
+for service in systemd-udevd dbus; do
+mkdir /etc/systemd/system/$service.service.d
+cat > /etc/systemd/system/$service.service.d/disable-oomscoreadjust.conf <<DISABLEOOMSCORE
+[Service]
+OOMScoreAdjust=0
+DISABLEOOMSCORE
+
+done

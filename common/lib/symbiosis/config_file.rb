@@ -3,6 +3,7 @@ require 'erubis'
 require 'erubis/engine/enhanced'
 require 'tempfile'
 require 'symbiosis/domain'
+require 'diffy'
 
 module Symbiosis
 
@@ -121,6 +122,23 @@ module Symbiosis
       self.filename
     end
 
+    #
+    # Return a diff of the new configuration comapred with the existing one.
+    # The format option can take on of Diff::Diff.to_s() format options,
+    # currently :text, :color, :html, and :html_simple. Defaults to :html.  A
+    # different configuraion template can be specified in the second option.
+    #
+    def diff(format = nil, templ = self.template)
+      config = generate_config(templ)
+
+      tempfile = Tempfile.new(File.basename(filename))
+      tempfile.puts(config)
+      tempfile.flush
+
+      fn = ( File.exists?(self.filename) ? self.filename : '/dev/null' )
+
+      Diffy::Diff.new(fn, tempfile.path, source: 'files', include_diff_info: true).to_s(format)
+    end
 
     #
     # See if the generated config is OK.  This method always returns true, and

@@ -2,9 +2,10 @@
 
 require 'symbiosis/monitor/check'
 
+# Ensure clamav-freshclam is running and responds to pings
 class FreshclamCheck < Symbiosis::Monitor::Check
   def initialize
-    super pid_file: '/run/clamav/freshclam.pid',
+		super pid_file: '/run/clamav/freshclam.pid',
           init_script: '/etc/init.d/clamav-freshclam',
           unit_name: 'clamav-freshclam',
           process_name: 'freshclam'
@@ -16,4 +17,3 @@ class FreshclamCheck < Symbiosis::Monitor::Check
 end
 
 exit FreshclamCheck.new.do_check if $PROGRAM_NAME == __FILE__
-

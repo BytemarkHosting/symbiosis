@@ -1,0 +1,18 @@
+# Default locale for the system environment:
+locales	locales/default_environment_locale	select	en_GB.UTF-8
+# Locales to be generated
+locales	locales/locales_to_be_generated	multiselect	en_GB.UTF-8 UTF-8
+# New password for the MySQL "root" user:
+mysql-server-5.5	mysql-server/root_password	password	semiconscious malpractice
+# Repeat password for the MySQL "root" user:
+mysql-server-5.5	mysql-server/root_password_again	password	semiconscious malpractice
+# Password of the database's administrative user:
+phpmyadmin	phpmyadmin/mysql/admin-pass	 password	semiconscious malpractice
+# Password of the database's administrative user:
+roundcube-core roundcube/mysql/admin-pass  password semiconscious malpractice
+# Just in case.. dbconfig-common seems to have two passwords for mysql..
+dbconfig-common dbconfig-common/mysql/admin-password password semiconscious malpractice
+dbconfig-common dbconfig-common/mysql/admin-pass password semiconscious malpractice
+# Also remember the password.
+dbconfig-common dbconfig-common/remember-admin-pass     boolean true
+
