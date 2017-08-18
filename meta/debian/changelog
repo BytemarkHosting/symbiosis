@@ -1,3 +1,9 @@
+bytemark-symbiosis (2017:0818) stable; urgency=medium
+
+  * Added systemd unit to output Symbiosis logo on boot.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 18 Aug 2017 18:17:12 +0100
+
 bytemark-symbiosis (2017:0424) stable; urgency=medium
 
   * Added tentacles to Bytemark Symbiosis logo in honour of Debian Stretch.

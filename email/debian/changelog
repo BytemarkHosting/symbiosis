@@ -1,3 +1,9 @@
+symbiosis-email (2017:0818) stable; urgency=medium
+
+  * Added systemd-based clamav monit scripts.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 18 Aug 2017 18:21:44 +0100
+
 symbiosis-email (2017:0510) stable; urgency=medium
 
   * Store monit configuration in /usr/share instead of /etc. Use symlinks to
