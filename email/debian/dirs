@@ -4,3 +4,4 @@ etc/dovecot
 usr/sbin
 etc/exim4/symbiosis.d/
 etc/dovecot/symbiosis.d/
+etc/symbiosis/monit.d/
