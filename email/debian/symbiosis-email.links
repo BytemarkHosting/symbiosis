@@ -1,0 +1,4 @@
+/usr/share/symbiosis/monit/checks/exim4                   /etc/symbiosis/monit.d/
+/usr/share/symbiosis/monit/checks/dovecot                 /etc/symbiosis/monit.d/
+/usr/share/symbiosis/monit/checks/clamav-daemon           /etc/symbiosis/monit.d/
+/usr/share/symbiosis/monit/checks/clamav-freshclam        /etc/symbiosis/monit.d/
