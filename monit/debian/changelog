@@ -13,6 +13,12 @@ symbiosis-monit (2017:0424) stable; urgency=medium
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:00:36 +0100
 
+symbiosis-monit (2015:0620) oldstable; urgency=medium
+
+  * Ensure man pages are built.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 06 Jul 2017 16:08:39 +0100
+
 symbiosis-monit (2015:0619) stable; urgency=medium
 
   * Updated Makefile to reflect proper test targets.

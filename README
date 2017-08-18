@@ -10,7 +10,7 @@ All the details on the Bytemark Symbiosis packages may be found online:
 Building The Packages
 ---------------------
 
-The minimium packages needed to get the build process working are:
+The minimum packages needed to get the build process working are:
 
   rake devscripts rdoc graphviz
 
