@@ -38,6 +38,9 @@
 # a Symbiosis system. It can request certificates from LetsEncrypt or generate
 # self-signed ones (see PROVIDERS).
 #
+# In addition, if any domain's certificate set was altered, hooks are run (see
+# HOOKS).
+#
 # PROVIDERS
 #
 # Currently two providers are supported, namely LetsEncrypt and SelfSigned. A
@@ -48,6 +51,20 @@
 # If the provider is set to something else (e.g. CertificateProviderDuJour)
 # then no certificates will be generated, but it is possible to manage updating
 # certificates with this program.
+#
+# HOOKS
+#
+# Hooks are executed from the /etc/symbiosis/ssl-hooks.d directory, given the
+# following conditions:
+#
+# * The file is executable
+# * The file's name is made up only of alphanumerics, underscore (_) and hyphen
+# (-)
+#
+# At present, only one event causes the hooks to be executed. If any domain's
+# certificate set is altered by symbiosis-ssl, at the end of the process all
+# the hooks are called with 'live-update' passed as their only command-line
+# argument and the list of domains that were altered
 #
 # AUTHOR
 #   Patrick J. Cherry <patrick@bytemark.co.uk>
@@ -237,7 +254,7 @@ domains.sort_by(&:name).each do |domain|
   end
 end
 
-success = Symbiosis::SSL.call_hooks domains_altered, 'live-update'
+success = Symbiosis::SSL::Hooks.run! domains_altered, 'live-update'
 exit_code = 2 unless success
 
 exit exit_code
