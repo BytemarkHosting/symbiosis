@@ -12,7 +12,7 @@ module Symbiosis
 
       Dir.glob(hooks_path).each do |script|
         next unless File.executable?(script)
-        next if File.basename(script) =~ /^[a-zA-Z0-9_-]+$/
+        next unless File.basename(script) =~ /^[a-zA-Z0-9_-]+$/
 
         success &&= run_hook_script(event, script, domains_with_updates)
       end
