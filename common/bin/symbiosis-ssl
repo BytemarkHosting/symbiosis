@@ -38,6 +38,9 @@
 # a Symbiosis system. It can request certificates from LetsEncrypt or generate
 # self-signed ones (see PROVIDERS).
 #
+# In addition, if any domain's certificate set was altered, hooks are run (see
+# HOOKS).
+#
 # PROVIDERS
 #
 # Currently two providers are supported, namely LetsEncrypt and SelfSigned. A
@@ -48,6 +51,20 @@
 # If the provider is set to something else (e.g. CertificateProviderDuJour)
 # then no certificates will be generated, but it is possible to manage updating
 # certificates with this program.
+#
+# HOOKS
+#
+# Hooks are executed from the /etc/symbiosis/ssl-hooks.d directory, given the
+# following conditions:
+#
+# * The file is executable
+# * The file's name is made up only of alphanumerics, underscore (_) and hyphen
+# (-)
+#
+# At present, only one event causes the hooks to be executed. If any domain's
+# certificate set is altered by symbiosis-ssl, at the end of the process all
+# the hooks are called with 'live-update' passed as their only command-line
+# argument and the list of domains that were altered
 #
 # AUTHOR
 #   Patrick J. Cherry <patrick@bytemark.co.uk>
@@ -71,7 +88,8 @@ opts = GetoptLong.new(
   ['--no-generate', '-G', GetoptLong::NO_ARGUMENT],
   ['--no-rollover', '-R', GetoptLong::NO_ARGUMENT],
   ['--select', '-s', GetoptLong::REQUIRED_ARGUMENT],
-  ['--prefix', '-p', GetoptLong::REQUIRED_ARGUMENT]
+  ['--prefix', '-p', GetoptLong::REQUIRED_ARGUMENT],
+  ['--etc-dir', '-r', GetoptLong::REQUIRED_ARGUMENT]
 )
 
 manual = help = false
@@ -81,6 +99,7 @@ prefix = '/srv'
 do_list = do_generate = do_rollover = nil
 rollover_to = nil
 threshold = 21
+etc_dir = '/etc'
 
 opts.each do |opt,arg|
   case opt
@@ -105,6 +124,8 @@ opts.each do |opt,arg|
     manual = true
   when '--prefix'
     prefix = arg
+  when '--etc-dir'
+    etc_dir = arg
   when '--list'
     do_list = true
   when '--verbose'
@@ -113,6 +134,7 @@ opts.each do |opt,arg|
     $DEBUG = true
   end
 end
+
 
 #
 # Output help as required.
@@ -131,6 +153,7 @@ end
 v = $VERBOSE
 $VERBOSE = false
 
+require 'symbiosis'
 require 'symbiosis/domains'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/ssl'
@@ -141,6 +164,8 @@ require 'symbiosis/ssl/selfsigned'
 # And unhide.  Ugh.
 #
 $VERBOSE = v
+
+Symbiosis.etc = etc_dir
 
 domains = []
 
@@ -176,6 +201,8 @@ exit_code = 0
 end
 
 now = Time.now
+
+domains_altered = []
 
 domains.sort_by(&:name).each do |domain|
   if do_list || rollover_to
@@ -218,12 +245,16 @@ domains.sort_by(&:name).each do |domain|
   end
 
   begin
-    domain.ssl_magic(threshold, do_generate, do_rollover, now)
+    rollover_performed = domain.ssl_magic(threshold, do_generate, do_rollover, now)
+    domains_altered.push domain.name if rollover_performed
   rescue StandardError => err
     puts "\t!! Failed: #{err.to_s.gsub($RS, '')}" if $VERBOSE
     puts err.backtrace.join("\n") if $DEBUG
     exit_code = 1
   end
 end
+
+success = Symbiosis::SSL::Hooks.run! domains_altered, 'live-update'
+exit_code = 2 unless success
 
 exit exit_code

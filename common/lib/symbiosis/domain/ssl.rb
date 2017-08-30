@@ -397,6 +397,9 @@ module Symbiosis
     #   * generation
     #   * rollover
     #
+    # Why does it do all these things?
+    #
+    # Returns true if a rollover was performed, or false otherwise.
     def ssl_magic(threshold = 14, do_generate = nil, do_rollover = nil, now = Time.now)
 
       puts "* Examining certificates for #{self.name}" if $VERBOSE
@@ -464,7 +467,7 @@ module Symbiosis
 
       else
         puts "\tNo valid certificate sets found." if $VERBOSE
-        do_generate = true  if do_generate.nil?
+        do_generate = true if do_generate.nil?
 
       end
 
