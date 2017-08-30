@@ -11,7 +11,7 @@ module Symbiosis
         Hooks.new.run_hooks(event, domains)
       end
 
-      def initialize(hooks_glob = Symbiosis.path_in_etc(HOOKS_GLOB))
+      def initialize(hooks_glob = Symbiosis::DefaultDirs.path_in_etc(HOOKS_GLOB))
         @hooks_glob = hooks_glob
       end
 

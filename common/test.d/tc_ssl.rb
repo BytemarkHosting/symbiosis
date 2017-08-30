@@ -30,9 +30,9 @@ class SSLTest < Test::Unit::TestCase
     @etc = Dir.mktmpdir('etc')
 
     @prefix = Dir.mktmpdir("srv")
-    Symbiosis.etc = File.realpath @etc
-    Symbiosis.prefix = File.realpath @prefix
+    @dirs = Symbiosis::Dirs.new(File.realpath(@etc), File.realpath(@prefix))
 
+    @dirs.freeze
     @etc.freeze
     @prefix.freeze
     @domain = Symbiosis::Domain.new(nil, @prefix)
@@ -959,8 +959,8 @@ class SSLTest < Test::Unit::TestCase
     regular_domain = Symbiosis::Domain.new(nil, @prefix)
     regular_domain.create
 
-    args_path = Symbiosis.path_in_etc('hook.args')
-    out_path = Symbiosis.path_in_etc('hook.output')
+    args_path = @dirs.path_in_etc('hook.args')
+    out_path = @dirs.path_in_etc('hook.output')
 
     hook = <<HOOK
 #!/bin/bash
@@ -969,9 +969,9 @@ echo "$1" > #{args_path}
 cat > #{out_path}
 HOOK
 
-    FileUtils.mkdir_p Symbiosis.path_in_etc('symbiosis/ssl-hooks.d')
+    FileUtils.mkdir_p @dirs.path_in_etc('symbiosis', 'ssl-hooks.d')
 
-    IO.write Symbiosis.path_in_etc('symbiosis/ssl-hooks.d/hook'), hook, mode: 'w', perm: 0755
+    IO.write @dirs.path_in_etc('symbiosis', 'ssl-hooks.d', 'hook'), hook, mode: 'w', perm: 0755
 
     system("#{@script} --etc-dir=#{@etc} --prefix=#{@prefix}")
     
