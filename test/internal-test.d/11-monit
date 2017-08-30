@@ -16,11 +16,7 @@ do_monit() {
 
   touch /srv/$(hostname)/config/anti{spam,virus}
 
-  if /usr/sbin/symbiosis-monit --help | grep -q -- --force ; then
-    /usr/sbin/symbiosis-monit --force
-  else
-    /usr/sbin/symbiosis-monit
-  fi
+  /usr/sbin/symbiosis-monit --force --verbose
 }
 
 
@@ -49,11 +45,6 @@ for i in $(seq 1 300) ; do
   echo -n "."
   sleep 1
 done
-
-echo "Setting monit to use verbose template"
-rm /usr/share/symbiosis/monit/default.txt.erb
-ln -s verbose.txt.erb /usr/share/symbiosis/monit/default.txt.erb
-
 
 #
 # Have a couple of goes running monit 

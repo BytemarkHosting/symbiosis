@@ -28,18 +28,9 @@ fi
 symbiosis-xmpp-configure --verbose
 
 #
-#  Rebuild dovecot
+# Restart prosody
 #
-if [ -e /etc/dovecot/Makefile ] ; then
-    cd /etc/dovecot && make
-fi
-
-#
-#  Restart all daemons
-#
-for i in prosody dovecot; do
-  invoke-rc.d $i restart || true
-done
+invoke-rc.d prosody restart || true
 
 #DEBHELPER#
 

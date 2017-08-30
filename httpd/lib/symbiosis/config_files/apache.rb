@@ -36,7 +36,6 @@ module Symbiosis
         end
       end
 
-
       #
       # This checks a site has its config file linked into the sites-enabled
       # directory.  If no filename has been specified, it defaults to
@@ -275,7 +274,7 @@ module Symbiosis
           false
         end
       end
-    
+
       #
       # This returns the FQDN
       #

@@ -50,7 +50,18 @@ class TestConfigFile < Test::Unit::TestCase
   #
   def test_ok?
     x = ConfigFile.new(@config.path)
-    assert(x.ok?) 
+    assert(x.ok?)
+  end
+
+  #
+  # This method should return a string representing a diff.
+  #
+  def test_diff
+    config = "# Testing 1.. 2.. 3..\n"
+    x = ConfigFile.new(@config.path)
+    x.write(config)
+
+    assert_kind_of(String, x.diff(:text, @template.path))
   end
 
   def test_outdated?
@@ -61,7 +72,7 @@ class TestConfigFile < Test::Unit::TestCase
     # The config hasn't been written yet.  Assume it is out of date.
     #
     assert_equal(true, x.outdated?)
-    
+
     #
     # Write the configuration.
     #
@@ -71,7 +82,7 @@ class TestConfigFile < Test::Unit::TestCase
     # It should not be out of date now.
     #
     assert_equal(false, x.outdated?)
-  
+
     #
     # Change our global variable.
     #
@@ -91,7 +102,7 @@ class TestConfigFile < Test::Unit::TestCase
     # The config is an empty file.  Assume it has been changed.
     #
     assert_equal(true, x.changed?)
-    
+
     #
     # Generate a configuration using our template.  Once written, changed?
     # should return false.
@@ -99,9 +110,9 @@ class TestConfigFile < Test::Unit::TestCase
     original_config = x.generate_config
     assert_nothing_raised { x.write(original_config) }
     assert_equal(false, x.changed?)
-  
+
     #
-    # Change our config.  changed? should now return true. 
+    # Change our config.  changed? should now return true.
     #
     new_config =  "New Directive.\n" + original_config
     assert_nothing_raised { x.write(new_config) }
@@ -128,7 +139,7 @@ class TestConfigFile < Test::Unit::TestCase
     assert_nothing_raised{ x.template = @template.path }
 
     #
-    # The config is an empty file.  It is not managed 
+    # The config is an empty file.  It is not managed
     #
     assert_equal(false, x.managed?)
 
@@ -141,7 +152,7 @@ class TestConfigFile < Test::Unit::TestCase
     assert_equal(true, x.managed?)
 
     #
-    # Change our config.  managed? should still be true. 
+    # Change our config.  managed? should still be true.
     #
     new_config =  "New Directive.\n" + original_config
     assert_nothing_raised { x.write(new_config) }

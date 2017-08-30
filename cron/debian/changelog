@@ -4,6 +4,13 @@ symbiosis-cron (2017:0424) stable; urgency=medium
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 24 Apr 2017 15:45:21 +0100
 
+symbiosis-cron (2015:1104) stable; urgency=medium
+
+  * Fix bug in --test mode where the NEVER would be shown in certain
+    circumstances.  Closes #77.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Wed, 07 Jun 2017 16:28:20 +0100
+
 symbiosis-cron (2015:1103) stable; urgency=medium
 
   * Now follows cron specs accurately when both month day and weekday fields
