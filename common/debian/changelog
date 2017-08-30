@@ -1,3 +1,10 @@
+symbiosis-common (2017:0830) stable; urgency=medium
+
+  * Add support for running hooks on SSL certificate updates.
+    See symbiosis-ssl's man page for more details.
+
+ -- Telyn Roat <telyn@bytemark.co.uk>  Wed, 30 Aug 2017 11:04:32 +0100
+
 symbiosis-common (2017:0818) stable; urgency=medium
 
   * Added diff option for Symbiosis::ConfigFile.

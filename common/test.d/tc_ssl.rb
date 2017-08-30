@@ -2,6 +2,7 @@ $:.unshift  "../lib/" if File.directory?("../lib")
 
 require 'test/unit'
 require 'tmpdir'
+require 'symbiosis'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/ssl/selfsigned'
 require 'mocha/test_unit'
@@ -26,12 +27,24 @@ class SSLTest < Test::Unit::TestCase
     #
     Process.egid = 1000 if Process.gid == 0
     Process.euid = 1000 if Process.uid == 0
+    @etc = Dir.mktmpdir('etc')
 
     @prefix = Dir.mktmpdir("srv")
+    Symbiosis.etc = File.realpath @etc
+    Symbiosis.prefix = File.realpath @prefix
 
+    @etc.freeze
     @prefix.freeze
     @domain = Symbiosis::Domain.new(nil, @prefix)
     @domain.create
+
+    @verbose = (($VERBOSE or $DEBUG) ? " --verbose " : "")
+
+    testd = File.dirname(__FILE__)
+
+    @script = File.expand_path(File.join(testd,"..","bin","symbiosis-ssl"))
+    @script = '/usr/sbin/symbiosis-ssl' unless File.exist?(@script)
+    @script += @verbose
   end
 
   def teardown
@@ -50,6 +63,8 @@ class SSLTest < Test::Unit::TestCase
       @domain.destroy  if @domain.is_a?( Symbiosis::Domain)
       FileUtils.rm_rf(@prefix) if File.directory?(@prefix)
     end
+
+    FileUtils.rm_rf(@etc) if File.directory?(@etc)
 
     Process.euid = 0 if Process.uid == 0
     Process.egid = 0 if Process.gid == 0
@@ -928,4 +943,42 @@ class SSLTest < Test::Unit::TestCase
 
   end
 
+  def test_ssl_hooks
+    #
+    # This requires the Self-signed provider to be in place
+    #
+
+    ssl_domain = @domain
+    ssl_domain.ssl_provider = 'selfsigned'
+
+    ssl_dir  = File.join(ssl_domain.config_dir, 'ssl')
+    sets_dir = File.join(ssl_dir, 'sets')
+
+    Symbiosis::Utils.mkdir_p(sets_dir)
+
+    regular_domain = Symbiosis::Domain.new(nil, @prefix)
+    regular_domain.create
+
+    args_path = Symbiosis.path_in_etc('hook.args')
+    out_path = Symbiosis.path_in_etc('hook.output')
+
+    hook = <<HOOK
+#!/bin/bash
+
+echo "$1" > #{args_path}
+cat > #{out_path}
+HOOK
+
+    FileUtils.mkdir_p Symbiosis.path_in_etc('symbiosis/ssl-hooks.d')
+
+    IO.write Symbiosis.path_in_etc('symbiosis/ssl-hooks.d/hook'), hook, mode: 'w', perm: 0755
+
+    system("#{@script} --etc-dir=#{@etc} --prefix=#{@prefix}")
+    
+    args = IO.read args_path
+    out = IO.read out_path
+
+    assert_equal "live-update\n", args
+    assert_equal "#{ssl_domain.name}\n", out
+  end
 end
