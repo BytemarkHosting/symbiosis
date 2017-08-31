@@ -157,6 +157,7 @@ require 'symbiosis'
 require 'symbiosis/domains'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/ssl'
+require 'symbiosis/ssl/hooks'
 require 'symbiosis/ssl/letsencrypt'
 require 'symbiosis/ssl/selfsigned'
 
@@ -254,7 +255,7 @@ domains.sort_by(&:name).each do |domain|
   end
 end
 
-success = Symbiosis::SSL::Hooks.run! domains_altered, 'live-update'
+success = Symbiosis::SSL::Hooks.run! 'live-update', domains_altered
 exit_code = 2 unless success
 
 exit exit_code
