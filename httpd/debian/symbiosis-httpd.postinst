@@ -73,12 +73,15 @@ for domain in /srv/*; do
   [ -d "$domain" ] && continue;
 
   no_stats="$domain/config/no-stats"
-  stats="$domain/config/stats-enabled"
-  echo false > "$stats"
-
-  if [ -e "$no_stats" ]; then
-    grep false "$no_stats" >/dev/null && echo "true" > "$stats"
+  stats="$domain/config/stats"
+  if [ -e "$no_stats" ] && ( grep -q false "$no_stats" ) ; then
+    # Use cp to maintain permissions, and follow symlinks, removing any destination file first.
+    cp -aL --remove-destination $no_stats $stats
+    truncate -s 0 $stats
   fi
+
+  # remove the old no-stats file
+  [ -f "$no_stats" ] && rm "$no_stats"
 done
 
 
