@@ -212,6 +212,10 @@ module Symbiosis
       File.directory?(self.directory)
     end
 
+    def configured?
+      File.directory?(config_dir)
+    end
+
     #
     # Create directories using our default uid/gid
     #
