@@ -67,6 +67,20 @@ if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
   done
 fi
 
+# change "no-stats" file to "stats" file
+for domain in /srv/*; do
+  [ -h "$domain" ] && continue;
+  [ -d "$domain" ] && continue;
+
+  no_stats="$domain/config/no-stats"
+  stats="$domain/config/stats-enabled"
+  echo false > "$stats"
+
+  if [ -e "$no_stats" ]; then
+    grep false "$no_stats" >/dev/null && echo "true" > "$stats"
+  fi
+done
+
 
 #
 # Reconfigure apache.
