@@ -63,6 +63,13 @@ if [ -z "$HOSTNAME" ] ; then
 fi
 
 #
+# Append ".localdomain" if HOSTNAME has no dots.
+#
+if ! [[ "$HOSTNAME" =~ ^[_a-z0-9-]+\.([_a-z0-9-]+\.?)+$ ]] ; then
+	HOSTNAME="$HOSTNAME.localdomain"
+fi
+
+#
 #  If there are no existing directories beneath /srv/ create a default.
 #
 if [ ! -e "/srv/$HOSTNAME" ] ; then
