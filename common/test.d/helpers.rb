@@ -30,7 +30,9 @@ HOOK
     end
 
     def hook_ran?
-      File.exist?(@args_path) && File.exist?(@output_path)
+      return @hook_ran unless @hook_ran.nil?
+
+      @hook_ran = File.exist?(@args_path) && File.exist?(@output_path)
     end
 
     def args
