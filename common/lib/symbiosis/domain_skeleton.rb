@@ -17,10 +17,6 @@ module Symbiosis
       !domain.configured?
     end
 
-    def run_hooks!(hooks_dir)
-      DomainSkeleton::Hooks.run!(hooks_dir)
-    end
-
     # abuse Symbiosis::Utils.get_param and Symbiosis::Utils.set_param
     # as a copy method because they do lots of safety checks for us.
     def copy!(domain)
@@ -37,7 +33,20 @@ module Symbiosis
     def populate!(domain)
       false unless should_populate? domain
       copy!(domain)
-      run_hooks!(domain)
+      Hooks.run!('domain-populated', [domain])
+    end
+
+    # Hooks for DomainSkeleton
+    # by default these live in /etc/symbiosis/skel-hooks.d
+    class Hooks
+      HOOKS_DIR = File.join('symbiosis', 'skel-hooks.d')
+      def self.run!(event, domains)
+        Symbiosis::DomainSkeleton::Hooks.new.run!(event, domains)
+      end
+
+      def initialize(hooks_dir = Symbiosis.path_in_etc(HOOKS_DIR))
+        super hooks_dir
+      end
     end
   end
 end
