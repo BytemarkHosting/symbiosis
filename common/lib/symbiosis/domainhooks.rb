@@ -14,7 +14,7 @@ module Symbiosis
       @event = event
       @domains = domains
 
-      Dir.entries(@hooks_dir)
+      Dir.glob(File.join(@hooks_dir, '*'))
          .select { |h| valid_hook?(h) }
          .all? { |h| runs_successfully?(h) }
     end
