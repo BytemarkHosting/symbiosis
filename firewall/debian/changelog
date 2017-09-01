@@ -1,3 +1,9 @@
+symbiosis-firewall (2017:0901) stable; urgency=medium
+
+  * Removed default install of reject-www-data rule.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 01 Sep 2017 15:17:19 +0100
+
 symbiosis-firewall (2017:0510) stable; urgency=medium
 
   * Store monit configuration in /usr/share instead of /etc. Use symlinks to
