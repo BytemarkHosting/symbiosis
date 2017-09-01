@@ -1,3 +1,11 @@
+symbiosis-httpd (2017:0818) stable; urgency=medium
+
+  * Added a --diff-only option to symbiosis-httpd-configure.
+  * Updated default apache templates to return the correct ErrorDocument for
+    non-mass-hosted sites. 
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Fri, 18 Aug 2017 18:18:12 +0100
+
 symbiosis-httpd (2017:0510) stable; urgency=medium
 
   * Store monit configuration in /usr/share instead of /etc. Use symlinks to

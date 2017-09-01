@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+require 'symbiosis/monitor/check'
+
+# Ensure clamav-freshclam is running and responds to pings
+class FreshclamCheck < Symbiosis::Monitor::Check
+  def initialize
+		super pid_file: '/run/clamav/freshclam.pid',
+          init_script: '/etc/init.d/clamav-freshclam',
+          unit_name: 'clamav-freshclam',
+          process_name: 'freshclam'
+  end
+
+  def should_be_running?
+    !Dir.glob('/srv/*/config/antivirus').empty?
+  end
+end
+
+exit FreshclamCheck.new.do_check if $PROGRAM_NAME == __FILE__

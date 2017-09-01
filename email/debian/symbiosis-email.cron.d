@@ -5,5 +5,5 @@
 #
 
 # hourly check
-@hourly root [ -x /usr/sbin/symbiosis-encrypt-mailpass  ] && /usr/sbin/symbiosis-encrypt-mailpass 
+@hourly root [ -x /usr/sbin/symbiosis-email-encrypt-passwords ] && /usr/sbin/symbiosis-email-encrypt-passwords
 

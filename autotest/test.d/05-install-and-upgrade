@@ -16,6 +16,9 @@ fi
 # echo "Acquire::http::Proxy \"http://$GATEWAY:3142\";" >> /etc/apt/apt.conf.d/95proxy
 
 if [ "upgrade" = "$ACTION" ] ; then
+	echo "I: Adding jessie sources list"
+  cp $PREFIX/conf/debian-jessie-sources.list /etc/apt/sources.list
+
   echo "I: Installing current version of Symbiosis from repo.bytemark.co.uk"
   $PREFIX/bin/apt-get-install $PREFIX/conf/current-stretch-sources.list $PREFIX/conf/stretch-packages
     
@@ -70,7 +73,8 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   echo "I: ensuring Symbiosis packages are installed"
   $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list $PREFIX/conf/stretch-packages
 else 
-
+	echo "I: Adding jessie sources list"
+  cp $PREFIX/conf/debian-jessie-sources.list /etc/apt/sources.list
 
   echo "I: Installing latest version of Symbiosis from repo.bytemark.co.uk"
   $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list $PREFIX/conf/stretch-packages

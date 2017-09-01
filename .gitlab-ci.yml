@@ -16,6 +16,16 @@ stages:
     - cd $PACKAGE
     - "[ ! -f Makefile ] || make test"
 
+### Analyse with our local codeclimate image
+codeclimate:
+  stage: test
+  tags: [ docker-socket ]
+  image: $CI_REGISTRY/docker-images/layers:stretch-codeclimate
+  script:
+    - codeclimate analyze -f json > codeclimate.json
+  artifacts:
+    paths: [ codeclimate.json ]
+
 test:backup:
   <<: *test
 
@@ -29,7 +39,7 @@ test:cron:
 
 test:dns:
   variables:
-    TEST_DEPS: ruby-linux-netlink ruby-erubis
+    TEST_DEPS: ruby-linux-netlink ruby-erubis ruby-diffy
   <<: *test
 
 test:doc:
@@ -53,7 +63,7 @@ test:ftpd:
 test:httpd:
   variables:
     RUBYOPT: -v
-    TEST_DEPS: ruby-linux-netlink ruby-erubis apache2
+    TEST_DEPS: ruby-linux-netlink ruby-erubis apache2 ruby-diffy
   <<: *test
 
 test:httpd-logger:
@@ -66,7 +76,7 @@ test:meta:
 
 test:monit:
   variables:
-    TEST_DEPS: ruby-sqlite3 ruby-log4r
+    TEST_DEPS: ruby-sqlite3 ruby-log4r ruby-dbus-systemd
   <<: *test
 
 test:mysql:
@@ -88,6 +98,8 @@ test:xmpp:
   image: $CI_REGISTRY/docker-images/layers:stretch-deb
   stage: package
   script:
+    - cp symbiosis.list /etc/apt/sources.list.d/
+    - apt-get update
     - export PACKAGE=${CI_BUILD_NAME##package:}
     - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
     - cd $PACKAGE
