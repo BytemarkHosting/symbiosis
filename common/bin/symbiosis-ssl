@@ -157,7 +157,6 @@ require 'symbiosis'
 require 'symbiosis/domains'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/ssl'
-require 'symbiosis/ssl/hooks'
 require 'symbiosis/ssl/letsencrypt'
 require 'symbiosis/ssl/selfsigned'
 

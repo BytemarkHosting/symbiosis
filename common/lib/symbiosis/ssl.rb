@@ -11,8 +11,8 @@ module Symbiosis
     class Hooks < Symbiosis::DomainHooks
       HOOKS_DIR = File.join('symbiosis', 'ssl-hooks.d').freeze
 
-      def self.run!
-        Symbiosis::SSL::Hooks.new.run!
+      def self.run!(event, domains)
+        Symbiosis::SSL::Hooks.new.run! event, domains
       end
 
       def initialize(hooks_dir = Symbiosis.path_in_etc(HOOKS_DIR))
