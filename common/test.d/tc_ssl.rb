@@ -959,20 +959,7 @@ class SSLTest < Test::Unit::TestCase
     regular_domain = Symbiosis::Domain.new(nil, @prefix)
     regular_domain.create
 
-    args_path = Symbiosis.path_in_etc('hook.args')
-    out_path = Symbiosis.path_in_etc('hook.output')
-
-    hook = <<HOOK
-#!/bin/bash
-
-echo "$1" > #{args_path}
-cat > #{out_path}
-HOOK
-
-    FileUtils.mkdir_p Symbiosis.path_in_etc('symbiosis/ssl-hooks.d')
-
-    IO.write Symbiosis.path_in_etc('symbiosis/ssl-hooks.d/hook'), hook, mode: 'w', perm: 0755
-
+    TestHelpers.make_test_hook Symbiosis.path_in_etc('symbiosis', 'ssl-hooks.d')
     system("#{@script} --etc-dir=#{@etc} --prefix=#{@prefix}")
     
     args = IO.read args_path
