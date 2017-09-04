@@ -1,5 +1,5 @@
 require 'symbiosis'
-require 'symbiosis/domainhooks'
+require 'symbiosis/domain_hooks'
 require 'open3'
 
 module Symbiosis
