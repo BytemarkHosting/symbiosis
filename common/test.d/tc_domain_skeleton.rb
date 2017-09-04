@@ -22,7 +22,7 @@ class TestDomainSkeleton < Test::Unit::TestCase
   def make_skeleton
     skelpath = Symbiosis.path_in_etc('symbiosis/skel')
 
-    Symbiosis::Utils.mkdir_p skelpath
+    Symbiosis::Utils.mkdir_p File.join(skelpath, 'test', 'deep')
 
     Symbiosis::Utils.set_param 'test-param', 'this is a test', skelpath
     Symbiosis::Utils.set_param 'test-param', 'also a test', File.join(skelpath, 'test')
@@ -52,16 +52,19 @@ class TestDomainSkeleton < Test::Unit::TestCase
     assert_equal 'deep test', domain.get_param('test/deep/test-param')
   end
 
-  def test_domainskeleton_hooks
+  def test_hooks
     hooks_dir = Symbiosis.path_in_etc('symbiosis', 'skel-hooks.d')
-    outputTestHelpers.make_test_hook hooks_dir
+
+    result = TestHelpers.make_test_hook hooks_dir
 
     domain = Symbiosis::Domain.new(nil, Symbiosis.prefix)
     domain.create
 
-    result = Symbiosis::DomainSkeleton.run_hooks! domain.name
+    success = Symbiosis::DomainSkeleton::Hooks.run! 'domain-populated', [domain.name]
 
-    assert_equal "domain-created\n", result.args
+    assert_equal true, success
+
+    assert_equal "domain-populated\n", result.args
     assert_equal "#{domain.name}\n", result.output
 
     Symbiosis.rm_rf hooks_dir

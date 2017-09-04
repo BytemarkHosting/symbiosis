@@ -1,3 +1,4 @@
+require 'symbiosis/domain_hooks'
 require 'symbiosis/utils'
 require 'pathname'
 
@@ -7,11 +8,11 @@ module Symbiosis
     attr_reader :skel_dir
 
     def initialize(skel_dir = Symbiosis.path_in_etc('symbiosis', 'skel'))
-      self.skel_dir = skel_dir
+      @skel_dir = skel_dir
     end
 
     def params
-      Dir.glob(File.join(@skel, '**', '*'))
+      Dir.glob(File.join(@skel_dir, '**', '*'))
          .select { |f| File.file?(f) }
     end
 
@@ -19,21 +20,27 @@ module Symbiosis
       !domain.configured?
     end
 
+    def param_rel_dir(path)
+      skel = Pathname.new(@skel_dir)
+      pathname = Pathname.new(path)
+      param_rel_path = pathname.relative_path_from(skel).to_s
+
+      File.dirname(param_rel_path)
+    end
+
     # abuse Symbiosis::Utils.get_param and Symbiosis::Utils.set_param
     # as a copy method because they do lots of safety checks for us.
     def copy!(domain)
-      skel = Pathname.new(@skel)
       params.each do |path|
-        pathname = Pathname.new(path)
-        param_rel_path = pathname.relative_path_from(skel).to_s
+        param_name = File.basename path
 
-        param_rel_dir = File.dirname param_rel_path
-        param_name = File.basename param_rel_path
+        old_param_dir = File.join(@skel_dir, param_rel_dir(path))
+        new_param_dir = File.join(domain.directory, param_rel_dir(path))
 
+        value = Symbiosis::Utils.get_param(param_name, old_param_dir)
 
-        value = Symbiosis::Utils.get_param(param_name, File.join(@skel, param_rel_dir))
-        Symbiosis::Utils.mkdir_p File.join(domain.directory, param_rel_dir)
-        Symbiosis::Utils.set_param(param_name, value, File.join(domain.directory, param_name))
+        Symbiosis::Utils.mkdir_p new_param_dir
+        Symbiosis::Utils.set_param(param_name, value, new_param_dir)
       end
     end
 
@@ -45,7 +52,7 @@ module Symbiosis
 
     # Hooks for DomainSkeleton
     # by default these live in /etc/symbiosis/skel-hooks.d
-    class Hooks
+    class Hooks < Symbiosis::DomainHooks
       HOOKS_DIR = File.join('symbiosis', 'skel-hooks.d')
       def self.run!(event, domains)
         Symbiosis::DomainSkeleton::Hooks.new.run!(event, domains)
