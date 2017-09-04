@@ -4,8 +4,10 @@ require 'pathname'
 module Symbiosis
   # Manages copying a domain skeleton into a freshly-made domain
   class DomainSkeleton
+    attr_reader :skel_dir
+
     def initialize(skel_dir = Symbiosis.path_in_etc('symbiosis', 'skel'))
-      @skel = skel_dir
+      self.skel_dir = skel_dir
     end
 
     def params

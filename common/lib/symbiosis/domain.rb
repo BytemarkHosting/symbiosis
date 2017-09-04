@@ -223,6 +223,14 @@ module Symbiosis
       mkdir_p(d, {:user => @user, :group => @group, :mode => mode})
     end
 
+    def get_param(name, dir = directory, opts = {})
+      Symbiosis::Utils.get_param(name, dir, opts)
+    end
+
+    def set_param(name, dir = directory, opts = {})
+      Symbiosis::Utils.set_param(name, dir, opts)
+    end
+
     #
     # Return the filename of the IP file, or nil if none has been set.
     #
