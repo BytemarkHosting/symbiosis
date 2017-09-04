@@ -1,3 +1,10 @@
+symbiosis-xmpp (2017:0904) stable; urgency=medium
+
+  * Added ssl-hook to reconfigure prosody when a new SSL certificate is
+    generated.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 04 Sep 2017 11:20:16 +0100
+
 symbiosis-xmpp (2017:0510) stable; urgency=medium
 
   * Store monit configuration in /usr/share instead of /etc. Use symlinks to
