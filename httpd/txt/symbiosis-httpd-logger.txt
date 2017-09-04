@@ -1,0 +1,45 @@
+
+NAME
+
+  symbiosis-apache-logger - Log access requests on a per-domain basis.
+
+SYNOPSIS
+
+ symbiosis-apache-logger [ -f <n> ] [ -s ] [ -l <filename> ] [ -h ] [ -v ] <default_filename>
+
+OPTIONS
+
+ -f <number>     Maxium number of log files to hold open. Defaults to 50.
+
+ -l <filename>   The name of the generated logs.  Defaults to "access.log"
+
+ -p <directory>  Set the Symbiosis "prefix" directory for testing. Defaults to /srv.
+
+ -s              Open the file for writing synchronously, i.e. without any buffering.
+
+ -h              Show a help message, and exit.
+
+ -v              Show verbose errors
+
+USAGE
+
+This program is used to capture per-domain logs for each domain
+running under Bytemark Symbiosis. It writes the logs out to
+`/srv/example.com/public/logs/access.log` by default.
+
+There are a few other flags that are no-ops now, notably `-u` and `-g`
+for dropping privileges when the program is started.
+
+EXAMPLES
+
+Use the following apache configuration lines for hosting multiple
+domains using a vhost module.  It is important to use the custom log
+format so the domain gets logged with each line.
+
+  LogFormat "%V %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" mass_hosting_combined
+  CustomLog "|| /usr/sbin/symbiosis-httpd-logger -s -l access.log ${APACHE_LOG_DIR}/zz-mass-hosting.access.log" mass_hosting_combined
+
+AUTHOR
+
+ Patrick J Cherry <patrick@bytemark.co.uk> 
+

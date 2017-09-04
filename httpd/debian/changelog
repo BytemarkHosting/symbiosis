@@ -1,3 +1,9 @@
+symbiosis-httpd (2017:0904) stable; urgency=medium
+
+  * Replaced ruby httpd loggger with our golang version.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 04 Sep 2017 16:35:03 +0100
+
 symbiosis-httpd (2017:0818) stable; urgency=medium
 
   * Added a --diff-only option to symbiosis-httpd-configure.
