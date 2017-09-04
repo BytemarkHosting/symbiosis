@@ -85,14 +85,6 @@ for domain in /srv/*; do
 done
 
 #
-# With the switch to ssl-hooks.d, hourly rebuilds are no longer needed.
-#
-if [ -h "/etc/cron.hourly/symbiosis-httpd-configure" ] ; then
-  echo "I: Removing obsolete hourly cron job for symbiosis-httpd-configure"
-  rm "/etc/cron.hourly/symbiosis-httpd-configure"
-fi
-
-#
 # Reconfigure apache.
 #
 symbiosis-httpd-configure --no-reload --verbose

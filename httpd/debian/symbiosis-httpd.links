@@ -1,1 +1,2 @@
+usr/sbin/symbiosis-httpd-configure                  etc/cron.hourly/symbiosis-httpd-configure
 usr/sbin/symbiosis-httpd-rotate-logs                etc/cron.daily/symbiosis-httpd-rotate-logs
