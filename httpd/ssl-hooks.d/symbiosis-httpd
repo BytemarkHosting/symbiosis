@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 if ! [ "$1" = "live-update" ] ; then
    echo "I: $0: Ignoring unknown hook action $1"
@@ -8,4 +8,4 @@ fi
 #
 # Reconfigure httpd regardless of the domains given.
 #
-exec symbiosis-httpd-configure
+exec /usr/bin/sudo /usr/sbin/symbiosis-httpd-configure

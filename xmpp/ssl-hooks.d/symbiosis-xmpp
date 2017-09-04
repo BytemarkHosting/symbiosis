@@ -7,7 +7,7 @@ fi
 
 for domain in $(cat) ; do
   if [ -f "/srv/$domain/config/xmpp" ] ; then
-    exec symbiosis-xmpp-configure
+    exec /usr/bin/sudo /usr/sbin/symbiosis-xmpp-configure
   fi
 done
 

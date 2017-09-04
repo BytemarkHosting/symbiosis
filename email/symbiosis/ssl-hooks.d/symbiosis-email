@@ -8,5 +8,4 @@ fi
 #
 # Only dovecot needs reloading following a certificate change
 #
-exec service dovecot reload
-
+exec /usr/bin/sudo /usr/sbin/service dovecot reload
