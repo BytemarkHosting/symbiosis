@@ -1,3 +1,9 @@
+symbiosis-ftpd (2017:0904) stable; urgency=medium
+
+  * Added hook to restart daemon on SSL certificate renewal.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 04 Sep 2017 12:08:18 +0100
+
 symbiosis-ftpd (2017:0510) stable; urgency=medium
 
   * Store monit configuration in /usr/share instead of /etc. Use symlinks to
