@@ -25,8 +25,8 @@ class TestDomainSkeleton < Test::Unit::TestCase
     Symbiosis::Utils.mkdir_p skelpath
 
     Symbiosis::Utils.set_param 'test-param', 'this is a test', skelpath
-    Symbiosis::Utils.set_param 'test/test-param', 'also a test', skelpath
-    Symbiosis::Utils.set_param 'test/deep/test-param', 'deep test', skelpath
+    Symbiosis::Utils.set_param 'test-param', 'also a test', File.join(skelpath, 'test')
+    Symbiosis::Utils.set_param 'test-param', 'deep test', File.join(skelpath, 'test', 'deep')
 
     @skel = Symbiosis::DomainSkeleton.new skelpath
   end

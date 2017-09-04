@@ -25,10 +25,15 @@ module Symbiosis
       skel = Pathname.new(@skel)
       params.each do |path|
         pathname = Pathname.new(path)
-        param_name = pathname.relative_path_from(skel).to_s
+        param_rel_path = pathname.relative_path_from(skel).to_s
 
-        value = Symbiosis::Utils.get_param(param_name, @skel)
-        Symbiosis::Utils.set_param(param_name, value, domain.directory)
+        param_rel_dir = File.dirname param_rel_path
+        param_name = File.basename param_rel_path
+
+
+        value = Symbiosis::Utils.get_param(param_name, File.join(@skel, param_rel_dir))
+        Symbiosis::Utils.mkdir_p File.join(domain.directory, param_rel_dir)
+        Symbiosis::Utils.set_param(param_name, value, File.join(domain.directory, param_name))
       end
     end
 
