@@ -66,7 +66,5 @@ class TestDomainSkeleton < Test::Unit::TestCase
 
     assert_equal "domain-populated\n", result.args
     assert_equal "#{domain.name}\n", result.output
-
-    Symbiosis.rm_rf hooks_dir
   end
 end
