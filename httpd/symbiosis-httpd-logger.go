@@ -461,7 +461,7 @@ func writeLog(prefix string, host string, log string, filename string, syncFlag 
 //
 func main() {
 	//
-	// Define command-line flags: -s (this is a no-op now)
+	// Define command-line flags: -s
 	//
 	var syncFlag bool
 	flag.BoolVar(&syncFlag, "s", false, "Open log files in synchronous mode")

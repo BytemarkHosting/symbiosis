@@ -1,3 +1,13 @@
+symbiosis-mysql (2017:0905) stable; urgency=medium
+
+  * Explcitly depend on the stretch version of default-mysql-server to pull
+    in MariaDB.
+  * Automatically upgrade the MySQL tables for MariaDB.
+  * Move the Symbiosis configuration snippet to the mariadb.conf.d/ directory
+    to override the default values set therein.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 05 Sep 2017 12:13:10 +0100
+
 symbiosis-mysql (2017:0510) stable; urgency=medium
 
   * Store monit configuration in /usr/share instead of /etc. Use symlinks to

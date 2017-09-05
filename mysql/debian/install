@@ -1,2 +1,2 @@
 monit.d/*            usr/share/symbiosis/monit/checks/
-mysql                etc
+mariadb.conf.d/      etc/mysql/
