@@ -17,6 +17,8 @@ class TestDomainSkeleton < Test::Unit::TestCase
 
     @verbose = $VERBOSE || $DEBUG ? ' --verbose ' : ''
 
+    testd = File.dirname(__FILE__)
+
     @script = File.expand_path(File.join(testd,"..","bin","symbiosis-skel"))
     @script = '/usr/sbin/symbiosis-skel' unless File.exist?(@script)
     @script += @verbose
