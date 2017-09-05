@@ -82,6 +82,8 @@ class TestDomainSkeleton < Test::Unit::TestCase
     domain = Symbiosis::Domain.new(nil, Symbiosis.prefix)
     domain.create
 
+    FileUtils.rm_rf domain.config_dir
+
     pid = spawn("#{@script} --etc=#{Symbiosis.etc} --prefix=#{Symbiosis.prefix}")
 
     _, status = Process.wait2(pid)
