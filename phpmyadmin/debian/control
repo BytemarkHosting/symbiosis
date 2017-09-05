@@ -10,6 +10,7 @@ Bugs: https://projects.bytemark.co.uk/projects/symbiosis/issues
 Package: symbiosis-phpmyadmin
 Architecture: all
 Depends: phpmyadmin, symbiosis-mysql (>=2017:0905), ruby, ${misc:Depends}
+Pre-Depends: symbiosis-mysql (>=2017:0905)
 Replaces: bytemark-vhost-phpmyadmin, symbiosis-test, symbiosis-monit (<< 2011:1206)
 Breaks: symbiosis-monit (<< 2011:1206)
 Conflicts: bytemark-vhost-phpmyadmin, symbiosis-test
