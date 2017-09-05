@@ -1,11 +1,13 @@
 #!/usr/bin/make -f
 #
 
+export DH_GOPKG := symbiosis-httpd-logger
+
 %:
-	dh $@ --buildsystem=ruby --with ruby,apache2
+	dh $@ --buildsystem=ruby --with ruby,apache2,golang
 
 override_dh_auto_build:
-	$(MAKE) docs
+	$(MAKE) 
 	cd vhost-alias && $(MAKE) && $(MAKE) test
 	dh_auto_build
 

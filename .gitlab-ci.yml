@@ -63,12 +63,7 @@ test:ftpd:
 test:httpd:
   variables:
     RUBYOPT: -v
-    TEST_DEPS: ruby-linux-netlink ruby-erubis apache2 ruby-diffy
-  <<: *test
-
-test:httpd-logger:
-  variables:
-    TEST_DEPS: golang-go ruby-linux-netlink
+    TEST_DEPS: ruby-linux-netlink ruby-erubis apache2 ruby-diffy golang-go
   <<: *test
 
 test:meta:
@@ -125,8 +120,6 @@ package:firewall:
 package:ftpd:
   <<: *package
 package:httpd:
-  <<: *package
-package:httpd-logger:
   <<: *package
 package:meta:
   <<: *package
