@@ -82,8 +82,9 @@ class TestDomainSkeleton < Test::Unit::TestCase
     domain = Symbiosis::Domain.new(nil, Symbiosis.prefix)
     domain.create
 
-    system("#{@script} --etc=#{Symbiosis.etc} --prefix=#{Symbiosis.prefix}")
-
+    pid = spawn("#{@script} --etc=#{Symbiosis.etc} --prefix=#{Symbiosis.prefix}")
+    
+    assert_equal 0, Process.wait(pid)
     assert_equal "domains-populated\n", result.args
     assert_equal "#{domain.name}\n", result.output
   end
