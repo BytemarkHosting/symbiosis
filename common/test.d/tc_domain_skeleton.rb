@@ -16,6 +16,10 @@ class TestDomainSkeleton < Test::Unit::TestCase
     Symbiosis.prefix = File.realpath Dir.mktmpdir('srv')
 
     @verbose = $VERBOSE || $DEBUG ? ' --verbose ' : ''
+
+    @script = File.expand_path(File.join(testd,"..","bin","symbiosis-skel"))
+    @script = '/usr/sbin/symbiosis-skel' unless File.exist?(@script)
+    @script += @verbose
     make_skeleton
   end
 
@@ -60,7 +64,7 @@ class TestDomainSkeleton < Test::Unit::TestCase
     domain = Symbiosis::Domain.new(nil, Symbiosis.prefix)
     domain.create
 
-    success = Symbiosis::DomainSkeleton::Hooks.run! 'domain-populated', [domain.name]
+    success = Symbiosis::DomainSkeleton::Hooks.run! 'domains-populated', [domain.name]
 
     assert_equal true, success
 
@@ -76,7 +80,7 @@ class TestDomainSkeleton < Test::Unit::TestCase
     domain = Symbiosis::Domain.new(nil, Symbiosis.prefix)
     domain.create
 
-    system("#{script} --etc=#{Symbiosis.etc} --prefix=#{Symbiosis.prefix}")
+    system("#{@script} --etc=#{Symbiosis.etc} --prefix=#{Symbiosis.prefix}")
 
     assert_equal "domains-populated\n", result.args
     assert_equal "#{domain.name}\n", result.output
