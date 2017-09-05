@@ -137,7 +137,7 @@ end
 warn "Running symbiosis-skel on #{domains.join "\n"}\n\n"
 exit_code = 0
 updated_domains = Symbiosis::DomainSkeleton.new.populate!(domains)
-puts updated_domains.map(&:name).join("\n")
+puts updated_domains.keys.join("\n")
 domain_errors = updated_domains.reject { |_, err| err.nil? }
 
 unless domain_errors.empty?
@@ -146,9 +146,9 @@ unless domain_errors.empty?
 end
 
 domains_for_hooks = updated_domains.select { |_, err| err.nil? }
-                                   .map(&:name)
+                                   .keys
 
-puts domains_for_hooks
+puts "passing to hooks: #{domains_for_hooks.join("\n")}"
 
 exit exit_code if domains_for_hooks.empty?
 
