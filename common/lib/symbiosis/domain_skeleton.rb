@@ -48,10 +48,14 @@ module Symbiosis
     end
 
     def populate!(domains)
+      warn "Attempting to populate #{domains.join("\n")}"
       domains = domains.select { |domain| should_populate? domain }
+      warn "definitely populating #{domains.join("\n")}"
       Hash[domains.map do |domain|
         begin
+          warn "copy! #{domain}"
           copy! domain
+          warn "...OK"
           [domain.name, nil]
         rescue => e
           warn "Error populating #{domain.name} - #{e}"
