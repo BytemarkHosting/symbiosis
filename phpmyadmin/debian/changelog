@@ -1,3 +1,10 @@
+symbiosis-phpmyadmin (2017:0905) stable; urgency=medium
+
+  * Upgrade symbiosis-mysql dependency to the most recent version to help with
+    MariaDB upgrade process.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Tue, 05 Sep 2017 12:14:43 +0100
+
 symbiosis-phpmyadmin (2017:0424) stable; urgency=medium
 
   * Use apache2 debhelper scripts to install config snippet.

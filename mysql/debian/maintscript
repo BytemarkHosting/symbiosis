@@ -1,1 +1,2 @@
 rm_conffile /etc/symbiosis/monit.d/mysqld 2017:0424
+rm_conffile /etc/mysql/conf.d/symbiosis.cnf 2017:0905~

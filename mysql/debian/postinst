@@ -33,4 +33,12 @@ done
 #
 invoke-rc.d mysql restart
 
+#
+# And upgrade mysql, if we can.
+#
+if [ -x /usr/bin/mysql_upgrade ] ; then
+  echo "I: Upgrading MySQL"
+  /usr/bin/mysql_upgrade --defaults-file=/etc/mysql/debian.cnf || true
+fi
+
 exit 0
