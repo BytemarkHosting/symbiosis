@@ -83,8 +83,10 @@ class TestDomainSkeleton < Test::Unit::TestCase
     domain.create
 
     pid = spawn("#{@script} --etc=#{Symbiosis.etc} --prefix=#{Symbiosis.prefix}")
-    
-    assert_equal 0, Process.wait(pid)
+
+    _, status = Process.wait2(pid)
+
+    assert_equal 0, status.exitstatus
     assert_equal "domains-populated\n", result.args
     assert_equal "#{domain.name}\n", result.output
   end
