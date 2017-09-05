@@ -1,0 +1,11 @@
+#!/bin/sh -eu
+
+if ! [ "$1" = "live-update" ] ; then
+  echo "I: $0: Ignoring unknown hook action $1"
+  exit 0
+fi
+
+#
+# pure-ftpd needs a full restart to get the new certificate.
+#
+exec /usr/bin/sudo /usr/sbin/service pure-ftpd restart

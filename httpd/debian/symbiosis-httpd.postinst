@@ -84,7 +84,6 @@ for domain in /srv/*; do
   [ -f "$no_stats" ] && rm "$no_stats"
 done
 
-
 #
 # Reconfigure apache.
 #

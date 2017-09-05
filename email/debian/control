@@ -10,7 +10,7 @@ XS-Ruby-Versions: all
 Package: symbiosis-email
 Architecture: all
 Pre-Depends: dpkg (>= 1.15.7.2)
-Depends: symbiosis-common (>= 2017:0328), exim4-daemon-heavy (>= 4.84), dovecot-core (>= 1:2.2.0), dovecot-sieve, dovecot-managesieved, dovecot-imapd, dovecot-pop3d, adduser, make, clamav-daemon, clamav-freshclam, spamassassin, ruby, ruby-eventmachine (>= 1.0), ruby-cracklib, ssl-cert, ${misc:Depends}
+Depends: symbiosis-common (>= 2017:0830), exim4-daemon-heavy (>= 4.84), dovecot-core (>= 1:2.2.0), dovecot-sieve, dovecot-managesieved, dovecot-imapd, dovecot-pop3d, adduser, make, clamav-daemon, clamav-freshclam, spamassassin, ruby, ruby-eventmachine (>= 1.0), ruby-cracklib, ssl-cert, ${misc:Depends}
 Recommends: symbiosis-webmail, symbiosis-email-activesync
 Replaces: bytemark-vhost-email, symbiosis-monit (<< 2011:1206), symbiosis-test
 Breaks:  symbiosis-monit (<< 2011:1206)

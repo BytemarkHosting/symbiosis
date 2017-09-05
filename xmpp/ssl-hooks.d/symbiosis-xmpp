@@ -1,0 +1,13 @@
+#!/bin/bash -eu
+
+if ! [ "$1" = "live-update" ] ; then
+  echo "I: $0: Ignoring unknown hook action $1"
+  exit 0
+fi
+
+for domain in $(cat) ; do
+  if [ -f "/srv/$domain/config/xmpp" ] ; then
+    exec /usr/bin/sudo /usr/sbin/symbiosis-xmpp-configure
+  fi
+done
+

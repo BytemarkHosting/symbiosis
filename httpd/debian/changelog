@@ -1,5 +1,7 @@
 symbiosis-httpd (2017:0904) stable; urgency=medium
 
+  * Use ssl-hooks to reload apache when SSL certificates are
+    generated/renewed.
   * Replaced ruby httpd loggger with our golang version.
 
  -- Patrick J Cherry <patrick@bytemark.co.uk>  Mon, 04 Sep 2017 16:35:03 +0100

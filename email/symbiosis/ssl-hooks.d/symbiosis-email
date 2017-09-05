@@ -1,0 +1,11 @@
+#!/bin/sh -eu
+
+if ! [ "$1" = "live-update" ] ; then
+  echo "I: $0: Ignoring unknown hook action $1"
+  exit 0
+fi
+
+#
+# Only dovecot needs reloading following a certificate change
+#
+exec /usr/bin/sudo /usr/sbin/service dovecot reload
