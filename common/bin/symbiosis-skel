@@ -134,7 +134,7 @@ domains = Symbiosis::Domains.all(prefix) if ARGV.empty?
 end
 
 exit_code = 0
-updated_domains = DomainSkeleton.new.populate!(domains)
+updated_domains = Symbiosis::DomainSkeleton.new.populate!(domains)
 domain_errors = updated_domains.reject { |_, err| err.nil? }
 
 unless domain_errors.empty?
@@ -142,7 +142,10 @@ unless domain_errors.empty?
   exit_code = 1
 end
 
-exit_code = 2 unless Hooks.run!('domains-populated',
-                                updated_domains.select { |_, err| err.nil? })
+domains_for_hooks = updated_domains.select { |_, err| err.nil? }
+                                   .map { |domain, _| domain.name }
+
+exit_code = 2 unless Symbiosis::DomainSkeleton::Hooks.run!('domains-populated',
+                                                           domains_for_hooks)
 
 exit exit_code
