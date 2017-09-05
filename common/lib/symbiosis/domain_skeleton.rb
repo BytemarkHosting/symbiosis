@@ -17,7 +17,9 @@ module Symbiosis
     end
 
     def should_populate?(domain)
-      !domain.configured?
+      Dir.mkdir File.join(domain.directory, 'config')
+    rescue Errno::EEXIST
+      false
     end
 
     def param_rel_dir(path)
@@ -42,12 +44,20 @@ module Symbiosis
         Symbiosis::Utils.mkdir_p new_param_dir
         Symbiosis::Utils.set_param(param_name, value, new_param_dir)
       end
+      true
     end
 
-    def populate!(domain)
-      false unless should_populate? domain
-      copy!(domain)
-      Hooks.run!('domain-populated', [domain])
+    def populate!(domains)
+      domains = domains.select { |domain| should_populate? domain }
+      Hash[domains.map do |domain|
+        begin
+          copy! domain
+          [domain.name, nil]
+        rescue => e
+          warn "Error populating #{domain.name} - #{e}"
+          [domain.name, e]
+        end
+      end]
     end
 
     # Hooks for DomainSkeleton

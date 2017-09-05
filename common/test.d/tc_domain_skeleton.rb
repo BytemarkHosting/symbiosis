@@ -64,7 +64,21 @@ class TestDomainSkeleton < Test::Unit::TestCase
 
     assert_equal true, success
 
-    assert_equal "domain-populated\n", result.args
+    assert_equal "domains-populated\n", result.args
+    assert_equal "#{domain.name}\n", result.output
+  end
+
+  def test_symbiosis_skel
+    hooks_dir = Symbiosis.path_in_etc('symbiosis', 'skel-hooks.d')
+
+    result = TestHelpers.make_test_hook hooks_dir
+
+    domain = Symbiosis::Domain.new(nil, Symbiosis.prefix)
+    domain.create
+
+    system("#{script} --etc=#{Symbiosis.etc} --prefix=#{Symbiosis.prefix}")
+
+    assert_equal "domains-populated\n", result.args
     assert_equal "#{domain.name}\n", result.output
   end
 end
