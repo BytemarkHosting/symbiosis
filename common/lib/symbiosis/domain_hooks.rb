@@ -1,4 +1,5 @@
 require 'symbiosis'
+require 'open3'
 
 module Symbiosis
   # generic hooks implementation
