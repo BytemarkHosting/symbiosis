@@ -47,21 +47,30 @@ module Symbiosis
       true
     end
 
-    def populate!(domains)
-      warn "Attempting to populate #{domains.join("\n")}"
-      domains = domains.select { |domain| should_populate? domain }
-      warn "definitely populating #{domains.join("\n")}"
-      Hash[domains.map do |domain|
+    # returns an array of key-value pair arrays
+    # where the key is the domain name and the
+    # value is an error or nil. If nil the copy for that
+    # domain was successful.
+    def try_copy!(domains)
+      domains.map do |domain|
         begin
-          warn "copy! #{domain}"
+          warn "Copying skeleton to #{domain.directory}..."
           copy! domain
-          warn "...OK"
+          warn "Copy completed for #{domain.directory}"
           [domain.name, nil]
         rescue => e
-          warn "Error populating #{domain.name} - #{e}"
+          warn "Error copying to #{domain.directory} - #{e}"
           [domain.name, e]
         end
-      end]
+      end
+    end
+
+    def populate!(domains)
+      warn "Checking which domains to populate..."
+      domains = domains.select { |domain| should_populate? domain }
+      warn "Populating [#{domains.join(", ")}"]
+      # convert [ [key, value], ... ] from try_copy! to a hash
+      Hash[try_copy!(domains)]
     end
 
     # Hooks for DomainSkeleton
