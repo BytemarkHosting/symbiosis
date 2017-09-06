@@ -1,0 +1,8 @@
+[Unit]
+Description=Watcher for symbiosis-skel automated domain population
+
+[Path]
+PathExistsGlob=/srv/*
+
+[Install]
+WantedBy=multi-user.target
