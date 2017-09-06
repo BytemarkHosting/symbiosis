@@ -134,7 +134,6 @@ domains = Symbiosis::Domains.all(prefix) if ARGV.empty?
   end
 end
 
-warn "Running symbiosis-skel on #{domains.join "\n"}\n\n"
 exit_code = 0
 updated_domains = Symbiosis::DomainSkeleton.new.populate!(domains)
 puts updated_domains.keys.join("\n")

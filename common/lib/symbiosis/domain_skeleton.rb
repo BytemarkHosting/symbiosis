@@ -22,12 +22,28 @@ module Symbiosis
       false
     end
 
-    def param_rel_dir(path)
+    def path_relative_to_skel(path)
       skel = Pathname.new(@skel_dir)
       pathname = Pathname.new(path)
-      param_rel_path = pathname.relative_path_from(skel).to_s
+      pathname.relative_path_from(skel).to_s
+    end
 
-      File.dirname(param_rel_path)
+    def copy_file!(rel_path, domain)
+      verbose "Reading skeleton #{rel_path}"
+      src_path = File.join(@skel_dir, rel_path)
+      contents = Symbiosis::Utils.safe_open(src_path, File::RDONLY){|fh| fh.read}
+
+      new_path = File.join domain.directory, rel_path
+      new_dir = File.dirname new_path
+
+      verbose "Ensuring #{new_dir} exists"
+      Symbiosis::Utils.mkdir_p new_dir
+
+      verbose "Writing #{new_path}"
+      Symbiosis::Utils.safe_open(new_path, File::WRONLY|File::CREAT, mode: 0644, uid: domain.uid, gid: domain.gid) do |fh|
+        fh.truncate(0)
+        fh.write(contents)
+      end
     end
 
     # abuse Symbiosis::Utils.get_param and Symbiosis::Utils.set_param
@@ -35,14 +51,7 @@ module Symbiosis
     def copy!(domain)
       params.each do |path|
         param_name = File.basename path
-
-        old_param_dir = File.join(@skel_dir, param_rel_dir(path))
-        new_param_dir = File.join(domain.directory, param_rel_dir(path))
-
-        value = Symbiosis::Utils.get_param(param_name, old_param_dir)
-
-        Symbiosis::Utils.mkdir_p new_param_dir
-        Symbiosis::Utils.set_param(param_name, value, new_param_dir)
+        copy_file! path_relative_to_skel(path), domain
       end
       true
     end
@@ -71,6 +80,10 @@ module Symbiosis
       warn "Populating [#{domains.join(", ")}]"
       # convert [ [key, value], ... ] from try_copy! to a hash
       Hash[try_copy!(domains)]
+    end
+
+    def verbose(str)
+      warn str if $VERBOSE
     end
 
     # Hooks for DomainSkeleton
