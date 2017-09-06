@@ -68,7 +68,7 @@ module Symbiosis
     def populate!(domains)
       warn "Checking which domains to populate..."
       domains = domains.select { |domain| should_populate? domain }
-      warn "Populating [#{domains.join(", ")}"]
+      warn "Populating [#{domains.join(", ")}]"
       # convert [ [key, value], ... ] from try_copy! to a hash
       Hash[try_copy!(domains)]
     end
