@@ -1,3 +1,9 @@
+symbiosis-httpd (2017:0907) stable; urgency=medium
+
+  * Move ssl-hooks to /usr/share, and symlink back to /etc.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 07 Sep 2017 17:02:33 +0100
+
 symbiosis-httpd (2017:0904) stable; urgency=medium
 
   * Use ssl-hooks to reload apache when SSL certificates are
