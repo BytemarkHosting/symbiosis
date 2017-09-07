@@ -135,6 +135,9 @@ if [ ! -e "/etc/ssl/ssl.key" ] &&
 
 fi
 
+systemctl enable symbiosis-skel.path
+systemctl start symbiosis-skel.path
+
 #DEBHELPER#
 
 exit 0

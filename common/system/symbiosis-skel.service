@@ -3,5 +3,3 @@ Description=Service for symbiosis-skel. Activated by symbiosis-skel.path
 
 [Service]
 ExecStart=/usr/bin/symbiosis-skel 
-User=admin
-Group=admin
