@@ -46,8 +46,6 @@ module Symbiosis
       end
     end
 
-    # abuse Symbiosis::Utils.get_param and Symbiosis::Utils.set_param
-    # as a copy method because they do lots of safety checks for us.
     def copy!(domain)
       params.each do |path|
         param_name = File.basename path
