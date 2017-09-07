@@ -1,3 +1,9 @@
+symbiosis-email (2017:0907) stable; urgency=medium
+
+  * Remove duplicate cron job encrypting passwords.
+
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 07 Sep 2017 12:18:45 +0100
+
 symbiosis-email (2017:0904) stable; urgency=medium
 
   * Added ssl-hook to reload dovecot when any SSL certificates are renewed.
