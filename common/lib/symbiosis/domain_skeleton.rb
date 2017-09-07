@@ -1,4 +1,4 @@
-require 'symbiosis/domain_hooks'
+require 'symbiosis/hooks'
 require 'symbiosis/utils'
 require 'pathname'
 
@@ -88,7 +88,7 @@ module Symbiosis
 
     # Hooks for DomainSkeleton
     # by default these live in /etc/symbiosis/skel-hooks.d
-    class Hooks < Symbiosis::DomainHooks
+    class Hooks < Symbiosis::Hooks
       HOOKS_DIR = File.join('symbiosis', 'skel-hooks.d')
       def self.run!(event, domains)
         Symbiosis::DomainSkeleton::Hooks.new.run!(event, domains)

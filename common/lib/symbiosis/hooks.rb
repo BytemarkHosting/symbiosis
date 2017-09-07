@@ -6,14 +6,14 @@ module Symbiosis
   # use subclasses to provide default behaviour
   # see Symbiosis::DomainSkeleton::Hooks
   # and Symbiosis::SSL::Hooks
-  class DomainHooks
+  class Hooks
     def initialize(hooks_dir)
       @hooks_dir = hooks_dir
     end
 
-    def run!(event, domains)
+    def run!(event, stdin_data)
       @event = event
-      @domains = domains
+      @stdin_data = Array(stdin_data).join("\n")
 
       Dir.glob(File.join(@hooks_dir, '*'))
          .select { |h| valid_hook?(h) }
@@ -28,7 +28,7 @@ module Symbiosis
     private
 
     def runs_successfully?(script)
-      opts = { stdin_data: @domains.join("\n") + "\n" }
+      opts = { stdin_data: @stdin_data + "\n" }
       output, status = Open3.capture2e(script, @event, opts)
       return true if status.success?
       puts script_status(script, output, status)

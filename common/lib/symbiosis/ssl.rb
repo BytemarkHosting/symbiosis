@@ -1,5 +1,5 @@
 require 'symbiosis'
-require 'symbiosis/domain_hooks'
+require 'symbiosis/hooks'
 require 'open3'
 
 module Symbiosis
@@ -8,7 +8,7 @@ module Symbiosis
     PROVIDERS ||= []
 
     # Hooks for SSL
-    class Hooks < Symbiosis::DomainHooks
+    class Hooks < Symbiosis::Hooks
       HOOKS_DIR = File.join('symbiosis', 'ssl-hooks.d').freeze
 
       def self.run!(event, domains)
