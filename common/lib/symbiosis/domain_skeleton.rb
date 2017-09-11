@@ -22,9 +22,10 @@ module Symbiosis
       false
     end
 
-    # after running should_populate? the config directory will have the wrong uid, so set it right
+    # after running should_populate? the config directory will have the wrong
+    # uid, so set it right
     def ensure_config_owner(domain)
-      File.lchown domain.uid, domain.gid, domain.config_dir 
+      File.lchown domain.uid, domain.gid, domain.config_dir
     end
 
     def path_relative_to_skel(path)
@@ -33,10 +34,25 @@ module Symbiosis
       pathname.relative_path_from(skel).to_s
     end
 
-    def copy_file!(rel_path, domain)
+    def read_file(rel_path)
       verbose "Reading skeleton #{rel_path}"
       src_path = File.join(@skel_dir, rel_path)
-      contents = Symbiosis::Utils.safe_open(src_path, File::RDONLY){|fh| fh.read}
+      Symbiosis::Utils.safe_open(src_path, File::RDONLY, &:read)
+    end
+
+    def write_file!(new_path, domain, contents)
+      verbose "Writing #{new_path}"
+      Symbiosis::Utils.safe_open(new_path, File::WRONLY | File::CREAT,
+                                 mode: 0o644,
+                                 uid: domain.uid,
+                                 gid: domain.gid) do |fh|
+        fh.truncate(0)
+        fh.write(contents)
+      end
+    end
+
+    def copy_file!(rel_path, domain)
+      contents = read_file rel_path
 
       new_path = File.join domain.directory, rel_path
       new_dir = File.dirname new_path
@@ -44,22 +60,17 @@ module Symbiosis
       verbose "Ensuring #{new_dir} exists"
       Symbiosis::Utils.mkdir_p new_dir
 
-      verbose "Writing #{new_path}"
-      Symbiosis::Utils.safe_open(new_path, File::WRONLY|File::CREAT, mode: 0644, uid: domain.uid, gid: domain.gid) do |fh|
-        fh.truncate(0)
-        fh.write(contents)
-      end
+      write_file! new_path, domain, contents
     end
 
     def copy!(domain)
       params.each do |path|
-        param_name = File.basename path
         copy_file! path_relative_to_skel(path), domain
       end
       true
     end
 
-    # returns an array of key-value pair arrays
+    # returns an array of key-value pair arrays
     # where the key is the domain name and the
     # value is an error or nil. If nil the copy for that
     # domain was successful.
@@ -79,10 +90,10 @@ module Symbiosis
     end
 
     def populate!(domains)
-      warn "Checking which domains to populate..."
+      warn 'Checking which domains to populate...'
       domains = domains.select { |domain| should_populate? domain }
-      warn "Populating [#{domains.join(", ")}]"
-      # convert [ [key, value], ... ] from try_copy! to a hash
+      warn "Populating [#{domains.join(', ')}]"
+      # convert [ [key, value], ... ] from try_copy! to a hash
       Hash[try_copy!(domains)]
     end
 
