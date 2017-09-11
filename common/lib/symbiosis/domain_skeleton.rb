@@ -17,9 +17,14 @@ module Symbiosis
     end
 
     def should_populate?(domain)
-      Dir.mkdir File.join(domain.directory, 'config')
+      Dir.mkdir domain.config_dir
     rescue Errno::EEXIST
       false
+    end
+
+    # after running should_populate? the config directory will have the wrong uid, so set it right
+    def ensure_config_owner(domain)
+      File.lchown domain.uid, domain.gid, domain.config_dir 
     end
 
     def path_relative_to_skel(path)
@@ -61,6 +66,7 @@ module Symbiosis
     def try_copy!(domains)
       domains.map do |domain|
         begin
+          ensure_config_owner
           warn "Copying skeleton to #{domain.directory}..."
           copy! domain
           warn "Copy completed for #{domain.directory}"
