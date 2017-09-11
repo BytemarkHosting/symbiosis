@@ -26,7 +26,7 @@ class TestDomainSkeleton < Test::Unit::TestCase
   end
 
   def make_skeleton
-    skelpath = Symbiosis.path_in_etc('symbiosis/skel')
+    skelpath = Symbiosis.path_in_etc('symbiosis/skel.d')
 
     Symbiosis::Utils.mkdir_p File.join(skelpath, 'test', 'deep')
 

@@ -7,7 +7,7 @@ module Symbiosis
   class DomainSkeleton
     attr_reader :skel_dir
 
-    def initialize(skel_dir = Symbiosis.path_in_etc('symbiosis', 'skel'))
+    def initialize(skel_dir = Symbiosis.path_in_etc('symbiosis', 'skel.d'))
       @skel_dir = skel_dir
     end
 
