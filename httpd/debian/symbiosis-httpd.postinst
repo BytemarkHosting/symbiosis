@@ -85,6 +85,15 @@ for domain in /srv/*; do
 done
 
 #
+# Increase Apache PHP7 module default 'upload_max_filesize' and 'post_max_size' values
+#
+
+if [ -e /etc/php/7.0/apache2/php.ini ] ; then
+  sed -i 's|upload_max_filesize = 2M|upload_max_filesize = 64M|' /etc/php/7.0/apache2/php.ini
+  sed -i 's|post_max_size = 8M|post_max_size = 64M|' /etc/php/7.0/apache2/php.ini
+fi
+
+#
 # Reconfigure apache.
 #
 symbiosis-httpd-configure --no-reload --verbose
