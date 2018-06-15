@@ -1,3 +1,9 @@
+symbiosis-ftpd (2018:0615) stable; urgency=medium
+
+  * Restrict FTP sessions to TLS only.
+
+ -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Fri, 15 Jun 2018 13:17:42 +0100
+
 symbiosis-ftpd (2017:0904) stable; urgency=medium
 
   * Added hook to restart daemon on SSL certificate renewal.
