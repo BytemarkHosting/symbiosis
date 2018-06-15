@@ -7,16 +7,16 @@
 #   symbiosis-ip [ --all ] [ --ipv4 ] [ --ipv6 ] [ --verbose ] [ --help ]
 #
 # OPTIONS
-#   --all         Show all available addresses on the system, not just the
+#  --all         Show all available addresses on the system, not just the
 #                 primary one.
 #
 #  --ipv4         Show IPv4 addresses
 #
 #  --ipv6         Show IPv6 addresses
 #
-#   --help        Show the help information for this script.
+#  --help        Show the help information for this script.
 #
-#   --verbose     Show debugging information.
+#  --verbose     Show debugging information.
 #
 # Output the system's primary IP address. This is determined as being the
 # address with the smallest CIDR prefix on the interface which has the default
