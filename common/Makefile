@@ -19,7 +19,7 @@ clean:
 	$(RM) -r man
 
 test:
-	RUBYLIB=./lib ruby ./bin/symbiosis-test test.d/
+	ruby ./bin/symbiosis-test test.d/
 
 .PHONY: test clean all docs
 
