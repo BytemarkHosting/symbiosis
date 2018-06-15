@@ -1,3 +1,6 @@
+# Enable keep_environment
+keep_environment =
+
 # Note that the default setting means you cannot deliver mail addressed to root
 # as if it were a normal user. This isn't usually a problem, as most sites have
 # an alias for root that redirects such mail to a human administrator.
