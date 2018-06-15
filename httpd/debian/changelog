@@ -1,3 +1,9 @@
+symbiosis-httpd (2018:0615) stable; urgency=medium
+
+  * Enable Apache PHP7 module by default. 
+
+ -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Fri, 15 Jun 2018 13:24:58 +0100
+
 symbiosis-httpd (2017:0904) stable; urgency=medium
 
   * Use ssl-hooks to reload apache when SSL certificates are
