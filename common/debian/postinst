@@ -47,9 +47,7 @@ fi
 #
 # Ensure admin user is added to www-data group
 #
-if [ ! "groups admin | grep www-data" ] ; then
-  usermod -a -G www-data admin
-fi
+usermod -a -G www-data admin
 
 #
 # Add a stat override for the /srv directory.
