@@ -45,6 +45,13 @@ if ( ! grep ^admin: /etc/passwd 2>/dev/null >/dev/null ); then
 fi
 
 #
+# Ensure admin user is added to www-data group
+#
+if [ ! "groups admin | grep www-data" ] ; then
+  usermod -a -G www-data admin
+fi
+
+#
 # Add a stat override for the /srv directory.
 #
 if ( ! dpkg-statoverride --list /srv > /dev/null ) ; then

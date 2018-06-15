@@ -1,3 +1,9 @@
+symbiosis-common (2018:0615) stable; urgency=medium
+
+  * Add the admin user to the www-data group by default. 
+
+ -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Fri, 15 Jun 2018 15:28:56 +0100
+
 symbiosis-common (2017:0901) stable; urgency=medium
 
   * Update postinstall hostname check to ensure HOSTNAME is qualfied.
