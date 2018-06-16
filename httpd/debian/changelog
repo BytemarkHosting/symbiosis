@@ -1,3 +1,9 @@
+symbiosis-httpd (2018:0616) stable; urgency=medium
+
+  * Mask Ruby interpreter warnings by setting verbosity level later in script.
+
+ -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Sat, 16 Jun 2018 23:35:47 +0100
+
 symbiosis-httpd (2017:0904) stable; urgency=medium
 
   * Use ssl-hooks to reload apache when SSL certificates are

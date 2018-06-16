@@ -104,6 +104,7 @@ require 'symbiosis/utils'
 #  Entry point to the code
 #
 $FORCE    = false
+$VERBOSETEMP = false
 $VERBOSE  = false
 help      = false
 manual    = false
@@ -168,7 +169,7 @@ begin
     when '--manual'
       manual = true
     when '--verbose'
-      $VERBOSE = true
+      $VERBOSETEMP = true
     when '--force'
       $FORCE = true
     end
@@ -204,6 +205,11 @@ require 'symbiosis/domains/http'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/domain/http'
 require 'symbiosis/config_files/apache'
+
+#
+# Set verbosity here to hide syntax warnings
+#
+$VERBOSE = $VERBOSETEMP
 
 #
 # Set the default paths.
