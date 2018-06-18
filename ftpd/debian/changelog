@@ -1,3 +1,16 @@
+symbiosis-ftpd (2018:0618) stable; urgency=medium
+
+  * Revert previous commits, #2b86bfe2 and #c45d9e59, to allow TLS and normal
+    FTP sessions. 
+
+ -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Mon, 18 Jun 2018 11:00:15 +0100
+
+symbiosis-ftpd (2018:0615) stable; urgency=medium
+
+  * Restrict FTP sessions to TLS only.
+
+ -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Fri, 15 Jun 2018 13:17:42 +0100
+
 symbiosis-ftpd (2017:0904) stable; urgency=medium
 
   * Added hook to restart daemon on SSL certificate renewal.
