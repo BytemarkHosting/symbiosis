@@ -1,5 +1,5 @@
 
-RUBYLIB := "./lib:$(PWD)/lib:$(PWD)/ext:$(PWD)/../common/lib"
+RUBYLIB := "./lib:$(PWD)/lib"
 
 all: docs
 
@@ -19,7 +19,7 @@ clean:
 	$(RM) -r man
 
 test:
-	ruby ./bin/symbiosis-test test.d/
+	RUBYLIB=$(RUBYLIB) ruby ./bin/symbiosis-test test.d/
 
 .PHONY: test clean all docs
 
