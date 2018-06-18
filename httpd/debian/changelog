@@ -1,3 +1,10 @@
+symbiosis-httpd (2018:0618) stable; urgency=medium
+
+  * Remove `-s` flag from the Apache vhost templates to improve
+    performance of the golang logger.
+
+ -- Jamie Nguyen <j@jamielinux.com>  Mon, 18 Jun 2018 13:57:18 +0100
+
 symbiosis-httpd (2017:0904) stable; urgency=medium
 
   * Use ssl-hooks to reload apache when SSL certificates are
