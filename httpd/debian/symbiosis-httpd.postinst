@@ -69,8 +69,8 @@ fi
 
 # change "no-stats" file to "stats" file
 for domain in /srv/*; do
-  [ -h "$domain" ] && continue;
-  [ -d "$domain" ] && continue;
+  [ -h "$domain" ] && continue
+  [ ! -d "$domain" ] && continue
 
   no_stats="$domain/config/no-stats"
   stats="$domain/config/stats"
