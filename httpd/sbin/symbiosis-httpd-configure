@@ -462,10 +462,9 @@ configurations.each do |config|
       #
       if diff_only
         # Disable $VERBOSE for config.diff call to avoid warnings. 
-        verbosetemp = $VERBOSE
         $VERBOSE = false
         puts config.diff(:color)
-        $VERBOSE = verbosetemp
+        $VERBOSE = verbosetmp
         puts "\tW: Apache has rejected this configuration change" unless config.ok?
         next
       end
