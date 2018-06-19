@@ -1,6 +1,6 @@
 symbiosis-httpd (2018:0618) stable; urgency=medium
 
-  * Remove `-s` flag from the Apache vhost templates to improve
+  * Remove sync (-s) flag from the Apache vhost templates to improve
     performance of the golang logger.
 
  -- Jamie Nguyen <j@jamielinux.com>  Mon, 18 Jun 2018 13:57:18 +0100
