@@ -1,3 +1,10 @@
+symbiosis-httpd (2018:0619) stable; urgency=medium
+
+  * Fix symbiosis-httpd.postinst so that no-stats configuration is correctly
+    preserved.
+
+ -- Jamie Nguyen <j@jamielinux.com>  Tue, 19 Jun 2018 10:29:55 +0100
+
 symbiosis-httpd (2017:0904) stable; urgency=medium
 
   * Use ssl-hooks to reload apache when SSL certificates are
