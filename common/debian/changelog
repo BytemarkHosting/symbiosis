@@ -1,3 +1,9 @@
+symbiosis-common (2018:0616) stable; urgency=medium
+
+  * Rename deprecated 'File.exists?' call to 'File.exist?' in 'config_file.rb'. 
+
+ -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Sat, 16 Jun 2018 23:44:10 +0100
+
 symbiosis-common (2017:0901) stable; urgency=medium
 
   * Update postinstall hostname check to ensure HOSTNAME is qualfied.
