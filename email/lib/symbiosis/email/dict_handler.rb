@@ -17,7 +17,7 @@ module Symbiosis
       def self.syslog=(s)
         @@syslog = s
       end
- 
+
       include EventMachine::Protocols::LineProtocol
 
       def receive_line(l)
@@ -42,7 +42,7 @@ module Symbiosis
           # DICT_PROTOCOL_CMD_ATOMIC_INC = 'A' /* <id> <key> <diff> */
           else
             send_data "F\n"
-        
+
             # fail?
         end
       rescue StandardError => err
@@ -79,8 +79,8 @@ module Symbiosis
           'uid' =>  mailbox.uid,
           'gid' =>  mailbox.gid,
           'mail' => "maildir:#{mailbox.directory}/Maildir",
-          'sieve' => "file:#{mailbox.directory}/#{mailbox.dot}sieve",
-          'sieve_dir' => "file:#{mailbox.directory}/#{mailbox.dot}sieve.d"
+          'sieve' => "file:#{mailbox.directory}/#{mailbox.dot}sieve.d;" \
+                     "active=#{mailbox.directory}/#{mailbox.dot}sieve"
         }
 
         unless mailbox.quota.nil? or 0 == mailbox.quota
@@ -102,7 +102,7 @@ module Symbiosis
           passdb_res = {}
           res.collect{|k,v| passdb_res["userdb_#{k}"] = v}
 
-          if mailbox.password        
+          if mailbox.password
             real_password = mailbox.password
             if real_password =~ /^(\{(?:crypt|CRYPT)\})?(\$(?:1|2a|5|6)\$[a-zA-Z0-9.\/]{1,16}\$[a-zA-Z0-9\.\/]+)$/
               password = real_password
@@ -110,9 +110,9 @@ module Symbiosis
               password = mailbox.domain.crypt_password(real_password)
             end
 
-            passdb_res["password"] = password 
+            passdb_res["password"] = password
           end
-            
+
           res = passdb_res
         end
 

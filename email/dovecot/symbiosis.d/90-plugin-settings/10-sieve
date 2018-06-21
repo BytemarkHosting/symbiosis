@@ -1,6 +1,7 @@
   #
-  # Used by both the Sieve plugin and the ManageSieve protocol
+  # Used by both the Sieve plugin and the ManageSieve protocol.  This is the
+  # *default* value, and overridden in Symbiosis by the values returned from
+  # the dict proxy.
   #
-  sieve      = ~/sieve
-  sieve_dir  = ~/sieve.d
+  sieve      = file:~/sieve;active=~/sieve.d
 
