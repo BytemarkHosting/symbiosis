@@ -1,3 +1,10 @@
+symbiosis-httpd (2018:0619) stable; urgency=medium
+
+  * Fix symbiosis-httpd.postinst so that no-stats configuration is correctly
+    preserved.
+
+ -- Jamie Nguyen <j@jamielinux.com>  Tue, 19 Jun 2018 10:29:55 +0100
+
 symbiosis-httpd (2018:0618) stable; urgency=medium
 
   * Remove sync (-s) flag from the Apache vhost templates to improve
