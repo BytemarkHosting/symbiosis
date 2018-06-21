@@ -82,7 +82,7 @@
         # made against, so that the cron-job in /etc/cron.daily may generate
         # statistics for each domain.
         #
-        ErrorLog   "|| /usr/sbin/symbiosis-httpd-logger -s <%= domain.log_dir %>/error.log"
-        CustomLog  "|| /usr/sbin/symbiosis-httpd-logger -s <%= domain.log_dir %>/access.log" combined
+        ErrorLog   "|| /usr/sbin/symbiosis-httpd-logger <%= domain.log_dir %>/error.log"
+        CustomLog  "|| /usr/sbin/symbiosis-httpd-logger <%= domain.log_dir %>/access.log" combined
 </VirtualHost>
 
