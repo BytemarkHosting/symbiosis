@@ -14,4 +14,3 @@ CLAMAV_SOCKET = /var/run/clamav/clamd.ctl
 # This user is used if no appropriate user can be found wilst using spamassassin.
 DEFAULT_SPAMD_USER = nobody
 
-
