@@ -2,6 +2,7 @@ $:.unshift  "../lib/" if File.directory?("../lib")
 
 require 'test/unit'
 require 'tmpdir'
+require './helpers'
 require 'symbiosis'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/ssl/selfsigned'
@@ -959,26 +960,10 @@ class SSLTest < Test::Unit::TestCase
     regular_domain = Symbiosis::Domain.new(nil, @prefix)
     regular_domain.create
 
-    args_path = Symbiosis.path_in_etc('hook.args')
-    out_path = Symbiosis.path_in_etc('hook.output')
-
-    hook = <<HOOK
-#!/bin/bash
-
-echo "$1" > #{args_path}
-cat > #{out_path}
-HOOK
-
-    FileUtils.mkdir_p Symbiosis.path_in_etc('symbiosis/ssl-hooks.d')
-
-    IO.write Symbiosis.path_in_etc('symbiosis/ssl-hooks.d/hook'), hook, mode: 'w', perm: 0755
-
+    result = TestHelpers.make_test_hook Symbiosis.path_in_etc('symbiosis', 'ssl-hooks.d')
     system("#{@script} --etc-dir=#{@etc} --prefix=#{@prefix}")
     
-    args = IO.read args_path
-    out = IO.read out_path
-
-    assert_equal "live-update\n", args
-    assert_equal "#{ssl_domain.name}\n", out
+    assert_equal "live-update\n", result.args
+    assert_equal "#{ssl_domain.name}\n", result.output
   end
 end

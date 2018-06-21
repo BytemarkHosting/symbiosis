@@ -64,7 +64,8 @@
 # At present, only one event causes the hooks to be executed. If any domain's
 # certificate set is altered by symbiosis-ssl, at the end of the process all
 # the hooks are called with 'live-update' passed as their only command-line
-# argument and the list of domains that were altered
+# argument and the list of domains that were altered is written to standard
+# input, one per line.
 #
 # AUTHOR
 #   Patrick J. Cherry <patrick@bytemark.co.uk>
@@ -157,7 +158,6 @@ require 'symbiosis'
 require 'symbiosis/domains'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/ssl'
-require 'symbiosis/ssl/hooks'
 require 'symbiosis/ssl/letsencrypt'
 require 'symbiosis/ssl/selfsigned'
 

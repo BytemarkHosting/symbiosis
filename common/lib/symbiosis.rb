@@ -21,11 +21,11 @@ module Symbiosis
     @@prefix = new_prefix
   end
 
-  def self.path_in_etc(path)
+  def self.path_in_etc(*path)
     File.join(etc, path)
   end
 
-  def self.path_in_prefix(path)
+  def self.path_in_prefix(*path)
     File.join(prefix, path)
   end
 end
