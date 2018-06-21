@@ -2,7 +2,7 @@ sbin/*             usr/sbin/
 default/*          etc/default/
 monit.d/*          usr/share/symbiosis/monit/checks/
 test.d/*           etc/symbiosis/test.d/
-ssl-hooks.d/*      etc/symbiosis/ssl-hooks.d/
+ssl-hooks.d/*      usr/share/symbiosis/ssl-hooks.d/
 patterns.d/*       etc/symbiosis/firewall/patterns.d/
 lib/*              usr/lib/ruby/vendor_ruby/
 pure-ftpd          etc/

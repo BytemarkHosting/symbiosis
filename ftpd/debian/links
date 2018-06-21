@@ -1,1 +1,2 @@
 etc/pure-ftpd/conf/ExtAuth etc/pure-ftpd/auth/60ext
+usr/share/symbiosis/ssl-hooks.d/symbiosis-ftpd etc/symbiosis/ssl-hooks.d/symbiosis-ftpd

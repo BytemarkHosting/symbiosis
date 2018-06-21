@@ -2,6 +2,6 @@ exim4/                     etc/
 dovecot/                   etc/
 sbin/                      usr/
 symbiosis/firewall         etc/symbiosis
-symbiosis/ssl-hooks.d      etc/symbiosis
+symbiosis/ssl-hooks.d      usr/share/symbiosis/ssl-hooks/
 symbiosis/test.d           etc/symbiosis
 symbiosis/monit.d/*        usr/share/symbiosis/monit/checks/

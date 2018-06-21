@@ -1,4 +1,4 @@
 monit.d/*     /usr/share/symbiosis/monit/checks/
 templates.d/* /etc/symbiosis/xmpp.d
-ssl-hooks.d   /etc/symbiosis/
+ssl-hooks.d   /usr/share/symbiosis/
 sbin/*        /usr/sbin
