@@ -212,11 +212,23 @@ module Symbiosis
       File.directory?(self.directory)
     end
 
+    def configured?
+      File.directory?(config_dir)
+    end
+
     #
     # Create directories using our default uid/gid
     #
     def create_dir(d, mode = 0755)
       mkdir_p(d, {:user => @user, :group => @group, :mode => mode})
+    end
+
+    def get_param(name, dir = directory, opts = {})
+      Symbiosis::Utils.get_param(name, dir, opts)
+    end
+
+    def set_param(name, dir = directory, opts = {})
+      Symbiosis::Utils.set_param(name, dir, opts)
     end
 
     #

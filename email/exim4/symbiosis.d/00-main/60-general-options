@@ -62,3 +62,6 @@ daemon_smtp_ports = 25 : 465 : 587
 # Use the system filter to remove extra headers
 system_filter = ETC_DIR/exim4/system_filter
 
+# Set keep_environment to avoid warning on restart
+keep_environment =
+

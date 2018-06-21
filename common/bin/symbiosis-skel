@@ -1,0 +1,157 @@
+#!/usr/bin/ruby
+#
+# NAME
+#   symbiosis-skel - Populate new domains from a skeleton
+#
+# SYNOPSIS
+#   symbiosis-skel [ --etc path ] [ --prefix prefix ] [ domain ... ]
+#
+# OPTIONS
+#  --etc path       Set the directory in which configuration is stored.
+#                   Defaults to /etc
+#
+#  --prefix prefix  Set the directory prefix for Symbiosis. Defaults to /srv.
+#
+#  --help           Show the help information for this script.
+#
+#  --manual         Show the manual for this script.
+#
+#  --verbose        Show verbose information.
+#
+#  --debug          Show debug information.
+#
+# USAGE
+#
+# This command checks to see if any domains do not have config dirs and
+# populates the ones that don't with the contents of the skeleton directory.
+#
+# If domains are passed as arguments, it only checks and populates those
+# domains.
+#
+# At the end of this process, hooks are run (see HOOKS)
+#
+# If an error occurred populating a domain, the script exits with exit code 1
+# If a hook returns a non-zero exit code, this script exits with exit code 2
+#
+# HOOKS
+#
+# Hooks are executed from the /etc/symbiosis/skel-hooks.d directory, given the
+# following conditions:
+#
+# * The file is executable
+# * The file's name is made up only of alphanumerics, underscore (_) and hyphen
+# (-)
+#
+# If any domain is altered by symbiosis-skel, at the end of the process all
+# the hooks are called with 'domain-populated' passed as their only command-line
+# argument and the list of domains that were altered is written to standard
+# input, one per line.
+#
+# AUTHOR
+#   Telyn <telyn@bytemark.co.uk>
+#
+
+require 'English'
+require 'getoptlong'
+
+opts = GetoptLong.new(
+  ['--help', '-h', GetoptLong::NO_ARGUMENT],
+  ['--manual', '-m', GetoptLong::NO_ARGUMENT],
+  ['--verbose', '-v', GetoptLong::NO_ARGUMENT],
+  ['--debug', '-d', GetoptLong::NO_ARGUMENT],
+  ['--prefix', '-p', GetoptLong::REQUIRED_ARGUMENT],
+  ['--etc', '-e', GetoptLong::REQUIRED_ARGUMENT]
+)
+
+manual = help = false
+$VERBOSE = false
+$DEBUG = false
+prefix = '/srv'
+etc = '/etc'
+
+opts.each do |opt, arg|
+  case opt
+  when '--help'
+    help = true
+  when '--manual'
+    manual = true
+  when '--verbose'
+    $VERBOSE = true
+  when '--debug'
+    $DEBUG = true
+  when '--prefix'
+    prefix = arg
+  when '--etc'
+    etc = arg
+  end
+end
+
+if help || manual
+  require 'symbiosis/utils'
+  Symbiosis::Utils.show_help(__FILE__) if help
+  Symbiosis::Utils.show_manual(__FILE__) if manual
+  exit 0
+end
+
+v = $VERBOSE
+$VERBOSE = false
+
+#
+# The requires spawn a massive stack of warnings in verbose mode.  So let's
+# hide them.
+#
+require 'symbiosis'
+require 'symbiosis/domains'
+require 'symbiosis/domain_skeleton'
+
+$VERBOSE = v
+
+Symbiosis.etc = etc
+Symbiosis.prefix = prefix
+
+domains = []
+
+ARGV.each do |arg|
+  domain = Symbiosis::Domains.find(arg.to_s, prefix)
+  if domain.nil?
+    warn "** Unable to find/parse domain #{arg.inspect}"
+    next
+  end
+  domains << domain
+end
+
+domains = Symbiosis::Domains.all(prefix) if ARGV.empty?
+
+
+%w[INT TERM].each do |sig|
+  trap(sig) do
+    if Process.uid.zero?
+      Process.euid = 0
+      Process.egid = 0
+    end
+
+    exit 1
+  end
+end
+
+exit_code = 0
+updated_domains = Symbiosis::DomainSkeleton.new.populate!(domains)
+puts updated_domains.keys.join("\n")
+domain_errors = updated_domains.reject { |_, err| err.nil? }
+
+unless domain_errors.empty?
+  # some error occurred
+  exit_code = 1
+end
+
+domains_for_hooks = updated_domains.select { |_, err| err.nil? }
+                                   .keys
+
+puts "passing to hooks: #{domains_for_hooks.join("\n")}"
+
+exit exit_code if domains_for_hooks.empty?
+
+exit_code = 2 unless Symbiosis::DomainSkeleton::Hooks.run!('domains-populated',
+                                                           domains_for_hooks)
+
+exit exit_code

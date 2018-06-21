@@ -4,5 +4,6 @@ apache.d                  etc/symbiosis/
 ssl-hooks.d               usr/share/symbiosis/
 monit.d/*                 usr/share/symbiosis/monit/checks/
 bytemark/*                usr/share/symbiosis/static/
+bytemark/*                etc/symbiosis/skel.d/public/htdocs/
 apache2                   etc/
 php                       etc/

@@ -1,8 +1,14 @@
+symbiosis-email (2018:0615) stable; urgency=medium
+
+  * Set 'keep_environment' in Exim config.  
+
+ -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Fri, 15 Jun 2018 13:15:08 +0100
+
 symbiosis-email (2017:0907) stable; urgency=medium
 
-  * Move ssl-hooks to /usr/share, and symlink back to /etc.
+  * Remove duplicate cron job encrypting passwords.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 07 Sep 2017 17:03:03 +0100
+ -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 07 Sep 2017 12:18:45 +0100
 
 symbiosis-email (2017:0904) stable; urgency=medium
 

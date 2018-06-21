@@ -1,8 +1,16 @@
-symbiosis-httpd (2017:0907) stable; urgency=medium
+symbiosis-httpd (2018:0619) stable; urgency=medium
 
-  * Move ssl-hooks to /usr/share, and symlink back to /etc.
+  * Fix symbiosis-httpd.postinst so that no-stats configuration is correctly
+    preserved.
 
- -- Patrick J Cherry <patrick@bytemark.co.uk>  Thu, 07 Sep 2017 17:02:33 +0100
+ -- Jamie Nguyen <j@jamielinux.com>  Tue, 19 Jun 2018 10:29:55 +0100
+
+symbiosis-httpd (2018:0618) stable; urgency=medium
+
+  * Remove sync (-s) flag from the Apache vhost templates to improve
+    performance of the golang logger.
+
+ -- Jamie Nguyen <j@jamielinux.com>  Mon, 18 Jun 2018 13:57:18 +0100
 
 symbiosis-httpd (2017:0904) stable; urgency=medium
 

@@ -16,16 +16,6 @@ stages:
     - cd $PACKAGE
     - "[ ! -f Makefile ] || make test"
 
-### Analyse with our local codeclimate image
-codeclimate:
-  stage: test
-  tags: [ docker-socket ]
-  image: $CI_REGISTRY/docker-images/layers:stretch-codeclimate
-  script:
-    - codeclimate analyze -f json > codeclimate.json
-  artifacts:
-    paths: [ codeclimate.json ]
-
 test:backup:
   <<: *test
 

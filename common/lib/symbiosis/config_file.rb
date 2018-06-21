@@ -123,7 +123,7 @@ module Symbiosis
     end
 
     #
-    # Return a diff of the new configuration comapred with the existing one.
+    # Return a diff of the new configuration compared with the existing one.
     # The format option can take on of Diff::Diff.to_s() format options,
     # currently :text, :color, :html, and :html_simple. Defaults to :html.  A
     # different configuraion template can be specified in the second option.
@@ -135,7 +135,7 @@ module Symbiosis
       tempfile.puts(config)
       tempfile.flush
 
-      fn = ( File.exists?(self.filename) ? self.filename : '/dev/null' )
+      fn = ( File.exist?(self.filename) ? self.filename : '/dev/null' )
 
       Diffy::Diff.new(fn, tempfile.path, source: 'files', include_diff_info: true).to_s(format)
     end

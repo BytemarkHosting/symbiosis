@@ -10,3 +10,4 @@ rm_conffile /etc/symbiosis/monit.d/dovecot 2016:0101
 rm_conffile /etc/symbiosis/monit.d/clamav-freshclam 2016:0101
 rm_conffile /etc/symbiosis/monit.d/clamav-daemon 2016:0101
 rm_conffile /etc/symbiosis/ssl-hooks.d/symbiosis-email 2017:0907~
+rm_conffile /etc/cron.d/symbiosis-email 2017:0907~

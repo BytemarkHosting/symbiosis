@@ -37,11 +37,19 @@ if ( ! grep ^admin: /etc/passwd 2>/dev/null >/dev/null ); then
   usermod -p "$(grep root /etc/shadow | cut -f 2 -d :)" admin
 
   #
-  #  If we have an adm group - which we shold - add the admin user to it.
+  #  If we have an adm group - which we should - add the admin user to it.
   #
   if ( getent group adm >/dev/null ); then
     adduser admin adm
   fi
+  
+  #
+  #  Ensure the admin user is added to the www-data group too 
+  #
+  if ( getent group www-data >/dev/null ); then
+    adduser admin www-data
+  fi
+
 fi
 
 #
@@ -134,6 +142,9 @@ if [ ! -e "/etc/ssl/ssl.key" ] &&
   fi
 
 fi
+
+systemctl enable symbiosis-skel.path
+systemctl start symbiosis-skel.path
 
 #DEBHELPER#
 
