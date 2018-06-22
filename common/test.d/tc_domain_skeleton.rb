@@ -3,6 +3,7 @@
 require 'test/unit'
 require 'tmpdir'
 require 'symbiosis'
+require 'symbiosis/domain'
 require 'symbiosis/domain_skeleton'
 require './helpers.rb'
 
@@ -50,7 +51,7 @@ class TestDomainSkeleton < Test::Unit::TestCase
   def test_copy
     domain = Symbiosis::Domain.new(nil, Symbiosis.prefix)
     domain.create
-    
+
     @skel.copy! domain
 
     assert_equal 'this is a test', domain.get_param('test-param')
