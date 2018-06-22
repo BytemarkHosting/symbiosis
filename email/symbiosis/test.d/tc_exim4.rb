@@ -391,7 +391,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_acl_check_antivirus
     # Only run these tests if clam is running
     system('systemctl -q is-active clamav-daemon')
-    if $?.exitstatus.zero?
+    if 0 && $?.exitstatus.zero?
       do_skip "Clamav not running"
       return
     end
