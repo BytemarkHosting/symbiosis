@@ -82,8 +82,8 @@ class Exim4ConfigTest < Test::Unit::TestCase
 		File.open(File.join(@tempdir, "exim4", "symbiosis.d", "00-main", "11-primary-hostname"),"w+") do |fh|
       fh.puts("primary_hostname = "+fetch_hostname)
 		end
-    
-    # Add in the spool directory 
+
+    # Add in the spool directory
     File.open(File.join(@tempdir, "exim4",  "symbiosis.d", "00-main", "11-spool-directory"), "w") do |fh|
       fh.puts("spool_directory = "+File.join(@tempdir, "spool"))
     end
@@ -185,7 +185,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
     cmd = "#{EXIM_BINARY} -C #{@exim4_conf}"
     cmd += " -f #{sender}" if sender
-    cmd += " -bt #{address}" 
+    cmd += " -bt #{address}"
 
     op = `#{cmd} 2>&1`
     assert_equal(status,$?.exitstatus, op) unless status.nil?
@@ -205,7 +205,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
         when /^\s+(router = ([^,]+), )?transport = ([^\s]+)\s*$/ then
           this_router = $2 unless $2.nil?
           this_transport = $3 #f this_transport.nil?
-        when /^mail to ([^\s]+) is discarded$/ then 
+        when /^mail to ([^\s]+) is discarded$/ then
           this_destination = ":blackhole:"
           this_transport = ":blackhole:"
         when /^([^\s]+) cannot be resolved at this time:/ then
@@ -390,7 +390,8 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
   def test_acl_check_antivirus
     # Only run these tests if clam is running
-    if !is_running?('/var/run/clamav/clamd.pid')
+    system('systemctl -q is-active clamav-daemon')
+    if $?.exitstatus.zero?
       do_skip "Clamav not running"
       return
     end
@@ -424,7 +425,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_acl_check_port_587
     do_acl_setup
     # Test we can relay on port 587 from localhost
-    # Test we can relay on port 587 from an allowed domain 
+    # Test we can relay on port 587 from an allowed domain
     # Test we cannot relay on port 587 from a random IP, without authentication
 
     username = @acl_config['local_users'].first['username']
@@ -438,7 +439,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
     do_exim4_bh("127.0.0.1", "127.0.0.1.587", script)
     relay_ip = @acl_config['relay_from_hosts'].first
     do_exim4_bh(relay_ip, @acl_config['local_ip']+".587", script)
-    
+
     script[-1][-1] = 550
     do_exim4_bh(@acl_config['remote_ip'], @acl_config['local_ip']+".587", script)
   end
@@ -446,7 +447,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
   ################################################################################
   # ROUTERS
   ################################################################################
-  
+
   def test_router_dnslookup_with_dkim
     do_acl_setup
     domain = @acl_config['local_domains'].first
@@ -487,7 +488,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
     do_exim4_bt("test@"+domain, "test@"+domain, "vhost_no_local_mail", "remote_smtp")
   end
 
-  def do_test_forwarding(forward_file, lp, domain, router) 
+  def do_test_forwarding(forward_file, lp, domain, router)
     home_dir = File.dirname(forward_file)
     FileUtils.mkdir_p(home_dir)
 
@@ -660,12 +661,12 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_router_local_users_forward
     test_user = fetch_test_user
     if test_user.nil?
-      do_skip "No test user" 
+      do_skip "No test user"
       return
     end
 
     lp = test_user.name
-    domain = fetch_hostname 
+    domain = fetch_hostname
     forward_file = File.join(test_user.dir,".forward")
 
     FileUtils.touch(forward_file)
@@ -686,12 +687,12 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_router_local_users_forward_sieve
     test_user = fetch_test_user
     if test_user.nil?
-      do_skip "No test user" 
+      do_skip "No test user"
       return
     end
 
     lp = test_user.name
-    domain = fetch_hostname 
+    domain = fetch_hostname
     sieve_file = File.join(test_user.dir,".sieve")
 
     FileUtils.touch(sieve_file)
@@ -712,12 +713,12 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_router_local_users_vacation
     test_user = fetch_test_user
     if test_user.nil?
-      do_skip "No test user" 
+      do_skip "No test user"
       return
     end
 
     lp = test_user.name
-    domain = fetch_hostname 
+    domain = fetch_hostname
     vacation_file = File.join(test_user.dir,".vacation")
 
     FileUtils.touch(vacation_file)
@@ -734,12 +735,12 @@ class Exim4ConfigTest < Test::Unit::TestCase
   def test_router_local_user_mailbox
     test_user = fetch_test_user
     if test_user.nil?
-      do_skip "No test user" 
+      do_skip "No test user"
       return
     end
 
     lp = test_user.name
-    domain = fetch_hostname 
+    domain = fetch_hostname
     do_exim4_bt(lp+"@"+domain, File.join(test_user.dir,"Maildir/"), "local_users_mailbox", "address_directory")
   end
 
@@ -800,7 +801,7 @@ class Exim4ConfigTest < Test::Unit::TestCase
 
     if this_hostname == "localhost"
       do_skip "Cannot do localhost rewrite tests, since this host thinks it is called localhost."
-      return 
+      return
     end
 
     lp = "rewrite_test"

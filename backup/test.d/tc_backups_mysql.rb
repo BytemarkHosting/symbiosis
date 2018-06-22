@@ -7,7 +7,7 @@ require 'symbiosis/utils'
 require 'test/unit'
 
 begin
-  require 'mysql'
+  require 'mysql2'
 rescue LoadError
   # Do nothing.
 end
@@ -48,8 +48,7 @@ class TcBackupsMysql < Test::Unit::TestCase
   end
 
   def has_mysql?
-    defined? Mysql and
-      @username and @password
+    defined? Mysql2 and Process.uid == 0
   end
 
   def do_conv(to, from, str)
@@ -89,20 +88,14 @@ class TcBackupsMysql < Test::Unit::TestCase
   end
 
   def create_db(database, charset=@default_charset)
-    assert_nothing_raised("Failure when creating MySQL DB with #{charset} charset.") {
-      dbh = Mysql.new(nil, @username, @password)
-      dbh.query("SET CHARSET #{charset}")
-      dbh.query("SET NAMES #{charset}")
-      dbh.query("CREATE DATABASE `#{database}` CHARACTER SET #{charset};")
-    }
+    dbh = Mysql2::Client.new(username: @username, password: @password, encoding: charset.downcase)
+    dbh.query("CREATE DATABASE `#{database}` CHARACTER SET #{charset};")
   end
 
   def drop_db(database, charset=@default_charset)
-    dbh = Mysql.new(nil, @username, @password)
-    dbh.query("SET NAMES #{charset}")
-    dbh.query("SET CHARSET #{charset}")
+    dbh = Mysql2::Client.new(username: @username, password: @password, encoding: charset.downcase)
     dbh.query("DROP DATABASE IF EXISTS `#{database}`")
-  rescue Mysql::Error => err
+  rescue Mysql2::Error => err
     warn err.to_s
   ensure
     dbh.close if dbh
@@ -111,38 +104,25 @@ class TcBackupsMysql < Test::Unit::TestCase
   def do_test_db(charset, database, table, column, value, insert_data = false)
     res = nil
 
-    msg = "Failure when " + (insert_data ? "populating" : "reconnecting to") + " MySQL DB to test backups."
-
-    assert_nothing_raised(msg) {
-      dbh = Mysql.new(nil, @username, @password)
-      dbh.query("SET CHARSET #{charset}")
-      dbh.query("SET NAMES #{charset}")
-      dbh.query "USE `#{database}`;"
-      if insert_data
-        dbh.query "CREATE TABLE `#{table}` (`#{column}` CHAR(20) CHARACTER SET #{charset});"
-        dbh.query "INSERT INTO `#{table}` (`#{column}`) VALUES (\"#{value}\");"
-      end
-      res = dbh.query "SELECT * FROM `#{table}`;"
-      dbh.close
-    }
+    dbh = Mysql2::Client.new(username: @username, password: @password, encoding: charset.downcase)
+    dbh.query "USE `#{database}`;"
+    if insert_data
+      dbh.query "CREATE TABLE `#{table}` (`#{column}` CHAR(20) CHARACTER SET #{charset});"
+      dbh.query "INSERT INTO `#{table}` (`#{column}`) VALUES (\"#{value}\");"
+    end
+    res = dbh.query "SELECT * FROM `#{table}`;"
+    dbh.close
 
     #
     # Make sure we've inserted the things properly
     #
-    assert_equal(1, res.num_fields, "Mysql returned the wrong number of fields")
-    assert_equal(1, res.num_rows, "Mysql returned the wrong number of rows")
+    assert_equal(1, res.fields.count, "Mysql returned the wrong number of fields")
+    assert_equal(1, res.count, "Mysql returned the wrong number of rows")
 
-    returned_col = res.fetch_fields.first.name.dup
-    #
-    # The MySQL library does not set the string encoding correctly for Ruby
-    # 1.9, so we have to force it.
-    #
-    returned_col.force_encoding(@charset_map[charset]) if returned_col.respond_to?(:force_encoding)
+    returned_col = res.fields.first.dup
+    assert_equal(column, returned_col.encode(@charset_map[charset]), "Mysql returned the wrong field name")
 
-    assert_equal(column, returned_col, "Mysql returned the wrong field name")
-
-    returned_val = res.fetch_row.first
-    returned_val.force_encoding(@charset_map[charset]) if returned_val.respond_to?(:force_encoding)
+    returned_val = res.first[returned_col]
     assert_equal(value,  returned_val, "Mysql returned the wrong value")
   end
 

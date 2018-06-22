@@ -3,3 +3,4 @@
 /usr/share/symbiosis/monit/checks/dovecot                 /etc/symbiosis/monit.d/dovecot
 /usr/share/symbiosis/monit/checks/clamav-daemon           /etc/symbiosis/monit.d/clamav-dovecot
 /usr/share/symbiosis/monit/checks/clamav-freshclam        /etc/symbiosis/monit.d/clamav-freshclam
+/usr/share/symbiosis/monit/checks/spamassassin            /etc/symbiosis/monit.d/spamassassin
