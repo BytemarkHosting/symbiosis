@@ -77,22 +77,23 @@ module Symbiosis
     def try_copy!(domains)
       domains.map do |domain|
         begin
-          ensure_config_owner
-          warn "Copying skeleton to #{domain.directory}..."
+          ensure_config_owner(domain)
+          verbose "Copying skeleton to #{domain.directory}..."
           copy! domain
-          warn "Copy completed for #{domain.directory}"
+          verbose "Copy completed for #{domain.directory}"
           [domain.name, nil]
-        rescue => e
+        rescue StandardError => e
           warn "Error copying to #{domain.directory} - #{e}"
+          puts e.backtrace.join("\n")
           [domain.name, e]
         end
       end
     end
 
     def populate!(domains)
-      warn 'Checking which domains to populate...'
+      verbose 'Checking which domains to populate...'
       domains = domains.select { |domain| should_populate? domain }
-      warn "Populating [#{domains.join(', ')}]"
+      verbose "Populating [#{domains.join(', ')}]"
       # convert [ [key, value], ... ] from try_copy! to a hash
       Hash[try_copy!(domains)]
     end
