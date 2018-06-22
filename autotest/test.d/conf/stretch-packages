@@ -1,6 +1,7 @@
 lsb-base
 lsb-release
 coreutils
+dpkg-dev
 bytemark-symbiosis
 symbiosis-backup
 symbiosis-common

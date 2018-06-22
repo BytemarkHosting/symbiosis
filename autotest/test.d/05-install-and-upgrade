@@ -16,8 +16,8 @@ fi
 # echo "Acquire::http::Proxy \"http://$GATEWAY:3142\";" >> /etc/apt/apt.conf.d/95proxy
 
 if [ "upgrade" = "$ACTION" ] ; then
-	echo "I: Adding jessie sources list"
-  cp $PREFIX/conf/debian-jessie-sources.list /etc/apt/sources.list
+  echo "I: Adding stretch sources list"
+  cp $PREFIX/conf/debian-stretch-sources.list /etc/apt/sources.list
 
   echo "I: Installing current version of Symbiosis from repo.bytemark.co.uk"
   $PREFIX/bin/apt-get-install $PREFIX/conf/current-stretch-sources.list $PREFIX/conf/stretch-packages
@@ -30,17 +30,17 @@ if [ "upgrade" = "$ACTION" ] ; then
 
 elif [ "dist-upgrade" = "$ACTION" ] ; then
   #
-  # If we're upgrading from squeeze:
+  # If we're upgrading from jessie:
   #
-  if grep -q wheezy /etc/apt/sources.list ; then
-    echo "I: Installing wheezy version of Symbiosis from repo.bytemark.co.uk"
-    $PREFIX/bin/apt-get-install $PREFIX/conf/current-wheezy-sources.list $PREFIX/conf/wheezy-packages || true
+  if grep -q jessie /etc/apt/sources.list ; then
+    echo "I: Installing jessie version of Symbiosis from repo.bytemark.co.uk"
+    $PREFIX/bin/apt-get-install $PREFIX/conf/current-jessie-sources.list $PREFIX/conf/jessie-packages || true
 
-    echo "I: Replacing wheezy sources with stretch"
+    echo "I: Replacing jessie sources with stretch"
     cp $PREFIX/conf/debian-stretch-sources.list /etc/apt/sources.list
 
-    echo "I: Removing old wheezy symbiosis list"
-    rm /etc/apt/sources.list.d/current-wheezy-sources.list
+    echo "I: Removing old jessie symbiosis list"
+    rm /etc/apt/sources.list.d/current-jessie-sources.list
 
     #echo "I: clamav with squeeze is a bit ropey, so I'll clear out the freshclam stuff"
     #invoke-rc.d clamav-daemon stop
@@ -57,7 +57,7 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   #
   # Now upgrade to stretch
   #
-  echo "I: Performing dist-upgrade from wheezy"
+  echo "I: Performing dist-upgrade from jessie"
 
   #
   # If the install has failed, try to start pure-authd and carry on
@@ -73,8 +73,8 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   echo "I: ensuring Symbiosis packages are installed"
   $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list $PREFIX/conf/stretch-packages
 else 
-	echo "I: Adding jessie sources list"
-  cp $PREFIX/conf/debian-jessie-sources.list /etc/apt/sources.list
+	echo "I: Adding stretch sources list"
+  cp $PREFIX/conf/debian-stretch-sources.list /etc/apt/sources.list
 
   echo "I: Installing latest version of Symbiosis from repo.bytemark.co.uk"
   $PREFIX/bin/apt-get-install $PREFIX/conf/autotest-sources.list $PREFIX/conf/stretch-packages
