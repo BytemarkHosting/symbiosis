@@ -14,7 +14,14 @@
 #export DH_RUBY_GEMSPEC=gem.gemspec
 
 %:
-	dh $@ --buildsystem=ruby --with ruby
+	dh $@ --buildsystem=ruby --with ruby --with-systemd
+
+override_dh_installinit:
+	dh_installinit
+	dh_installinit symbiosis-skel.service
+	dh_installinit symbiosis-skel.path
+	dh_systemd_enable symbiosis-skel.path
+	dh_systemd_start symbiosis-skel.path
 
 override_dh_auto_build-indep:
 	$(MAKE) docs
