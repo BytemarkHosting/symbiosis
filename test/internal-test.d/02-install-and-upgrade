@@ -31,7 +31,7 @@ if [ "upgrade" = "$ACTION" ] ; then
   echo "I: Install current symbiosis.bytemark.co.uk release"
   echo "deb http://symbiosis.bytemark.co.uk/$DEBIAN_RELEASE/ ./" > $APT_LIST
   apt-get $APT_OPTS update
-  apt-get $APT_OPTS install --install-recommends bytemark-symbiosis
+  apt-get $APT_OPTS install $(< $CONF/packages)
 
   echo "I: Re-seed debconf"
   debconf-set-selections < "$CONF/debconf-preseed"
@@ -48,7 +48,7 @@ elif [ "dist-upgrade" = "$ACTION" ] ; then
   echo "I: Install $OLD_DEBIAN_RELEASE version of Symbiosis from symbiosis.bytemark.co.uk"
   echo "deb http://symbiosis.bytemark.co.uk/$OLD_DEBIAN_RELEASE/ ./" > $APT_LIST
   apt-get $APT_OPTS update
-  apt-get $APT_OPTS install --install-recommends bytemark-symbiosis
+  apt-get $APT_OPTS install $(< $OLD_CONF/packages)
 
   echo "I: Re-seed debconf with $DEBIAN_RELEASE config"
   debconf-set-selections < "$CONF/debconf-preseed"
@@ -67,6 +67,6 @@ else
   cp $CONF/sources.list $APT_LIST
   echo "deb http://repo.bytemark.co.uk/open-source/symbiosis/$BRANCH_NAME/latest/ ./" >> $APT_LIST
   apt-get $APT_OPTS update
-  apt-get $APT_OPTS install --install-recommends bytemark-symbiosis
+  apt-get $APT_OPTS install $(< $CONF/packages)
 fi
 

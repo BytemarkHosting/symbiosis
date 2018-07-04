@@ -44,7 +44,7 @@ class SSLTest < Test::Unit::TestCase
     testd = File.dirname(__FILE__)
 
     @script = File.expand_path(File.join(testd,"..","bin","symbiosis-ssl"))
-    @script = '/usr/sbin/symbiosis-ssl' unless File.exist?(@script)
+    @script = '/usr/bin/symbiosis-ssl' unless File.exist?(@script)
     @script += @verbose
   end
 
@@ -962,7 +962,7 @@ class SSLTest < Test::Unit::TestCase
 
     result = TestHelpers.make_test_hook Symbiosis.path_in_etc('symbiosis', 'ssl-hooks.d')
     system("#{@script} --etc-dir=#{@etc} --prefix=#{@prefix}")
-    
+
     assert_equal "live-update\n", result.args
     assert_equal "#{ssl_domain.name}\n", result.output
   end

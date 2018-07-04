@@ -21,7 +21,7 @@ class TestDomainSkeleton < Test::Unit::TestCase
     testd = File.dirname(__FILE__)
 
     @script = File.expand_path(File.join(testd,"..","bin","symbiosis-skel"))
-    @script = '/usr/sbin/symbiosis-skel' unless File.exist?(@script)
+    @script = '/usr/bin/symbiosis-skel' unless File.exist?(@script)
     @script += @verbose
     make_skeleton
   end
