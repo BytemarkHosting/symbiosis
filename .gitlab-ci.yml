@@ -158,11 +158,11 @@ publish:
       done
     - machinectl copy-to $MACHINE test/internal-test.d /root/test.d
   script:
-    - | 
+    - |
       cat > run-test <<END_OF_INTERNAL_TEST
       #!/bin/bash
       set -e
-      
+
       export ACTION=$ACTION
       export DEBIAN_RELEASE=$DEBIAN_RELEASE
       export OLD_DEBIAN_RELEASE=$OLD_DEBIAN_RELEASE
@@ -175,7 +175,7 @@ publish:
 
       /bin/run-parts --exit-on-error /root/test.d/
       END_OF_INTERNAL_TEST
-    - sed -e 's/32;/34;/g' -i run-test 
+    - sed -e 's/32;/34;/g' -i run-test
     - chmod +x run-test
     - machinectl copy-to $MACHINE run-test /run-test
     - ssh -o StrictHostKeyChecking=false -o UserKnownHostsFile=/dev/null root@$IP /run-test
@@ -201,12 +201,14 @@ install:fresh-install:
 
 install:upgrade:
   <<: *install
+  allow_failure: true
   variables:
     <<: *installvars
     ACTION: upgrade
 
 install:dist-upgrade:
   <<: *install
+  allow_failure: true
   variables:
     <<: *installvars
     ACTION: dist-upgrade
