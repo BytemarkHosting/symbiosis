@@ -7,7 +7,7 @@
 #   symbiosis-test [ --help ] [ --manual ] [ --verbose ] [directory]
 #
 # OPTIONS
-#   --help        Show a brief help message.
+#  --help        Show a brief help message.
 #
 #  --manual       Show the full manual.
 #
