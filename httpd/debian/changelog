@@ -1,6 +1,7 @@
 symbiosis-httpd (2018:0620) stable; urgency=medium
 
   * Enable Apache PHP7 module by default. 
+  * Mask Ruby interpreter warnings by setting verbosity level later in script.
 
  -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Fri, 15 Jun 2018 13:24:58 +0100
 
