@@ -1,3 +1,4 @@
 usr/sbin/symbiosis-httpd-configure                  etc/cron.hourly/symbiosis-httpd-configure
 usr/sbin/symbiosis-httpd-rotate-logs                etc/cron.daily/symbiosis-httpd-rotate-logs
 usr/share/symbiosis/ssl-hooks.d/symbiosis-httpd     etc/symbiosis/ssl-hooks.d/symbiosis-httpd
+etc/php/7.0/conf.d/symbiosis-httpd.ini              etc/php/7.0/apache2/conf.d/00-symbiosis-httpd.ini
