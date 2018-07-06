@@ -3,6 +3,7 @@ symbiosis-common (2018:0616) stable; urgency=medium
   * Rename deprecated 'File.exists?' call to 'File.exist?' in 'config_file.rb'. 
   * Add the admin user to the www-data group by default. 
   * Fix blank man pages for symbiosis-common scripts.
+  * Fix up symbiosis-skel path
 
  -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Sat, 16 Jun 2018 23:44:10 +0100
 
