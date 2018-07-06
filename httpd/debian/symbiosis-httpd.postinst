@@ -65,6 +65,16 @@ if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
   for mod in headers rewrite cgi ssl vhost_bytemark ; do
     apache2_invoke enmod $mod
   done
+
+  #
+  # Enable Apache PHP7 module by default
+  #
+  if [ -e /etc/apache2/mods-enabled/php5.load ] ; then
+    apache2_invoke dismod php5
+    apache2_invoke enmod php7.0
+    apache2_invoke restart
+  fi
+
 fi
 
 # change "no-stats" file to "stats" file

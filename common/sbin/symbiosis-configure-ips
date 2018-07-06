@@ -4,7 +4,7 @@
 #   symbiosis-configure-ips - Automatically configure IPs for domains
 #
 # SYNOPSIS
-#  symbiosis-configure-ips [ -h | --help ] [-m | --manual]
+#   symbiosis-configure-ips [ -h | --help ] [-m | --manual]
 #       [ -v | --verbose ] <interface>
 #
 # OPTIONS

@@ -1,3 +1,11 @@
+symbiosis-httpd (2018:0620) stable; urgency=medium
+
+  * Enable Apache PHP7 module by default. 
+  * Mask Ruby interpreter warnings by setting verbosity level later in script.
+  * Increase Apache PHP7 'upload_max_filesize' and 'post_max_size' values.
+
+ -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Fri, 15 Jun 2018 13:24:58 +0100
+
 symbiosis-httpd (2018:0619) stable; urgency=medium
 
   * Fix symbiosis-httpd.postinst so that no-stats configuration is correctly

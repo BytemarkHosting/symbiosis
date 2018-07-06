@@ -107,7 +107,8 @@ $FORCE    = false
 $VERBOSE  = false
 help      = false
 manual    = false
-
+# Temporary storage for $VERBOSE, to avoid warnings when using '--verbose' flag. 
+verbosetmp = false
 #
 #  Do we need to reload apache?
 #
@@ -168,7 +169,7 @@ begin
     when '--manual'
       manual = true
     when '--verbose'
-      $VERBOSE = true
+      verbosetmp = true
     when '--force'
       $FORCE = true
     end
@@ -204,6 +205,11 @@ require 'symbiosis/domains/http'
 require 'symbiosis/domain/ssl'
 require 'symbiosis/domain/http'
 require 'symbiosis/config_files/apache'
+
+#
+# Set verbosity here to avoid warnings when using '--verbose' flag. 
+#
+$VERBOSE = verbosetmp
 
 #
 # Set the default paths.
@@ -455,7 +461,10 @@ configurations.each do |config|
       # the next domain.
       #
       if diff_only
+        # Disable $VERBOSE for config.diff call to avoid warnings. 
+        $VERBOSE = false
         puts config.diff(:color)
+        $VERBOSE = verbosetmp
         puts "\tW: Apache has rejected this configuration change" unless config.ok?
         next
       end
