@@ -17,9 +17,12 @@
 	dh $@ --buildsystem=ruby --with ruby --with-systemd
 
 override_dh_installinit:
-	dh_installinit
-	dh_installinit symbiosis-skel.service
-	dh_installinit symbiosis-skel.path
+	# This service is called by symbiosis-skel.path, so no need to do
+	# anything other than install it.
+	dh_installinit --no-start --no-scripts --name symbiosis-skel
+	# GROSS HACK.  dh_installinit doesn't seem to support systemd units
+	# other than service, so install it directly.
+	dh_install debian/symbiosis-skel.path lib/systemd/system/
 	dh_systemd_enable symbiosis-skel.path
 	dh_systemd_start symbiosis-skel.path
 
