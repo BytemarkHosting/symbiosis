@@ -1,3 +1,9 @@
+symbiosis-httpd (2018:0709) stable; urgency=medium
+
+  * Allow unrestricted/unredirected access to /.well-known/acme-challenge
+
+ -- Paul Cammish <paul.cammish@bytemark.co.uk>  Mon, 09 Jul 2018 16:05:58 +0100
+ 
 symbiosis-httpd (2018:0620) stable; urgency=medium
 
   * Enable Apache PHP7 module by default. 
