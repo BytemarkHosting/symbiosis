@@ -70,9 +70,9 @@ if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
   # Enable Apache PHP7 module by default
   #
   if [ -e /etc/apache2/mods-enabled/php5.load ] ; then
-    apache2_invoke dismod php5
+    rm -f /etc/apache2/mods-enabled/php5.conf
+    rm -f /etc/apache2/mods-enabled/php5.load
     apache2_invoke enmod php7.0
-    apache2_invoke restart
   fi
 
 fi
