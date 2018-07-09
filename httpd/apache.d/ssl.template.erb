@@ -116,6 +116,17 @@
         </LocationMatch>
 
         #
+        # Disable any restrictions or rewrites to /.well-known/acme-challenge
+        # This ensures Let's Encrypt can validate domain ownership.
+        #
+        <Directory <%= htdocs_directory %>/.well-known/acme-challenge/ >
+                Require all granted
+                <IfModule rewrite_module>
+                        RewriteEngine off
+                </IfModule>
+        </Directory>
+        
+        #
         # We need to log the virtual hostname the incoming request was
         # made against, so that the cron-job in /etc/cron.daily may generate
         # statistics for each domain.
@@ -217,6 +228,17 @@
                 Options -Indexes
         </LocationMatch>
 
+        #
+        # Disable any restrictions or rewrites to /.well-known/acme-challenge
+        # This ensures Let's Encrypt can validate domain ownership.
+        #
+        <Directory <%= htdocs_directory %>/.well-known/acme-challenge/ >
+                Require all granted
+                <IfModule rewrite_module>
+                        RewriteEngine off
+                </IfModule>
+        </Directory>
+        
         #
         #  We need to log the virtual hostname the incoming request was
         # made against, so that the cron-job in /etc/cron.daily may generate
