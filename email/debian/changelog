@@ -1,6 +1,7 @@
 symbiosis-email (2018:0615) stable; urgency=medium
 
   * Set 'keep_environment' in Exim config.  
+  * Only restart clamav in postinst when 'antivirus' file present. 
 
  -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Fri, 15 Jun 2018 13:15:08 +0100
 
