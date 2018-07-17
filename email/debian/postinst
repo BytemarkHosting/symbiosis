@@ -147,20 +147,7 @@ done
 #
 #  Only restart clamav if a domain contains an 'antivirus' file
 #
-
-antivirus_enabled=false
-
-for domain in /srv/*; do
-  [ -h "$domain" ] && continue
-  [ ! -d "$domain" ] && continue
-
-  antivirus="$domain/config/antivirus"
-  if [ -e "$antivirus" ] ; then
-    antivirus_enabled=true
-  fi
-done
-
-if [ "$antivirus_enabled" = true ] ; then
+if ( stat /srv/*/config/antivirus > /dev/null 2>&1 ) ; then
   for i in clamav-daemon clamav-freshclam; do
     service $i restart || true
   done
