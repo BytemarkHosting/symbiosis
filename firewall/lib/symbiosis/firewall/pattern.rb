@@ -81,7 +81,7 @@ module Symbiosis
             begin
               ip = IPAddr.new(ip)
             rescue ArgumentError
-              verbose "Failed to parse IP #{ip.inspect} (from #{line.inspect})."
+              puts "Failed to parse IP #{ip.inspect} (from #{line.inspect})." if $VERBOSE
             end
 
             next unless ip.is_a?(IPAddr)
