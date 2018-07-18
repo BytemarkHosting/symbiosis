@@ -139,10 +139,19 @@ fi
 #
 #  Restart all deamons
 #
-for i in exim4 dovecot spamassassin clamav-daemon clamav-freshclam symbiosis-email-dict-proxy symbiosis-email-poppassd; do
+for i in exim4 dovecot spamassassin symbiosis-email-dict-proxy symbiosis-email-poppassd; do
     # spamassassin + clamav-daemon might not be installed.  Wrap the invokation.
     service $i restart || true
 done
+
+#
+#  Only restart clamav if a domain contains an 'antivirus' file
+#
+if ( stat /srv/*/config/antivirus > /dev/null 2>&1 ) ; then
+  for i in clamav-daemon clamav-freshclam; do
+    service $i restart || true
+  done
+fi
 
 #DEBHELPER#
 exit 0
