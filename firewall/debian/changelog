@@ -1,3 +1,9 @@
+symbiosis-firewall (2018:0717) stable; urgency=medium
+
+  * Fixed typo in pattern.rb to prevent erroneous cron emails.
+
+ -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Tue, 17 Jul 2018 08:31:29 +0100
+
 symbiosis-firewall (2017:0901) stable; urgency=medium
 
   * Removed default install of reject-www-data rule.
