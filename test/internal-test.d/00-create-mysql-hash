@@ -4,6 +4,8 @@
 # Hash password "semiconscious malpractice" and store in .mysql.hash file
 #
 
+mkdir -p /etc/first-boot.d
+
 echo "semiconscious malpractice" | ruby -n -rdigest -e \
   'puts Digest::SHA1.hexdigest(Digest::SHA1.digest($_.chomp)).upcase' > \
     /etc/first-boot.d/.mysql.hash
