@@ -47,7 +47,7 @@ fi
 if grep -qx 'password = ' /etc/mysql/debian.cnf && [ "$(mysql -u root -se "select exists(select user from mysql.user where user = 'admin');")" = "0" ] ; then
   echo "I: Adding 'admin'@'localhost' MySQL user"
   if [ -e /etc/first-boot.d/.mysql.hash ]; then
-    mysql -u root -e "grant all privileges on *.* to 'admin'@'localhost' identified by password '*$(cat /etc/first-boot.d/.mysql.hash)' with grant option;"
+    mysql -u root -e "grant all privileges on *.* to 'admin'@'localhost' identified by password '*\$(cat /etc/first-boot.d/.mysql.hash)' with grant option;"
   else
     read -p "Enter a password for the admin@localhost MySQL user (To be used with phpMyAdmin): " password
     mysql -u root -e "grant all privileges on *.* to 'admin'@'localhost' identified by '$password' with grant option;"
