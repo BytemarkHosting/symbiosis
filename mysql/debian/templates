@@ -1,0 +1,3 @@
+Template: symbiosis-mysql/admin_password
+Type: password
+Description: Enter a password for the admin@localhost MySQL user (for phpMyAdmin access). 
