@@ -1,3 +1,6 @@
 Template: symbiosis-mysql/admin_password
 Type: password
-Description: Enter a password for the admin@localhost MySQL user (for phpMyAdmin access). 
+Description: Enter a password for the 'admin@localhost' MySQL user:
+ MariaDB enforces Unix socket authentication by default, which is incompatible with phpMyAdmin.
+ A new MySQL user will be created, 'admin@localhost', which uses traditional username/password 
+ authentication and is therefore compatible with phpMyAdmin. 
