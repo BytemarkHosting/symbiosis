@@ -2,10 +2,12 @@
 
 . /usr/share/debconf/confmodule
 
-while [ -z "$RET" ] ; do
-  db_input high symbiosis-mysql/admin_password || true
-  db_go
-  db_get symbiosis-mysql/admin_password
-done
+if [ ! -e /etc/first-boot.d/.mysql.hash ] ; then
+  while [ -z "$RET" ] ; do
+    db_input high symbiosis-mysql/admin_password || true
+    db_go
+    db_get symbiosis-mysql/admin_password
+  done
+fi
 
 exit 0
