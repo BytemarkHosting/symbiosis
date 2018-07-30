@@ -47,7 +47,6 @@ name = Symbiosis::Host.primary_backup_space.to_s
 #  If we didn't get a name then exit.
 #
 if name.empty?
-  puts "Failed to determine backup space name.  Not downloading existing backups."
   exit 0
 end
 
