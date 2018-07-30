@@ -2,6 +2,8 @@
 
 set -e
 
+. /usr/share/debconf/confmodule
+
 #
 # Skip, if we are not in "configure" state
 #
@@ -39,6 +41,19 @@ invoke-rc.d mysql restart
 if [ -x /usr/bin/mysql_upgrade ] ; then
   echo "I: Upgrading MySQL"
   /usr/bin/mysql_upgrade --defaults-file=/etc/mysql/debian.cnf || true
+fi
+
+#
+# Add an admin user with user/password authentication for phpmyadmin if one doesn't already exist
+#
+if grep -qx 'password = ' /etc/mysql/debian.cnf && [ "$(mysql -u root -se "select exists(select user from mysql.user where user = 'admin');")" = "0" ] ; then
+  echo "I: Adding 'admin'@'localhost' MySQL user"
+  if [ -e /etc/first-boot.d/.mysql.hash ]; then
+    mysql -u root -e "grant all privileges on *.* to 'admin'@'localhost' identified by password '*$(cat /etc/first-boot.d/.mysql.hash)' with grant option;"
+  else
+    db_get symbiosis-mysql/admin_password
+    mysql -u root -e "grant all privileges on *.* to 'admin'@'localhost' identified by '$RET' with grant option;"
+  fi
 fi
 
 exit 0
