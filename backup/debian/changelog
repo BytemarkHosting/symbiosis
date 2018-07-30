@@ -1,4 +1,4 @@
-symbiosis-backup (2018:0830) stable; urgency=medium
+symbiosis-backup (2018:0730) stable; urgency=medium
 
   * Removed output when not finding deprecated Bytemark backup space.
   * Added jobs to temporarily move lock file when doing space estimation.
