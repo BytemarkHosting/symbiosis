@@ -6,7 +6,7 @@
 #
 
 # Determine the location of the lock file from the default config.
-LOCK="$(grep '^BACKUP_DIR=\|^VOLNAME=' /etc/backup2l.conf | sed 's|.*="||' | tr -d '\n' | sed -e 's|"|/|1' -e 's|"|.lock|')"
+LOCK="$(grep '^BACKUP_DIR=\|^VOLNAME=' /etc/backup2l.conf | sed 's|.*="||' | tr -d '\n' | sed -e 's|"|/|1' -e 's|"||').lock"
 
 # If it exists, then move it out of the way for now.
 if [ -f ${LOCK} ]; then
