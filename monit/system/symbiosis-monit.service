@@ -1,8 +1,6 @@
 [Unit]
 Description=Symbiosis monitor
-OnFailure=symbiosis-monit-failure-email.service
 
 [Service]
 Type=simple
-ExecStartPre=/bin/sh -c 'journalctl -o cat -n 0 -u %n --show-cursor | cut -f3 -d" " | sudo -u nobody tee /var/tmp/symbiosis-monit.cursor >/dev/null'
 ExecStart=/usr/sbin/symbiosis-monit -t email /etc/symbiosis/monit.d
