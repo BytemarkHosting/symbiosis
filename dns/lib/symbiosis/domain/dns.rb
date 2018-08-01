@@ -79,7 +79,7 @@ module Symbiosis
 
       return nil unless raw_dmarc
 
-      return 'v=DMARC1; p=quarantine; sp=none' if true == raw_dmarc
+      return 'v=DMARC1; p=none; sp=none; pct=0' if true == raw_dmarc
 
       #
       # Make sure we're not matching against things other than strings.
