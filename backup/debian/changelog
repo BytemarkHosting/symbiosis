@@ -1,3 +1,10 @@
+symbiosis-backup (2018:0730) stable; urgency=medium
+
+  * Removed output when not finding deprecated Bytemark backup space.
+  * Added jobs to temporarily move lock file when doing space estimation.
+
+ -- Paul Cammish <paul.cammish@bytemark.co.uk>  Mon, 30 Jul 2018 09:40:38 +0100
+
 symbiosis-backup (2017:0818) stable; urgency=medium
 
   * Fixed typo in output.

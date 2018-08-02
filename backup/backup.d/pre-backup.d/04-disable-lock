@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Disables the backup2l lock file introduced in 1.6 as we're about to run
+#  backup2l a second time (as a dry-run) to determine the amount of disk
+#  space we're likely to use for the next backup.
+#
+
+# Determine the location of the lock file from the default config.
+LOCK="$(grep '^BACKUP_DIR=\|^VOLNAME=' /etc/backup2l.conf | sed 's|.*="||' | tr -d '\n' | sed -e 's|"|/|1' -e 's|"||').lock"
+
+# If it exists, then move it out of the way for now.
+if [ -f ${LOCK} ]; then
+  mv -f ${LOCK} ${LOCK}_disabled
+fi
