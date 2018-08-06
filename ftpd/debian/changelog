@@ -1,4 +1,4 @@
-symbiosis-ftpd (2018:0618) stable; urgency=medium
+symbiosis-ftpd (2018:0806) stable; urgency=medium
 
   * Re-impliments enforced TLS encryption to comply with best practices.
 
