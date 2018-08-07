@@ -1,0 +1,7 @@
+[Unit]
+Description=Notify by email about symbiosis-monit failure
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/symbiosis-monit-failure-email
+

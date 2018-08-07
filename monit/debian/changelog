@@ -1,7 +1,6 @@
 symbiosis-monit (2018:0802) stable; urgency=medium
 
-  * Remove symbiosis-monit-failure-email to email only on test failures
-    instead of the monit service itself.  
+  * No longer emails on temporary failure of symbiosis-monit service itself.   
 
  -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Thu, 02 Aug 2018 13:03:11 +0100
 

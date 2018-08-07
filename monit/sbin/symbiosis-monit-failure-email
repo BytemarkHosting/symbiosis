@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+args="--since=today"
+[ -e "/var/tmp/symbiosis-monit.cursor" ] && args="--after-cursor=$(</var/tmp/symbiosis-monit.cursor)"
+
+journalctl -b0 $args -o cat -u "symbiosis-monit.service" | mail -s "Symbiosis monitor detected service failure" root
+
