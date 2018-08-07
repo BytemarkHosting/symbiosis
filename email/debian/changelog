@@ -1,3 +1,7 @@
+symbiosis-email (2018:0807) stable; urgency=medium
+
+  * enable SNI in Exim to improve user account configuration experience
+
 symbiosis-email (2018:0615) stable; urgency=medium
 
   * Set 'keep_environment' in Exim config.  
