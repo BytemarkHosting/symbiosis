@@ -16,8 +16,15 @@ tls_advertise_hosts = *
 # need the first setting, or in separate files, in which case you need both
 # options.
 
-tls_certificate = /etc/ssl/ssl.combined
-tls_privatekey  = /etc/ssl/ssl.combined
+# Use the domain certificate, if there's an SNI domain, and the certificate exists
+# otherwise use the default certificate
+tls_certificate  = ${if and {\
+                                { eq { ${domain:foo@$tls_in_sni}} {$tls_in_sni} }\
+                                { exists{/srv/$tls_in_sni/config/ssl/current/ssl.combined} }\
+                            }\
+                        {/srv/$tls_in_sni/config/ssl/current/ssl.combined}\
+                        {/etc/ssl/ssl.combined}\
+                     }
 
 # In order to support roaming users who wish to send email from anywhere,
 # you may want to make Exim listen on other ports as well as port 25, in
