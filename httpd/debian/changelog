@@ -1,3 +1,10 @@
+symbiosis-httpd (2015:1114) stable; urgency=medium
+
+  * Backported performance fix from Stretch build in the event that the optional
+    symbiosis-httpd-logger package is installed.
+
+ -- Paul Cammish <paul.cammish@bytemark.co.uk>  Thu, 09 Aug 2018 15:13:21 +0100
+
 symbiosis-httpd (2015:1113) stable; urgency=medium
 
   * Removed symbiosis-common as a build-dep.
