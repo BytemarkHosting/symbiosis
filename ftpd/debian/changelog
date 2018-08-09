@@ -1,3 +1,9 @@
+symbiosis-ftpd (2018:0806) stable; urgency=medium
+
+  * Re-impliments enforced TLS encryption to comply with best practices.
+
+ -- Paul Cammish <paul.cammish@bytemark.co.uk>  Mon, 06 Aug 2018 10:31:03 +0100
+
 symbiosis-ftpd (2018:0618) stable; urgency=medium
 
   * Revert previous commits, #2b86bfe2 and #c45d9e59, to allow TLS and normal
