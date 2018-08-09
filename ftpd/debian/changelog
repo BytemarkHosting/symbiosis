@@ -1,8 +1,8 @@
-symbiosis-ftpd (2018:0806) stable; urgency=medium
+symbiosis-ftpd (2018:0809) stable; urgency=medium
 
   * Re-impliments enforced TLS encryption to comply with best practices.
 
- -- Paul Cammish <paul.cammish@bytemark.co.uk>  Mon, 06 Aug 2018 10:31:03 +0100
+ -- Paul Cammish <paul.cammish@bytemark.co.uk>  Thu, 09 Aug 2018 13:46:03 +0100
 
 symbiosis-ftpd (2018:0618) stable; urgency=medium
 

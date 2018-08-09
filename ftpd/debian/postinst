@@ -52,9 +52,9 @@ fi
 
 if [ -e /etc/ssl/private/pure-ftpd.pem ] ; then
   #
-  #  TLS should be enabled if we did the linking.
+  #  TLS should be enforced if we did the linking.
   #
-  echo '1' > /etc/pure-ftpd/conf/TLS
+  echo '2' > /etc/pure-ftpd/conf/TLS
 
   #
   # Set the TLS cipher suites
