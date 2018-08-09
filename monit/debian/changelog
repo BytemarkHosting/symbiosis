@@ -1,3 +1,9 @@
+symbiosis-monit (2018:0802) stable; urgency=medium
+
+  * No longer emails on temporary failure of symbiosis-monit service itself.   
+
+ -- Andrew Ladlow <andrew.ladlow@bytemark.co.uk>  Thu, 02 Aug 2018 13:03:11 +0100
+
 symbiosis-monit (2017:0907) stable; urgency=medium
 
   * Remove old cron.d script in favour of systemd timers.
