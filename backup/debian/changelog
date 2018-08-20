@@ -1,4 +1,10 @@
-symbiosis-backup (2018:0730) stable; urgency=medium
+symbiosis-backup (2018:0831) stable; urgency=medium
+
+  * Prevented *.lock from being synced to backup space.
+
+ -- Paul Cammish <paul.cammish@bytemark.co.uk>  Mon, 20 Aug 2018 12:08:00 +0100
+
+symbiosis-backup (2018:0830) stable; urgency=medium
 
   * Removed output when not finding deprecated Bytemark backup space.
   * Added jobs to temporarily move lock file when doing space estimation.
