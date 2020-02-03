@@ -130,8 +130,7 @@ publish:
   stage: publish
   variables:
     RSYNC_HOSTNAME: repo.bytemark.co.uk
-  tags:
-    - shell
+    image: $CI_REGISTRY/docker-images/layers:stretch-publish
   script:
     - publish
 
