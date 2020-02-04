@@ -17,18 +17,19 @@ module Symbiosis
 
     class LetsEncrypt < Symbiosis::SSL::SelfSigned
 
-      ENDPOINT = "https://acme-v01.api.letsencrypt.org/directory"
+      ENDPOINT = "https://acme-v02.api.letsencrypt.org/directory"
 
-      def initialize(domain, directory = nil)
+      def initialize(domain, endpoint = nil)
         super
         @config = {:email => nil, :endpoint => nil, :rsa_key_size => nil, :docroot => nil, :account_key => nil}
+        @verified_names = {};
       end
 
       #
       # Returns the client instance.
       #
       def client
-        @client ||= Acme::Client.new(private_key: self.account_key, endpoint: self.endpoint)
+        @client ||= Acme::Client.new(private_key: self.account_key, directory: self.endpoint)
       end
 
       #
@@ -100,12 +101,9 @@ module Symbiosis
         #
         # Send the key to the server.
         #
-        registration = do_with_nonce_debounce{ self.client.register(contact: 'mailto:'+self.email) }
-
-        #
-        # Should probably check we accept the terms.
-        #
-        do_with_nonce_debounce { registration.agree_terms }
+        registration = self.client.new_account(contact: 'mailto:'+self.email, terms_of_service_agreed: true)
+        puts "\tCreated new account with email address: "+self.email if $VERBOSE
+        puts "KeyID is: "+registration.kid if $DEBUG
 
         return true
       end
@@ -115,9 +113,28 @@ module Symbiosis
       # request.
       #
       def registered?
-        do_with_nonce_debounce{ self.client.authorize(domain: self.domain.name) }
+        puts "checking registration for #{self.domain.name}," if $DEBUG
+
+        kid = client.kid
+
+        puts "checking for key" if $DEBUG
+        puts "client.kid is #{kid}" if $DEBUG
+
+        order = self.client.new_order(identifiers: self.domain.name)
+        authorisation = order.authorizations.first
+        challenge = authorisation.http
+
+        #do_with_nonce_debounce{ self.client.authorization(url: self.domain.name) }
+        puts 'authorized' if $DEBUG
         return true
       rescue Acme::Client::Error::Unauthorized
+        puts 'not authorised' if $DEBUG
+        return false
+      rescue Acme::Client::Error::RejectedIdentifier
+        puts 'authorized, but invalid name?' if $DEBUG
+        return false
+      rescue Acme::Client::Error::AccountDoesNotExist
+        puts 'account does not exist' if $DEBUG
         return false
       end
 
@@ -125,11 +142,16 @@ module Symbiosis
       # This does the authorization.  Returns true if the verification succeeds.
       #
       def verify_name(name)
+        return @verified_names[name] if @verified_names.include?(name)
+
         #
         # Set up the authorisation for the http01 challenge
         #
-        authorisation = do_with_nonce_debounce{ self.client.authorize(domain: name) }
-        challenge     = do_with_nonce_debounce{ authorisation.http01 }
+
+        order = self.client.new_order(identifiers: name)
+        authorisation = order.authorizations.first
+        challenge = authorisation.http
+
         challenge_directory = File.join(self.docroot, File.dirname(challenge.filename))
 
         mkdir_p(challenge_directory)
@@ -138,13 +160,14 @@ module Symbiosis
 
         vs = nil # Record the verify status
 
-        if do_with_nonce_debounce{ challenge.request_verification }
+        if do_with_nonce_debounce{ challenge.request_validation }
           puts "\tRequesting verification for #{name} from #{endpoint}" if $VERBOSE
 
           60.times do
-            vs = do_with_nonce_debounce { challenge.verify_status }
+            vs = do_with_nonce_debounce { challenge.status }
             break unless vs == "pending"
             sleep(1)
+            challenge.reload
           end
         end
 
@@ -152,26 +175,50 @@ module Symbiosis
 
         if vs == "valid"
           puts "\tSuccessfully verified #{name}" if $VERBOSE
-          return true
+          @verified_names[name] = true
         else
           if $VERBOSE
             puts "\t!! Unable to verify #{name} (status: #{vs})"
             puts "\t!! Check http://#{name}/#{challenge.filename} works."
           end
-          return false
+          @verified_names[name] = false
         end
+        return @verified_names[name]
       end
 
       def acme_certificate(request = self.request)
-        return @certificate if @certificate.is_a?(Acme::Client::Certificate)
+        return @certificate if not @certificate.nil?
 
         raise ArgumentError, "Invalid certificate request" unless request.is_a?(OpenSSL::X509::Request)
 
-        acme_certificate = do_with_nonce_debounce{ client.new_certificate(request) }
+        puts "csr=#{request}" if $DEBUG
 
-        if acme_certificate.is_a?(Acme::Client::Certificate)
+#        acme_certificate = do_with_nonce_debounce{ client.new_certificate(request) }
+
+        names = @names.select { |name| self.verify_name(name) }
+        puts "names=#{names.join(', ')}" if $DEBUG
+        order = client.new_order(identifiers: names)
+        authorization = order.authorizations.first
+        challenge = authorization.http
+
+        order.finalize(csr: request)
+
+        while order.status == 'processing'
+          sleep(1)
+          puts '.'
+          challenge.reload
+        end
+
+        acme_certificate = order.certificate
+
+        puts "certificate=#{acme_certificate}" if $DEBUG
+
+        #if acme_certificate.is_a?(OpenSSL::X509::Certificate)
+        if acme_certificate.include? "-----BEGIN CERTIFICATE-----"
+          puts "That looks like a real cert!" if $DEBUG
           @certificate = acme_certificate
         else
+          puts "That's aparently not a cert?" if $DEBUG
           @certificate = nil
         end
 
@@ -182,8 +229,10 @@ module Symbiosis
       # Returns the signed X509 certificate for the request.
       #
       def certificate(request = self.request)
-        if self.acme_certificate(request).is_a?(Acme::Client::Certificate)
-          self.acme_certificate.x509
+#       if self.acme_certificate(request).is_a?(Acme::Client::Certificate)
+        if self.acme_certificate(request).include? "-----BEGIN CERTIFICATE-----"
+          #self.acme_certificate(request)
+          OpenSSL::X509::Certificate.new(self.acme_certificate(request).split("\n\n")[0])
         else
           nil
         end
@@ -193,8 +242,10 @@ module Symbiosis
       # Returns the CA bundle as an array
       #
       def bundle(request = self.request)
-        if self.acme_certificate(request).is_a?(Acme::Client::Certificate)
-          self.acme_certificate.x509_chain
+#       if self.acme_certificate(request).is_a?(Acme::Client::Certificate)
+        if self.acme_certificate(request).include? "-----BEGIN CERTIFICATE-----"
+#          self.acme_certificate.x509_chain
+          self.acme_certificate(request).split("\n\n")[1..-1].map { |cert| OpenSSL::X509::Certificate.new(cert) }
         else
           []
         end
