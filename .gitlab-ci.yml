@@ -97,7 +97,7 @@ test:xmpp:
   <<: *test
 
 .package: &package
-  image: $CI_REGISTRY/docker-images/layers:stretch-deb
+  image: $CI_REGISTRY/docker-images/layers:jessie-deb
   stage: package
   script:
     - cp symbiosis.list /etc/apt/sources.list.d/
