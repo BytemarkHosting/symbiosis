@@ -19,14 +19,14 @@ stages:
     - cd $PACKAGE
     - "[ ! -f Makefile ] || make test"
 
-codeclimate:
-  stage: test
-  tags: [ docker-socket ]
-  image: $CI_REGISTRY/docker-images/layers:stretch-codeclimate
-  script:
-    - codeclimate analyze -f json > codeclimate.json
-  artifacts:
-    paths: [ codeclimate.json ]
+#codeclimate:
+#  stage: test
+#  tags: [ docker-socket ]
+#  image: $CI_REGISTRY/docker-images/layers:stretch-codeclimate
+#  script:
+#    - codeclimate analyze -f json > codeclimate.json
+#  artifacts:
+#    paths: [ codeclimate.json ]
 
 test:backup:
   <<: *test
@@ -97,18 +97,15 @@ test:xmpp:
   <<: *test
 
 .package: &package
+  image: $CI_REGISTRY/docker-images/layers:jessie-deb
   stage: package
   script:
+    - cp symbiosis.list /etc/apt/sources.list.d/
+    - apt-get update
     - export PACKAGE=${CI_BUILD_NAME##package:}
-    - cp -v symbiosis.list $PACKAGE/
-    - pushd $PACKAGE ; sautobuild --distribution jessie --sources-list symbiosis.list --apt-key ../symbiosis.key $PWD ; popd
-    - mkdir -p pkg/
-    # These files are all optional
-    - 'mv -v *.{dsc,build,buildinfo,changes,tar.*} pkg/ 2>/dev/null || true'
-    # We always want a deb though.
-    - mv -v *.deb pkg/
-  tags:
-    - shell
+    - echo "$CI_BUILD_NAME" -  "$PACKAGE" - "${CI_BUILD_NAME##package:}"
+    - cd $PACKAGE
+    - package
   artifacts:
     paths:
       - pkg/
@@ -152,8 +149,7 @@ publish:
   stage: publish
   variables:
     RSYNC_HOSTNAME: repo.bytemark.co.uk
-  tags:
-    - shell
+  image: $CI_REGISTRY/docker-images/layers:stretch-publish
   script:
     - publish
 
