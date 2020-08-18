@@ -1,3 +1,12 @@
+# Updated in 2019 for Sympl (https://sympl.host) to support ACMEv02 Let's Encrypt API
+#   Sympl is a fork of Symbiosis under active development, with support for current Debian.
+#   The Sympl Project is supported by Mythic Beasts (mythic-beasts.com)
+#   Source: https://gitlab.mythic-beasts.com/sympl/sympl/-/blob/buster/core/lib/symbiosis/ssl/letsencrypt.rb
+#
+# This version back-ported to Symbiosis in Feb 2020.
+#
+# Original version copyright 2016 Bytemark Hosting.
+
 require 'symbiosis/ssl'
 require 'symbiosis/ssl/selfsigned'
 require 'symbiosis/host'
