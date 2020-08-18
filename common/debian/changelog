@@ -1,3 +1,9 @@
+symbiosis-common (2020:0818) stable; urgency=medium
+
+  * Fixed missing attribution for included code from other OSS projects.
+
+ -- Paul Cammish <kelduum@mythic-beasts.com>  Tue, 18 Aug 2020 11:18:34 +0100
+
 symbiosis-common (2020:0203) stable; urgency=medium
 
   * Implement Acme V2 Fix for Let's Encrypt
